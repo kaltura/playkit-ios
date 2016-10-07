@@ -14,6 +14,7 @@
 		FBA36D411D70DE55002F8D6C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBA36D401D70DE55002F8D6C /* Assets.xcassets */; };
 		FBA36D441D70DE55002F8D6C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FBA36D421D70DE55002F8D6C /* LaunchScreen.storyboard */; };
 		FBA36D4A1D72BC81002F8D6C /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA36D491D72BC81002F8D6C /* Player.swift */; };
+		FBD9793E1DA842EA00A69480 /* PlayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA36D281D70DDF8002F8D6C /* PlayKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBD9793E1DA842EA00A69480 /* PlayKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
