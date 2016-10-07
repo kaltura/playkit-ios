@@ -20,6 +20,9 @@ protocol Player {
 }
 
 public class PlayerConfig {
+    public init() {
+        
+    }
     public var mediaEntry : MediaEntry?
     public var position : Int64 = 0
     public var subtitleLanguage : String?

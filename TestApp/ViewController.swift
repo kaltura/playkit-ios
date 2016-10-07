@@ -14,14 +14,6 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        let kaltura = KalturaMediaEntryProvider.init(server: "https://cdnapisec.kaltura.com", partnerId: "1851571")
-        
-        let config = PlayerConfig()
-        config.mediaEntry = kaltura.mediaEntry("0_pl5lbfo0")
-        
-        let player = Player()
-        player.apply(all: config)
-
     }
 
     override func didReceiveMemoryWarning() {
