@@ -8,24 +8,31 @@
 
 import UIKit
 
-protocol Player {
+
+public protocol Player {
     func load(_ config: PlayerConfig) -> Bool    
     func apply(_ config: PlayerConfig) -> Bool
+    func play()
+    func pause()
     
     var view: UIView { get }
     
-    var position: Int64 { get }
-    var shouldPlay: Bool { get }
+    var position: Int64 { get set }
+    
     func release()
 }
 
-public class PlayerConfig {
-    public init() {
-        
+
+public class PlayerFactory {
+    public static func createPlayer() -> Player {
+        return PlayerImp();
     }
-    public var mediaEntry : MediaEntry?
-    public var position : Int64 = 0
-    public var subtitleLanguage : String?
-    public var audioLanguage : String?
+
+    public static func createPlayer(config: PlayerConfig) -> Player? {
+        let player = PlayerImp()
+        
+        return player.load(config) ? player : nil
+    }
 }
+
 

@@ -16,6 +16,8 @@
 		FBA36D4A1D72BC81002F8D6C /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA36D491D72BC81002F8D6C /* Player.swift */; };
 		FBD9793E1DA842EA00A69480 /* PlayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA36D281D70DDF8002F8D6C /* PlayKit.framework */; };
 		FBD979401DA8531E00A69480 /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9793F1DA8531E00A69480 /* MediaEntry.swift */; };
+		FBD979421DAA29CD00A69480 /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979411DAA29CD00A69480 /* PlayerConfig.swift */; };
+		FBD979441DAA29DD00A69480 /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979431DAA29DD00A69480 /* PlayerImp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +33,8 @@
 		FBA36D451D70DE55002F8D6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FBA36D491D72BC81002F8D6C /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		FBD9793F1DA8531E00A69480 /* MediaEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
+		FBD979411DAA29CD00A69480 /* PlayerConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
+		FBD979431DAA29DD00A69480 /* PlayerImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerImp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +81,8 @@
 				FBA36D2B1D70DDF8002F8D6C /* PlayKit.h */,
 				FBA36D2C1D70DDF8002F8D6C /* Info.plist */,
 				FBA36D491D72BC81002F8D6C /* Player.swift */,
+				FBD979411DAA29CD00A69480 /* PlayerConfig.swift */,
+				FBD979431DAA29DD00A69480 /* PlayerImp.swift */,
 			);
 			path = PlayKit;
 			sourceTree = "<group>";
@@ -211,6 +217,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBA36D4A1D72BC81002F8D6C /* Player.swift in Sources */,
+				FBD979441DAA29DD00A69480 /* PlayerImp.swift in Sources */,
+				FBD979421DAA29CD00A69480 /* PlayerConfig.swift in Sources */,
 				FBD979401DA8531E00A69480 /* MediaEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -36,3 +36,16 @@ open class DRMData {
 public class FairPlayDRMData: DRMData {
     var fpsCertificate: Data?    
 }
+
+public protocol MediaEntryProvider {
+    var mediaEntry: MediaEntry? { get }
+}
+
+public class MockMediaEntryProvider : MediaEntryProvider {
+    public var mediaEntry: MediaEntry?
+
+    public init(_ mockId: String) {
+        mediaEntry = MediaEntry(mockId)
+    }
+    
+}

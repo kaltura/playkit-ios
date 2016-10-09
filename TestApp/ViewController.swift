@@ -14,6 +14,22 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        let player = PlayerFactory.createPlayer()
+        let provider = MockMediaEntryProvider("mock1")
+        
+        guard let entry = provider.mediaEntry else {
+            fatalError("no entry")
+        }
+        
+        let config = PlayerConfig(mediaEntry: entry)
+        config.position = 3*1000    // skip 3 seconds
+        config.playWhenReady = true
+        
+        self.view.addSubview(player.view)
+        
+        if !player.load(config) {
+            print("load failed")
+        }
     }
 
     override func didReceiveMemoryWarning() {
