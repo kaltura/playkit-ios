@@ -23,13 +23,15 @@ class ViewController: UIViewController {
         
         let config = PlayerConfig(mediaEntry: entry)
         config.position = 3*1000    // skip 3 seconds
-        config.playWhenReady = true
+        config.shouldAutoPlay = true
         
         self.view.addSubview(player.view)
         
         if !player.load(config) {
             print("load failed")
         }
+        
+        player.pause()
     }
 
     override func didReceiveMemoryWarning() {

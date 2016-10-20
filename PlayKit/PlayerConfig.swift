@@ -15,9 +15,7 @@ public class PlayerConfig {
     }
     public var mediaEntry : MediaEntry?
     public var position : Int64 = 0
-    public var playWhenReady = false
-    public var subtitleLanguage : String?
-    public var audioLanguage : String?
+    public var shouldAutoPlay = false
 }
 
 
