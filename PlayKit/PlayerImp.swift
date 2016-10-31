@@ -84,4 +84,7 @@ class PlayerImp : Player {
         return false
     }
     
+    func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver) {
+        // TODO: save observer
+    }
 }

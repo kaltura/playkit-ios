@@ -64,4 +64,16 @@ public protocol Player {
      Release player resources.
     */
     func release()
+    
+    func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver)
 }
+
+public protocol TimeObserver {
+    func timeReached(player: Player, origin: Origin, offset: TimeInterval)
+}
+
+public enum Origin {
+    case start
+    case end
+}
+

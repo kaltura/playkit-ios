@@ -8,11 +8,13 @@
 
 import UIKit
 
-public class SamplePlugin: Plugin {
+public class SamplePlugin: Plugin, TimeObserver {
     public static let pluginName = "Sample"
 
     public required init() {
         print("Initialized")
+        
+        
     }
     
     
@@ -23,5 +25,11 @@ public class SamplePlugin: Plugin {
 
     public func load(player: Player, config: PlayerConfig) {
         print("load", player, config)
+        
+        player.addBoundaryTimeObserver(origin: .start, offset: 0, wait: true, observer: self)
+    }
+    
+    public func timeReached(player: Player, origin: Origin, offset: TimeInterval) {
+        print("timeReached", player, origin, offset)
     }
 }
