@@ -19,6 +19,8 @@
 		FBD979421DAA29CD00A69480 /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979411DAA29CD00A69480 /* PlayerConfig.swift */; };
 		FBD979441DAA29DD00A69480 /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979431DAA29DD00A69480 /* PlayerImp.swift */; };
 		FBE9960A1DC756B60020D5E1 /* PlayKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE996091DC756B60020D5E1 /* PlayKitManager.swift */; };
+		FBE9960C1DC757CA0020D5E1 /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE9960B1DC757CA0020D5E1 /* Plugin.swift */; };
+		FBE9960E1DC75CA60020D5E1 /* SamplePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE9960D1DC75CA60020D5E1 /* SamplePlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +39,8 @@
 		FBD979411DAA29CD00A69480 /* PlayerConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
 		FBD979431DAA29DD00A69480 /* PlayerImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerImp.swift; sourceTree = "<group>"; };
 		FBE996091DC756B60020D5E1 /* PlayKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayKitManager.swift; sourceTree = "<group>"; };
+		FBE9960B1DC757CA0020D5E1 /* Plugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plugin.swift; sourceTree = "<group>"; };
+		FBE9960D1DC75CA60020D5E1 /* SamplePlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SamplePlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,8 +87,10 @@
 				FBA36D2B1D70DDF8002F8D6C /* PlayKit.h */,
 				FBA36D2C1D70DDF8002F8D6C /* Info.plist */,
 				FBA36D491D72BC81002F8D6C /* Player.swift */,
+				FBE9960B1DC757CA0020D5E1 /* Plugin.swift */,
 				FBE996091DC756B60020D5E1 /* PlayKitManager.swift */,
 				FBD979411DAA29CD00A69480 /* PlayerConfig.swift */,
+				FBE9960D1DC75CA60020D5E1 /* SamplePlugin.swift */,
 				FBD979431DAA29DD00A69480 /* PlayerImp.swift */,
 			);
 			path = PlayKit;
@@ -219,6 +225,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBE9960C1DC757CA0020D5E1 /* Plugin.swift in Sources */,
+				FBE9960E1DC75CA60020D5E1 /* SamplePlugin.swift in Sources */,
 				FBA36D4A1D72BC81002F8D6C /* Player.swift in Sources */,
 				FBE9960A1DC756B60020D5E1 /* PlayKitManager.swift in Sources */,
 				FBD979441DAA29DD00A69480 /* PlayerImp.swift in Sources */,

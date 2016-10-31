@@ -54,6 +54,7 @@ class PlayerImp : Player {
     }
     
     lazy var view: UIView = {
+        
         // TODO: return the view
         return UIView()
     }()
@@ -62,6 +63,9 @@ class PlayerImp : Player {
     public func load(_ config: PlayerConfig) -> Bool {
         // TODO: prepare, set fields, etc
         // load the player
+
+        PlayKitManager.createPlugin(name: "Sample")?.load(player: self, config: config)
+        
         return false
     }
     
