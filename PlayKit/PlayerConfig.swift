@@ -10,12 +10,9 @@ import Foundation
 
 public class PlayerConfig {
     public init() {}
-    public init(mediaEntry: MediaEntry) {
-        self.mediaEntry = mediaEntry
-    }
     public var mediaEntry : MediaEntry?
-    public var position : Int64 = 0
-    public var shouldAutoPlay = false
+    public var startTime : TimeInterval = 0
+    public var autoPlay = false
 }
 
 

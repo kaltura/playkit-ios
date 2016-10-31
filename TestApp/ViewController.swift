@@ -21,9 +21,10 @@ class ViewController: UIViewController {
             fatalError("no entry")
         }
         
-        let config = PlayerConfig(mediaEntry: entry)
-        config.position = 3*1000    // skip 3 seconds
-        config.shouldAutoPlay = true
+        let config = PlayerConfig()
+        config.mediaEntry = entry
+        config.startTime = 3.0    // skip 3 seconds
+        config.autoPlay = true
         
         self.view.addSubview(player.view)
         

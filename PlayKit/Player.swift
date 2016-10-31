@@ -11,7 +11,7 @@ import UIKit
 
 public protocol Player {
     /**
-     Prepare for playing an entry. If `config.shouldAutoPlay` is true, the entry will automatically
+     Prepare for playing an entry. If `config.autoPlay` is true, the entry will automatically
      play when it's ready.
      */
     func load(_ config: PlayerConfig) -> Bool
@@ -26,7 +26,7 @@ public protocol Player {
      If set to true after entry is loaded, this will start playback.
      If set to false while entry is playing, this will pause playback.
      */
-    var shouldPlayWhenReady: Bool { get set }
+    var autoPlay: Bool { get set }
     
     /**
      Convenience method for setting shouldPlayWhenReady to true.
@@ -58,19 +58,10 @@ public protocol Player {
     /**
      Get/set the current player position.
     */
-    var position: TimeInterval { get set }
+    var currentTime: TimeInterval { get set }
     
     /**
      Release player resources.
     */
     func release()
 }
-
-
-public class PlayerFactory {
-    public static func createPlayer() -> Player {
-        return PlayerImp();
-    }
-}
-
-

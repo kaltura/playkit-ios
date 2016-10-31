@@ -12,11 +12,11 @@ import AVFoundation
 
 class PlayerImp : Player {
     
-    public var shouldPlayWhenReady: Bool = false {
+    public var autoPlay: Bool = false {
         
         didSet {
-            print("shouldPlayWhenReady has changed from \(oldValue) to \(shouldPlayWhenReady)")
-            if shouldPlayWhenReady {
+            print("autoPlay has changed from \(oldValue) to \(autoPlay)")
+            if autoPlay {
                 // TODO: play
             } else {
                 // TODO: pause
@@ -25,11 +25,11 @@ class PlayerImp : Player {
     }
     
     public func pause() {
-        shouldPlayWhenReady = false
+        autoPlay = false
     }
 
     public func play() {
-        shouldPlayWhenReady = true
+        autoPlay = true
     }
 
     
@@ -39,9 +39,9 @@ class PlayerImp : Player {
     
     
     
-    public var position: TimeInterval {
+    public var currentTime: TimeInterval {
         set {
-            // TODO: set position
+            // TODO: set current time
         }
         get {
             // TODO: return player's current time
