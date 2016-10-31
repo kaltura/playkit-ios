@@ -14,7 +14,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        let player = PlayerFactory.createPlayer()
+        let player = PlayKitManager.createPlayer()
         let provider = MockMediaEntryProvider("mock1")
         
         guard let entry = provider.mediaEntry else {

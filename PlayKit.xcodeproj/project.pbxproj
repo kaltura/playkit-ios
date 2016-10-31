@@ -18,6 +18,7 @@
 		FBD979401DA8531E00A69480 /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9793F1DA8531E00A69480 /* MediaEntry.swift */; };
 		FBD979421DAA29CD00A69480 /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979411DAA29CD00A69480 /* PlayerConfig.swift */; };
 		FBD979441DAA29DD00A69480 /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979431DAA29DD00A69480 /* PlayerImp.swift */; };
+		FBE9960A1DC756B60020D5E1 /* PlayKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE996091DC756B60020D5E1 /* PlayKitManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		FBD9793F1DA8531E00A69480 /* MediaEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
 		FBD979411DAA29CD00A69480 /* PlayerConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
 		FBD979431DAA29DD00A69480 /* PlayerImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerImp.swift; sourceTree = "<group>"; };
+		FBE996091DC756B60020D5E1 /* PlayKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayKitManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 				FBA36D2B1D70DDF8002F8D6C /* PlayKit.h */,
 				FBA36D2C1D70DDF8002F8D6C /* Info.plist */,
 				FBA36D491D72BC81002F8D6C /* Player.swift */,
+				FBE996091DC756B60020D5E1 /* PlayKitManager.swift */,
 				FBD979411DAA29CD00A69480 /* PlayerConfig.swift */,
 				FBD979431DAA29DD00A69480 /* PlayerImp.swift */,
 			);
@@ -156,7 +159,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0800;
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = Kaltura;
 				TargetAttributes = {
 					FBA36D271D70DDF8002F8D6C = {
@@ -217,6 +220,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBA36D4A1D72BC81002F8D6C /* Player.swift in Sources */,
+				FBE9960A1DC756B60020D5E1 /* PlayKitManager.swift in Sources */,
 				FBD979441DAA29DD00A69480 /* PlayerImp.swift in Sources */,
 				FBD979421DAA29CD00A69480 /* PlayerConfig.swift in Sources */,
 				FBD979401DA8531E00A69480 /* MediaEntry.swift in Sources */,
@@ -272,6 +276,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -325,6 +330,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
