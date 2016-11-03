@@ -24,9 +24,11 @@ class ViewController: UIViewController {
         }
         
         let config = PlayerConfig()
-        config.mediaEntry = entry
-        config.startTime = 3.0    // skip 3 seconds
-        config.autoPlay = true
+            .set(mediaEntry: entry)
+            .set(autoPlay: true)
+            .set(startTime: 3.0)
+        
+        config.startTime = 4.0
         
         self.view.addSubview(player.view)
         
