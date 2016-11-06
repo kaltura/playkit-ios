@@ -8,13 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FBA36D2D1D70DDF8002F8D6C /* PlayKit.h in Headers */ = {isa = PBXBuildFile; fileRef = FBA36D2B1D70DDF8002F8D6C /* PlayKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FBA36D3A1D70DE55002F8D6C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA36D391D70DE55002F8D6C /* AppDelegate.swift */; };
-		FBA36D3C1D70DE55002F8D6C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA36D3B1D70DE55002F8D6C /* ViewController.swift */; };
-		FBA36D3F1D70DE55002F8D6C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FBA36D3D1D70DE55002F8D6C /* Main.storyboard */; };
-		FBA36D411D70DE55002F8D6C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FBA36D401D70DE55002F8D6C /* Assets.xcassets */; };
-		FBA36D441D70DE55002F8D6C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FBA36D421D70DE55002F8D6C /* LaunchScreen.storyboard */; };
 		FBA36D4A1D72BC81002F8D6C /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA36D491D72BC81002F8D6C /* Player.swift */; };
-		FBD9793E1DA842EA00A69480 /* PlayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBA36D281D70DDF8002F8D6C /* PlayKit.framework */; };
 		FBD979401DA8531E00A69480 /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9793F1DA8531E00A69480 /* MediaEntry.swift */; };
 		FBD979421DAA29CD00A69480 /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979411DAA29CD00A69480 /* PlayerConfig.swift */; };
 		FBD979441DAA29DD00A69480 /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979431DAA29DD00A69480 /* PlayerImp.swift */; };
@@ -27,13 +21,6 @@
 		FBA36D281D70DDF8002F8D6C /* PlayKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PlayKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBA36D2B1D70DDF8002F8D6C /* PlayKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayKit.h; sourceTree = "<group>"; };
 		FBA36D2C1D70DDF8002F8D6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FBA36D371D70DE54002F8D6C /* TestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		FBA36D391D70DE55002F8D6C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		FBA36D3B1D70DE55002F8D6C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		FBA36D3E1D70DE55002F8D6C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		FBA36D401D70DE55002F8D6C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		FBA36D431D70DE55002F8D6C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		FBA36D451D70DE55002F8D6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FBA36D491D72BC81002F8D6C /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		FBD9793F1DA8531E00A69480 /* MediaEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
 		FBD979411DAA29CD00A69480 /* PlayerConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
@@ -51,14 +38,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FBA36D341D70DE54002F8D6C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FBD9793E1DA842EA00A69480 /* PlayKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -66,7 +45,6 @@
 			isa = PBXGroup;
 			children = (
 				FBA36D2A1D70DDF8002F8D6C /* PlayKit */,
-				FBA36D381D70DE55002F8D6C /* TestApp */,
 				FBA36D291D70DDF8002F8D6C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -75,7 +53,6 @@
 			isa = PBXGroup;
 			children = (
 				FBA36D281D70DDF8002F8D6C /* PlayKit.framework */,
-				FBA36D371D70DE54002F8D6C /* TestApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -94,19 +71,6 @@
 				FBD979431DAA29DD00A69480 /* PlayerImp.swift */,
 			);
 			path = PlayKit;
-			sourceTree = "<group>";
-		};
-		FBA36D381D70DE55002F8D6C /* TestApp */ = {
-			isa = PBXGroup;
-			children = (
-				FBA36D391D70DE55002F8D6C /* AppDelegate.swift */,
-				FBA36D3B1D70DE55002F8D6C /* ViewController.swift */,
-				FBA36D3D1D70DE55002F8D6C /* Main.storyboard */,
-				FBA36D401D70DE55002F8D6C /* Assets.xcassets */,
-				FBA36D421D70DE55002F8D6C /* LaunchScreen.storyboard */,
-				FBA36D451D70DE55002F8D6C /* Info.plist */,
-			);
-			path = TestApp;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -141,23 +105,6 @@
 			productReference = FBA36D281D70DDF8002F8D6C /* PlayKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		FBA36D361D70DE54002F8D6C /* TestApp */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = FBA36D461D70DE55002F8D6C /* Build configuration list for PBXNativeTarget "TestApp" */;
-			buildPhases = (
-				FBA36D331D70DE54002F8D6C /* Sources */,
-				FBA36D341D70DE54002F8D6C /* Frameworks */,
-				FBA36D351D70DE54002F8D6C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = TestApp;
-			productName = TestApp;
-			productReference = FBA36D371D70DE54002F8D6C /* TestApp.app */;
-			productType = "com.apple.product-type.application";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -172,11 +119,6 @@
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = X8RDCFJK95;
 						LastSwiftMigration = 0800;
-						ProvisioningStyle = Automatic;
-					};
-					FBA36D361D70DE54002F8D6C = {
-						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = X8RDCFJK95;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -195,7 +137,6 @@
 			projectRoot = "";
 			targets = (
 				FBA36D271D70DDF8002F8D6C /* PlayKit */,
-				FBA36D361D70DE54002F8D6C /* TestApp */,
 			);
 		};
 /* End PBXProject section */
@@ -205,16 +146,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FBA36D351D70DE54002F8D6C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FBA36D441D70DE55002F8D6C /* LaunchScreen.storyboard in Resources */,
-				FBA36D411D70DE55002F8D6C /* Assets.xcassets in Resources */,
-				FBA36D3F1D70DE55002F8D6C /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,35 +166,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FBA36D331D70DE54002F8D6C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FBA36D3C1D70DE55002F8D6C /* ViewController.swift in Sources */,
-				FBA36D3A1D70DE55002F8D6C /* AppDelegate.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		FBA36D3D1D70DE55002F8D6C /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				FBA36D3E1D70DE55002F8D6C /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		FBA36D421D70DE55002F8D6C /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				FBA36D431D70DE55002F8D6C /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		FBA36D2E1D70DDF8002F8D6C /* Debug */ = {
@@ -408,32 +311,6 @@
 			};
 			name = Release;
 		};
-		FBA36D471D70DE55002F8D6C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = X8RDCFJK95;
-				INFOPLIST_FILE = TestApp/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.kaltura.TestApp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
-			};
-			name = Debug;
-		};
-		FBA36D481D70DE55002F8D6C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = X8RDCFJK95;
-				INFOPLIST_FILE = TestApp/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.kaltura.TestApp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -451,15 +328,6 @@
 			buildConfigurations = (
 				FBA36D311D70DDF8002F8D6C /* Debug */,
 				FBA36D321D70DDF8002F8D6C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		FBA36D461D70DE55002F8D6C /* Build configuration list for PBXNativeTarget "TestApp" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				FBA36D471D70DE55002F8D6C /* Debug */,
-				FBA36D481D70DE55002F8D6C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
