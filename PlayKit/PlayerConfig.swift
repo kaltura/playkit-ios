@@ -17,7 +17,7 @@ public class PlayerConfig {
 
     public init() {}
     public init(_ player: Player) {
-        self.player = player
+       // self.player = player
     }
     
     // Builders
