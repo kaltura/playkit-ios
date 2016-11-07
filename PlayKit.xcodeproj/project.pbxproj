@@ -8,24 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		84A208221DD0519300A0154A /* PlayKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A208141DD0519300A0154A /* PlayKit.h */; };
-		84A208231DD0519300A0154A /* PlayKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208191DD0519300A0154A /* PlayKitManager.swift */; };
-		84A208241DD0519300A0154A /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A2081B1DD0519300A0154A /* MediaEntry.swift */; };
-		84A208251DD0519300A0154A /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A2081C1DD0519300A0154A /* Player.swift */; };
-		84A208261DD0519300A0154A /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A2081D1DD0519300A0154A /* PlayerConfig.swift */; };
-		84A208271DD0519300A0154A /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A2081E1DD0519300A0154A /* PlayerImp.swift */; };
-		84A208281DD0519300A0154A /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208201DD0519300A0154A /* Plugin.swift */; };
-		84A208291DD0519300A0154A /* SamplePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208211DD0519300A0154A /* SamplePlugin.swift */; };
+		84A208381DD071C300A0154A /* PlayKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A2082F1DD071C300A0154A /* PlayKitManager.swift */; };
+		84A208391DD071C300A0154A /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208311DD071C300A0154A /* MediaEntry.swift */; };
+		84A2083A1DD071C300A0154A /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208321DD071C300A0154A /* Player.swift */; };
+		84A2083B1DD071C300A0154A /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208331DD071C300A0154A /* PlayerConfig.swift */; };
+		84A2083C1DD071C300A0154A /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208341DD071C300A0154A /* PlayerImp.swift */; };
+		84A2083D1DD071C300A0154A /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208361DD071C300A0154A /* Plugin.swift */; };
+		84A2083E1DD071C300A0154A /* SamplePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208371DD071C300A0154A /* SamplePlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		84A208141DD0519300A0154A /* PlayKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayKit.h; sourceTree = "<group>"; };
-		84A208191DD0519300A0154A /* PlayKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayKitManager.swift; sourceTree = "<group>"; };
-		84A2081B1DD0519300A0154A /* MediaEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
-		84A2081C1DD0519300A0154A /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
-		84A2081D1DD0519300A0154A /* PlayerConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
-		84A2081E1DD0519300A0154A /* PlayerImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerImp.swift; sourceTree = "<group>"; };
-		84A208201DD0519300A0154A /* Plugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plugin.swift; sourceTree = "<group>"; };
-		84A208211DD0519300A0154A /* SamplePlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SamplePlugin.swift; sourceTree = "<group>"; };
+		84A2082F1DD071C300A0154A /* PlayKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayKitManager.swift; sourceTree = "<group>"; };
+		84A208311DD071C300A0154A /* MediaEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
+		84A208321DD071C300A0154A /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		84A208331DD071C300A0154A /* PlayerConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
+		84A208341DD071C300A0154A /* PlayerImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerImp.swift; sourceTree = "<group>"; };
+		84A208361DD071C300A0154A /* Plugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plugin.swift; sourceTree = "<group>"; };
+		84A208371DD071C300A0154A /* SamplePlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SamplePlugin.swift; sourceTree = "<group>"; };
 		FBA36D281D70DDF8002F8D6C /* PlayKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PlayKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBA36D2C1D70DDF8002F8D6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -56,48 +56,37 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
-		84A208161DD0519300A0154A /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				84A2081A1DD0519300A0154A /* Player */,
-				84A208181DD0519300A0154A /* Managers */,
-				84A2081F1DD0519300A0154A /* Plugins */,
-				84A208171DD0519300A0154A /* Addons */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		84A208171DD0519300A0154A /* Addons */ = {
+		84A2082D1DD071C300A0154A /* Addons */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = Addons;
 			sourceTree = "<group>";
 		};
-		84A208181DD0519300A0154A /* Managers */ = {
+		84A2082E1DD071C300A0154A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				84A208191DD0519300A0154A /* PlayKitManager.swift */,
+				84A2082F1DD071C300A0154A /* PlayKitManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
 		};
-		84A2081A1DD0519300A0154A /* Player */ = {
+		84A208301DD071C300A0154A /* Player */ = {
 			isa = PBXGroup;
 			children = (
-				84A2081B1DD0519300A0154A /* MediaEntry.swift */,
-				84A2081C1DD0519300A0154A /* Player.swift */,
-				84A2081D1DD0519300A0154A /* PlayerConfig.swift */,
-				84A2081E1DD0519300A0154A /* PlayerImp.swift */,
+				84A208311DD071C300A0154A /* MediaEntry.swift */,
+				84A208321DD071C300A0154A /* Player.swift */,
+				84A208331DD071C300A0154A /* PlayerConfig.swift */,
+				84A208341DD071C300A0154A /* PlayerImp.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
 		};
-		84A2081F1DD0519300A0154A /* Plugins */ = {
+		84A208351DD071C300A0154A /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
-				84A208201DD0519300A0154A /* Plugin.swift */,
-				84A208211DD0519300A0154A /* SamplePlugin.swift */,
+				84A208361DD071C300A0154A /* Plugin.swift */,
+				84A208371DD071C300A0154A /* SamplePlugin.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -121,9 +110,12 @@
 		FBA36D2A1D70DDF8002F8D6C /* PlayKit */ = {
 			isa = PBXGroup;
 			children = (
+				84A2082D1DD071C300A0154A /* Addons */,
+				84A2082E1DD071C300A0154A /* Managers */,
+				84A208301DD071C300A0154A /* Player */,
+				84A208351DD071C300A0154A /* Plugins */,
 				84A208131DD0519300A0154A /* Headers */,
 				84A208151DD0519300A0154A /* Helpers */,
-				84A208161DD0519300A0154A /* Model */,
 				FBA36D2C1D70DDF8002F8D6C /* Info.plist */,
 			);
 			path = PlayKit;
@@ -212,13 +204,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84A208281DD0519300A0154A /* Plugin.swift in Sources */,
-				84A208291DD0519300A0154A /* SamplePlugin.swift in Sources */,
-				84A208261DD0519300A0154A /* PlayerConfig.swift in Sources */,
-				84A208231DD0519300A0154A /* PlayKitManager.swift in Sources */,
-				84A208271DD0519300A0154A /* PlayerImp.swift in Sources */,
-				84A208251DD0519300A0154A /* Player.swift in Sources */,
-				84A208241DD0519300A0154A /* MediaEntry.swift in Sources */,
+				84A2083D1DD071C300A0154A /* Plugin.swift in Sources */,
+				84A2083E1DD071C300A0154A /* SamplePlugin.swift in Sources */,
+				84A2083B1DD071C300A0154A /* PlayerConfig.swift in Sources */,
+				84A208381DD071C300A0154A /* PlayKitManager.swift in Sources */,
+				84A2083C1DD071C300A0154A /* PlayerImp.swift in Sources */,
+				84A2083A1DD071C300A0154A /* Player.swift in Sources */,
+				84A208391DD071C300A0154A /* MediaEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
