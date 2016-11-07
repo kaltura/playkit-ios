@@ -24,7 +24,7 @@ TODO: Add long description of the pod here.
   s.homepage         = 'https://github.com/<GITHUB_USERNAME>/PlayKit'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Rivka Schwartz' => 'Rivka.Peleg@kaltura.com' }
+  s.author           = { 'Rivka Schwartz' => 'Rivka.Peleg@kaltura.com', 'Vadim Kononov' => 'vadim.kononov@kaltura.com', 'Eliza Sapir' => 'eliza.sapir@kaltura.com' }
   s.source           = { :git => 'https://github.com/<GITHUB_USERNAME>/PlayKit.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
@@ -53,6 +53,9 @@ end
 
   s.subspec 'IMAPlugin' do |ssp|
     ssp.source_files = 'Plugins/IMA'
+    ssp.xcconfig = { 'FRAMEWORK_SEARCH_PATHS' => '"${PODS_ROOT}/GoogleAds-IMA-iOS-SDK/GoogleInteractiveMediaAds/GoogleInteractiveMediaAds-GoogleIMA3"' }
+    ssp.dependency 'GoogleAds-IMA-iOS-SDK', '~> 3.3'
+
   end
 
 s.default_subspec = 'Core'
