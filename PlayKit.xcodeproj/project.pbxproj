@@ -7,27 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FBA36D2D1D70DDF8002F8D6C /* PlayKit.h in Headers */ = {isa = PBXBuildFile; fileRef = FBA36D2B1D70DDF8002F8D6C /* PlayKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FBA36D4A1D72BC81002F8D6C /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA36D491D72BC81002F8D6C /* Player.swift */; };
-		FBD979401DA8531E00A69480 /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD9793F1DA8531E00A69480 /* MediaEntry.swift */; };
-		FBD979421DAA29CD00A69480 /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979411DAA29CD00A69480 /* PlayerConfig.swift */; };
-		FBD979441DAA29DD00A69480 /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD979431DAA29DD00A69480 /* PlayerImp.swift */; };
-		FBE9960A1DC756B60020D5E1 /* PlayKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE996091DC756B60020D5E1 /* PlayKitManager.swift */; };
-		FBE9960C1DC757CA0020D5E1 /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE9960B1DC757CA0020D5E1 /* Plugin.swift */; };
-		FBE9960E1DC75CA60020D5E1 /* SamplePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE9960D1DC75CA60020D5E1 /* SamplePlugin.swift */; };
+		84A208221DD0519300A0154A /* PlayKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A208141DD0519300A0154A /* PlayKit.h */; };
+		84A208231DD0519300A0154A /* PlayKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208191DD0519300A0154A /* PlayKitManager.swift */; };
+		84A208241DD0519300A0154A /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A2081B1DD0519300A0154A /* MediaEntry.swift */; };
+		84A208251DD0519300A0154A /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A2081C1DD0519300A0154A /* Player.swift */; };
+		84A208261DD0519300A0154A /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A2081D1DD0519300A0154A /* PlayerConfig.swift */; };
+		84A208271DD0519300A0154A /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A2081E1DD0519300A0154A /* PlayerImp.swift */; };
+		84A208281DD0519300A0154A /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208201DD0519300A0154A /* Plugin.swift */; };
+		84A208291DD0519300A0154A /* SamplePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A208211DD0519300A0154A /* SamplePlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		84A208141DD0519300A0154A /* PlayKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayKit.h; sourceTree = "<group>"; };
+		84A208191DD0519300A0154A /* PlayKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayKitManager.swift; sourceTree = "<group>"; };
+		84A2081B1DD0519300A0154A /* MediaEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
+		84A2081C1DD0519300A0154A /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		84A2081D1DD0519300A0154A /* PlayerConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
+		84A2081E1DD0519300A0154A /* PlayerImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerImp.swift; sourceTree = "<group>"; };
+		84A208201DD0519300A0154A /* Plugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plugin.swift; sourceTree = "<group>"; };
+		84A208211DD0519300A0154A /* SamplePlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SamplePlugin.swift; sourceTree = "<group>"; };
 		FBA36D281D70DDF8002F8D6C /* PlayKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PlayKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		FBA36D2B1D70DDF8002F8D6C /* PlayKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayKit.h; sourceTree = "<group>"; };
 		FBA36D2C1D70DDF8002F8D6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FBA36D491D72BC81002F8D6C /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
-		FBD9793F1DA8531E00A69480 /* MediaEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
-		FBD979411DAA29CD00A69480 /* PlayerConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
-		FBD979431DAA29DD00A69480 /* PlayerImp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerImp.swift; sourceTree = "<group>"; };
-		FBE996091DC756B60020D5E1 /* PlayKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayKitManager.swift; sourceTree = "<group>"; };
-		FBE9960B1DC757CA0020D5E1 /* Plugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plugin.swift; sourceTree = "<group>"; };
-		FBE9960D1DC75CA60020D5E1 /* SamplePlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SamplePlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +41,67 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		84A208131DD0519300A0154A /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				84A208141DD0519300A0154A /* PlayKit.h */,
+			);
+			path = Headers;
+			sourceTree = "<group>";
+		};
+		84A208151DD0519300A0154A /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		84A208161DD0519300A0154A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				84A2081A1DD0519300A0154A /* Player */,
+				84A208181DD0519300A0154A /* Managers */,
+				84A2081F1DD0519300A0154A /* Plugins */,
+				84A208171DD0519300A0154A /* Addons */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		84A208171DD0519300A0154A /* Addons */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Addons;
+			sourceTree = "<group>";
+		};
+		84A208181DD0519300A0154A /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				84A208191DD0519300A0154A /* PlayKitManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		84A2081A1DD0519300A0154A /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				84A2081B1DD0519300A0154A /* MediaEntry.swift */,
+				84A2081C1DD0519300A0154A /* Player.swift */,
+				84A2081D1DD0519300A0154A /* PlayerConfig.swift */,
+				84A2081E1DD0519300A0154A /* PlayerImp.swift */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
+		84A2081F1DD0519300A0154A /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				84A208201DD0519300A0154A /* Plugin.swift */,
+				84A208211DD0519300A0154A /* SamplePlugin.swift */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
 		FBA36D1E1D70DDF8002F8D6C = {
 			isa = PBXGroup;
 			children = (
@@ -60,15 +121,10 @@
 		FBA36D2A1D70DDF8002F8D6C /* PlayKit */ = {
 			isa = PBXGroup;
 			children = (
-				FBD9793F1DA8531E00A69480 /* MediaEntry.swift */,
-				FBA36D2B1D70DDF8002F8D6C /* PlayKit.h */,
+				84A208131DD0519300A0154A /* Headers */,
+				84A208151DD0519300A0154A /* Helpers */,
+				84A208161DD0519300A0154A /* Model */,
 				FBA36D2C1D70DDF8002F8D6C /* Info.plist */,
-				FBA36D491D72BC81002F8D6C /* Player.swift */,
-				FBE9960B1DC757CA0020D5E1 /* Plugin.swift */,
-				FBE996091DC756B60020D5E1 /* PlayKitManager.swift */,
-				FBD979411DAA29CD00A69480 /* PlayerConfig.swift */,
-				FBE9960D1DC75CA60020D5E1 /* SamplePlugin.swift */,
-				FBD979431DAA29DD00A69480 /* PlayerImp.swift */,
 			);
 			path = PlayKit;
 			sourceTree = "<group>";
@@ -80,7 +136,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBA36D2D1D70DDF8002F8D6C /* PlayKit.h in Headers */,
+				84A208221DD0519300A0154A /* PlayKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,13 +212,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBE9960C1DC757CA0020D5E1 /* Plugin.swift in Sources */,
-				FBE9960E1DC75CA60020D5E1 /* SamplePlugin.swift in Sources */,
-				FBA36D4A1D72BC81002F8D6C /* Player.swift in Sources */,
-				FBE9960A1DC756B60020D5E1 /* PlayKitManager.swift in Sources */,
-				FBD979441DAA29DD00A69480 /* PlayerImp.swift in Sources */,
-				FBD979421DAA29CD00A69480 /* PlayerConfig.swift in Sources */,
-				FBD979401DA8531E00A69480 /* MediaEntry.swift in Sources */,
+				84A208281DD0519300A0154A /* Plugin.swift in Sources */,
+				84A208291DD0519300A0154A /* SamplePlugin.swift in Sources */,
+				84A208261DD0519300A0154A /* PlayerConfig.swift in Sources */,
+				84A208231DD0519300A0154A /* PlayKitManager.swift in Sources */,
+				84A208271DD0519300A0154A /* PlayerImp.swift in Sources */,
+				84A208251DD0519300A0154A /* Player.swift in Sources */,
+				84A208241DD0519300A0154A /* MediaEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
