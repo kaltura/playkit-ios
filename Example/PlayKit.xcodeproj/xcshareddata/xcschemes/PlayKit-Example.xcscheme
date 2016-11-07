@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0810"
+   LastUpgradeVersion = "0720"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FBA36D271D70DDF8002F8D6C"
-               BuildableName = "PlayKit.framework"
-               BlueprintName = "PlayKit"
+               BlueprintIdentifier = "607FACCF1AFB9204008FA782"
+               BuildableName = "PlayKit_Example.app"
+               BlueprintName = "PlayKit_Example"
+               ReferencedContainer = "container:PlayKit.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "607FACE41AFB9204008FA782"
+               BuildableName = "PlayKit_Tests.xctest"
+               BlueprintName = "PlayKit_Tests"
                ReferencedContainer = "container:PlayKit.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,7 +42,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "607FACE41AFB9204008FA782"
+               BuildableName = "PlayKit_Tests.xctest"
+               BlueprintName = "PlayKit_Tests"
+               ReferencedContainer = "container:PlayKit.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "607FACCF1AFB9204008FA782"
+            BuildableName = "PlayKit_Example.app"
+            BlueprintName = "PlayKit_Example"
+            ReferencedContainer = "container:PlayKit.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -42,15 +75,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FBA36D271D70DDF8002F8D6C"
-            BuildableName = "PlayKit.framework"
-            BlueprintName = "PlayKit"
+            BlueprintIdentifier = "607FACCF1AFB9204008FA782"
+            BuildableName = "PlayKit_Example.app"
+            BlueprintName = "PlayKit_Example"
             ReferencedContainer = "container:PlayKit.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -60,15 +94,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FBA36D271D70DDF8002F8D6C"
-            BuildableName = "PlayKit.framework"
-            BlueprintName = "PlayKit"
+            BlueprintIdentifier = "607FACCF1AFB9204008FA782"
+            BuildableName = "PlayKit_Example.app"
+            BlueprintName = "PlayKit_Example"
             ReferencedContainer = "container:PlayKit.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

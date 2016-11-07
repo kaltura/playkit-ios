@@ -1,1 +1,29 @@
-# playkit-ios
+# PlayKit
+
+[![CI Status](http://img.shields.io/travis/Rivka Schwartz/PlayKit.svg?style=flat)](https://travis-ci.org/Rivka Schwartz/PlayKit)
+[![Version](https://img.shields.io/cocoapods/v/PlayKit.svg?style=flat)](http://cocoapods.org/pods/PlayKit)
+[![License](https://img.shields.io/cocoapods/l/PlayKit.svg?style=flat)](http://cocoapods.org/pods/PlayKit)
+[![Platform](https://img.shields.io/cocoapods/p/PlayKit.svg?style=flat)](http://cocoapods.org/pods/PlayKit)
+
+## Example
+
+To run the example project, clone the repo, and run `pod install` from the Example directory first.
+
+## Requirements
+
+## Installation
+
+PlayKit is available through [CocoaPods](http://cocoapods.org). To install
+it, simply add the following line to your Podfile:
+
+```ruby
+pod "PlayKit"
+```
+
+## Author
+
+Rivka Schwartz, Rivka.Peleg@kaltura.com
+
+## License
+
+PlayKit is available under the MIT license. See the LICENSE file for more info.
