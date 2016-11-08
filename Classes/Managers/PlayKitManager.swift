@@ -10,21 +10,31 @@ import UIKit
 
 public class PlayKitManager: NSObject {
 
-    static var pluginRegistry = Dictionary<String, Plugin.Type>()
     
-    public static func createPlayer() -> Player {
-        return PlayerImp();
+   public static let sharedInstance : PlayKitManager = PlayKitManager()
+    var pluginRegistry = Dictionary<String, Plugin.Type>()
+    
+    public func createPlayer(config:PlayerConfig) -> Player {
+        
+        let controller = PlayerController()
+        
+        for plugin  in pluginRegistry.values {
+            let pluginObject: Plugin = plugin.init()
+            pluginObject.load(player: controller, config: config)
+        }
+        
+        return controller
     }
     
-    public static func registerPlugin(_ pluginClass: Plugin.Type) {
+    public func registerPlugin(_ pluginClass: Plugin.Type) {
         pluginRegistry[pluginClass.pluginName] = pluginClass
     }
     
-    static func createPlugin(name: String) -> Plugin? {
+ /*   static func createPlugin(name: String) -> Plugin? {
         let pluginClass = pluginRegistry[name]
         guard pluginClass != nil else {
             return nil
         }
         return pluginClass?.init()
-    }
+    }*/
 }
