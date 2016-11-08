@@ -79,3 +79,8 @@ public enum Origin {
     case end
 }
 
+public protocol DecoratedPlayerProvider {
+    func getDecoratedPlayer() -> Player
+}
+
+

@@ -18,7 +18,7 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
     var adTagUrl: String?
     var adTagsTimes: [TimeInterval : String]?
     
-    var player: Player! {
+    var player: Player! /*{
         didSet {
             self.subscribe(to: PlayerEventType.item_did_play_to_end_time, using: { (eventData: AnyObject?) -> Void in
                 self.adsPlugin.contentComplete()
@@ -36,19 +36,19 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
                 self.adsPlugin.tagsTimes = self.adTagsTimes
             }
         }
-    }
+    }*/
     
-    var layer: CALayer {
+    var layer: CALayer! {
         get {
             return self.player.layer
         }
     }
     
-    var avPlayer: AVPlayer? {
+    /*var avPlayer: AVPlayer? {
         get {
-            return self.player.avPlayer
+            return nil//self.player.avPlayer
         }
-    }
+    }*/
     
     func load(_ config: PlayerConfig) -> Bool {
         return self.player.load(config)
@@ -58,7 +58,7 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
         return self.player.apply(config)
     }
     
-    var autoPlay: Bool {
+    var autoPlay: Bool? {
         get {
             return self.player.autoPlay
         }
@@ -75,13 +75,13 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
         return self.player.loadNext()
     }
     
-    var view: UIView {
+    var view: UIView? {
         get {
             return self.player.view
         }
     }
     
-    var currentTime: TimeInterval {
+    var currentTime: TimeInterval? {
         get {
             return self.player.currentTime
         }
@@ -91,7 +91,8 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
     }
     
     func release() {
-        self.player.release()
+    //    self.adsPlugin.release()
+      //  self.player.release()
     }
     
     func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver) {
@@ -123,18 +124,10 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
     }
     
     func seek(to time: CMTime) {
-        self.player.seek(to: time)
+        //self.player.seek(to: time)
     }
     
-    func subscribe(to event: PlayerEventType, using block: @escaping (AnyObject?) -> Void) {
-        self.player.subscribe(to: event, using: block)
-    }
-    
-    func destroy() {
-        self.adsPlugin.destroy()
-    }
-    
-    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+    /*func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         self.adsPlugin.pipDelegate = delegate
         return self.player.createPiPController(with: self.adsPlugin)
     }
@@ -178,12 +171,12 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
         case .third_quartile:
             return PlayerEventType.third_quartile
         }
-    }
+    }*/
 
     func adsPluginVideoView(_ adsPlugin: AdsPlugin) -> UIView {
-        return self.dataSource!.playerVideoView(self)
+        return self.view!
     }
-    
+    /*
     func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
         if let canPlay = self.dataSource?.playerCanPlayAd?(self) {
             return canPlay
@@ -193,30 +186,30 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
     
     func adsPluginCompanionView(_ adsPlugin: AdsPlugin) -> UIView? {
         return self.dataSource?.playerCompanionView?(self)
-    }
+    }*/
     
     func adsPluginWebOpenerPresentingController(_ adsPlugin: AdsPlugin) -> UIViewController? {
-        if let presentingController = self.dataSource?.playerAdWebOpenerPresentingController?(self) {
+        /*if let presentingController = self.dataSource?.playerAdWebOpenerPresentingController?(self) {
             return presentingController
-        }
+        }*/
         return nil
     }
     
     func adsPluginDidRequestContentPause(_ adsPlugin: AdsPlugin) {
         self.isAdPlayback = true
-        self.delegate?.playerAdDidRequestContentPause?(self)
+       // self.delegate?.playerAdDidRequestContentPause?(self)
     }
     
     func adsPluginDidRequestContentResume(_ adsPlugin: AdsPlugin) {
         self.isAdPlayback = false
-        self.delegate?.playerAdDidRequestContentResume?(self)
+       // self.delegate?.playerAdDidRequestContentResume?(self)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, failedWith error: String) {
         self.isAdPlayback = false
-        self.delegate?.player?(self, failedWith: error)
+        //self.delegate?.player?(self, failedWith: error)
     }
-    
+    /*
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive adEvent: AdsPluginEventType) {
         self.delegate?.player?(self, didReceive: self.convertToPlayerEvent(adEvent))
     }
@@ -243,5 +236,5 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
     
     func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerWillOpenExternalBrowser webOpener: NSObject!) {
         self.delegate?.player?(self, adWebOpenerWillOpenInAppBrowser: webOpener)
-    }
+    }*/
 }

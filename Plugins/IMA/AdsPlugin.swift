@@ -72,7 +72,7 @@ class AdsPluginSettings {
 class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, DecoratedPlayerProvider, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
 
     private var player: Player!
-    private var config: AnyObject?
+    private var adsData: AnyObject?
     
     public weak var dataSource: AdsPluginDataSource! {
         didSet {
@@ -106,7 +106,7 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
     private var startAdCalled = false
     
     
-    override init() {
+    override required init() {
         super.init()
         
         if AdsPlugin.adsLoader == nil {
@@ -123,15 +123,19 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
         }
     }
     
+    static var pluginName: String {
+        get {
+           return "AdsPlugin"
+        }
+    }
+    
     //MARK: public methods
     
-    func load(player: Player, config: AnyObject?) {
+    func load(player: Player, config: PlayerConfig) {
         self.player = player
-        self.config = config
-        
-        self.player.subscribe(to: PlayerEventType.playhead_state_changed, using: { (eventData: AnyObject?) -> Void in
-            self.update(with: (eventData as! KalturaPlayerEventData).currentTime)
-        })
+        //self.adsData = config.adsData
+
+        Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(AdsPlugin.update), userInfo: nil, repeats: true)
     }
     
     func getDecoratedPlayer() -> Player {
@@ -139,10 +143,10 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
         decorator.adsPlugin = self
         decorator.player = self.player
         
-        if self.config != nil {
-            if let adTagUrl = self.config as? String {
+        if self.adsData != nil {
+            if let adTagUrl = self.adsData as? String {
                 decorator.adTagUrl = adTagUrl
-            } else if let adTagsTimes = self.config as? [TimeInterval : String] {
+            } else if let adTagsTimes = self.adsData as? [TimeInterval : String] {
                 decorator.adTagsTimes = adTagsTimes
             }
         }
@@ -156,11 +160,11 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
         
         var request: IMAAdsRequest
         
-        if let avPlayer = self.player.avPlayer {
+        /*if let avPlayer = self.player.avPlayer {
             request = IMAAdsRequest(adTagUrl: adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), avPlayerVideoDisplay: IMAAVPlayerVideoDisplay(avPlayer: avPlayer), pictureInPictureProxy: self.pictureInPictureProxy, userContext: nil)
-        } else {
+        } else {*/
             request = IMAAdsRequest(adTagUrl: adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), contentPlayhead: self, userContext: nil)
-        }
+        //}
         
         AdsPlugin.adsLoader.requestAds(with: request)
     }
@@ -189,9 +193,9 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
         AdsPlugin.adsLoader.contentComplete()
     }
     
-    func destroy() {
+    /*func release() {
         self.destroyManager()
-    }
+    }*/
 
     //MARK: private methods
     
@@ -208,9 +212,9 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
         self.companionView = self.dataSource.adsPluginCompanionView?(self)
         self.videoView = self.dataSource.adsPluginVideoView(self)
         
-        if let _ = self.player.avPlayer {
+        /*if let _ = self.player.avPlayer {
             self.pictureInPictureProxy = IMAPictureInPictureProxy(avPictureInPictureControllerDelegate: self)
-        }
+        }*/
         
         if (self.companionView != nil) {
             self.companionSlot = IMACompanionAdSlot(view: self.companionView, width: Int32(self.companionView!.frame.size.width), height: Int32(self.companionView!.frame.size.height))
@@ -275,9 +279,9 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
         return result
     }
     
-    private func update(with currentTime: CMTime) {
+    @objc private func update() {
         if !self.isAdPlayback {
-            self.currentPlaybackTime = CMTimeGetSeconds(currentTime)
+            self.currentPlaybackTime = self.player.currentTime
             self.loadAdsIfNeeded()
         }
     }
@@ -347,7 +351,7 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
     func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
         if event.type == IMAAdEventType.AD_BREAK_READY || event.type == IMAAdEventType.LOADED {
             let canPlay = self.dataSource.adsPluginCanPlayAd?(self)
-            if (canPlay == nil || canPlay == true || self.player.avPlayer != nil) {
+            if canPlay == nil || canPlay == true /*|| self.player.avPlayer != nil*/ {
                 adsManager.start()
             } else {
                 if event.type == IMAAdEventType.LOADED {
@@ -378,33 +382,39 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
     }
     
     func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
-        if self.player.avPlayer == nil {
+        //if self.player.avPlayer == nil {
             self.delegate?.adsPlugin?(self, adDidProgressToTime: mediaTime, totalTime: totalTime)
-        }
+        //}
     }
     
     // MARK: AVPictureInPictureControllerDelegate
     
+    @available(iOS 9.0, *)
     func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         self.pipDelegate?.pictureInPictureControllerWillStartPictureInPicture?(pictureInPictureController)
     }
     
+    @available(iOS 9.0, *)
     func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         self.pipDelegate?.pictureInPictureControllerDidStartPictureInPicture?(pictureInPictureController)
     }
     
+    @available(iOS 9.0, *)
     func picture(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
         self.pipDelegate?.picture?(pictureInPictureController, failedToStartPictureInPictureWithError: error)
     }
     
+    @available(iOS 9.0, *)
     func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         self.pipDelegate?.pictureInPictureControllerWillStopPictureInPicture?(pictureInPictureController)
     }
     
+    @available(iOS 9.0, *)
     func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         self.pipDelegate?.pictureInPictureControllerDidStopPictureInPicture?(pictureInPictureController)
     }
     
+    @available(iOS 9.0, *)
     func picture(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         self.pipDelegate?.picture?(pictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler: completionHandler)
     }
