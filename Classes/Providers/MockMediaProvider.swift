@@ -14,7 +14,7 @@ import SwiftyJSON
 public class MockMediaEntryProvider: MediaEntryProvider {
     
     
-    enum MockMediaEntryProviderError: Error {
+   public enum MockError: Error {
         case fileIsEmptyOrNotFound
         case invalidJSON
         case mediaNotFound
@@ -51,11 +51,11 @@ public class MockMediaEntryProvider: MediaEntryProvider {
         }
         
         guard let content = self.content  else {
-            callback(ResponseElemnt<MediaEntry>(response: nil, succedded: false, error:MockMediaEntryProviderError.emptyFile)); return}
+            callback(ResponseElemnt<MediaEntry>(response: nil, succedded: false, error:MockError.fileIsEmptyOrNotFound)); return}
         guard  let jsonObjects: JSON = JSON(data:self.content!), jsonObjects != .null  else {
-            callback(ResponseElemnt<MediaEntry>(response: nil, succedded: false, error:MockMediaEntryProviderError.invalidJSON)); return}
+            callback(ResponseElemnt<MediaEntry>(response: nil, succedded: false, error:MockError.invalidJSON)); return}
         guard let jsonObject: JSON = jsonObjects[self.id] , jsonObject != .null else {
-            callback(ResponseElemnt<MediaEntry>(response: nil, succedded: false, error:MockMediaEntryProviderError.mediaNotFound)); return}
+            callback(ResponseElemnt<MediaEntry>(response: nil, succedded: false, error:MockError.mediaNotFound)); return}
         let mediaEntry : MediaEntry = MediaEntry(json: jsonObject)
         callback(ResponseElemnt(response: mediaEntry, succedded: true, error:nil))
     }
