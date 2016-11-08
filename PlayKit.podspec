@@ -43,6 +43,9 @@ TODO: Add long description of the pod here.
   # s.dependency 'AFNetworking', '~> 2.3'
 
 
+s.dependency 'SwiftyJSON'
+
+
 s.subspec 'Core' do |sp|
   sp.source_files = 'Classes/**/*'
 end
