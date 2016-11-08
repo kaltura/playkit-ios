@@ -26,7 +26,7 @@ public protocol Player {
      If set to true after entry is loaded, this will start playback.
      If set to false while entry is playing, this will pause playback.
      */
-    var autoPlay: Bool { get set }
+    var autoPlay: Bool? { get set }
     
     /**
      Convenience method for setting shouldPlayWhenReady to true.
@@ -53,17 +53,19 @@ public protocol Player {
     /**
      Get the player's View component.
     */
-    var view: UIView { get }
+    var view: UIView? { get }
     
     /**
      Get/set the current player position.
     */
-    var currentTime: TimeInterval { get set }
+    var currentTime: TimeInterval? { get set }
+    
+    var layer: CALayer! { get }
     
     /**
      Release player resources.
     */
-    func release()
+  //  func release()
     
     func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver)
 }
