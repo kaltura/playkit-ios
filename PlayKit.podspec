@@ -53,7 +53,10 @@ end
 
   s.subspec 'IMAPlugin' do |ssp|
     ssp.source_files = 'Plugins/IMA'
-    ssp.xcconfig = { 'FRAMEWORK_SEARCH_PATHS' => '"${PODS_ROOT}/GoogleAds-IMA-iOS-SDK/GoogleInteractiveMediaAds/GoogleInteractiveMediaAds-GoogleIMA3"' }
+    ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+                  'OTHER_LDFLAGS' => '$(inherited) -framework "GoogleInteractiveMediaAds"',
+                  'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+                  'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
     ssp.dependency 'GoogleAds-IMA-iOS-SDK', '~> 3.3'
 
   end
