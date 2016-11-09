@@ -9,7 +9,14 @@
 import UIKit
 
 
+public protocol PlayerDataSource: class {
+    func playerVideoView(_ player: Player) -> UIView
+}
+
 public protocol Player {
+    
+    var dataSource: PlayerDataSource? { get set }
+    
     /**
      Prepare for playing an entry. If `config.autoPlay` is true, the entry will automatically
      play when it's ready.
@@ -80,7 +87,5 @@ public enum Origin {
 }
 
 public protocol DecoratedPlayerProvider {
-    func getDecoratedPlayer() -> Player
+    func getDecoratedPlayer() -> Player?
 }
-
-

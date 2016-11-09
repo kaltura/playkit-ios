@@ -26,7 +26,7 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
         }
     }
     
-    var delegate: PlayerDelegate?
+    var delegate: PlayerDelegate?*/
     var dataSource: PlayerDataSource? {
         didSet {
             self.adsPlugin.dataSource = self
@@ -36,7 +36,7 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
                 self.adsPlugin.tagsTimes = self.adTagsTimes
             }
         }
-    }*/
+    }
     
     var layer: CALayer! {
         get {
@@ -174,7 +174,7 @@ class AdsEnabledPlayerController : Player, AdsPluginDataSource, AdsPluginDelegat
     }*/
 
     func adsPluginVideoView(_ adsPlugin: AdsPlugin) -> UIView {
-        return self.view!
+        return self.dataSource!.playerVideoView(self)
     }
     /*
     func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
