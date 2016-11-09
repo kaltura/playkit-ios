@@ -10,17 +10,32 @@ import UIKit
 
 public class PlayKitManager: NSObject {
 
+    public static let sharedInstance : PlayKitManager = PlayKitManager()
     
-   public static let sharedInstance : PlayKitManager = PlayKitManager()
     var pluginRegistry = Dictionary<String, Plugin.Type>()
     
-    public func createPlayer(config:PlayerConfig) -> Player {
+    public func createPlayer(config: PlayerConfig) -> Player {
         
         let controller = PlayerController()
+        var decorator: Player? = nil
         
-        for plugin  in pluginRegistry.values {
-            let pluginObject: Plugin = plugin.init()
-            pluginObject.load(player: controller, config: config)
+        for pluginName in pluginRegistry.keys {
+            if let pluginObject = createPlugin(name: pluginName) {
+                pluginObject.load(player: controller, config: config)
+                
+                if pluginObject is DecoratedPlayerProvider {
+                    if let d = (pluginObject as! DecoratedPlayerProvider).getDecoratedPlayer() {
+                        if decorator != nil {
+                            //throw exception
+                        }
+                        decorator = d
+                    }
+                }
+            }
+        }
+        
+        if decorator != nil {
+            return decorator!
         }
         
         return controller
@@ -30,11 +45,11 @@ public class PlayKitManager: NSObject {
         pluginRegistry[pluginClass.pluginName] = pluginClass
     }
     
- /*   static func createPlugin(name: String) -> Plugin? {
+    func createPlugin(name: String) -> Plugin? {
         let pluginClass = pluginRegistry[name]
         guard pluginClass != nil else {
             return nil
         }
         return pluginClass?.init()
-    }*/
+    }
 }

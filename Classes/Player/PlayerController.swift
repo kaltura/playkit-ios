@@ -9,11 +9,13 @@
 import Foundation
 
 class PlayerController: Player {
+    
+    var dataSource: PlayerDataSource?
+    
     /**
      Get the player's View component.
      */
-    public var view: UIView?
-    
+    public var view: UIView?    
     private var currentPlayer: PlayerEngine?
     
     public init() {

@@ -69,18 +69,18 @@ class AdsPluginSettings {
     }
 }
 
-class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, DecoratedPlayerProvider, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
+public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, DecoratedPlayerProvider, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
 
     private var player: Player!
     private var adsData: AnyObject?
     
-    public weak var dataSource: AdsPluginDataSource! {
+    weak var dataSource: AdsPluginDataSource! {
         didSet {
             self.setupMainView()
         }
     }
-    public weak var delegate: AdsPluginDelegate?
-    public weak var pipDelegate: AVPictureInPictureControllerDelegate?
+    weak var delegate: AdsPluginDelegate?
+    weak var pipDelegate: AVPictureInPictureControllerDelegate?
     
     private var contentPlayhead: IMAAVPlayerContentPlayhead?
     private var adsManager: IMAAdsManager?
@@ -106,7 +106,7 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
     private var startAdCalled = false
     
     
-    override required init() {
+    override required public init() {
         super.init()
         
         if AdsPlugin.adsLoader == nil {
@@ -117,39 +117,41 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
         AdsPlugin.adsLoader.delegate = self
     }
     
-    var currentTime: TimeInterval {
+    public var currentTime: TimeInterval {
         get {
             return self.currentPlaybackTime
         }
     }
     
-    static var pluginName: String {
+    public static var pluginName: String {
         get {
-           return "AdsPlugin"
+           return String(describing: AdsPlugin.self)
         }
     }
     
     //MARK: public methods
     
-    func load(player: Player, config: PlayerConfig) {
+    public func load(player: Player, config: PlayerConfig) {
         self.player = player
         //self.adsData = config.adsData
 
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(AdsPlugin.update), userInfo: nil, repeats: true)
     }
     
-    func getDecoratedPlayer() -> Player {
+    public func getDecoratedPlayer() -> Player? {
         let decorator = AdsEnabledPlayerController()
         decorator.adsPlugin = self
         decorator.player = self.player
         
-        if self.adsData != nil {
+        /*if self.adsData != nil {
             if let adTagUrl = self.adsData as? String {
                 decorator.adTagUrl = adTagUrl
             } else if let adTagsTimes = self.adsData as? [TimeInterval : String] {
                 decorator.adTagsTimes = adTagsTimes
             }
-        }
+        }*/
+        
+        decorator.adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="
         
         self.delegate = decorator
         return decorator
@@ -323,7 +325,7 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
     
     // MARK: AdsLoaderDelegate
     
-    func adsLoader(_ loader: IMAAdsLoader!, adsLoadedWith adsLoadedData: IMAAdsLoadedData!) {
+    public func adsLoader(_ loader: IMAAdsLoader!, adsLoadedWith adsLoadedData: IMAAdsLoadedData!) {
         self.adsManager = adsLoadedData.adsManager
         self.adsManager!.delegate = self
         self.createRenderingSettings()
@@ -333,22 +335,23 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
         }
     }
     
-    func adsLoader(_ loader: IMAAdsLoader!, failedWith adErrorData: IMAAdLoadingErrorData!) {
+    public func adsLoader(_ loader: IMAAdsLoader!, failedWith adErrorData: IMAAdLoadingErrorData!) {
+        print(adErrorData.adError.message)
         self.delegate?.adsPlugin?(self, failedWith: adErrorData.adError.message)
         self.resumeContentPlayback()
     }
     
     // MARK: AdsManagerDelegate
     
-    func adsManagerAdDidStartBuffering(_ adsManager: IMAAdsManager!) {
+    public func adsManagerAdDidStartBuffering(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(true, alpha: 0.1)
     }
     
-    func adsManagerAdPlaybackReady(_ adsManager: IMAAdsManager!) {
+    public func adsManagerAdPlaybackReady(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(false, alpha: 0)
     }
     
-    func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
+    public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
         if event.type == IMAAdEventType.AD_BREAK_READY || event.type == IMAAdEventType.LOADED {
             let canPlay = self.dataSource.adsPluginCanPlayAd?(self)
             if canPlay == nil || canPlay == true /*|| self.player.avPlayer != nil*/ {
@@ -364,24 +367,24 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
         self.delegate?.adsPlugin?(self, didReceive: AdsPluginEventType(rawValue: event.type.rawValue)!)
     }
     
-    func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
+    public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
         self.delegate?.adsPlugin?(self, failedWith: error.message)
         self.resumeContentPlayback()
     }
     
-    func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
+    public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
         self.delegate?.adsPluginDidRequestContentPause?(self)
         self.isAdPlayback = true
         self.player.pause()
     }
     
-    func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
+    public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
         self.delegate?.adsPluginDidRequestContentResume?(self)
         self.isAdPlayback = false
         self.resumeContentPlayback()
     }
     
-    func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
+    public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
         //if self.player.avPlayer == nil {
             self.delegate?.adsPlugin?(self, adDidProgressToTime: mediaTime, totalTime: totalTime)
         //}
@@ -390,54 +393,54 @@ class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, Decorat
     // MARK: AVPictureInPictureControllerDelegate
     
     @available(iOS 9.0, *)
-    func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+    public func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         self.pipDelegate?.pictureInPictureControllerWillStartPictureInPicture?(pictureInPictureController)
     }
     
     @available(iOS 9.0, *)
-    func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+    public func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         self.pipDelegate?.pictureInPictureControllerDidStartPictureInPicture?(pictureInPictureController)
     }
     
     @available(iOS 9.0, *)
-    func picture(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
+    public func picture(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
         self.pipDelegate?.picture?(pictureInPictureController, failedToStartPictureInPictureWithError: error)
     }
     
     @available(iOS 9.0, *)
-    func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+    public func pictureInPictureControllerWillStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         self.pipDelegate?.pictureInPictureControllerWillStopPictureInPicture?(pictureInPictureController)
     }
     
     @available(iOS 9.0, *)
-    func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
+    public func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         self.pipDelegate?.pictureInPictureControllerDidStopPictureInPicture?(pictureInPictureController)
     }
     
     @available(iOS 9.0, *)
-    func picture(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+    public func picture(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
         self.pipDelegate?.picture?(pictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler: completionHandler)
     }
 
     // MARK: IMAWebOpenerDelegate
     
-    func webOpenerWillOpenExternalBrowser(_ webOpener: NSObject!) {
+    public func webOpenerWillOpenExternalBrowser(_ webOpener: NSObject!) {
         self.delegate?.adsPlugin?(self, webOpenerWillOpenExternalBrowser: webOpener)
     }
     
-    func webOpenerWillOpen(inAppBrowser webOpener: NSObject!) {
+    public func webOpenerWillOpen(inAppBrowser webOpener: NSObject!) {
         self.delegate?.adsPlugin?(self, webOpenerWillOpenInAppBrowser: webOpener)
     }
     
-    func webOpenerDidOpen(inAppBrowser webOpener: NSObject!) {
+    public func webOpenerDidOpen(inAppBrowser webOpener: NSObject!) {
         self.delegate?.adsPlugin?(self, webOpenerDidOpenInAppBrowser: webOpener)
     }
     
-    func webOpenerWillClose(inAppBrowser webOpener: NSObject!) {
+    public func webOpenerWillClose(inAppBrowser webOpener: NSObject!) {
         self.delegate?.adsPlugin?(self, webOpenerWillCloseInAppBrowser: webOpener)
     }
     
-    func webOpenerDidClose(inAppBrowser webOpener: NSObject!) {
+    public func webOpenerDidClose(inAppBrowser webOpener: NSObject!) {
         self.delegate?.adsPlugin?(self, webOpenerDidCloseInAppBrowser: webOpener)
     }
 }
