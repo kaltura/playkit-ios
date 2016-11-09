@@ -9,10 +9,9 @@
 import UIKit
 
 
-public struct ResponseElemnt<T> {
+public struct Response<T> {
     
-    public let response: T?
-    public let succedded: Bool
+    public let data: T?
     public let error : Error?
     
 }

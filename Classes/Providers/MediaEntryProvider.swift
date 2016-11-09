@@ -15,7 +15,7 @@ public protocol MediaEntryProvider {
      
      ## Important:  
      - In order to write custom provider you should implement this method
-     - In order to send an informative error in the ResponseElemnt
+     - In order to send an informative error in the Response
      you should implement an error enum with the relevnat errors
     
      - parameter callback - a block that called on completion and returing response object wich contain the MediaEntry
@@ -25,13 +25,13 @@ public protocol MediaEntryProvider {
             CustomMediaEntryProvider(customParameters)
      
          customMediaProvider.loadMedia { 
-            (r:ResponseElemnt<MediaEntry>) in
+            (r:Response<MediaEntry>) in
              if (r.succedded){
              ...
      ```
      
      */
-    func loadMedia(callback:(_ response:ResponseElemnt<MediaEntry>)->Void)
+    func loadMedia(callback:(_ response:Response<MediaEntry>)->Void)
 }
 
 

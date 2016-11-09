@@ -89,7 +89,7 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     }
     
     
-    public func loadMedia(callback: (ResponseElemnt<MediaEntry>) -> Void) {
+    public func loadMedia(callback: (Response<MediaEntry>) -> Void) {
         
         if self.content == nil {
             guard let stringPath = self.url?.absoluteString else {return }
@@ -97,13 +97,13 @@ public class MockMediaEntryProvider: MediaEntryProvider {
         }
         
         guard let content = self.content  else {
-            callback(ResponseElemnt<MediaEntry>(response: nil, succedded: false, error:MockError.fileIsEmptyOrNotFound)); return}
+            callback(Response<MediaEntry>(data: nil, error:MockError.fileIsEmptyOrNotFound)); return}
         guard  let jsonObjects: JSON = JSON(data:self.content!), jsonObjects != .null  else {
-            callback(ResponseElemnt<MediaEntry>(response: nil, succedded: false, error:MockError.invalidJSON)); return}
+            callback(Response<MediaEntry>(data: nil, error:MockError.invalidJSON)); return}
         guard let jsonObject: JSON = jsonObjects[self.id] , jsonObject != .null else {
-            callback(ResponseElemnt<MediaEntry>(response: nil, succedded: false, error:MockError.mediaNotFound)); return}
+            callback(Response<MediaEntry>(data: nil, error:MockError.mediaNotFound)); return}
         let mediaEntry : MediaEntry = MediaEntry(json: jsonObject)
-        callback(ResponseElemnt(response: mediaEntry, succedded: true, error:nil))
+        callback(Response(data: mediaEntry, error:nil))
     }
     
 }

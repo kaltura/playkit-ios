@@ -31,11 +31,12 @@ class MockMediaProviderTest: XCTestCase {
         let theExeption = expectation(description: "test")
         
         let mediaProvider1 : MediaEntryProvider = MockMediaEntryProvider(fileURL: self.filePath! , mediaEntryId: "m001")
-        mediaProvider1.loadMedia { (r:ResponseElemnt<MediaEntry>) in
+        mediaProvider1.loadMedia { (r:Response<MediaEntry>) in
             print(r)
-            if ( r.succedded == true){
+            if r.data != nil {
                 theExeption.fulfill()
-            }else{
+            }
+            else{
                 XCTFail()
             }
         }
@@ -52,7 +53,7 @@ class MockMediaProviderTest: XCTestCase {
         let theExeption = expectation(description: "test")
         
         let mediaProvider2 : MediaEntryProvider = MockMediaEntryProvider(fileURL: self.filePath! , mediaEntryId: "sdf")
-        mediaProvider2.loadMedia { (r:ResponseElemnt<MediaEntry>) in
+        mediaProvider2.loadMedia { (r:Response<MediaEntry>) in
             if let err = r.error as? MockMediaEntryProvider.MockError {
                 if( err == MockMediaEntryProvider.MockError.mediaNotFound){
                     theExeption.fulfill()
@@ -76,7 +77,7 @@ class MockMediaProviderTest: XCTestCase {
         let theExeption = expectation(description: "test")
         
         let mediaProvider2 : MediaEntryProvider = MockMediaEntryProvider(fileURL: URL(string:"asdd")! , mediaEntryId: "sdf")
-        mediaProvider2.loadMedia { (r:ResponseElemnt<MediaEntry>) in
+        mediaProvider2.loadMedia { (r:Response<MediaEntry>) in
             if let err = r.error as? MockMediaEntryProvider.MockError {
                 if( err == MockMediaEntryProvider.MockError.fileIsEmptyOrNotFound){
                     theExeption.fulfill()
