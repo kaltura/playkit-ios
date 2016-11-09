@@ -27,8 +27,30 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     public var content : Data?
     
     private var objects : JSON?
-    
-    
+  
+    /**
+     Constructor
+     init mokc media proviedr with file url and media entry id,
+     
+     The file content should be as follow:
+     ```
+     "entryID": {
+        "duration": int,
+        "id": "entryID",
+        "name": string,
+        "sources": [
+        {
+            "id": "sourceid",
+            "mimeType": string,
+            "url": string
+        }
+        ]
+     }
+     ```
+     
+     - parameter fileURL full path of file
+     - parameter mediaEntryId the id of the media we want to load from the file
+     */
     public init(fileURL:URL,mediaEntryId:String)
     {
         self.url = fileURL
@@ -36,9 +58,33 @@ public class MockMediaEntryProvider: MediaEntryProvider {
         
     }
     
-    public init(contentOfFile:Data,mediaEntryId:String)
+    
+    /**
+     Constructor
+     init mokc media proviedr with file url and media entry id,
+     
+     The content should be json as follow:
+     ```
+     "entryID": {
+     "duration": int,
+     "id": "entryID",
+     "name": string,
+     "sources": [
+     {
+     "id": "sourceid",
+     "mimeType": string,
+     "url": string
+     }
+     ]
+     }
+     ```
+     
+     - parameter the data for loading the media
+     - parameter mediaEntryId the id of the media we want to load from the file
+     */
+    public init(data:Data,mediaEntryId:String)
     {
-        self.content = contentOfFile
+        self.content = data
         self.id = mediaEntryId
     }
     
