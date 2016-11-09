@@ -61,6 +61,16 @@ end
 
   end
 
+s.subspec 'AnalyticsPlugin' do |ssp|
+ssp.source_files = 'Plugins/Analytics'
+ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+'OTHER_LDFLAGS' => '$(inherited) -framework "YouboraLib" -framework "YouboraPluginAVPlayer"',
+'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+ssp.dependency 'Youbora-AVPlayer'
+
+end
+
 s.default_subspec = 'Core'
 
 end
