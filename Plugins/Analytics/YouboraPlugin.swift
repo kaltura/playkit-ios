@@ -9,11 +9,23 @@
 import YouboraLib
 import YouboraPluginAVPlayer
 
-class YouboraPlugin { //: Plugin {
+class YouboraPlugin : Plugin {
 
     private var youboraObj : YBPluginAVPlayer!
+    static var pluginName: String = "YouboraPlugin"
+
+    required init() {
+        let options : [String : Any] = ["enableAnalytics" : true, "accountCode": ""]
+        youboraObj = YBPluginAVPlayer(options: options as NSObject!)
+    }
     
-    init() {
+    func load(player: Player, config: PlayerConfig) {
+     
+        //youboraObj.startMonitoring(withPlayer: player)
+        
+    }
+    
+    func release() {
         
     }
 }
