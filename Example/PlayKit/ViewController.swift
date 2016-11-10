@@ -7,12 +7,20 @@
 //
 
 import UIKit
+import PlayKit
 
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        let request: Request = Request().set(url: URL(string: "www.google.com")).set { (r:Response) in
+            print(r)
+        }
+        
+        URLSessionRequestExecutor().send(request: request)
+        
+        
     }
 
     override func didReceiveMemoryWarning() {

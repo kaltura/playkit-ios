@@ -89,28 +89,31 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     }
     
     
-    public func loadMedia(callback: (Response<MediaEntry>) -> Void) {
+    public func loadMedia(callback: (Result<MediaEntry>) -> Void) {
         
         if self.content == nil {
             guard let stringPath = self.url?.absoluteString else {return }
             self.content = NSData(contentsOfFile: stringPath) as Data?
         }
         
+        
+        
+        
         guard let content = self.content  else {
-            callback(Response<MediaEntry>(data: nil, error:MockError.fileIsEmptyOrNotFound))
+            
+            callback(Result(data: nil, error: MockError.fileIsEmptyOrNotFound))
             return
         }
         guard  let jsonObjects: JSON = JSON(data:self.content!), jsonObjects != .null  else {
-            callback(Response<MediaEntry>(data: nil, error:MockError.invalidJSON))
+            callback(Result(data: nil, error: MockError.invalidJSON))
             return
         }
         guard let jsonObject: JSON = jsonObjects[self.id] , jsonObject != .null else {
-            callback(Response<MediaEntry>(data: nil, error:MockError.mediaNotFound))
+            callback(Result(data: nil, error:MockError.mediaNotFound))
             return
         }
         
         let mediaEntry : MediaEntry = MediaEntry(json: jsonObject)
-        callback(Response(data: mediaEntry, error:nil))
     }
     
 }
