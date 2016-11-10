@@ -18,6 +18,11 @@
   "platforms": {
     "ios": "8.0"
   },
+  "dependencies": {
+    "SwiftyJSON": [
+
+    ]
+  },
   "default_subspecs": "Core",
   "subspecs": [
     {

@@ -7,25 +7,58 @@
 //
 
 import UIKit
+import SwiftyJSON
 
 public class MediaEntry: NSObject {
-    let id: String
-    var sources: [MediaSource]?
-    var duration: Int64?
+    internal var id: String?
+    internal var sources: [MediaSource]?
+    internal var duration: Int64?
     
-    init(_ id: String) {
+    private let idKey = "id"
+    private let sourcesKey = "sources"
+    private let durationKey = "duration"
+    
+
+    public init(json: JSON) {
+      
+        guard let id = json[idKey].string else { return}
         self.id = id
+        self.duration = json[durationKey].int64
+        var sources : [MediaSource] = [MediaSource]()
+        for jsonSource in json[sourcesKey].array! {
+            
+            let mediaSource : MediaSource = MediaSource(json: jsonSource)
+            sources.append(mediaSource)
+        }
+        
+        self.sources = sources
     }
 }
 
 public class MediaSource {
-    let id: String
-    var contentUrl: URL?
-    var mimeType: String?
-    var drmData: DRMData?
+    internal var id: String
+    internal var contentUrl: URL?
+    internal var mimeType: String?
+    internal var drmData: DRMData?
     
-    init(id: String) {
-        self.id = id
+    
+    
+    private let idKey: String = "id"
+    private let contentUrlKey: String = "url"
+    private let mimeTypeKey: String = "mimeType"
+    private let drmDataKey: String = "drmData"
+    
+    
+    public init(json:JSON) {
+        self.id = json[idKey].string!
+        
+        if let pathString = json[contentUrlKey].string {
+                self.contentUrl = URL(string: pathString)
+        }
+        
+        if let mimeTypeString = json[mimeTypeKey].string {
+            self.mimeType = mimeTypeString
+        }
     }
 }
 
@@ -37,15 +70,7 @@ public class FairPlayDRMData: DRMData {
     var fpsCertificate: Data?    
 }
 
-public protocol MediaEntryProvider {
-    var mediaEntry: MediaEntry? { get }
-}
 
-public class MockMediaEntryProvider : MediaEntryProvider {
-    public var mediaEntry: MediaEntry?
 
-    public init(_ mockId: String) {
-        mediaEntry = MediaEntry(mockId)
-    }
-    
-}
+
+
