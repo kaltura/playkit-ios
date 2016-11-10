@@ -22,11 +22,11 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     }
     
     
-    public var id : String
-    public var url : URL?
-    public var content : Data?
+    public var id: String
+    public var url: URL?
+    public var content: Data?
     
-    private var objects : JSON?
+    private var objects: JSON?
   
     /**
      Constructor
@@ -51,7 +51,7 @@ public class MockMediaEntryProvider: MediaEntryProvider {
      - parameter fileURL full path of file
      - parameter mediaEntryId the id of the media we want to load from the file
      */
-    public init(fileURL:URL,mediaEntryId:String)
+    public init(fileURL:URL, mediaEntryId:String)
     {
         self.url = fileURL
         self.id = mediaEntryId
@@ -82,7 +82,7 @@ public class MockMediaEntryProvider: MediaEntryProvider {
      - parameter the data for loading the media
      - parameter mediaEntryId the id of the media we want to load from the file
      */
-    public init(data:Data,mediaEntryId:String)
+    public init(data:Data, mediaEntryId:String)
     {
         self.content = data
         self.id = mediaEntryId
@@ -97,11 +97,18 @@ public class MockMediaEntryProvider: MediaEntryProvider {
         }
         
         guard let content = self.content  else {
-            callback(Response<MediaEntry>(data: nil, error:MockError.fileIsEmptyOrNotFound)); return}
+            callback(Response<MediaEntry>(data: nil, error:MockError.fileIsEmptyOrNotFound))
+            return
+        }
         guard  let jsonObjects: JSON = JSON(data:self.content!), jsonObjects != .null  else {
-            callback(Response<MediaEntry>(data: nil, error:MockError.invalidJSON)); return}
+            callback(Response<MediaEntry>(data: nil, error:MockError.invalidJSON))
+            return
+        }
         guard let jsonObject: JSON = jsonObjects[self.id] , jsonObject != .null else {
-            callback(Response<MediaEntry>(data: nil, error:MockError.mediaNotFound)); return}
+            callback(Response<MediaEntry>(data: nil, error:MockError.mediaNotFound))
+            return
+        }
+        
         let mediaEntry : MediaEntry = MediaEntry(json: jsonObject)
         callback(Response(data: mediaEntry, error:nil))
     }

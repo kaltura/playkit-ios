@@ -15,7 +15,7 @@ public protocol MediaEntryProvider {
      
      ## Important:  
      - In order to write custom provider you should implement this method
-     - In order to send an informative error in the Response
+     - In order to send an informative error in the ResponseElement
      you should implement an error enum with the relevnat errors
     
      - parameter callback - a block that called on completion and returing response object wich contain the MediaEntry
@@ -25,7 +25,7 @@ public protocol MediaEntryProvider {
             CustomMediaEntryProvider(customParameters)
      
          customMediaProvider.loadMedia { 
-            (r:Response<MediaEntry>) in
+            (r:ResponseElement<MediaEntry>) in
              if (r.succedded){
              ...
      ```

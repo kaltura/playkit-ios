@@ -53,7 +53,7 @@ public class MediaSource {
         self.id = json[idKey].string!
         
         if let pathString = json[contentUrlKey].string {
-                self.contentUrl = URL(string: pathString )
+                self.contentUrl = URL(string: pathString)
         }
         
         if let mimeTypeString = json[mimeTypeKey].string {
