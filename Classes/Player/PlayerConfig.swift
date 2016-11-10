@@ -14,6 +14,7 @@ public class PlayerConfig {
     public var autoPlay = false
     public var subtitleLanguage: String?
     public var audioLanguage: String?
+    public var plugins: [String : AnyObject?]?
 
     public init() {}
     public init(_ player: Player) {
@@ -49,7 +50,13 @@ public class PlayerConfig {
     public func set(audioLanguage: String) -> Self {
         self.audioLanguage = audioLanguage
         return self
-    } 
+    }
+    
+    @discardableResult
+    public func set(plugins: [String : AnyObject?]) -> Self {
+        self.plugins = plugins
+        return self
+    }
 }
 
 

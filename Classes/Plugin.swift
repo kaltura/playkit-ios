@@ -15,6 +15,6 @@ public protocol Plugin {
 
     init()
     
-    func load(player: Player, config: PlayerConfig)
+    func load(player: Player, config: AnyObject?)
     func release()
 }

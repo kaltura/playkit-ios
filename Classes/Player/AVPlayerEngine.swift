@@ -17,6 +17,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             return _layer
         }
     }
+    
     /**
      Convenience method for setting shouldPlayWhenReady to true.
      */
@@ -57,7 +58,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             super.play()
         }
     }
-    
+        
     public override init() {
         super.init()
         _layer = AVPlayerLayer(player: self)
@@ -86,8 +87,13 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     }
     
     func prepareNext(_ config: PlayerConfig) -> Bool {
-        self.replaceCurrentItem(with: AVPlayerItem(url: URL(string: "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")!))
-        
+        if let sources = config.mediaEntry?.sources {
+            if sources.count > 0 {
+                if let contentUrl = sources[0].contentUrl {
+                    self.replaceCurrentItem(with: AVPlayerItem(url: contentUrl))
+                }
+            }
+        }
         return true
     }
     
@@ -96,6 +102,10 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     }
     
     func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver) {
+        
+    }
+    
+    func destroy() {
         
     }
 }

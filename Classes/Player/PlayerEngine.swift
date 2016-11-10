@@ -7,8 +7,11 @@
 //
 
 import Foundation
+import AVFoundation
 
 public protocol PlayerEngine {
+    var layer: CALayer! { get }
+    
     /**
      Should playback start when ready?
      If set to true after entry is loaded, this will start playback.
@@ -31,6 +34,8 @@ public protocol PlayerEngine {
      */
     func pause()
     
+    func seek(to time: CMTime)
+
     /**
      Prepare for playing the next entry. If `config.shouldAutoPlay` is true, the entry will automatically
      play when it's ready and the current entry is ended.
@@ -56,9 +61,7 @@ public protocol PlayerEngine {
     /**
      Release player resources.
      */
-    func release()
-    
-    var layer: CALayer! { get }
+    func destroy()
     
     func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver)
 }

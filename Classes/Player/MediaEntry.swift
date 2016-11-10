@@ -39,6 +39,7 @@ public class FairPlayDRMData: DRMData {
 
 public protocol MediaEntryProvider {
     var mediaEntry: MediaEntry? { get }
+    func addSource(_ id: String, contentUrl: String)
 }
 
 public class MockMediaEntryProvider : MediaEntryProvider {
@@ -47,5 +48,13 @@ public class MockMediaEntryProvider : MediaEntryProvider {
     public init(_ mockId: String) {
         mediaEntry = MediaEntry(mockId)
     }
-    
+ 
+    public func addSource(_ id: String, contentUrl: String) {
+        if mediaEntry?.sources == nil {
+            mediaEntry?.sources = [MediaSource]()
+        }
+        let source = MediaSource(id: id)
+        source.contentUrl = URL(string: contentUrl)
+        mediaEntry?.sources?.append(source)
+    }
 }

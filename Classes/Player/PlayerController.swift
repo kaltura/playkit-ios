@@ -7,54 +7,25 @@
 //
 
 import Foundation
+import AVFoundation
 
 class PlayerController: Player {
     
     var dataSource: PlayerDataSource?
+    var delegate: PlayerDelegate?
     
-    /**
-     Get the player's View component.
-     */
-    public var view: UIView?    
+    public var view: UIView?
+    
     private var currentPlayer: PlayerEngine?
-    
-    public init() {
-        currentPlayer = AVPlayerEngine()
-    }
-
-    func load(_ config: PlayerConfig) -> Bool {
-        currentPlayer?.prepareNext(config)
-        return false
-    }
-
-    func apply(_ config: PlayerConfig) -> Bool {
-        return false
-    }
     
     public var autoPlay: Bool? {
         get {
             return false
-          //  return
+            //  return
         }
         set {
             //
         }
-    }
-
-    func play() {
-        self.currentPlayer?.play()
-    }
-
-    func pause() {
-        self.currentPlayer?.pause()
-    }
-
-    func prepareNext(_ config: PlayerConfig) -> Bool {
-        return false
-    }
-
-    func loadNext() -> Bool {
-        return false
     }
     
     public var currentTime: TimeInterval? {
@@ -72,8 +43,44 @@ class PlayerController: Player {
             return self.currentPlayer?.layer
         }
     }
+
+    public init() {
+        currentPlayer = AVPlayerEngine()
+    }
+
+    func prepare(_ config: PlayerConfig) {
+        currentPlayer?.prepareNext(config)
+    }
+    
+    func play() {
+        self.currentPlayer?.play()
+    }
+
+    func pause() {
+        self.currentPlayer?.pause()
+    }
+
+    func resume() {
+        self.currentPlayer?.play()
+    }
+    
+    func seek(to time: CMTime) {
+        self.currentPlayer?.seek(to: time)
+    }
+    
+    func prepareNext(_ config: PlayerConfig) -> Bool {
+        return false
+    }
+
+    func loadNext() -> Bool {
+        return false
+    }
     
     func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver) {
         
+    }
+    
+    func destroy() {
+        self.currentPlayer?.destroy()
     }
 }

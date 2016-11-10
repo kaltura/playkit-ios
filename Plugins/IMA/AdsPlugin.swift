@@ -105,7 +105,6 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     private var isAdPlayback = false
     private var startAdCalled = false
     
-    
     override required public init() {
         super.init()
         
@@ -131,27 +130,24 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     
     //MARK: public methods
     
-    public func load(player: Player, config: PlayerConfig) {
+    public func load(player: Player, config: AnyObject?) {
         self.player = player
-        //self.adsData = config.adsData
+        self.adsData = config
 
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(AdsPlugin.update), userInfo: nil, repeats: true)
     }
     
-    public func getDecoratedPlayer() -> Player? {
+    func getDecoratedPlayer() -> PlayerDecoratorBase? {
         let decorator = AdsEnabledPlayerController()
         decorator.adsPlugin = self
-        decorator.player = self.player
         
-        /*if self.adsData != nil {
+        if self.adsData != nil {
             if let adTagUrl = self.adsData as? String {
                 decorator.adTagUrl = adTagUrl
             } else if let adTagsTimes = self.adsData as? [TimeInterval : String] {
                 decorator.adTagsTimes = adTagsTimes
             }
-        }*/
-        
-        decorator.adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="
+        }
         
         self.delegate = decorator
         return decorator
@@ -195,9 +191,9 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         AdsPlugin.adsLoader.contentComplete()
     }
     
-    /*func release() {
+    func destroy() {
         self.destroyManager()
-    }*/
+    }
 
     //MARK: private methods
     
