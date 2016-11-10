@@ -8,15 +8,21 @@
 
 import Foundation
 import AVFoundation
+import AVKit
 
 class PlayerController: Player {
     
     var dataSource: PlayerDataSource?
     var delegate: PlayerDelegate?
     
-    public var view: UIView?
-    
     private var currentPlayer: PlayerEngine?
+    private var allowPlayerEngineExpose: Bool = false
+    
+    public var playerEngine: PlayerEngine? {
+        get {
+            return allowPlayerEngineExpose ? currentPlayer : nil
+        }
+    }
     
     public var autoPlay: Bool? {
         get {
@@ -50,6 +56,7 @@ class PlayerController: Player {
 
     func prepare(_ config: PlayerConfig) {
         currentPlayer?.prepareNext(config)
+        allowPlayerEngineExpose = config.allowPlayerEngineExpose
     }
     
     func play() {
@@ -78,6 +85,16 @@ class PlayerController: Player {
     
     func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver) {
         
+    }
+    
+    @available(iOS 9.0, *)
+    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+        if let avPlayerLayer = self.currentPlayer?.layer as? AVPlayerLayer {
+            let pip = AVPictureInPictureController(playerLayer: avPlayerLayer)
+            pip?.delegate = delegate
+            return pip
+        }
+        return nil
     }
     
     func destroy() {

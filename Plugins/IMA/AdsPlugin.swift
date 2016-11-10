@@ -72,7 +72,6 @@ class AdsPluginSettings {
 public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, DecoratedPlayerProvider, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
 
     private var player: Player!
-    private var adsData: AnyObject?
     
     weak var dataSource: AdsPluginDataSource! {
         didSet {
@@ -94,7 +93,8 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     private var videoView: UIView?
     private var loadingView: UIView?
     
-    public var tagsTimes: [TimeInterval : String]? {
+    private var adTagUrl: String?
+    private var tagsTimes: [TimeInterval : String]? {
         didSet {
             sortedTagsTimes = tagsTimes!.keys.sorted()
         }
@@ -132,7 +132,14 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     
     public func load(player: Player, config: AnyObject?) {
         self.player = player
-        self.adsData = config
+        
+        if config != nil {
+            if let adTagUrl = config as? String {
+                self.adTagUrl = adTagUrl
+            } else if let adTagsTimes = config as? [TimeInterval : String] {
+                self.tagsTimes = adTagsTimes
+            }
+        }
 
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(AdsPlugin.update), userInfo: nil, repeats: true)
     }
@@ -140,43 +147,40 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     func getDecoratedPlayer() -> PlayerDecoratorBase? {
         let decorator = AdsEnabledPlayerController()
         decorator.adsPlugin = self
-        
-        if self.adsData != nil {
-            if let adTagUrl = self.adsData as? String {
-                decorator.adTagUrl = adTagUrl
-            } else if let adTagsTimes = self.adsData as? [TimeInterval : String] {
-                decorator.adTagsTimes = adTagsTimes
-            }
-        }
-        
         self.delegate = decorator
         return decorator
     }
     
-    func requestAds(with adTagUrl: String) {
-        self.startAdCalled = false
-        
-        var request: IMAAdsRequest
-        
-        /*if let avPlayer = self.player.avPlayer {
-            request = IMAAdsRequest(adTagUrl: adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), avPlayerVideoDisplay: IMAAVPlayerVideoDisplay(avPlayer: avPlayer), pictureInPictureProxy: self.pictureInPictureProxy, userContext: nil)
-        } else {*/
-            request = IMAAdsRequest(adTagUrl: adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), contentPlayhead: self, userContext: nil)
-        //}
-        
-        AdsPlugin.adsLoader.requestAds(with: request)
+    func requestAds() {
+        if self.adTagUrl != nil && self.adTagUrl != "" {
+            self.startAdCalled = false
+            
+            var request: IMAAdsRequest
+            
+            if let avPlayer = self.player.playerEngine as? AVPlayer {
+                request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), avPlayerVideoDisplay: IMAAVPlayerVideoDisplay(avPlayer: avPlayer), pictureInPictureProxy: self.pictureInPictureProxy, userContext: nil)
+            } else {
+                request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), contentPlayhead: self, userContext: nil)
+            }
+            
+            AdsPlugin.adsLoader.requestAds(with: request)
+        }
     }
     
-    func start(showLoadingView: Bool) {
-        if showLoadingView {
-            self.showLoadingView(true, alpha: 1)
+    func start(showLoadingView: Bool) -> Bool {
+        if self.adTagUrl != nil && self.adTagUrl != "" {
+            if showLoadingView {
+                self.showLoadingView(true, alpha: 1)
+            }
+            
+            if let manager = self.adsManager {
+                manager.initialize(with: self.adsRenderingSettings)
+            } else {
+                self.startAdCalled = true
+            }
+            return true
         }
-        
-        if let manager = self.adsManager {
-            manager.initialize(with: self.adsRenderingSettings)
-        } else {
-            self.startAdCalled = true
-        }
+        return false
     }
     
     func resume() {
@@ -210,9 +214,9 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         self.companionView = self.dataSource.adsPluginCompanionView?(self)
         self.videoView = self.dataSource.adsPluginVideoView(self)
         
-        /*if let _ = self.player.avPlayer {
+        if let _ = self.player.playerEngine {
             self.pictureInPictureProxy = IMAPictureInPictureProxy(avPictureInPictureControllerDelegate: self)
-        }*/
+        }
         
         if (self.companionView != nil) {
             self.companionSlot = IMACompanionAdSlot(view: self.companionView, width: Int32(self.companionView!.frame.size.width), height: Int32(self.companionView!.frame.size.height))
@@ -250,20 +254,23 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
             let key = floor(self.currentPlaybackTime)
             if self.sortedTagsTimes!.count > 0 && key >= self.sortedTagsTimes![0] {
                 if let adTag = self.tagsTimes![key] {
-                    self.tagsTimes![key] = nil
-                    self.destroyManager()
-                    self.requestAds(with: adTag)
-                    self.start(showLoadingView: false)
+                    self.updateAdTag(adTag, tagTimeKeyForRemove: key)
                 } else {
                     let closestKey = self.findClosestTimeInterval(for: key)
                     let adTag = self.tagsTimes![closestKey]
-                    self.tagsTimes![closestKey] = nil
-                    self.destroyManager()
-                    self.requestAds(with: adTag!)
-                    self.start(showLoadingView: false)
+                    self.updateAdTag(adTag!, tagTimeKeyForRemove: closestKey)
                 }
             }
         }
+    }
+    
+    private func updateAdTag(_ adTag: String, tagTimeKeyForRemove: TimeInterval) {
+        self.tagsTimes![tagTimeKeyForRemove] = nil
+        self.destroyManager()
+        
+        self.adTagUrl = adTag
+        self.requestAds()
+        self.start(showLoadingView: false)
     }
     
     private func findClosestTimeInterval(for searchItem: TimeInterval) -> TimeInterval {
@@ -350,7 +357,7 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
         if event.type == IMAAdEventType.AD_BREAK_READY || event.type == IMAAdEventType.LOADED {
             let canPlay = self.dataSource.adsPluginCanPlayAd?(self)
-            if canPlay == nil || canPlay == true /*|| self.player.avPlayer != nil*/ {
+            if canPlay == nil || canPlay == true {
                 adsManager.start()
             } else {
                 if event.type == IMAAdEventType.LOADED {
@@ -381,9 +388,9 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
-        //if self.player.avPlayer == nil {
+        if self.player.playerEngine == nil {
             self.delegate?.adsPlugin?(self, adDidProgressToTime: mediaTime, totalTime: totalTime)
-        //}
+        }
     }
     
     // MARK: AVPictureInPictureControllerDelegate

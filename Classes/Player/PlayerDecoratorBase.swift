@@ -8,6 +8,7 @@
 
 import Foundation
 import AVFoundation
+import AVKit
 
 class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
     
@@ -24,13 +25,7 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
             self.player.delegate = self
         }
     }
-    
-    public var view: UIView? {
-        get {
-            return self.player.view
-        }
-    }
-    
+        
     public var currentTime: TimeInterval? {
         get {
             return self.player.currentTime
@@ -43,6 +38,12 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
     public var layer: CALayer! {
         get {
             return self.player.layer
+        }
+    }
+    
+    public var playerEngine: PlayerEngine? {
+        get {
+            return self.player.playerEngine
         }
     }
 
@@ -95,6 +96,11 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
         self.player.resume()
     }
     
+    @available(iOS 9.0, *)
+    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+        return self.player.createPiPController(with: delegate)
+    }
+    
     //MARK: Player DataSource methods
     
     public func playerVideoView(_ player: Player) -> UIView {
@@ -120,7 +126,7 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
     }
     
     func playerAdDidRequestContentResume(_ player: Player) {
-        self.delegate?.playerAdDidRequestContentPause(self)
+        self.delegate?.playerAdDidRequestContentResume(self)
     }
     
     func player(_ player: Player, failedWith error: String) {

@@ -10,7 +10,16 @@ import Foundation
 import AVFoundation
 
 public protocol PlayerEngine {
+    
+    /**
+     Get the player's layer component.
+     */
     var layer: CALayer! { get }
+    
+    /**
+     Get/set the current player position.
+     */
+    var currentPosition: TimeInterval { get set }
     
     /**
      Should playback start when ready?
@@ -47,16 +56,6 @@ public protocol PlayerEngine {
      Load the entry that was prepared with prepareNext(), without waiting for the current entry to end.
      */
     func loadNext() -> Bool
-    
-    /**
-     Get the player's View component.
-     */
-    var view: UIView? { get }
-    
-    /**
-     Get/set the current player position.
-     */
-    var currentPosition: TimeInterval { get set }
     
     /**
      Release player resources.

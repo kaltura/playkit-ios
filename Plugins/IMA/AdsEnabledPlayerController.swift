@@ -15,32 +15,24 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
     
     var isAdPlayback = false
     var adsPlugin: AdsPlugin!
-    var adTagUrl: String?
-    var adTagsTimes: [TimeInterval : String]?
     
-    /*var player: Player! {
-        didSet {
-            self.subscribe(to: PlayerEventType.item_did_play_to_end_time, using: { (eventData: AnyObject?) -> Void in
-                self.adsPlugin.contentComplete()
-            })
-        }
-    }*/
+    override func setPlayer(_ player: Player!) {
+        super.setPlayer(player)
+        
+        /*self.subscribe(to: PlayerEventType.item_did_play_to_end_time, using: { (eventData: AnyObject?) -> Void in
+            self.adsPlugin.contentComplete()
+        })*/
+    }
     
     override var dataSource: PlayerDataSource? {
         didSet {
             self.adsPlugin.dataSource = self
-            if self.adTagUrl != "" {
-                self.adsPlugin.requestAds(with: self.adTagUrl!)
-            } else if self.adTagsTimes != nil {
-                self.adsPlugin.tagsTimes = self.adTagsTimes
-            }
+            self.adsPlugin.requestAds()
         }
     }
     
     override func play() {
-        if self.adTagUrl != "" {
-            self.adsPlugin.start(showLoadingView: true)
-        } else {
+        if !self.adsPlugin.start(showLoadingView: true) {
             super.play()
         }
     }
@@ -65,18 +57,12 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
         super.destroy()
         self.adsPlugin.destroy()
     }
-    
-    /*var avPlayer: AVPlayer? {
-        get {
-            return nil//self.player.avPlayer
-        }
-    }*/
-    
         
-    /*func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+    @available(iOS 9.0, *)
+    override func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         self.adsPlugin.pipDelegate = delegate
-        return self.player.createPiPController(with: self.adsPlugin)
-    }*/
+        return super.createPiPController(with: self.adsPlugin)
+    }
     
     private func convertToPlayerEvent(_ event: AdsPluginEventType) -> PlayerEventType {
         switch event {

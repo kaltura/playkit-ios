@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import AVKit
 
 public enum PlayerEventType : Int {
     case ad_break_ready
@@ -61,16 +62,16 @@ public protocol Player {
     var delegate: PlayerDelegate? { get set }
     
     /**
-     Get the player's View component.
+     Get the player's layer component.
      */
-    var view: UIView? { get }
+    var layer: CALayer! { get }
+    
+    var playerEngine: PlayerEngine? { get }
     
     /**
      Get/set the current player position.
      */
     var currentTime: TimeInterval? { get set }
-    
-    var layer: CALayer! { get }
     
     /**
      Should playback start when ready?
@@ -117,6 +118,9 @@ public protocol Player {
     func destroy()
     
     func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver)
+    
+    @available(iOS 9.0, *)
+    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
 }
 
 public protocol TimeObserver {

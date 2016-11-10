@@ -9,8 +9,8 @@
 import Foundation
 import AVFoundation
 
-
 class AVPlayerEngine : AVPlayer, PlayerEngine {
+    
     private var _layer: AVPlayerLayer!
     public var layer: CALayer! {
         get {
@@ -18,16 +18,22 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         }
     }
     
-    /**
-     Convenience method for setting shouldPlayWhenReady to true.
-     */
-    public func load() {
-      
+    public var currentPosition: Double {
+        get {
+            return CMTimeGetSeconds(self.currentTime())
+        }
+        set {
+            let newTime = CMTimeMakeWithSeconds(newValue, 1)
+            super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+        }
     }
-
-    /// TODO::
-    //private var asset: PlayerAsset?
-
+    
+    public var duration: Double {
+        guard let currentItem = self.currentItem else { return 0.0 }
+        
+        return CMTimeGetSeconds(currentItem.duration)
+    }
+    
     public var autoPlay: Bool = false {
         
         didSet {
@@ -40,6 +46,21 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         }
     }
     
+    /// TODO::
+    //private var asset: PlayerAsset?
+    
+    public override init() {
+        super.init()
+        _layer = AVPlayerLayer(player: self)
+    }
+    
+    /**
+     Convenience method for setting shouldPlayWhenReady to true.
+     */
+    public func load() {
+      
+    }
+
     public override func pause() {
        // autoPlay = false
         
@@ -57,33 +78,6 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             print("play")
             super.play()
         }
-    }
-        
-    public override init() {
-        super.init()
-        _layer = AVPlayerLayer(player: self)
-    }
-    
-    public var view: UIView? {
-        get {
-            return self.view
-        }
-    }
-
-    public var currentPosition: Double {
-        get {
-            return CMTimeGetSeconds(self.currentTime())
-        }
-        set {
-            let newTime = CMTimeMakeWithSeconds(newValue, 1)
-            super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
-        }
-    }
-
-    public var duration: Double {
-        guard let currentItem = self.currentItem else { return 0.0 }
-        
-        return CMTimeGetSeconds(currentItem.duration)
     }
     
     func prepareNext(_ config: PlayerConfig) -> Bool {
