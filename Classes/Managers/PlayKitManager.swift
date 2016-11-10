@@ -14,31 +14,10 @@ public class PlayKitManager: NSObject {
     
     var pluginRegistry = Dictionary<String, Plugin.Type>()
     
-    public func createPlayer(config: PlayerConfig) -> Player {
-        
-        let controller = PlayerController()
-        var decorator: Player? = nil
-        
-        for pluginName in pluginRegistry.keys {
-            if let pluginObject = createPlugin(name: pluginName) {
-                pluginObject.load(player: controller, config: config)
-                
-                if pluginObject is DecoratedPlayerProvider {
-                    if let d = (pluginObject as! DecoratedPlayerProvider).getDecoratedPlayer() {
-                        if decorator != nil {
-                            //throw exception
-                        }
-                        decorator = d
-                    }
-                }
-            }
-        }
-        
-        if decorator != nil {
-            return decorator!
-        }
-        
-        return controller
+    public func loadPlayer(config: PlayerConfig) -> Player {
+        let loader = PlayerLoader()
+        loader.load(config)
+        return loader
     }
     
     public func registerPlugin(_ pluginClass: Plugin.Type) {
