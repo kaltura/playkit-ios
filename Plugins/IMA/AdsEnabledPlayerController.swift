@@ -52,7 +52,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
             super.resume()
         }
     }
-        
+    
     @available(iOS 9.0, *)
     override func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         self.adsPlugin.pipDelegate = delegate
@@ -68,35 +68,35 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
         case .ad_break_started:
             return PlayerEventType.ad_break_started
         case .all_ads_completed:
-            return PlayerEventType.all_ads_completed
+            return PlayerEventType.ad_all_completed
         case .clicked:
-            return PlayerEventType.clicked
+            return PlayerEventType.ad_clicked
         case .complete:
-            return PlayerEventType.complete
+            return PlayerEventType.ad_complete
         case .cuepoints_changed:
-            return PlayerEventType.cuepoints_changed
+            return PlayerEventType.ad_cuepoints_changed
         case .first_quartile:
-            return PlayerEventType.first_quartile
+            return PlayerEventType.ad_first_quartile
         case .loaded:
-            return PlayerEventType.loaded
+            return PlayerEventType.ad_loaded
         case .log:
-            return PlayerEventType.log
+            return PlayerEventType.ad_log
         case .midpoint:
-            return PlayerEventType.midpoint
+            return PlayerEventType.ad_midpoint
         case .pause:
-            return PlayerEventType.pause
+            return PlayerEventType.ad_pause
         case .resume:
-            return PlayerEventType.resume
+            return PlayerEventType.ad_resume
         case .skipped:
-            return PlayerEventType.skipped
+            return PlayerEventType.ad_skipped
         case .started:
-            return PlayerEventType.started
+            return PlayerEventType.ad_started
         case .stream_loaded:
-            return PlayerEventType.stream_loaded
+            return PlayerEventType.ad_stream_loaded
         case .tapped:
-            return PlayerEventType.tapped
+            return PlayerEventType.ad_tapped
         case .third_quartile:
-            return PlayerEventType.third_quartile
+            return PlayerEventType.ad_third_quartile
         }
     }
 

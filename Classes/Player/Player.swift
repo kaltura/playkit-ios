@@ -14,23 +14,21 @@ public enum PlayerEventType : Int {
     case ad_break_ready
     case ad_break_ended
     case ad_break_started
-    case all_ads_completed
-    case clicked
-    case complete
-    case cuepoints_changed
-    case first_quartile
-    case loaded
-    case log
-    case midpoint
-    case pause
-    case resume
-    case skipped
-    case started
-    case stream_loaded
-    case tapped
-    case third_quartile
-    case playhead_state_changed
-    case item_did_play_to_end_time
+    case ad_all_completed
+    case ad_clicked
+    case ad_complete
+    case ad_cuepoints_changed
+    case ad_first_quartile
+    case ad_loaded
+    case ad_log
+    case ad_midpoint
+    case ad_pause
+    case ad_resume
+    case ad_skipped
+    case ad_started
+    case ad_stream_loaded
+    case ad_tapped
+    case ad_third_quartile
 }
 
 public protocol PlayerDataSource: class {
