@@ -150,7 +150,6 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     func getDecoratedPlayer() -> PlayerDecoratorBase? {
         let decorator = AdsEnabledPlayerController()
         decorator.adsPlugin = self
-        self.delegate = decorator
         return decorator
     }
     

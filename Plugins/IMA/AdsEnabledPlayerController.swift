@@ -31,6 +31,12 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
         }
     }
     
+    override var delegate: PlayerDelegate? {
+        didSet {
+            self.adsPlugin.delegate = self
+        }
+    }
+    
     override func play() {
         if !self.adsPlugin.start(showLoadingView: true) {
             super.play()
