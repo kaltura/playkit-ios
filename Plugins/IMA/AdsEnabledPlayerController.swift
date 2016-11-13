@@ -52,11 +52,6 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
             super.resume()
         }
     }
-
-    override func destroy() {
-        super.destroy()
-        self.adsPlugin.destroy()
-    }
         
     @available(iOS 9.0, *)
     override func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {

@@ -10,7 +10,9 @@ import Foundation
 
 class PlayerLoader: PlayerDecoratorBase {
     
-    func load(_ config: PlayerConfig) {
+    var loadedPlugins = [Plugin]()
+    
+    func load(_ config: PlayerConfig) throws {
         var player: Player = PlayerController()
         player.prepare(config)
         
@@ -24,12 +26,14 @@ class PlayerLoader: PlayerDecoratorBase {
                     if pluginObject is DecoratedPlayerProvider {
                         if let d = (pluginObject as! DecoratedPlayerProvider).getDecoratedPlayer() {
                             if decorator != nil {
-                                //throw exception
+                                throw PlayKitError.multipleDecoratorsDetected
                             }
                             decorator = d
                             decorator!.setPlayer(player)
                         }
                     }
+                    
+                    loadedPlugins.append(pluginObject)
                 }
             }
         }
@@ -39,5 +43,12 @@ class PlayerLoader: PlayerDecoratorBase {
         }
         
         setPlayer(player)
+    }
+    
+    override func destroy() {
+        for plugin in loadedPlugins {
+            plugin.destroy()
+        }
+        super.destroy()
     }
 }

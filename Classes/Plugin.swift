@@ -16,5 +16,6 @@ public protocol Plugin {
     init()
     
     func load(player: Player, config: AnyObject?)
-    func release()
+    
+    func destroy()
 }

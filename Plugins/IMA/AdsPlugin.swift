@@ -105,6 +105,20 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     private var isAdPlayback = false
     private var startAdCalled = false
     
+    public var currentTime: TimeInterval {
+        get {
+            return self.currentPlaybackTime
+        }
+    }
+    
+    //MARK: plugin protocol methods
+    
+    public static var pluginName: String {
+        get {
+            return String(describing: AdsPlugin.self)
+        }
+    }
+
     override required public init() {
         super.init()
         
@@ -116,20 +130,6 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         AdsPlugin.adsLoader.delegate = self
     }
     
-    public var currentTime: TimeInterval {
-        get {
-            return self.currentPlaybackTime
-        }
-    }
-    
-    public static var pluginName: String {
-        get {
-           return String(describing: AdsPlugin.self)
-        }
-    }
-    
-    //MARK: public methods
-    
     public func load(player: Player, config: AnyObject?) {
         self.player = player
         
@@ -140,9 +140,15 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
                 self.tagsTimes = adTagsTimes
             }
         }
-
+        
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(AdsPlugin.update), userInfo: nil, repeats: true)
     }
+
+    public func destroy() {
+        self.destroyManager()
+    }
+
+    //MARK: DecoratedPlayerProvider protocol methods
     
     func getDecoratedPlayer() -> PlayerDecoratorBase? {
         let decorator = AdsEnabledPlayerController()
@@ -150,6 +156,8 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         self.delegate = decorator
         return decorator
     }
+    
+    //MARK: public methods
     
     func requestAds() {
         if self.adTagUrl != nil && self.adTagUrl != "" {
@@ -195,10 +203,6 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         AdsPlugin.adsLoader.contentComplete()
     }
     
-    func destroy() {
-        self.destroyManager()
-    }
-
     //MARK: private methods
     
     private func setupAdsLoader(with settings: AdsPluginSettings) {
