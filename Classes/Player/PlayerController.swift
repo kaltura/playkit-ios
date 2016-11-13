@@ -44,9 +44,9 @@ class PlayerController: Player {
         }
     }
     
-    public var layer: CALayer! {
+    public var view: UIView! {
         get {
-            return self.currentPlayer?.layer
+            return self.currentPlayer?.view
         }
     }
 
@@ -89,12 +89,7 @@ class PlayerController: Player {
     
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        if let avPlayerLayer = self.currentPlayer?.layer as? AVPlayerLayer {
-            let pip = AVPictureInPictureController(playerLayer: avPlayerLayer)
-            pip?.delegate = delegate
-            return pip
-        }
-        return nil
+        return self.currentPlayer?.createPiPController(with: delegate)
     }
     
     func destroy() {

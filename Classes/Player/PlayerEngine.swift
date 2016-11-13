@@ -8,13 +8,14 @@
 
 import Foundation
 import AVFoundation
+import AVKit
 
 public protocol PlayerEngine {
     
     /**
-     Get the player's layer component.
+     Get the player's view component.
      */
-    var layer: CALayer! { get }
+    var view: UIView! { get }
     
     /**
      Get/set the current player position.
@@ -63,4 +64,7 @@ public protocol PlayerEngine {
     func destroy()
     
     func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver)
+    
+    @available(iOS 9.0, *)
+    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
 }

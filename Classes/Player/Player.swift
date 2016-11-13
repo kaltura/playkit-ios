@@ -62,7 +62,7 @@ public protocol Player {
     /**
      Get the player's layer component.
      */
-    var layer: CALayer! { get }
+    var view: UIView! { get }
     
     var playerEngine: PlayerEngine? { get }
     

@@ -35,9 +35,9 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
         }
     }
     
-    public var layer: CALayer! {
+    public var view: UIView! {
         get {
-            return self.player.layer
+            return self.player.view
         }
     }
     

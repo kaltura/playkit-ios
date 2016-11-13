@@ -8,13 +8,16 @@
 
 import Foundation
 import AVFoundation
+import AVKit
 
 class AVPlayerEngine : AVPlayer, PlayerEngine {
     
-    private var _layer: AVPlayerLayer!
-    public var layer: CALayer! {
+    private var avPlayerLayer: AVPlayerLayer!
+    
+    private var _view: PlayerView!
+    public var view: UIView! {
         get {
-            return _layer
+            return _view
         }
     }
     
@@ -51,7 +54,8 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     
     public override init() {
         super.init()
-        _layer = AVPlayerLayer(player: self)
+        avPlayerLayer = AVPlayerLayer(player: self)
+        _view = PlayerView(playerLayer: avPlayerLayer)
     }
     
     /**
@@ -101,6 +105,13 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     
     func destroy() {
         
+    }
+    
+    @available(iOS 9.0, *)
+    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?{
+        let pip = AVPictureInPictureController(playerLayer: avPlayerLayer)
+        pip?.delegate = delegate
+        return pip
     }
 }
 
