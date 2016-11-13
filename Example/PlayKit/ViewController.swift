@@ -9,17 +9,37 @@
 import UIKit
 import PlayKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, SessionProvider {
 
+    
+    var ks: String = ""
+    var udid: String  = ""
+    var partnerId: Int64 = 198
+    var serverURL: String  = "http://52.210.223.65:8080/v4_0/api_v3"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        let request: Request = Request().set(url: URL(string: "www.google.com")).set { (r:Response) in
-            print(r)
+        if let requestBuilder: RequestBuilder = OTTUserService.login(sessionProvider: self, username:"rivka@p.com", password: "123456"){
+            let request = requestBuilder.set(completion: { (r:Response) in
+                
+                if let data = r.data {
+                    do {
+                    let object: Any = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions())
+                    print(object)
+                    }catch{
+                        
+                    }
+                }else{
+                    guard let e = r.error else {return}
+                    print(e)
+                }
+            }).build()
+            
+            USRExecutor().send(request: request)
+            
+            
         }
-        
-        URLSessionRequestExecutor().send(request: request)
-        
         
     }
 
