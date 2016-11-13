@@ -102,11 +102,7 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
     }
     
     //MARK: Player DataSource methods
-    
-    public func playerVideoView(_ player: Player) -> UIView {
-        return self.dataSource!.playerVideoView(self)
-    }
-    
+        
     func playerCanPlayAd(_ player: Player) -> Bool {
         return self.dataSource!.playerCanPlayAd(self)
     }

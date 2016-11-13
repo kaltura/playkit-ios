@@ -99,10 +99,6 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
             return PlayerEventType.ad_third_quartile
         }
     }
-
-    func adsPluginVideoView(_ adsPlugin: AdsPlugin) -> UIView {
-        return self.dataSource!.playerVideoView(self)
-    }
     
     func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
         return self.dataSource!.playerCanPlayAd(self)

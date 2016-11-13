@@ -30,8 +30,6 @@ import GoogleInteractiveMediaAds
 }
 
 @objc protocol AdsPluginDataSource : class {
-    func adsPluginVideoView(_ adsPlugin: AdsPlugin) -> UIView
-    
     @objc optional func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool
     @objc optional func adsPluginCompanionView(_ adsPlugin: AdsPlugin) -> UIView?
     @objc optional func adsPluginVideoBitrate(_ adsPlugin: AdsPlugin) -> Int32
@@ -90,7 +88,6 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     private var pictureInPictureProxy: IMAPictureInPictureProxy?
 
     private var companionView: UIView?
-    private var videoView: UIView?
     private var loadingView: UIView?
     
     private var adTagUrl: String?
@@ -216,7 +213,6 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
 
     private func setupMainView() {
         self.companionView = self.dataSource.adsPluginCompanionView?(self)
-        self.videoView = self.dataSource.adsPluginVideoView(self)
         
         if let _ = self.player.playerEngine {
             self.pictureInPictureProxy = IMAPictureInPictureProxy(avPictureInPictureControllerDelegate: self)
@@ -242,6 +238,7 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         self.loadingView!.addConstraint(NSLayoutConstraint(item: self.loadingView!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: indicator, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         self.loadingView!.addConstraint(NSLayoutConstraint(item: self.loadingView!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: indicator, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
         
+        let videoView = self.player.view
         videoView?.addSubview(self.loadingView!)
         videoView?.addConstraint(NSLayoutConstraint(item: videoView!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0))
         videoView?.addConstraint(NSLayoutConstraint(item: videoView!, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.left, multiplier: 1, constant: 0))
@@ -250,7 +247,7 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     }
     
     private func createAdDisplayContainer() -> IMAAdDisplayContainer {
-        return IMAAdDisplayContainer(adContainer: self.dataSource.adsPluginVideoView(self), companionSlots: self.companionView != nil ? [self.companionSlot!] : nil)
+        return IMAAdDisplayContainer(adContainer: self.player.view, companionSlots: self.companionView != nil ? [self.companionSlot!] : nil)
     }
 
     private func loadAdsIfNeeded() {
@@ -317,7 +314,7 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         self.loadingView!.alpha = alpha
         self.loadingView!.isHidden = !show
 
-        self.videoView?.bringSubview(toFront: self.loadingView!)
+        self.player.view?.bringSubview(toFront: self.loadingView!)
     }
     
     private func resumeContentPlayback() {
