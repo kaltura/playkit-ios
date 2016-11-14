@@ -110,14 +110,6 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
         return self.dataSource!.playerCanPlayAd(self)
     }
     
-    func adsPluginCompanionView(_ adsPlugin: AdsPlugin) -> UIView? {
-        return self.dataSource!.playerCompanionView(self)
-    }
-    
-    func adsPluginWebOpenerPresentingController(_ adsPlugin: AdsPlugin) -> UIViewController? {
-        return self.dataSource!.playerAdWebOpenerPresentingController(self)
-    }
-    
     func adsPluginDidRequestContentPause(_ adsPlugin: AdsPlugin) {
         self.isAdPlayback = true
         self.delegate?.player(self, didReceive: PlayerEventType.ad_did_pause, with: nil)

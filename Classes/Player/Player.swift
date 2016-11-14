@@ -41,8 +41,6 @@ public enum PlayerEventType : Int {
 
 public protocol PlayerDataSource: class {
     func playerCanPlayAd(_ player: Player) -> Bool
-    func playerCompanionView(_ player: Player) -> UIView?
-    func playerAdWebOpenerPresentingController(_ player: Player) -> UIViewController?
 }
 
 public protocol PlayerDelegate: class {

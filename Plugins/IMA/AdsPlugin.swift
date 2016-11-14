@@ -31,10 +31,6 @@ import GoogleInteractiveMediaAds
 
 @objc protocol AdsPluginDataSource : class {
     @objc optional func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool
-    @objc optional func adsPluginCompanionView(_ adsPlugin: AdsPlugin) -> UIView?
-    @objc optional func adsPluginVideoBitrate(_ adsPlugin: AdsPlugin) -> Int32
-    @objc optional func adsPluginVideoMimeTypes(_ adsPlugin: AdsPlugin) -> [AnyObject]
-    @objc optional func adsPluginWebOpenerPresentingController(_ adsPlugin: AdsPlugin) -> UIViewController?
 }
 
 @objc protocol AdsPluginDelegate : class {
@@ -49,22 +45,6 @@ import GoogleInteractiveMediaAds
     @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerDidOpenInAppBrowser webOpener: NSObject!)
     @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerWillCloseInAppBrowser webOpener: NSObject!)
     @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerDidCloseInAppBrowser webOpener: NSObject!)
-}
-
-class AdsPluginSettings {
-    var language: String = "en"
-    var enableBackgroundPlayback: Bool = true
-    var autoPlayAdBreaks: Bool = false
-    
-    init() {
-        
-    }
-    
-    init(language: String, enableBackgroundPlayback: Bool, autoPlayAdBreaks: Bool) {
-        self.language = language
-        self.enableBackgroundPlayback = enableBackgroundPlayback
-        self.autoPlayAdBreaks = autoPlayAdBreaks
-    }
 }
 
 public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, DecoratedPlayerProvider, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
@@ -86,10 +66,9 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     private static var adsLoader: IMAAdsLoader!
     
     private var pictureInPictureProxy: IMAPictureInPictureProxy?
-
-    private var companionView: UIView?
     private var loadingView: UIView?
     
+    private var config: AdsConfig!
     private var adTagUrl: String?
     private var tagsTimes: [TimeInterval : String]? {
         didSet {
@@ -108,6 +87,10 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         }
     }
     
+    override public required init() {
+        
+    }
+    
     //MARK: plugin protocol methods
     
     public static var pluginName: String {
@@ -115,25 +98,22 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
             return String(describing: AdsPlugin.self)
         }
     }
-
-    override required public init() {
-        super.init()
-        
-        if AdsPlugin.adsLoader == nil {
-            self.setupAdsLoader(with: AdsPluginSettings(language: "en", enableBackgroundPlayback: true, autoPlayAdBreaks: false))
-        }
-        
-        AdsPlugin.adsLoader.contentComplete()
-        AdsPlugin.adsLoader.delegate = self
-    }
     
-    public func load(player: Player, config: AnyObject?) {
-        self.player = player
-        
-        if config != nil {
-            if let adTagUrl = config as? String {
+    public func load(player: Player, config: Any?) {
+        if let adsConfig = config as? AdsConfig {
+            self.config = adsConfig
+            self.player = player
+            
+            if AdsPlugin.adsLoader == nil {
+                self.setupAdsLoader(with: self.config)
+            }
+            
+            AdsPlugin.adsLoader.contentComplete()
+            AdsPlugin.adsLoader.delegate = self
+            
+            if let adTagUrl = self.config.adTagUrl {
                 self.adTagUrl = adTagUrl
-            } else if let adTagsTimes = config as? [TimeInterval : String] {
+            } else if let adTagsTimes = self.config.tagsTimes {
                 self.tagsTimes = adTagsTimes
             }
         }
@@ -201,24 +181,22 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     
     //MARK: private methods
     
-    private func setupAdsLoader(with settings: AdsPluginSettings) {
+    private func setupAdsLoader(with config: AdsConfig) {
         let imaSettings: IMASettings! = IMASettings()
-        imaSettings.language = settings.language
-        imaSettings.enableBackgroundPlayback = settings.enableBackgroundPlayback
-        imaSettings.autoPlayAdBreaks = settings.autoPlayAdBreaks
+        imaSettings.language = config.language
+        imaSettings.enableBackgroundPlayback = config.enableBackgroundPlayback
+        imaSettings.autoPlayAdBreaks = config.autoPlayAdBreaks
         
         AdsPlugin.adsLoader = IMAAdsLoader(settings: imaSettings)
     }
 
     private func setupMainView() {
-        self.companionView = self.dataSource.adsPluginCompanionView?(self)
-        
         if let _ = self.player.playerEngine {
             self.pictureInPictureProxy = IMAPictureInPictureProxy(avPictureInPictureControllerDelegate: self)
         }
         
-        if (self.companionView != nil) {
-            self.companionSlot = IMACompanionAdSlot(view: self.companionView, width: Int32(self.companionView!.frame.size.width), height: Int32(self.companionView!.frame.size.height))
+        if (self.config.companionView != nil) {
+            self.companionSlot = IMACompanionAdSlot(view: self.config.companionView, width: Int32(self.config.companionView!.frame.size.width), height: Int32(self.config.companionView!.frame.size.height))
         }
     }
     
@@ -246,7 +224,7 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     }
     
     private func createAdDisplayContainer() -> IMAAdDisplayContainer {
-        return IMAAdDisplayContainer(adContainer: self.player.view, companionSlots: self.companionView != nil ? [self.companionSlot!] : nil)
+        return IMAAdDisplayContainer(adContainer: self.player.view, companionSlots: self.config.companionView != nil ? [self.companionSlot!] : nil)
     }
 
     private func loadAdsIfNeeded() {
@@ -293,14 +271,14 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     
     private func createRenderingSettings() {
         self.adsRenderingSettings.webOpenerDelegate = self
-        if let webOpenerPresentingController = self.dataSource.adsPluginWebOpenerPresentingController?(self) {
+        if let webOpenerPresentingController = self.config.webOpenerPresentingController {
             self.adsRenderingSettings.webOpenerPresentingController = webOpenerPresentingController
         }
         
-        if let bitrate = self.dataSource.adsPluginVideoBitrate?(self) {
+        if let bitrate = self.config.videoBitrate {
             self.adsRenderingSettings.bitrate = bitrate
         }
-        if let mimeTypes = self.dataSource.adsPluginVideoMimeTypes?(self) {
+        if let mimeTypes = self.config.videoMimeTypes {
             self.adsRenderingSettings.mimeTypes = mimeTypes
         }
     }

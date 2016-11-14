@@ -107,14 +107,6 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
         return self.dataSource!.playerCanPlayAd(self)
     }
     
-    func playerCompanionView(_ player: Player) -> UIView? {
-        return self.dataSource!.playerCompanionView(self)
-    }
-    
-    func playerAdWebOpenerPresentingController(_ player: Player) -> UIViewController? {
-        return self.dataSource!.playerAdWebOpenerPresentingController(self)
-    }
-    
     //MARK: Player Delegate methods
     
     func player(_ player: Player, failedWith error: String) {
