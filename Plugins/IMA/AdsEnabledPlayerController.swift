@@ -120,12 +120,12 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
     
     func adsPluginDidRequestContentPause(_ adsPlugin: AdsPlugin) {
         self.isAdPlayback = true
-        self.delegate?.playerAdDidRequestContentPause(self)
+        self.delegate?.player(self, didReceive: PlayerEventType.ad_did_pause, with: nil)
     }
     
     func adsPluginDidRequestContentResume(_ adsPlugin: AdsPlugin) {
         self.isAdPlayback = false
-        self.delegate?.playerAdDidRequestContentResume(self)
+        self.delegate?.player(self, didReceive: PlayerEventType.ad_did_resume, with: nil)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, failedWith error: String) {
@@ -134,30 +134,33 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive adEvent: AdsPluginEventType) {
-        self.delegate?.player(self, didReceive: self.convertToPlayerEvent(adEvent))
+        self.delegate?.player(self, didReceive: self.convertToPlayerEvent(adEvent), with: nil)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
-        self.delegate?.player(self, adDidProgressToTime: mediaTime, totalTime: totalTime)
+        var data = [String : TimeInterval]()
+        data["mediaTime"] = mediaTime
+        data["totalTime"] = totalTime
+        self.delegate?.player(self, didReceive: PlayerEventType.ad_did_progress_to_time, with: data)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerDidOpenInAppBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerDidOpenInAppBrowser: webOpener)
+        self.delegate?.player(self, didReceive: PlayerEventType.ad_web_opener_did_open_in_app_browser, with: webOpener)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerWillOpenInAppBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerWillOpenInAppBrowser: webOpener)
+        self.delegate?.player(self, didReceive: PlayerEventType.ad_web_opener_will_open_in_app_browser, with: webOpener)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerDidCloseInAppBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerDidCloseInAppBrowser: webOpener)
+        self.delegate?.player(self, didReceive: PlayerEventType.ad_web_opener_did_close_in_app_browser, with: webOpener)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerWillCloseInAppBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerWillCloseInAppBrowser: webOpener)
+        self.delegate?.player(self, didReceive: PlayerEventType.ad_web_opener_will_close_in_app_browser, with: webOpener)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerWillOpenExternalBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerWillOpenInAppBrowser: webOpener)
+        self.delegate?.player(self, didReceive: PlayerEventType.ad_web_opener_will_open_external_browser, with: webOpener)
     }
 }

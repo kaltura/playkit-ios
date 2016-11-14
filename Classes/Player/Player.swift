@@ -29,6 +29,14 @@ public enum PlayerEventType : Int {
     case ad_stream_loaded
     case ad_tapped
     case ad_third_quartile
+    case ad_web_opener_will_open_external_browser
+    case ad_web_opener_will_open_in_app_browser
+    case ad_web_opener_did_open_in_app_browser
+    case ad_web_opener_will_close_in_app_browser
+    case ad_web_opener_did_close_in_app_browser
+    case ad_did_progress_to_time
+    case ad_did_pause
+    case ad_did_resume
 }
 
 public protocol PlayerDataSource: class {
@@ -39,17 +47,7 @@ public protocol PlayerDataSource: class {
 
 public protocol PlayerDelegate: class {
     func player(_ player: Player, failedWith error: String)
-    func player(_ player: Player, didReceive event: PlayerEventType)
-    
-    func player(_ player: Player, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval)
-    func playerAdDidRequestContentResume(_ player: Player)
-    func playerAdDidRequestContentPause(_ player: Player)
-    
-    func player(_ player: Player, adWebOpenerWillOpenExternalBrowser webOpener: NSObject!)
-    func player(_ player: Player, adWebOpenerWillOpenInAppBrowser webOpener: NSObject!)
-    func player(_ player: Player, adWebOpenerDidOpenInAppBrowser webOpener: NSObject!)
-    func player(_ player: Player, adWebOpenerWillCloseInAppBrowser webOpener: NSObject!)
-    func player(_ player: Player, adWebOpenerDidCloseInAppBrowser webOpener: NSObject!)
+    func player(_ player: Player, didReceive event: PlayerEventType, with eventData: Any?)
 }
 
 public protocol Player {

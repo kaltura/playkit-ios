@@ -117,43 +117,11 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
     
     //MARK: Player Delegate methods
     
-    func playerAdDidRequestContentPause(_ player: Player) {
-        self.delegate?.playerAdDidRequestContentPause(self)
-    }
-    
-    func playerAdDidRequestContentResume(_ player: Player) {
-        self.delegate?.playerAdDidRequestContentResume(self)
-    }
-    
     func player(_ player: Player, failedWith error: String) {
         self.delegate?.player(self, failedWith: error)
     }
     
-    func player(_ player: Player, didReceive event: PlayerEventType) {
-        self.delegate?.player(self, didReceive: event)
-    }
-    
-    func player(_ player: Player, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
-        self.delegate?.player(self, adDidProgressToTime: mediaTime, totalTime: totalTime)
-    }
-    
-    func player(_ player: Player, adWebOpenerDidOpenInAppBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerDidOpenInAppBrowser: webOpener)
-    }
-    
-    func player(_ player: Player, adWebOpenerDidCloseInAppBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerDidCloseInAppBrowser: webOpener)
-    }
-    
-    func player(_ player: Player, adWebOpenerWillOpenInAppBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerWillOpenInAppBrowser: webOpener)
-    }
-    
-    func player(_ player: Player, adWebOpenerWillCloseInAppBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerWillCloseInAppBrowser: webOpener)
-    }
-    
-    func player(_ player: Player, adWebOpenerWillOpenExternalBrowser webOpener: NSObject!) {
-        self.delegate?.player(self, adWebOpenerWillOpenExternalBrowser: webOpener)
+    func player(_ player: Player, didReceive event: PlayerEventType, with eventData: Any?) {
+        self.delegate?.player(self, didReceive: event, with: eventData)
     }
 }
