@@ -8,43 +8,13 @@
 
 import GoogleInteractiveMediaAds
 
-@objc enum AdsPluginEventType : Int {
-    case ad_break_ready
-    case ad_break_ended
-    case ad_break_started
-    case all_ads_completed
-    case clicked
-    case complete
-    case cuepoints_changed
-    case first_quartile
-    case loaded
-    case log
-    case midpoint
-    case pause
-    case resume
-    case skipped
-    case started
-    case stream_loaded
-    case tapped
-    case third_quartile
+protocol AdsPluginDataSource : class {
+    func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool
 }
 
-@objc protocol AdsPluginDataSource : class {
-    @objc optional func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool
-}
-
-@objc protocol AdsPluginDelegate : class {
-    @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, failedWith error: String)
-    @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, didReceive adEvent: AdsPluginEventType)
-    @objc optional func adsPluginDidRequestContentResume(_ adsPlugin: AdsPlugin)
-    @objc optional func adsPluginDidRequestContentPause(_ adsPlugin: AdsPlugin)
-    @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval)
-    
-    @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerWillOpenExternalBrowser webOpener: NSObject!)
-    @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerWillOpenInAppBrowser webOpener: NSObject!)
-    @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerDidOpenInAppBrowser webOpener: NSObject!)
-    @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerWillCloseInAppBrowser webOpener: NSObject!)
-    @objc optional func adsPlugin(_ adsPlugin: AdsPlugin, webOpenerDidCloseInAppBrowser webOpener: NSObject!)
+protocol AdsPluginDelegate : class {
+    func adsPlugin(_ adsPlugin: AdsPlugin, failedWith error: String)
+    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PlayerEventType, with eventData: Any?)
 }
 
 public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, DecoratedPlayerProvider, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
@@ -299,6 +269,47 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         self.player.play()
     }
     
+    private func convertToPlayerEvent(_ event: IMAAdEventType) -> PlayerEventType {
+        switch event {
+        case .AD_BREAK_READY:
+            return PlayerEventType.ad_break_ready
+        case .AD_BREAK_ENDED:
+            return PlayerEventType.ad_break_ended
+        case .AD_BREAK_STARTED:
+            return PlayerEventType.ad_break_started
+        case .ALL_ADS_COMPLETED:
+            return PlayerEventType.ad_all_completed
+        case .CLICKED:
+            return PlayerEventType.ad_clicked
+        case .COMPLETE:
+            return PlayerEventType.ad_complete
+        case .CUEPOINTS_CHANGED:
+            return PlayerEventType.ad_cuepoints_changed
+        case .FIRST_QUARTILE:
+            return PlayerEventType.ad_first_quartile
+        case .LOADED:
+            return PlayerEventType.ad_loaded
+        case .LOG:
+            return PlayerEventType.ad_log
+        case .MIDPOINT:
+            return PlayerEventType.ad_midpoint
+        case .PAUSE:
+            return PlayerEventType.ad_paused
+        case .RESUME:
+            return PlayerEventType.ad_resumed
+        case .SKIPPED:
+            return PlayerEventType.ad_skipped
+        case .STARTED:
+            return PlayerEventType.ad_started
+        case .STREAM_LOADED:
+            return PlayerEventType.ad_stream_loaded
+        case .TAPPED:
+            return PlayerEventType.ad_tapped
+        case .THIRD_QUARTILE:
+            return PlayerEventType.ad_third_quartile
+        }
+    }
+
     private func destroyManager() {
         self.adsManager?.destroy()
         self.adsManager = nil
@@ -318,7 +329,7 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     
     public func adsLoader(_ loader: IMAAdsLoader!, failedWith adErrorData: IMAAdLoadingErrorData!) {
         print(adErrorData.adError.message)
-        self.delegate?.adsPlugin?(self, failedWith: adErrorData.adError.message)
+        self.delegate?.adsPlugin(self, failedWith: adErrorData.adError.message)
         self.resumeContentPlayback()
     }
     
@@ -334,7 +345,7 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
         if event.type == IMAAdEventType.AD_BREAK_READY || event.type == IMAAdEventType.LOADED {
-            let canPlay = self.dataSource.adsPluginCanPlayAd?(self)
+            let canPlay = self.dataSource.adsPluginCanPlayAd(self)
             if canPlay == nil || canPlay == true {
                 adsManager.start()
             } else {
@@ -345,29 +356,32 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         } else if event.type == IMAAdEventType.AD_BREAK_STARTED || event.type == IMAAdEventType.STARTED {
             self.showLoadingView(false, alpha: 0)
         }
-        self.delegate?.adsPlugin?(self, didReceive: AdsPluginEventType(rawValue: event.type.rawValue)!)
+        self.delegate?.adsPlugin(self, didReceive: self.convertToPlayerEvent(event.type), with: nil)
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
-        self.delegate?.adsPlugin?(self, failedWith: error.message)
+        self.delegate?.adsPlugin(self, failedWith: error.message)
         self.resumeContentPlayback()
     }
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
-        self.delegate?.adsPluginDidRequestContentPause?(self)
+        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_did_request_pause, with: nil)
         self.isAdPlayback = true
         self.player.pause()
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
-        self.delegate?.adsPluginDidRequestContentResume?(self)
+        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_did_request_resume, with: nil)
         self.isAdPlayback = false
         self.resumeContentPlayback()
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
         if self.player.playerEngine == nil {
-            self.delegate?.adsPlugin?(self, adDidProgressToTime: mediaTime, totalTime: totalTime)
+            var data = [String : TimeInterval]()
+            data["mediaTime"] = mediaTime
+            data["totalTime"] = totalTime
+            self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_did_progress_to_time, with: data)
         }
     }
     
@@ -406,22 +420,22 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     // MARK: IMAWebOpenerDelegate
     
     public func webOpenerWillOpenExternalBrowser(_ webOpener: NSObject!) {
-        self.delegate?.adsPlugin?(self, webOpenerWillOpenExternalBrowser: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_will_open_external_browser, with: webOpener)
     }
     
     public func webOpenerWillOpen(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin?(self, webOpenerWillOpenInAppBrowser: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_will_open_in_app_browser, with: webOpener)
     }
     
     public func webOpenerDidOpen(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin?(self, webOpenerDidOpenInAppBrowser: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_did_open_in_app_browser, with: webOpener)
     }
     
     public func webOpenerWillClose(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin?(self, webOpenerWillCloseInAppBrowser: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_will_close_in_app_browser, with: webOpener)
     }
     
     public func webOpenerDidClose(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin?(self, webOpenerDidCloseInAppBrowser: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_did_close_in_app_browser, with: webOpener)
     }
 }

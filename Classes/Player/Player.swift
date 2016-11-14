@@ -22,8 +22,8 @@ public enum PlayerEventType : Int {
     case ad_loaded
     case ad_log
     case ad_midpoint
-    case ad_pause
-    case ad_resume
+    case ad_paused
+    case ad_resumed
     case ad_skipped
     case ad_started
     case ad_stream_loaded
@@ -35,8 +35,8 @@ public enum PlayerEventType : Int {
     case ad_web_opener_will_close_in_app_browser
     case ad_web_opener_did_close_in_app_browser
     case ad_did_progress_to_time
-    case ad_did_pause
-    case ad_did_resume
+    case ad_did_request_pause
+    case ad_did_request_resume
 }
 
 public protocol PlayerDataSource: class {
