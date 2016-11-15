@@ -24,12 +24,10 @@ public class OTTEntryProvider: MediaEntryProvider {
         
     }
     
-    public init( sessionProvider:SessionProvider, mediaId: String, type:AssetType){
+    public init(sessionProvider:SessionProvider, mediaId: String, type:AssetType,formats: [String]){
         self.sessionProvider = sessionProvider
         self.mediaId = mediaId
         self.type = type
-        
-
     }
     
     public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
