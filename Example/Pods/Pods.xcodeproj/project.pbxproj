@@ -27,18 +27,18 @@
 		843154D31DD49BFD00D1BB96 /* RequestExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154D21DD49BFD00D1BB96 /* RequestExecutor.swift */; };
 		843154D71DD4A26000D1BB96 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154D61DD4A26000D1BB96 /* Response.swift */; };
 		843154D91DD4B55D00D1BB96 /* USRExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154D81DD4B55D00D1BB96 /* USRExecutor.swift */; };
-		843D62BC1DD8ECF00003F461 /* OTTEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843D62BB1DD8ECF00003F461 /* OTTEntryProvider.swift */; };
-		843D62BE1DD8ED5A0003F461 /* AssetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843D62BD1DD8ED5A0003F461 /* AssetService.swift */; };
+		8483C8A61DDAF73F00984647 /* AssetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A41DDAF73F00984647 /* AssetService.swift */; };
+		8483C8A71DDAF73F00984647 /* OTTUserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A51DDAF73F00984647 /* OTTUserService.swift */; };
+		8483C8A81DDAF8DC00984647 /* MockMediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A01DDAF71600984647 /* MockMediaProvider.swift */; };
+		8483C8A91DDAF8E300984647 /* OTTEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A21DDAF71600984647 /* OTTEntryProvider.swift */; };
 		84D3DB7A1DD8D04700E79EBA /* RestRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */; };
 		84D3DB7C1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */; };
-		84D3DB7E1DD8DBA000E79EBA /* OTTUserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB7D1DD8DBA000E79EBA /* OTTUserService.swift */; };
 		84D3DB801DD8DC3600E79EBA /* SessionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB7F1DD8DC3600E79EBA /* SessionProvider.swift */; };
 		899A4846612B1A3839E7ED12BF43C67B /* PlayKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 070E84F76AC3FC5E27EC814B74C3DB37 /* PlayKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		94D52CFFC946CB9F43DEC56A44310A94 /* MediaEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51139F3E0E0E46EBFB2AAF2B114B579F /* MediaEntryProvider.swift */; };
 		A31CA6C3FB83BC8671FC30B4CF35BF93 /* Pods-PlayKit_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 03DD4247E2D34442878F7945CD89C0C5 /* Pods-PlayKit_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B04AE2542EEAE9034697DCC18C0473F9 /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85929CB4ACE3B622D783281B3A29300 /* PlayerImp.swift */; };
 		B420C473377722F4D49F0BA0CE93842A /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30BD1676138246EC59A34949DC977D2 /* PlayerConfig.swift */; };
-		C2B3569C5D1022B6596B41FC4758C0FA /* MockMediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390163C2EB1EEAE464A474BA6D326A5B /* MockMediaProvider.swift */; };
 		D498B9A836DDFA5AC7C1CCCD472476DD /* SwiftyJSON-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D7ECC5C8E2621F999CBE41E736CC212D /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4303F57B465B830A536EF90803CBDF44 /* MediaEntry.swift */; };
 		DC9592BE3A822FEF563F4D68DA679EAB /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */; };
@@ -81,7 +81,6 @@
 		3091515E9E9C6A2C995314CF5EAC21EA /* PlayKitManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayKitManager.swift; sourceTree = "<group>"; };
 		32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SwiftyJSON-dummy.m"; sourceTree = "<group>"; };
 		36B5338A05369D466EEF9A9283C6C810 /* Pods-PlayKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-PlayKit_Example-resources.sh"; sourceTree = "<group>"; };
-		390163C2EB1EEAE464A474BA6D326A5B /* MockMediaProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockMediaProvider.swift; sourceTree = "<group>"; };
 		4303F57B465B830A536EF90803CBDF44 /* MediaEntry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
 		4381400D98EEAEFFEBE6ECBA5A387A04 /* PlayKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PlayKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FE403A2E6CCDE0F7E7B30FB8A94FE2C /* Pods-PlayKit_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-PlayKit_Tests-umbrella.h"; sourceTree = "<group>"; };
@@ -95,11 +94,12 @@
 		843154D21DD49BFD00D1BB96 /* RequestExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestExecutor.swift; sourceTree = "<group>"; };
 		843154D61DD4A26000D1BB96 /* Response.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
 		843154D81DD4B55D00D1BB96 /* USRExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = USRExecutor.swift; sourceTree = "<group>"; };
-		843D62BB1DD8ECF00003F461 /* OTTEntryProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTEntryProvider.swift; sourceTree = "<group>"; };
-		843D62BD1DD8ED5A0003F461 /* AssetService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetService.swift; sourceTree = "<group>"; };
+		8483C8A01DDAF71600984647 /* MockMediaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMediaProvider.swift; sourceTree = "<group>"; };
+		8483C8A21DDAF71600984647 /* OTTEntryProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTTEntryProvider.swift; sourceTree = "<group>"; };
+		8483C8A41DDAF73F00984647 /* AssetService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetService.swift; sourceTree = "<group>"; };
+		8483C8A51DDAF73F00984647 /* OTTUserService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTUserService.swift; sourceTree = "<group>"; };
 		84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestRequestBuilder.swift; sourceTree = "<group>"; };
 		84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestMultiRequestBuilder.swift; sourceTree = "<group>"; };
-		84D3DB7D1DD8DBA000E79EBA /* OTTUserService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTUserService.swift; sourceTree = "<group>"; };
 		84D3DB7F1DD8DC3600E79EBA /* SessionProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionProvider.swift; sourceTree = "<group>"; };
 		89748EEB01201FA5E39224EC57BE819A /* PlayKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = PlayKit.modulemap; sourceTree = "<group>"; };
 		8A952382B5B94531E747707422A109ED /* SamplePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SamplePlugin.swift; sourceTree = "<group>"; };
@@ -200,9 +200,7 @@
 				843154D81DD4B55D00D1BB96 /* USRExecutor.swift */,
 				84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */,
 				84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */,
-				84D3DB7D1DD8DBA000E79EBA /* OTTUserService.swift */,
 				84D3DB7F1DD8DC3600E79EBA /* SessionProvider.swift */,
-				843D62BD1DD8ED5A0003F461 /* AssetService.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -243,8 +241,9 @@
 			isa = PBXGroup;
 			children = (
 				51139F3E0E0E46EBFB2AAF2B114B579F /* MediaEntryProvider.swift */,
-				390163C2EB1EEAE464A474BA6D326A5B /* MockMediaProvider.swift */,
-				843D62BB1DD8ECF00003F461 /* OTTEntryProvider.swift */,
+				8483C89F1DDAF71600984647 /* Mock */,
+				8483C8A11DDAF71600984647 /* OTT */,
+				8483C8A31DDAF71600984647 /* OVP */,
 			);
 			path = Providers;
 			sourceTree = "<group>";
@@ -317,6 +316,31 @@
 				7EA29000DDCFC4AD342105199921E85D /* Sample */,
 			);
 			path = Plugins;
+			sourceTree = "<group>";
+		};
+		8483C89F1DDAF71600984647 /* Mock */ = {
+			isa = PBXGroup;
+			children = (
+				8483C8A01DDAF71600984647 /* MockMediaProvider.swift */,
+			);
+			path = Mock;
+			sourceTree = "<group>";
+		};
+		8483C8A11DDAF71600984647 /* OTT */ = {
+			isa = PBXGroup;
+			children = (
+				8483C8A41DDAF73F00984647 /* AssetService.swift */,
+				8483C8A51DDAF73F00984647 /* OTTUserService.swift */,
+				8483C8A21DDAF71600984647 /* OTTEntryProvider.swift */,
+			);
+			path = OTT;
+			sourceTree = "<group>";
+		};
+		8483C8A31DDAF71600984647 /* OVP */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = OVP;
 			sourceTree = "<group>";
 		};
 		8EC39E1DC11846207722B71AAFE40F98 /* Support Files */ = {
@@ -581,25 +605,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				D7ECC5C8E2621F999CBE41E736CC212D /* MediaEntry.swift in Sources */,
-				843D62BC1DD8ECF00003F461 /* OTTEntryProvider.swift in Sources */,
 				84D3DB7A1DD8D04700E79EBA /* RestRequestBuilder.swift in Sources */,
 				843154CD1DD48F7A00D1BB96 /* Request.swift in Sources */,
 				843154CF1DD4917600D1BB96 /* RequestConfiguration.swift in Sources */,
 				94D52CFFC946CB9F43DEC56A44310A94 /* MediaEntryProvider.swift in Sources */,
 				84D3DB7C1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift in Sources */,
-				84D3DB7E1DD8DBA000E79EBA /* OTTUserService.swift in Sources */,
-				C2B3569C5D1022B6596B41FC4758C0FA /* MockMediaProvider.swift in Sources */,
 				735532B42A32B731EA14527451F74C9F /* Player.swift in Sources */,
 				B420C473377722F4D49F0BA0CE93842A /* PlayerConfig.swift in Sources */,
 				B04AE2542EEAE9034697DCC18C0473F9 /* PlayerImp.swift in Sources */,
 				843154D71DD4A26000D1BB96 /* Response.swift in Sources */,
+				8483C8A61DDAF73F00984647 /* AssetService.swift in Sources */,
+				8483C8A81DDAF8DC00984647 /* MockMediaProvider.swift in Sources */,
 				843154D91DD4B55D00D1BB96 /* USRExecutor.swift in Sources */,
+				8483C8A91DDAF8E300984647 /* OTTEntryProvider.swift in Sources */,
 				84D3DB801DD8DC3600E79EBA /* SessionProvider.swift in Sources */,
 				0C37CD52423623547780B75F7530FC15 /* PlayKit-dummy.m in Sources */,
 				ECAD9F1A9219AEF299F43428C4A1A0BE /* PlayKitManager.swift in Sources */,
+				8483C8A71DDAF73F00984647 /* OTTUserService.swift in Sources */,
 				843154D31DD49BFD00D1BB96 /* RequestExecutor.swift in Sources */,
 				31651C4487857A5495299EC40518C467 /* Plugin.swift in Sources */,
-				843D62BE1DD8ED5A0003F461 /* AssetService.swift in Sources */,
 				62B6C6C13ECB795A0CDC1915AFC5100F /* ReplaceMe.swift in Sources */,
 				24E1A9632AF282B62EBD0313178AD037 /* Result.swift in Sources */,
 				096CB2751DAB2CA33DAD9493411357CD /* SamplePlugin.swift in Sources */,
