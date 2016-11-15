@@ -1,4 +1,4 @@
-#
+   #
 # Be sure to run `pod lib lint PlayKit.podspec' to ensure this is a
 # valid spec before submitting.
 #
@@ -43,33 +43,28 @@ TODO: Add long description of the pod here.
   # s.dependency 'AFNetworking', '~> 2.3'
 
 
-s.subspec 'Core' do |sp|
-  sp.source_files = 'Classes/**/*'
-end
+  s.subspec 'Core' do |sp|
+    sp.source_files = 'Classes/**/*'
+    sp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+                  'OTHER_LDFLAGS' => '$(inherited) -framework "GoogleInteractiveMediaAds"',
+                  'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+                  'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+    sp.dependency 'GoogleAds-IMA-iOS-SDK', '~> 3.3'
+  end
 
   s.subspec 'SamplePlugin' do |ssp|
     ssp.source_files = 'Plugins/Sample'
   end
 
-  s.subspec 'IMAPlugin' do |ssp|
-    ssp.source_files = 'Plugins/IMA'
+  
+  s.subspec 'AnalyticsPlugin' do |ssp|
+    ssp.source_files = 'Plugins/Analytics'
     ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
-                  'OTHER_LDFLAGS' => '$(inherited) -framework "GoogleInteractiveMediaAds"',
-                  'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
-                  'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
-    ssp.dependency 'GoogleAds-IMA-iOS-SDK', '~> 3.3'
-
+                   'OTHER_LDFLAGS' => '$(inherited) -framework "YouboraLib" -framework "YouboraPluginAVPlayer"',
+                   'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+                   'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+    ssp.dependency 'Youbora-AVPlayer'
   end
-
-s.subspec 'AnalyticsPlugin' do |ssp|
-ssp.source_files = 'Plugins/Analytics'
-ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
-'OTHER_LDFLAGS' => '$(inherited) -framework "YouboraLib" -framework "YouboraPluginAVPlayer"',
-'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
-'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
-ssp.dependency 'Youbora-AVPlayer'
-
-end
 
 s.default_subspec = 'Core'
 

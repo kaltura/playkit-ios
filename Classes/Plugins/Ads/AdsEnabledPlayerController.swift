@@ -11,10 +11,15 @@ import UIKit
 import AVFoundation
 import AVKit
 
-class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, AdsPluginDelegate {
+class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPluginDataSource {
     
     var isAdPlayback = false
     var adsPlugin: AdsPlugin!
+    
+    init(adsPlugin: AdsPlugin) {
+        super.init()
+        self.adsPlugin = adsPlugin
+    }
     
     override func setPlayer(_ player: Player!) {
         super.setPlayer(player)
@@ -71,14 +76,17 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
     }
         
     func adsPlugin(_ adsPlugin: AdsPlugin, failedWith error: String) {
+        super.play()
         self.isAdPlayback = false
         self.delegate?.player(self, failedWith: error)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PlayerEventType, with eventData: Any?) {
         if event == PlayerEventType.ad_did_request_pause {
+            super.pause()
             self.isAdPlayback = true
         } else if event == PlayerEventType.ad_did_request_resume {
+            super.play()
             self.isAdPlayback = false
         }
         self.delegate?.player(self, didReceive: event, with: eventData)

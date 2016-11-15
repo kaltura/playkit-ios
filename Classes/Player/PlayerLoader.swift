@@ -23,14 +23,9 @@ class PlayerLoader: PlayerDecoratorBase {
                 if let pluginObject = PlayKitManager.sharedInstance.createPlugin(name: pluginName) {
                     pluginObject.load(player: player, config: plugins[pluginName] as? AnyObject)
                     
-                    if pluginObject is DecoratedPlayerProvider {
-                        if let d = (pluginObject as! DecoratedPlayerProvider).getDecoratedPlayer() {
-                            if decorator != nil {
-                                throw PlayKitError.multipleDecoratorsDetected
-                            }
-                            decorator = d
-                            decorator!.setPlayer(player)
-                        }
+                    if pluginObject is AdsPlugin {
+                        decorator = AdsEnabledPlayerController(adsPlugin: pluginObject as! AdsPlugin)
+                        decorator!.setPlayer(player)
                     }
                     
                     loadedPlugins.append(pluginObject)

@@ -123,7 +123,3 @@ public enum Origin {
     case start
     case end
 }
-
-protocol DecoratedPlayerProvider {
-    func getDecoratedPlayer() -> PlayerDecoratorBase?
-}
