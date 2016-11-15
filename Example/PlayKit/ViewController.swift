@@ -16,6 +16,7 @@ class ViewController: UIViewController, SessionProvider {
     var serverURL: String  = "http://52.210.223.65:8080/v4_0/api_v3"
     var clientTag: String = "java:16-09-10"
     var apiVersion: String = "3.6.1078.11798"
+    var ks: String = ""
 
     
     override func viewDidLoad() {

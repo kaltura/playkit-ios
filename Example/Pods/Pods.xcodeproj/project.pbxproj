@@ -31,6 +31,9 @@
 		8483C8A71DDAF73F00984647 /* OTTUserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A51DDAF73F00984647 /* OTTUserService.swift */; };
 		8483C8A81DDAF8DC00984647 /* MockMediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A01DDAF71600984647 /* MockMediaProvider.swift */; };
 		8483C8A91DDAF8E300984647 /* OTTEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A21DDAF71600984647 /* OTTEntryProvider.swift */; };
+		8483C8AB1DDAFB0100984647 /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8AA1DDAFB0100984647 /* Asset.swift */; };
+		8483C8AD1DDB01DD00984647 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8AC1DDB01DD00984647 /* File.swift */; };
+		8483C8AF1DDB32D900984647 /* OTTResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8AE1DDB32D900984647 /* OTTResponse.swift */; };
 		84D3DB7A1DD8D04700E79EBA /* RestRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */; };
 		84D3DB7C1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */; };
 		84D3DB801DD8DC3600E79EBA /* SessionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB7F1DD8DC3600E79EBA /* SessionProvider.swift */; };
@@ -98,6 +101,9 @@
 		8483C8A21DDAF71600984647 /* OTTEntryProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTTEntryProvider.swift; sourceTree = "<group>"; };
 		8483C8A41DDAF73F00984647 /* AssetService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetService.swift; sourceTree = "<group>"; };
 		8483C8A51DDAF73F00984647 /* OTTUserService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTUserService.swift; sourceTree = "<group>"; };
+		8483C8AA1DDAFB0100984647 /* Asset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
+		8483C8AC1DDB01DD00984647 /* File.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
+		8483C8AE1DDB32D900984647 /* OTTResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTResponse.swift; sourceTree = "<group>"; };
 		84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestRequestBuilder.swift; sourceTree = "<group>"; };
 		84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestMultiRequestBuilder.swift; sourceTree = "<group>"; };
 		84D3DB7F1DD8DC3600E79EBA /* SessionProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionProvider.swift; sourceTree = "<group>"; };
@@ -332,6 +338,9 @@
 				8483C8A41DDAF73F00984647 /* AssetService.swift */,
 				8483C8A51DDAF73F00984647 /* OTTUserService.swift */,
 				8483C8A21DDAF71600984647 /* OTTEntryProvider.swift */,
+				8483C8AA1DDAFB0100984647 /* Asset.swift */,
+				8483C8AC1DDB01DD00984647 /* File.swift */,
+				8483C8AE1DDB32D900984647 /* OTTResponse.swift */,
 			);
 			path = OTT;
 			sourceTree = "<group>";
@@ -604,12 +613,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8483C8AD1DDB01DD00984647 /* File.swift in Sources */,
 				D7ECC5C8E2621F999CBE41E736CC212D /* MediaEntry.swift in Sources */,
 				84D3DB7A1DD8D04700E79EBA /* RestRequestBuilder.swift in Sources */,
 				843154CD1DD48F7A00D1BB96 /* Request.swift in Sources */,
 				843154CF1DD4917600D1BB96 /* RequestConfiguration.swift in Sources */,
 				94D52CFFC946CB9F43DEC56A44310A94 /* MediaEntryProvider.swift in Sources */,
+				8483C8AF1DDB32D900984647 /* OTTResponse.swift in Sources */,
 				84D3DB7C1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift in Sources */,
+				8483C8AB1DDAFB0100984647 /* Asset.swift in Sources */,
 				735532B42A32B731EA14527451F74C9F /* Player.swift in Sources */,
 				B420C473377722F4D49F0BA0CE93842A /* PlayerConfig.swift in Sources */,
 				B04AE2542EEAE9034697DCC18C0473F9 /* PlayerImp.swift in Sources */,

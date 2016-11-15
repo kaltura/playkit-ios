@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import SwiftyJSON
 
-class OTTEntryProvider: MediaEntryProvider {
+public class OTTEntryProvider: MediaEntryProvider {
 
     
     let sessionProvider: SessionProvider
@@ -28,16 +29,21 @@ class OTTEntryProvider: MediaEntryProvider {
         self.mediaId = mediaId
         self.type = type
         
+
     }
     
-    public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {        
+    public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
         
-//        let request = AssetService.get(baseURL: self.sessionProvider.serverURL, ks: self.sessionProvider.ks, assetId: self.mediaId, type:AssetType.media)
-//        request?.set(completion: { (Response) in
-//            
-//            
-//        })
+        let request = AssetService.get(baseURL: sessionProvider.serverURL, ks: sessionProvider.ks, assetId: self.mediaId, type:self.type)
+        request?.set(completion: { (r:Response) in
+            let jsonResponse =  JSON(r.data)
+            
+            
+        }).build()
         
+        if let assetRequest = request {
+            USRExecutor.shared.send(request: assetRequest)
+        }
     }
 
     

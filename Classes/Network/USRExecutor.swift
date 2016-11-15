@@ -14,10 +14,9 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
     enum ResponseError: Error {
         case emptyOrIncorrectURL
         case inCorrectJSONBody
-        //case
-        
     }
 
+    static let shared = USRExecutor()
     
     public func send(request r:Request){
         
