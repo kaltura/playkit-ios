@@ -16,7 +16,7 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     
    public enum MockError: Error {
         case fileIsEmptyOrNotFound
-        case invalidJSON
+        case unableToParseJSON
         case mediaNotFound
         
     }
@@ -103,7 +103,7 @@ public class MockMediaEntryProvider: MediaEntryProvider {
             return
         }
         guard  let jsonObjects: JSON = JSON(data:self.content!), jsonObjects != .null  else {
-            callback(Result(data: nil, error: MockError.invalidJSON))
+            callback(Result(data: nil, error: MockError.unableToParseJSON))
             return
         }
         guard let jsonObject: JSON = jsonObjects[self.id] , jsonObject != .null else {
@@ -111,7 +111,8 @@ public class MockMediaEntryProvider: MediaEntryProvider {
             return
         }
         
-        let mediaEntry : MediaEntry = MediaEntry(json: jsonObject)
+        let mediaEntry : MediaEntry? = MediaEntry(json: jsonObject)
+        callback(Result(data: mediaEntry, error: nil))
     }
     
 }

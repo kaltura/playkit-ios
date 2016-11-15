@@ -16,35 +16,46 @@ class ViewController: UIViewController, SessionProvider {
     var serverURL: String  = "http://52.210.223.65:8080/v4_0/api_v3"
     var clientTag: String = "java:16-09-10"
     var apiVersion: String = "3.6.1078.11798"
-    var ks: String = ""
+    var ks: String = "djJ8MTk4fE7hluWe-lWC5ZzsXcrL-Jlbqy3kWMCtzhJFn_kKqSUJt9I8NbmFI4LboK-Q3UnwHduQNWDFc-5gSVeEVMRjUfSe95py7DpkZgp6KPJm0JPv"
 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let mediaProvider = OTTEntryProvider(sessionProvider: self, mediaId: "258656", type: AssetType.media, formats: ["Mobile_Devices_Main_SD"])
         
-        if let requestBuilder2: RestRequestBuilder = AssetService.get(baseURL: self.serverURL, ks:"1:result:loginSession:ks" , assetId: "258656", type: .media),
-            let requestBuilder1: RestRequestBuilder = OTTUserService.login(baseURL: self.serverURL, partnerId: self.partnerId, username: "rivka@p.com", password: "123456")
-        {
-            let mrb = RestMultiRequestBuilder(url: URL(string: self.serverURL)!)?.add(request: requestBuilder1).add(request: requestBuilder2)
-                .set(completion: { (r:Response) in
-                
-                if let data = r.data {
-                    do {
-                    let object: Any = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions())
-                    print(object)
-                    }catch{
-                        
-                    }
-                }else{
-                    guard let e = r.error else {return}
-                    print(e)
-                }
-            }).build()
+        mediaProvider.loadMedia { (r:Result<MediaEntry>) in
             
-            USRExecutor().send(request: mrb!)
-            
+            if let error = r.error {
+                print(error)
+            }else{
+              print(r.data)
+            }
             
         }
+//        if let requestBuilder2: RestRequestBuilder = AssetService.get(baseURL: self.serverURL, ks:"1:result:loginSession:ks" , assetId: "258656", type: .media),
+//            let requestBuilder1: RestRequestBuilder = OTTUserService.login(baseURL: self.serverURL, partnerId: self.partnerId, username: "rivka@p.com", password: "123456")
+//        {
+//            let mrb = RestMultiRequestBuilder(url: URL(string: self.serverURL)!)?.add(request: requestBuilder1).add(request: requestBuilder2)
+//                .set(completion: { (r:Response) in
+//                
+//                if let data = r.data {
+//                    do {
+//                    let object: Any = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions())
+//                    print(object)
+//                    }catch{
+//                        
+//                    }
+//                }else{
+//                    guard let e = r.error else {return}
+//                    print(e)
+//                }
+//            }).build()
+//            
+//            USRExecutor().send(request: mrb!)
+//            
+//            
+//        }
         
     }
 

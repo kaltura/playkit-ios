@@ -9,23 +9,32 @@
 import UIKit
 import SwiftyJSON
 
-class File {
+internal class File {
     
-    var id: String? = nil
-    var type: String? = nil
-    var url: URL? = nil
-    var duration: TimeInterval? = nil
+    internal var id: String
+    internal var type: String? = nil
+    internal var url: URL? = nil
+    internal var duration: TimeInterval? = nil
     
     private let idKey: String = "id"
     private let typeKey: String = "type"
     private let urlKey: String = "url"
     private let durationKey: String = "url"
 
+    internal init(id:String){
+        self.id = id
+    }
     
-    init(json:Any) {
+    internal init?(json:Any) {
         
         let fileJosn = JSON(json)
-        self.id = fileJosn[idKey].string
+        
+        if let id = fileJosn[idKey].number {
+            self.id = id.stringValue
+        }else{
+            return nil
+        }
+        
         self.type = fileJosn[typeKey].string
         if let contentURL = fileJosn[urlKey].string{
                 self.url = URL(string: contentURL)

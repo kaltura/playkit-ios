@@ -45,13 +45,13 @@ public class RestRequestBuilder: RequestBuilder, RestRequest{
         
         super.init(url: url)
         
-        
+        self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
+        self.method = "POST"
     }
     
     public func build() -> RestRequest {
         super.build()
-        self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
-        self.method = "POST"
+        
         return self
     }
     

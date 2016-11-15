@@ -41,6 +41,7 @@ public class AssetService {
             .setBody(key: "ks", value: JSON(ks))
             .setBody(key: "assetReferenceType", value: JSON(type.rawValue))
             .setBody(key: "type", value: JSON(type.rawValue))
+            .setBody(key: "with", value: JSON([["type":"files","objectType":"KalturaCatalogWithHolder"]]))
             .setClientTag()
             .setApiVersion()
             

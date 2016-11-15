@@ -37,8 +37,8 @@ public class RestMultiRequestBuilder: RestRequestBuilder {
     
    override public func build() -> Request {
         
-        self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
-        self.method = "POST"
+//        self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
+//        self.method = "POST"
         
         if self.jsonBody == nil {
             self.jsonBody = JSON([String:Any]())
