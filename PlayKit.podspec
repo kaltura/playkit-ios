@@ -52,6 +52,9 @@ TODO: Add long description of the pod here.
     sp.dependency 'GoogleAds-IMA-iOS-SDK', '~> 3.3'
   end
 
+  s.dependency 'SwiftyJSON'
+
+
   s.subspec 'SamplePlugin' do |ssp|
     ssp.source_files = 'Plugins/Sample'
   end
@@ -66,6 +69,6 @@ TODO: Add long description of the pod here.
     ssp.dependency 'Youbora-AVPlayer'
   end
 
-s.default_subspec = 'Core'
+  s.default_subspec = 'Core'
 
 end

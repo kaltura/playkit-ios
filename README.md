@@ -26,4 +26,4 @@ Rivka Schwartz, Rivka.Peleg@kaltura.com
 
 ## License
 
-PlayKit is available under the MIT license. See the LICENSE file for more info.
+PlayKit is available under the AGPLv3 license. See the LICENSE file for more info.
