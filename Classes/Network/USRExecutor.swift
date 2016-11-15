@@ -58,10 +58,14 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
 
         // settings headers:
         let task = session.dataTask(with: request) { (data, response, error) in
-            if let completion = r.completion {
-                
-                let result = Response(data: data, error:nil)
-                completion(result)
+            
+            DispatchQueue.main.async {
+                if let completion = r.completion {
+                    
+                    let result = Response(data: data, error:nil)
+                    completion(result)
+                }
+
             }
         }
     
