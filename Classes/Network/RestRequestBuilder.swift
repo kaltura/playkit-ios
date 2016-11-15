@@ -9,36 +9,51 @@
 import UIKit
 
 
+
 public protocol RestRequest: Request {
     var baseURL: String { get }
-    var service: String { get }
-    var action: String { get }
+    var service: String? { get }
+    var action: String? { get }
 }
 
 public class RestRequestBuilder: RequestBuilder, RestRequest{
 
     public var baseURL: String
-    public var service: String
-    public var action: String
+    public var service: String?
+    public var action: String?
     
-    
-    init?(baseURL: String, service: String, action: String) {
+    init?(url: String, service: String?, action: String?) {
         
-        self.baseURL = baseURL
-        self.service = service
-        self.action = action
+        self.baseURL = url
         
-        guard let url =  URL(string: baseURL + "/service/" + service + "/action/" + action)  else {
+        var path = self.baseURL
+        if let service = service {
+            self.service = service
+            let serviceSuffix = "/service/" + service
+            path += serviceSuffix
+        }
+        
+        if let action = action {
+            self.action = action
+            let actionSuffix = "/action/" + action
+            path += actionSuffix
+        }
+
+        guard let url =  URL(string: path)  else {
             return nil
         }
         
         super.init(url: url)
         
-        self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
-        self.method = "POST"
+        
     }
     
-    func build() -> RestRequest {
+    public func build() -> RestRequest {
+        super.build()
+        self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
+        self.method = "POST"
         return self
     }
+    
+
 }

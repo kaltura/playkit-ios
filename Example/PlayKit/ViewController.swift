@@ -12,16 +12,20 @@ import PlayKit
 class ViewController: UIViewController, SessionProvider {
 
     
-    var ks: String = ""
-    var udid: String  = ""
     var partnerId: Int64 = 198
     var serverURL: String  = "http://52.210.223.65:8080/v4_0/api_v3"
+    var clientTag: String = "java:16-09-10"
+    var apiVersion: String = "3.6.1078.11798"
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        if let requestBuilder: RequestBuilder = OTTUserService.login(sessionProvider: self, username:"rivka@p.com", password: "123456"){
-            let request = requestBuilder.set(completion: { (r:Response) in
+        
+        if let requestBuilder2: RestRequestBuilder = AssetService.get(baseURL: self.serverURL, ks:"1:result:loginSession:ks" , assetId: "258656", type: .media),
+            let requestBuilder1: RestRequestBuilder = OTTUserService.login(baseURL: self.serverURL, partnerId: self.partnerId, username: "rivka@p.com", password: "123456")
+        {
+            let mrb = RestMultiRequestBuilder(url: URL(string: self.serverURL)!)?.add(request: requestBuilder1).add(request: requestBuilder2)
+                .set(completion: { (r:Response) in
                 
                 if let data = r.data {
                     do {
@@ -36,7 +40,7 @@ class ViewController: UIViewController, SessionProvider {
                 }
             }).build()
             
-            USRExecutor().send(request: request)
+            USRExecutor().send(request: mrb!)
             
             
         }

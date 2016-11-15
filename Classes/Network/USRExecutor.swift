@@ -29,15 +29,22 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
         }
 
         // handle body
-        var data: Data? = nil
-        do{
-                data = try r.body?.rawData()
-        }catch{
-            if let completion = r.completion{
-                completion(Response(data: nil, error: ResponseError.inCorrectJSONBody))
-            }
+        
+        if let data = r.dataBody {
+            request.httpBody = data
         }
-        request.httpBody = data
+        else{
+            var data: Data? = nil
+            do{
+                data = try r.jsonBody?.rawData()
+            }catch{
+                if let completion = r.completion{
+                    completion(Response(data: nil, error: ResponseError.inCorrectJSONBody))
+                }
+            }
+            request.httpBody = data
+        }
+        
         
         // handle headers
         if let headers = r.headers{
@@ -47,9 +54,6 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
         }
 
         
-    
-//        let configuration: URLSessionConfiguration = URLSessionConfiguration()
-//        URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
         let session: URLSession = URLSession.shared
         
 

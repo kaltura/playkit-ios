@@ -89,14 +89,12 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     }
     
     
-    public func loadMedia(callback: (Result<MediaEntry>) -> Void) {
+    public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void){
         
         if self.content == nil {
             guard let stringPath = self.url?.absoluteString else {return }
             self.content = NSData(contentsOfFile: stringPath) as Data?
         }
-        
-        
         
         
         guard let content = self.content  else {

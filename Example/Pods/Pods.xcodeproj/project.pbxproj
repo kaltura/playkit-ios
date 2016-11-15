@@ -27,6 +27,8 @@
 		843154D31DD49BFD00D1BB96 /* RequestExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154D21DD49BFD00D1BB96 /* RequestExecutor.swift */; };
 		843154D71DD4A26000D1BB96 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154D61DD4A26000D1BB96 /* Response.swift */; };
 		843154D91DD4B55D00D1BB96 /* USRExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154D81DD4B55D00D1BB96 /* USRExecutor.swift */; };
+		843D62BC1DD8ECF00003F461 /* OTTEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843D62BB1DD8ECF00003F461 /* OTTEntryProvider.swift */; };
+		843D62BE1DD8ED5A0003F461 /* AssetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843D62BD1DD8ED5A0003F461 /* AssetService.swift */; };
 		84D3DB7A1DD8D04700E79EBA /* RestRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */; };
 		84D3DB7C1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */; };
 		84D3DB7E1DD8DBA000E79EBA /* OTTUserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB7D1DD8DBA000E79EBA /* OTTUserService.swift */; };
@@ -93,6 +95,8 @@
 		843154D21DD49BFD00D1BB96 /* RequestExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestExecutor.swift; sourceTree = "<group>"; };
 		843154D61DD4A26000D1BB96 /* Response.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
 		843154D81DD4B55D00D1BB96 /* USRExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = USRExecutor.swift; sourceTree = "<group>"; };
+		843D62BB1DD8ECF00003F461 /* OTTEntryProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTEntryProvider.swift; sourceTree = "<group>"; };
+		843D62BD1DD8ED5A0003F461 /* AssetService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetService.swift; sourceTree = "<group>"; };
 		84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestRequestBuilder.swift; sourceTree = "<group>"; };
 		84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestMultiRequestBuilder.swift; sourceTree = "<group>"; };
 		84D3DB7D1DD8DBA000E79EBA /* OTTUserService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTUserService.swift; sourceTree = "<group>"; };
@@ -198,6 +202,7 @@
 				84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */,
 				84D3DB7D1DD8DBA000E79EBA /* OTTUserService.swift */,
 				84D3DB7F1DD8DC3600E79EBA /* SessionProvider.swift */,
+				843D62BD1DD8ED5A0003F461 /* AssetService.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -239,6 +244,7 @@
 			children = (
 				51139F3E0E0E46EBFB2AAF2B114B579F /* MediaEntryProvider.swift */,
 				390163C2EB1EEAE464A474BA6D326A5B /* MockMediaProvider.swift */,
+				843D62BB1DD8ECF00003F461 /* OTTEntryProvider.swift */,
 			);
 			path = Providers;
 			sourceTree = "<group>";
@@ -575,6 +581,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D7ECC5C8E2621F999CBE41E736CC212D /* MediaEntry.swift in Sources */,
+				843D62BC1DD8ECF00003F461 /* OTTEntryProvider.swift in Sources */,
 				84D3DB7A1DD8D04700E79EBA /* RestRequestBuilder.swift in Sources */,
 				843154CD1DD48F7A00D1BB96 /* Request.swift in Sources */,
 				843154CF1DD4917600D1BB96 /* RequestConfiguration.swift in Sources */,
@@ -592,6 +599,7 @@
 				ECAD9F1A9219AEF299F43428C4A1A0BE /* PlayKitManager.swift in Sources */,
 				843154D31DD49BFD00D1BB96 /* RequestExecutor.swift in Sources */,
 				31651C4487857A5495299EC40518C467 /* Plugin.swift in Sources */,
+				843D62BE1DD8ED5A0003F461 /* AssetService.swift in Sources */,
 				62B6C6C13ECB795A0CDC1915AFC5100F /* ReplaceMe.swift in Sources */,
 				24E1A9632AF282B62EBD0313178AD037 /* Result.swift in Sources */,
 				096CB2751DAB2CA33DAD9493411357CD /* SamplePlugin.swift in Sources */,

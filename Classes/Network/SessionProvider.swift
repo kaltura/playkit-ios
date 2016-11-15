@@ -9,10 +9,11 @@
 import UIKit
 
 public protocol SessionProvider {
-    var ks: String { get }
-    var udid: String { get }
-    var partnerId: Int64 { get }
+    
     var serverURL: String { get }
+    var partnerId: Int64 { get }
+    var clientTag: String { get }
+    var apiVersion: String { get }
 }
 
 

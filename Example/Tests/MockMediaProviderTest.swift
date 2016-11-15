@@ -42,7 +42,7 @@ class MockMediaProviderTest: XCTestCase {
         }
         
         
-        waitForExpectations(timeout: 6.0) { (_) -> Void in
+        self.waitForExpectations(timeout: 6.0) { (_) -> Void in
             
             
         }
@@ -64,13 +64,13 @@ class MockMediaProviderTest: XCTestCase {
                 XCTFail()
             }
             
-            
-            waitForExpectations(timeout: 6.0) { (_) -> Void in
+            self.waitForExpectations(timeout: 6.0) { (_) -> Void in
                 
             }
             
         }
     }
+    
     
     func testMediaProvideFileNotFoundFlow() {
         
@@ -89,7 +89,7 @@ class MockMediaProviderTest: XCTestCase {
             }
             
             
-            waitForExpectations(timeout: 6.0) { (_) -> Void in
+            self.waitForExpectations(timeout: 6.0) { (_) -> Void in
                 
             }
             

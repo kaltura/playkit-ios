@@ -15,7 +15,8 @@ public protocol Request {
 
      var method: String? { get }
      var url: URL { get }
-     var body: JSON? { get }
+     var jsonBody: JSON? { get }
+     var dataBody: Data? { get }
      var headers: [String:String]? { get }
      var timeout: Double { get }
      var conifiguration: RequestConfiguration? { get }
@@ -23,10 +24,13 @@ public protocol Request {
 }
 
 public class RequestBuilder : Request {
+    
+
 
     public var method: String? = nil
     public var url: URL
-    public var body: JSON? = nil
+    public var jsonBody: JSON? = nil
+    public var dataBody: Data? = nil
     public var headers: [String:String]? = nil
     public var timeout: Double = 3
     public var conifiguration: RequestConfiguration? = nil
@@ -48,10 +52,16 @@ public class RequestBuilder : Request {
         return self
     }
     
-    public func set(body:JSON?) -> RequestBuilder{
-        self.body = body
+    public func set(jsonBody:JSON?) -> RequestBuilder{
+        self.jsonBody = jsonBody
         return self
     }
+    
+    public func set(dataBody: Data?)-> RequestBuilder{
+        self.dataBody = dataBody
+        return self
+    }
+    
     
     public func set(headers: [String: String]?) -> RequestBuilder{
         self.headers = headers
@@ -82,10 +92,10 @@ public class RequestBuilder : Request {
     
     public func setBody(key: String, value:JSON) -> RequestBuilder {
         
-        if var body = self.body {
-            self.body![key] = value
+        if var body = self.jsonBody {
+            self.jsonBody![key] = value
         }else{
-            self.body = [key:value]
+            self.jsonBody = [key:value]
         }
         return self
     }

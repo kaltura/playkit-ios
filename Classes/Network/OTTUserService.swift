@@ -12,13 +12,13 @@ import SwiftyJSON
 public class OTTUserService: NSObject {
 
     
-   public static func login(sessionProvider:SessionProvider,username:String,password:String) -> RestRequestBuilder? {
+    public static func login(baseURL:String,partnerId:Int64,username:String,password:String) -> RestRequestBuilder? {
         
-        if let request = RestRequestBuilder(baseURL: sessionProvider.serverURL, service: "ottUser", action: "login") {
+        if let request = RestRequestBuilder(url: baseURL, service: "ottUser", action: "login") {
                 request
                     .setBody(key: "username", value: JSON(username))
                     .setBody(key: "password", value: JSON(password))
-                    .setBody(key: "partnerId", value: JSON(NSNumber.init(value: sessionProvider.partnerId)))
+                    .setBody(key: "partnerId", value: JSON(NSNumber.init(value: partnerId)))
             
                 return request
         }else{
