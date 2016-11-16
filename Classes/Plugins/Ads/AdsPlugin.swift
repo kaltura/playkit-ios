@@ -10,7 +10,7 @@ import Foundation
 import AVKit
 
 protocol AdsPluginDataSource : class {
-    func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool
+    func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool
 }
 
 protocol AdsPluginDelegate : class {

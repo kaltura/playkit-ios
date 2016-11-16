@@ -322,7 +322,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
         if event.type == IMAAdEventType.AD_BREAK_READY || event.type == IMAAdEventType.LOADED {
-            let canPlay = self.dataSource.adsPluginCanPlayAd(self)
+            let canPlay = self.dataSource.adsPluginShouldPlayAd(self)
             if canPlay == nil || canPlay == true {
                 adsManager.start()
             } else {

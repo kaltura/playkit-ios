@@ -40,7 +40,7 @@ public enum PlayerEventType : Int {
 }
 
 public protocol PlayerDataSource: class {
-    func playerCanPlayAd(_ player: Player) -> Bool
+    func playerShouldPlayAd(_ player: Player) -> Bool
 }
 
 public protocol PlayerDelegate: class {

@@ -103,8 +103,8 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
     
     //MARK: Player DataSource methods
         
-    func playerCanPlayAd(_ player: Player) -> Bool {
-        return self.dataSource!.playerCanPlayAd(self)
+    func playerShouldPlayAd(_ player: Player) -> Bool {
+        return self.dataSource!.playerShouldPlayAd(self)
     }
     
     //MARK: Player Delegate methods

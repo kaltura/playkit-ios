@@ -71,8 +71,8 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     }
     
         
-    func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
-        return self.dataSource!.playerCanPlayAd(self)
+    func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
+        return self.dataSource!.playerShouldPlayAd(self)
     }
         
     func adsPlugin(_ adsPlugin: AdsPlugin, failedWith error: String) {

@@ -12,7 +12,7 @@ class PlayerLoader: PlayerDecoratorBase {
     
     var loadedPlugins = [Plugin]()
     
-    func load(_ config: PlayerConfig) throws {
+    func load(_ config: PlayerConfig) {
         var player: Player = PlayerController()
         player.prepare(config)
         
