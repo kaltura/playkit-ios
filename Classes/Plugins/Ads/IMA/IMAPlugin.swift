@@ -321,19 +321,35 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
-        if event.type == IMAAdEventType.AD_BREAK_READY || event.type == IMAAdEventType.LOADED {
+        let converted = self.convertToPlayerEvent(event.type)
+        //print("xxx " + String(describing: converted))
+        
+        switch event.type {
+        case .AD_BREAK_READY:
             let canPlay = self.dataSource.adsPluginShouldPlayAd(self)
             if canPlay == nil || canPlay == true {
                 adsManager.start()
-            } else {
-                if event.type == IMAAdEventType.LOADED {
+            }
+            break
+        case .LOADED:
+            if adsManager.adCuePoints.count == 0 { //single ad
+                let canPlay = self.dataSource.adsPluginShouldPlayAd(self)
+                if canPlay == nil || canPlay == true {
+                    adsManager.start()
+                } else {
                     adsManager.skip()
+                    self.adsManagerDidRequestContentResume(adsManager)
                 }
             }
-        } else if event.type == IMAAdEventType.AD_BREAK_STARTED || event.type == IMAAdEventType.STARTED {
+            break
+        case .AD_BREAK_STARTED, .STARTED:
             self.showLoadingView(false, alpha: 0)
+            break
+        default:
+            break
         }
-        self.delegate?.adsPlugin(self, didReceive: self.convertToPlayerEvent(event.type), with: nil)
+        
+        self.delegate?.adsPlugin(self, didReceive: converted, with: nil)
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
