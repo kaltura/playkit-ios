@@ -104,11 +104,6 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
             IMAPlugin.loader.requestAds(with: request)
         }
     }
-
-    @objc func aa() {
-        self.manager?.pause()
-        self.delegate?.adsPlugin(self, managerFailedWith: "aa")
-    }
     
     func start(showLoadingView: Bool) -> Bool {
         if self.loaderFailed {
@@ -349,7 +344,6 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
                 let canPlay = self.dataSource.adsPluginShouldPlayAd(self)
                 if canPlay == nil || canPlay == true {
                     adsManager.start()
-                   // Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(IMAPlugin.aa), userInfo: nil, repeats: false)
                 } else {
                     adsManager.skip()
                     self.adsManagerDidRequestContentResume(adsManager)
