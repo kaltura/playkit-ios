@@ -72,6 +72,10 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
         self.player = player
     }
     
+    public func getPlayer() -> Player {
+        return self.player
+    }
+    
     public func destroy() {
         self.player.destroy()
     }
@@ -113,7 +117,7 @@ class PlayerDecoratorBase: Player, PlayerDataSource, PlayerDelegate {
         self.delegate?.player(self, failedWith: error)
     }
     
-    func player(_ player: Player, didReceive event: PlayerEventType, with eventData: Any?) {
-        self.delegate?.player(self, didReceive: event, with: eventData)
+    func player(_ player: Player, didReceive event: PKEvent, with eventData: Any?) {
+       // self.delegate?.player(self, didReceive: event, with: eventData)
     }
 }

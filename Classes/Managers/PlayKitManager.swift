@@ -16,7 +16,7 @@ public class PlayKitManager: NSObject {
 
     public static let sharedInstance : PlayKitManager = PlayKitManager()
     
-    var pluginRegistry = Dictionary<String, Plugin.Type>()
+    var pluginRegistry = Dictionary<String, PKPlugin.Type>()
     
     public func loadPlayer(config: PlayerConfig) throws -> Player {
         let loader = PlayerLoader()
@@ -24,11 +24,11 @@ public class PlayKitManager: NSObject {
         return loader
     }
     
-    public func registerPlugin(_ pluginClass: Plugin.Type) {
+    public func registerPlugin(_ pluginClass: PKPlugin.Type) {
         pluginRegistry[pluginClass.pluginName] = pluginClass
     }
     
-    func createPlugin(name: String) -> Plugin? {
+    func createPlugin(name: String) -> PKPlugin? {
         let pluginClass = pluginRegistry[name]
         guard pluginClass != nil else {
             return nil

@@ -10,49 +10,19 @@ import UIKit
 import AVFoundation
 import AVKit
 
-public enum PlayerEventType : Int {
-    case ad_break_ready
-    case ad_break_ended
-    case ad_break_started
-    case ad_all_completed
-    case ad_clicked
-    case ad_complete
-    case ad_cuepoints_changed
-    case ad_first_quartile
-    case ad_loaded
-    case ad_log
-    case ad_midpoint
-    case ad_paused
-    case ad_resumed
-    case ad_skipped
-    case ad_started
-    case ad_stream_loaded
-    case ad_tapped
-    case ad_third_quartile
-    case ad_web_opener_will_open_external_browser
-    case ad_web_opener_will_open_in_app_browser
-    case ad_web_opener_did_open_in_app_browser
-    case ad_web_opener_will_close_in_app_browser
-    case ad_web_opener_did_close_in_app_browser
-    case ad_did_progress_to_time
-    case ad_did_request_pause
-    case ad_did_request_resume
-}
-
 public protocol PlayerDataSource: class {
     func playerCanPlayAd(_ player: Player) -> Bool
 }
 
 public protocol PlayerDelegate: class {
     func player(_ player: Player, failedWith error: String)
-    func player(_ player: Player, didReceive event: PlayerEventType, with eventData: Any?)
 }
 
 public protocol Player {
     
     var dataSource: PlayerDataSource? { get set }
     var delegate: PlayerDelegate? { get set }
-    
+        
     /**
      Get the player's layer component.
      */
@@ -124,6 +94,6 @@ public enum Origin {
     case end
 }
 
-protocol DecoratedPlayerProvider {
+protocol PlayerDecorator {
     func getDecoratedPlayer() -> PlayerDecoratorBase?
 }

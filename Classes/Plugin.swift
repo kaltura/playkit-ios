@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-public protocol Plugin {
+public protocol PKPlugin {
     
     static var pluginName: String { get }
 

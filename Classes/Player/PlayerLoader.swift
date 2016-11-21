@@ -8,47 +8,85 @@
 
 import Foundation
 
+class LoadedPlugin {
+    var plugin: PKPlugin
+    var decorator: PlayerDecorator
+    init(plugin :PKPlugin, decorator: PlayerDecorator) {
+        self.plugin = plugin
+        self.decorator = decorator
+    }
+}
+
 class PlayerLoader: PlayerDecoratorBase {
     
-    var loadedPlugins = [Plugin]()
+   // var loadedPlugins = [PKPlugin]()
+    var loadedPlugins = Dictionary<String, LoadedPlugin>()
     
-    func load(_ config: PlayerConfig) throws {
-        var player: Player = PlayerController()
-        player.prepare(config)
+    func load(_ config: PlayerConfig) {
+        var playerController: PlayerController
         
-        var decorator: PlayerDecoratorBase? = nil
-        
-        if let plugins = config.plugins {
-            for pluginName in plugins.keys {
-                if let pluginObject = PlayKitManager.sharedInstance.createPlugin(name: pluginName) {
-                    pluginObject.load(player: player, config: plugins[pluginName] as? AnyObject)
-                    
-                    if pluginObject is DecoratedPlayerProvider {
-                        if let d = (pluginObject as! DecoratedPlayerProvider).getDecoratedPlayer() {
-                            if decorator != nil {
-                                throw PlayKitError.multipleDecoratorsDetected
+        if let mediaEntry = config.mediaEntry {
+            playerController = PlayerController(mediaEntry: mediaEntry)
+            
+            // TODO::
+            // add event listener on player controller
+            
+            var player: Player = playerController
+            var decorator: PlayerDecoratorBase? = nil
+            
+            if let plugins = config.plugins {
+                for pluginName in plugins.keys {
+                    if let pluginObject = PlayKitManager.sharedInstance.createPlugin(name: pluginName) {
+                        // TODO::
+                        // send message bus
+                        pluginObject.load(player: player, config: plugins[pluginName] as? AnyObject)
+                        
+                        if pluginObject is PlayerDecorator {
+                            if let d = (pluginObject as! PlayerDecorator).getDecoratedPlayer() {
+                                if d != nil {
+                                    decorator = d
+                                    decorator!.setPlayer(player)
+                                }
                             }
-                            decorator = d
-                            decorator!.setPlayer(player)
                         }
+
+                        loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator as! PlayerDecorator)
                     }
                     
-                    loadedPlugins.append(pluginObject)
+                    setPlayer(player)
                 }
             }
         }
+    }
+    
+    func destroyPlayer() {
+        getPlayer().destroy()
+    }
+    
+    func destroyPlugins() {
+        var currentLayer = getPlayer()
         
-        if decorator != nil {
-            player = decorator!
+        for (pluginName, loadedPlugin) in self.loadedPlugins.reversed() {
+            // Peel off decorator, if this plugin added one
+            if loadedPlugin.decorator != nil {
+                //TODO:: assert
+                if let decorator = (currentLayer as! PlayerDecorator).getDecoratedPlayer() {
+                    currentLayer = decorator
+                }
+            }
+            
+            // Release the plugin
+            
+            loadedPlugin.plugin.destroy()
+            loadedPlugins.removeValue(forKey: pluginName)
         }
         
-        setPlayer(player)
+        setPlayer(currentLayer)
     }
     
     override func destroy() {
-        for plugin in loadedPlugins {
-            plugin.destroy()
-        }
+        self.destroyPlayer()
+        self.destroyPlugins()
         super.destroy()
     }
 }

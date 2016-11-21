@@ -10,7 +10,14 @@ import Foundation
 import AVFoundation
 import AVKit
 
+public protocol PlayerEngineDelegate: class {
+    
+    func player(changedState: PKEvent)
+    func player(encounteredError: NSError)
+}
+
 public protocol PlayerEngine {
+    weak var delegate: PlayerEngineDelegate? {get set}
     
     /**
      Get the player's view component.

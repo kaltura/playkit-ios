@@ -11,7 +11,8 @@ import AVFoundation
 import AVKit
 
 class PlayerController: Player {
-    
+    //public var messageBus: PKMessageBus?
+
     var dataSource: PlayerDataSource?
     var delegate: PlayerDelegate?
     
@@ -50,8 +51,8 @@ class PlayerController: Player {
         }
     }
 
-    public init() {
-        currentPlayer = AVPlayerEngine()
+    public init(mediaEntry: MediaEntry) {
+        self.currentPlayer = AVPlayerEngine()
     }
 
     func prepare(_ config: PlayerConfig) {
