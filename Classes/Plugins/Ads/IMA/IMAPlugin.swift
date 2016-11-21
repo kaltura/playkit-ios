@@ -322,7 +322,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
         let converted = self.convertToPlayerEvent(event.type)
-        //print("xxx " + String(describing: converted))
+        print("xxx " + String(describing: converted))
         
         switch event.type {
         case .AD_BREAK_READY:
