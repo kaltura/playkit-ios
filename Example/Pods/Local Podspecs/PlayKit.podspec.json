@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "summary": "A short description of PlayKit.",
   "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/<GITHUB_USERNAME>/PlayKit",
+  "homepage": "https://github.com/kaltura/playkit-ios",
   "license": {
-    "type": "MIT",
+    "type": "AGPLv3",
     "file": "LICENSE"
   },
   "authors": {
     "Rivka Schwartz": "Rivka.Peleg@kaltura.com"
   },
   "source": {
-    "git": "https://github.com/<GITHUB_USERNAME>/PlayKit.git",
+    "git": "https://github.com/kaltura/playkit-ios.git",
     "tag": "0.1.0"
   },
   "platforms": {

@@ -10,6 +10,14 @@ import UIKit
 import PlayKit
 
 class ViewController: UIViewController, SessionProvider {
+    public func refreshKS(completion: (Result<String>) -> Void) {
+        
+    }
+
+    public func loadKS(completion: (Result<String>) -> Void) {
+        completion(Result(data: "ks", error: nil))
+    }
+
 
     
     var partnerId: Int64 = 198
@@ -22,17 +30,28 @@ class ViewController: UIViewController, SessionProvider {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let mediaProvider = OTTEntryProvider(sessionProvider: self, mediaId: "258656", type: AssetType.media, formats: ["Mobile_Devices_Main_SD"])
+        let sessionManager =  OTTSessionManager(serverURL: self.serverURL, partnerId: self.partnerId, clientTag: self.clientTag, apiVersion: self.apiVersion)
         
-        mediaProvider.loadMedia { (r:Result<MediaEntry>) in
-            
-            if let error = r.error {
+        sessionManager.login(username: "rivka@p.com", password: "123456") { (e:Error?) in
+            if let error = e {
                 print(error)
             }else{
-              print(r.data)
+                print("success")
             }
-            
         }
+        
+        
+//        let mediaProvider = OTTEntryProvider(sessionProvider: self, mediaId: "258656", type: AssetType.media, formats: ["Mobile_Devices_Main_SD"])
+//        
+//        mediaProvider.loadMedia { (r:Result<MediaEntry>) in
+//            
+//            if let error = r.error {
+//                print(error)
+//            }else{
+//              print(r.data)
+//            }
+//            
+//        }
 //        if let requestBuilder2: RestRequestBuilder = AssetService.get(baseURL: self.serverURL, ks:"1:result:loginSession:ks" , assetId: "258656", type: .media),
 //            let requestBuilder1: RestRequestBuilder = OTTUserService.login(baseURL: self.serverURL, partnerId: self.partnerId, username: "rivka@p.com", password: "123456")
 //        {

@@ -14,7 +14,12 @@ public protocol SessionProvider {
     var partnerId: Int64 { get }
     var clientTag: String { get }
     var apiVersion: String { get }
-    var ks: String { get }
+    
+    func refreshKS(completion: (_ result :Result<String>) -> Void)
+
+    
+    
+    
 }
 
 

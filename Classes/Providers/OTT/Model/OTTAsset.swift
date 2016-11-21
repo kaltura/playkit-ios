@@ -9,10 +9,10 @@
 import UIKit
 import SwiftyJSON
 
-internal class Asset {
+internal class OTTAsset {
 
     internal var id: String 
-    internal var files: [File]?
+    internal var files: [OTTFile]?
     
     private let idKey = "id"
     private let idfiles = "mediaFiles"
@@ -27,9 +27,9 @@ internal class Asset {
         self.id = id.stringValue
         if let jsonFiles = assetJson[idfiles].array {
             
-            self.files = [File]()
+            self.files = [OTTFile]()
             for jsonFile in jsonFiles {
-                if let file = File(json: jsonFile.object){
+                if let file = OTTFile(json: jsonFile.object){
                     self.files?.append(file)
                 }
             }

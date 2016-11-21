@@ -7,108 +7,104 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		04B26C5A9F69E3AA7FAA44C4B771B2E7 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F05A2DDA9058082E37FAAA448F008219 /* SwiftyJSON.framework */; };
-		096CB2751DAB2CA33DAD9493411357CD /* SamplePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A952382B5B94531E747707422A109ED /* SamplePlugin.swift */; };
-		0C37CD52423623547780B75F7530FC15 /* PlayKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B147A6A4753BEFB57AE500896E3ED0F /* PlayKit-dummy.m */; };
+		0139ACBECC9D6EA1EAAE69DD4BBE2AA7 /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF5C640F2DD4795B199491CD1D659A6 /* MediaEntry.swift */; };
+		0F8B9A1958C4DA6A01BA517052C59D8F /* OTTLoginSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02BDE62C33E7CA6FF5632DAECFB7648C /* OTTLoginSession.swift */; };
 		0F8C399A8A586C64A57632A20B465CC4 /* Pods-PlayKit_Example-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A03CE08C77156A15137D60293642A02A /* Pods-PlayKit_Example-dummy.m */; };
+		1C151DAC6DF14721D4A91F0D360514DC /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7F9C1D0E8201121A4F7E49039893DD /* Request.swift */; };
 		1E2E733838ECE0308C5CFE497A253204 /* Pods-PlayKit_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A899AFEC56C1BC3B97B671E7CD92E332 /* Pods-PlayKit_Tests-dummy.m */; };
-		232A997885A384CEF669C7E42941C06D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */; };
-		24E1A9632AF282B62EBD0313178AD037 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF0487CF910A66BFC2FB0C4876C1D86 /* Result.swift */; };
+		1EE88FAFB27958F8FD1BA6F5E1FFA89A /* SwiftyJSON-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */; };
+		1F7F33134A5DEE59501A93156EF882A2 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F05A2DDA9058082E37FAAA448F008219 /* SwiftyJSON.framework */; };
+		22439525CFAACDD85BF5DFF9BB11994E /* OTTAssetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA7827E4848B27A422E2AA0FA7BD151 /* OTTAssetService.swift */; };
 		275420C197C765FD9DFC96E2ABD27206 /* Pods-PlayKit_Tests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 4FE403A2E6CCDE0F7E7B30FB8A94FE2C /* Pods-PlayKit_Tests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		31651C4487857A5495299EC40518C467 /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23688C5787935F688A3A591493380893 /* Plugin.swift */; };
-		327BE69F63BB8FA82AD540AE89525A86 /* SwiftyJSON-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */; };
+		28950DE76EF1A177749D9F02415A0D08 /* USRExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9592E9EFAEF0219E1027A441A57D98 /* USRExecutor.swift */; };
+		2C5A89C9FED84036BEFF91ECC8703ED3 /* SwiftyJSON-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34839F68E571142C000BA217B8F296AD /* OTTSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB026E126FD5DB6CB913FB0D42055CF /* OTTSessionManager.swift */; };
+		34A9A9218DD90F65F69CC7D4A79341AF /* OTTGetAssetResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E37BD1DB28068F3E83A2D99C3F97122 /* OTTGetAssetResponse.swift */; };
 		447C40394EDC6AF2D4875D034FA23C15 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */; };
-		552A6BCECEF4E079593C8C6EFF617A9B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */; };
-		62B6C6C13ECB795A0CDC1915AFC5100F /* ReplaceMe.swift in Sources */ = {isa = PBXBuildFile; fileRef = D26904DDC65A4EAB8C8F156166C344F7 /* ReplaceMe.swift */; };
-		735532B42A32B731EA14527451F74C9F /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E57F21B0496799DDA6F53879B2A661 /* Player.swift */; };
+		588C2ACFC182C01764462A7112A25385 /* OTTUserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06B1B01D30C0C46FBA1AFB846155E17 /* OTTUserService.swift */; };
+		5A339C4BDD5F84E167B4048BFFAC7E3B /* PlayKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B147A6A4753BEFB57AE500896E3ED0F /* PlayKit-dummy.m */; };
+		5E327BBBB0A98D982536CB8DBDAEE09E /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00ED9FAFF11EDC53D5DF0EDA59575AB /* Player.swift */; };
+		61D419A093B5248B1D6ABBA56833CF53 /* PlayKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 070E84F76AC3FC5E27EC814B74C3DB37 /* PlayKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DDCB6A2B2F30FB14425EAE63D886A69 /* SessionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6576A5085C77CCB8DE81AC720CFB553C /* SessionProvider.swift */; };
+		755BE620E1F20E818343BC7617B991C4 /* OTTEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F13E424BA49641D66A017CAE8A35F5D /* OTTEntryProvider.swift */; };
+		7A00E2BD84893559AE4D0CEFF2CBD89F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */; };
+		7A518036D78E4BCFB03144E50F9D2395 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D43FC469E143163C85AA54DCF36AE7A /* Response.swift */; };
 		83645471276D8EDBBE5A443D99CF0632 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */; };
-		843154CD1DD48F7A00D1BB96 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154CC1DD48F7A00D1BB96 /* Request.swift */; };
-		843154CF1DD4917600D1BB96 /* RequestConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154CE1DD4917600D1BB96 /* RequestConfiguration.swift */; };
-		843154D31DD49BFD00D1BB96 /* RequestExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154D21DD49BFD00D1BB96 /* RequestExecutor.swift */; };
-		843154D71DD4A26000D1BB96 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154D61DD4A26000D1BB96 /* Response.swift */; };
-		843154D91DD4B55D00D1BB96 /* USRExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843154D81DD4B55D00D1BB96 /* USRExecutor.swift */; };
-		8483C8A61DDAF73F00984647 /* AssetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A41DDAF73F00984647 /* AssetService.swift */; };
-		8483C8A71DDAF73F00984647 /* OTTUserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A51DDAF73F00984647 /* OTTUserService.swift */; };
-		8483C8A81DDAF8DC00984647 /* MockMediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A01DDAF71600984647 /* MockMediaProvider.swift */; };
-		8483C8A91DDAF8E300984647 /* OTTEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8A21DDAF71600984647 /* OTTEntryProvider.swift */; };
-		8483C8AB1DDAFB0100984647 /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8AA1DDAFB0100984647 /* Asset.swift */; };
-		8483C8AD1DDB01DD00984647 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8AC1DDB01DD00984647 /* File.swift */; };
-		8483C8AF1DDB32D900984647 /* OTTGetAssetResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8483C8AE1DDB32D900984647 /* OTTGetAssetResponse.swift */; };
-		84D3DB7A1DD8D04700E79EBA /* RestRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */; };
-		84D3DB7C1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */; };
-		84D3DB801DD8DC3600E79EBA /* SessionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D3DB7F1DD8DC3600E79EBA /* SessionProvider.swift */; };
-		899A4846612B1A3839E7ED12BF43C67B /* PlayKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 070E84F76AC3FC5E27EC814B74C3DB37 /* PlayKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		94D52CFFC946CB9F43DEC56A44310A94 /* MediaEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51139F3E0E0E46EBFB2AAF2B114B579F /* MediaEntryProvider.swift */; };
+		8D4E9CCF31BE981B697E77F57162E022 /* MediaEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5250637354DDFD10E84160DD6A26664B /* MediaEntryProvider.swift */; };
+		8EAEB7759F465A28A1CA97A1539B0334 /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA6A2CD69A6F9A8A7D75A97AE933DE4 /* Plugin.swift */; };
+		93D8F150E0D30ACE7C41E18D9C37967C /* OTTRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7E033C37656BC7A9E3B04022329446D /* OTTRequestBuilder.swift */; };
+		9985418B2D72648E77571402EBB35ADC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */; };
+		9C3F00614247CF36524CADAF5C044677 /* OTTAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA96FE8D3D68D98B70A25CF0909F2D2B /* OTTAsset.swift */; };
+		9D328D2E3FECE45D0D83459CE729E212 /* SamplePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A952382B5B94531E747707422A109ED /* SamplePlugin.swift */; };
 		A31CA6C3FB83BC8671FC30B4CF35BF93 /* Pods-PlayKit_Example-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 03DD4247E2D34442878F7945CD89C0C5 /* Pods-PlayKit_Example-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B04AE2542EEAE9034697DCC18C0473F9 /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85929CB4ACE3B622D783281B3A29300 /* PlayerImp.swift */; };
-		B420C473377722F4D49F0BA0CE93842A /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30BD1676138246EC59A34949DC977D2 /* PlayerConfig.swift */; };
-		D498B9A836DDFA5AC7C1CCCD472476DD /* SwiftyJSON-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D7ECC5C8E2621F999CBE41E736CC212D /* MediaEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4303F57B465B830A536EF90803CBDF44 /* MediaEntry.swift */; };
-		DC9592BE3A822FEF563F4D68DA679EAB /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */; };
-		ECAD9F1A9219AEF299F43428C4A1A0BE /* PlayKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3091515E9E9C6A2C995314CF5EAC21EA /* PlayKitManager.swift */; };
+		A588E2D98A45711E92BB4B89C68B2378 /* OTTFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23BDB636A74B0717FA2A7DF80425871 /* OTTFile.swift */; };
+		A8CEB14F60E4A37FACBC6608F014984B /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */; };
+		B31EC0266982FCB1647B1B72B057E48C /* ReplaceMe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631973D29741E527CA678D6DDE91A454 /* ReplaceMe.swift */; };
+		B58E44209E7D1567B107495AF716B245 /* OTTMultiRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48577633881EC313AE148B567F2EDAFE /* OTTMultiRequestBuilder.swift */; };
+		B5FF4176E7AFD9C58CD96ABABD3FDA92 /* RequestConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5766825764F46B5E51C8BAF6624B459B /* RequestConfiguration.swift */; };
+		BCDA151FA0C1B9871D38ABC35130DC55 /* RequestExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF0A54C7F9DC7ADF20B30B92059A140 /* RequestExecutor.swift */; };
+		D16138CFADDA22575B0F5F809360A553 /* PlayerImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD7ADE6B1EE2312FA3C8DF0EEA0C8BD /* PlayerImp.swift */; };
+		D66E2E9EC8B5D761DB935ADA4557F25F /* OTTSessionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3671212B86C1BE42DE9DB50A69BBEE4F /* OTTSessionService.swift */; };
+		DDF47E2715339DA25CDF4E626E9CE83F /* PlayKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D64EC3498A2FC27CE189F44F328FC5BB /* PlayKitManager.swift */; };
+		E9A24F9C1F509C7ED10E9F7E456E8B20 /* PlayerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF33C6E9F8E30222BB3508359510E6BE /* PlayerConfig.swift */; };
+		F8F1E4DA0BB722D732CBABD037F357F5 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45ACAF18B23C8B064041D43833AA96EF /* Result.swift */; };
+		FB0EA99A3BC1CAE37EC053A173EE6B69 /* MockMediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B7C423F1D74BC7ED0F1A4D6FFB90CDD /* MockMediaProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		32C928E9D24A36BACA8FE848DAC9C4A7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 831A7807D8F4689A338EABAEF5B8C46C;
-			remoteInfo = SwiftyJSON;
-		};
 		7475758B188BA73223DE837FE99EDD6F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 831A7807D8F4689A338EABAEF5B8C46C;
+			remoteGlobalIDString = 24DED97F3FC84DF85B375605ABB7B978;
+			remoteInfo = SwiftyJSON;
+		};
+		A1672ACE124434459A2AA214536809BA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 24DED97F3FC84DF85B375605ABB7B978;
 			remoteInfo = SwiftyJSON;
 		};
 		DE4352E4122B165C843C708F02378C9D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = DD852D6B594755725C79B96AC4AF7371;
+			remoteGlobalIDString = 0280CDDB5CC2A61D6DE906F56AB27FBF;
 			remoteInfo = PlayKit;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		02BDE62C33E7CA6FF5632DAECFB7648C /* OTTLoginSession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTLoginSession.swift; sourceTree = "<group>"; };
 		03DD4247E2D34442878F7945CD89C0C5 /* Pods-PlayKit_Example-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-PlayKit_Example-umbrella.h"; sourceTree = "<group>"; };
 		05CA09B061E193906653AC21FD3A94F1 /* SwiftyJSON-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-umbrella.h"; sourceTree = "<group>"; };
 		070E84F76AC3FC5E27EC814B74C3DB37 /* PlayKit-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PlayKit-umbrella.h"; sourceTree = "<group>"; };
+		0B7C423F1D74BC7ED0F1A4D6FFB90CDD /* MockMediaProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockMediaProvider.swift; sourceTree = "<group>"; };
 		23228E52A0E72AA4F610067420FD178D /* SwiftyJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftyJSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		23688C5787935F688A3A591493380893 /* Plugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Plugin.swift; sourceTree = "<group>"; };
 		263FE9D33EC1A0763C7DD16D79760C8D /* Pods-PlayKit_Example-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-PlayKit_Example-acknowledgements.markdown"; sourceTree = "<group>"; };
 		2A5A943578F345FA39C5E36FB2457068 /* Pods_PlayKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlayKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SwiftyJSON.xcconfig; sourceTree = "<group>"; };
-		3091515E9E9C6A2C995314CF5EAC21EA /* PlayKitManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayKitManager.swift; sourceTree = "<group>"; };
 		32B9BBA8F5B33E56C38F5546432F66B7 /* SwiftyJSON-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SwiftyJSON-dummy.m"; sourceTree = "<group>"; };
+		3671212B86C1BE42DE9DB50A69BBEE4F /* OTTSessionService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTSessionService.swift; sourceTree = "<group>"; };
 		36B5338A05369D466EEF9A9283C6C810 /* Pods-PlayKit_Example-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-PlayKit_Example-resources.sh"; sourceTree = "<group>"; };
-		4303F57B465B830A536EF90803CBDF44 /* MediaEntry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
+		3F13E424BA49641D66A017CAE8A35F5D /* OTTEntryProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTEntryProvider.swift; sourceTree = "<group>"; };
 		4381400D98EEAEFFEBE6ECBA5A387A04 /* PlayKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PlayKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		45ACAF18B23C8B064041D43833AA96EF /* Result.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
+		48577633881EC313AE148B567F2EDAFE /* OTTMultiRequestBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTMultiRequestBuilder.swift; sourceTree = "<group>"; };
 		4FE403A2E6CCDE0F7E7B30FB8A94FE2C /* Pods-PlayKit_Tests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-PlayKit_Tests-umbrella.h"; sourceTree = "<group>"; };
-		51139F3E0E0E46EBFB2AAF2B114B579F /* MediaEntryProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MediaEntryProvider.swift; sourceTree = "<group>"; };
+		5250637354DDFD10E84160DD6A26664B /* MediaEntryProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MediaEntryProvider.swift; sourceTree = "<group>"; };
 		5554A55FB0B6A5DDF118AA891189E5EF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5CF0487CF910A66BFC2FB0C4876C1D86 /* Result.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
+		5766825764F46B5E51C8BAF6624B459B /* RequestConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RequestConfiguration.swift; sourceTree = "<group>"; };
+		631973D29741E527CA678D6DDE91A454 /* ReplaceMe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReplaceMe.swift; sourceTree = "<group>"; };
+		6576A5085C77CCB8DE81AC720CFB553C /* SessionProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SessionProvider.swift; sourceTree = "<group>"; };
 		6B147A6A4753BEFB57AE500896E3ED0F /* PlayKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "PlayKit-dummy.m"; sourceTree = "<group>"; };
+		6BF0A54C7F9DC7ADF20B30B92059A140 /* RequestExecutor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RequestExecutor.swift; sourceTree = "<group>"; };
 		79A1A841E799F3DF5943919A07374497 /* Pods-PlayKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-PlayKit_Tests.modulemap"; sourceTree = "<group>"; };
-		843154CC1DD48F7A00D1BB96 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
-		843154CE1DD4917600D1BB96 /* RequestConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestConfiguration.swift; sourceTree = "<group>"; };
-		843154D21DD49BFD00D1BB96 /* RequestExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestExecutor.swift; sourceTree = "<group>"; };
-		843154D61DD4A26000D1BB96 /* Response.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
-		843154D81DD4B55D00D1BB96 /* USRExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = USRExecutor.swift; sourceTree = "<group>"; };
-		8483C8A01DDAF71600984647 /* MockMediaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMediaProvider.swift; sourceTree = "<group>"; };
-		8483C8A21DDAF71600984647 /* OTTEntryProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTTEntryProvider.swift; sourceTree = "<group>"; };
-		8483C8A41DDAF73F00984647 /* AssetService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetService.swift; sourceTree = "<group>"; };
-		8483C8A51DDAF73F00984647 /* OTTUserService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTUserService.swift; sourceTree = "<group>"; };
-		8483C8AA1DDAFB0100984647 /* Asset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
-		8483C8AC1DDB01DD00984647 /* File.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
-		8483C8AE1DDB32D900984647 /* OTTGetAssetResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTGetAssetResponse.swift; sourceTree = "<group>"; };
-		84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestRequestBuilder.swift; sourceTree = "<group>"; };
-		84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestMultiRequestBuilder.swift; sourceTree = "<group>"; };
-		84D3DB7F1DD8DC3600E79EBA /* SessionProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionProvider.swift; sourceTree = "<group>"; };
 		89748EEB01201FA5E39224EC57BE819A /* PlayKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = PlayKit.modulemap; sourceTree = "<group>"; };
 		8A952382B5B94531E747707422A109ED /* SamplePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SamplePlugin.swift; sourceTree = "<group>"; };
+		8D43FC469E143163C85AA54DCF36AE7A /* Response.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
+		8E37BD1DB28068F3E83A2D99C3F97122 /* OTTGetAssetResponse.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTGetAssetResponse.swift; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		98EC9B3CF9ACB306D34D7BD50F974044 /* PlayKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PlayKit.xcconfig; sourceTree = "<group>"; };
 		9B6A7FC7667556CD3067241BFDC8087F /* Pods-PlayKit_Tests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-PlayKit_Tests-resources.sh"; sourceTree = "<group>"; };
@@ -117,36 +113,45 @@
 		A899AFEC56C1BC3B97B671E7CD92E332 /* Pods-PlayKit_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-PlayKit_Tests-dummy.m"; sourceTree = "<group>"; };
 		ABCE7197F4E23DFC27ADD3D366B3B90C /* Pods-PlayKit_Tests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-PlayKit_Tests-frameworks.sh"; sourceTree = "<group>"; };
 		B0001E300ED203F4AC054965AD408787 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B00ED9FAFF11EDC53D5DF0EDA59575AB /* Player.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		B1844ADAA8C12FD7B94DBC0B86E3489E /* Pods-PlayKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-PlayKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		B49DF08DFE6663D7A25579D1153336CE /* Pods-PlayKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-PlayKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		B9B4B035EA215AF9485179D719ADC902 /* Pods-PlayKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-PlayKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		BAA6A2CD69A6F9A8A7D75A97AE933DE4 /* Plugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Plugin.swift; sourceTree = "<group>"; };
 		BBD3CFC63F069A454E070497AA80E75A /* Pods-PlayKit_Example-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-PlayKit_Example-acknowledgements.plist"; sourceTree = "<group>"; };
 		BBF610E40BDF6E542FA21FF7E5491205 /* SwiftyJSON-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftyJSON-prefix.pch"; sourceTree = "<group>"; };
 		BDE506ECE97701EBA44FDBFF401C1A04 /* SwiftyJSON.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SwiftyJSON.swift; path = Source/SwiftyJSON.swift; sourceTree = "<group>"; };
+		C06B1B01D30C0C46FBA1AFB846155E17 /* OTTUserService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTUserService.swift; sourceTree = "<group>"; };
 		C4A9A658C966F6BB111BEDBDEA1F874A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C62A5F58A28628A2BB9C8BD160CA9BA5 /* PlayKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PlayKit-prefix.pch"; sourceTree = "<group>"; };
 		C8DA2B39FADE7C357D1133F05EF05365 /* Pods-PlayKit_Example-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-PlayKit_Example-frameworks.sh"; sourceTree = "<group>"; };
 		D032A29E584B77AE187E586922267CF5 /* SwiftyJSON.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = SwiftyJSON.modulemap; sourceTree = "<group>"; };
-		D26904DDC65A4EAB8C8F156166C344F7 /* ReplaceMe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReplaceMe.swift; sourceTree = "<group>"; };
+		D64EC3498A2FC27CE189F44F328FC5BB /* PlayKitManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayKitManager.swift; sourceTree = "<group>"; };
 		D825E1B086569E7731D7AD42B3DEC4EF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D85929CB4ACE3B622D783281B3A29300 /* PlayerImp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerImp.swift; sourceTree = "<group>"; };
+		DA96FE8D3D68D98B70A25CF0909F2D2B /* OTTAsset.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTAsset.swift; sourceTree = "<group>"; };
+		DBF5C640F2DD4795B199491CD1D659A6 /* MediaEntry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MediaEntry.swift; sourceTree = "<group>"; };
+		DE9592E9EFAEF0219E1027A441A57D98 /* USRExecutor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = USRExecutor.swift; sourceTree = "<group>"; };
 		E31602DC16C140425522BBC17183E2D7 /* Pods-PlayKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-PlayKit_Example.release.xcconfig"; sourceTree = "<group>"; };
-		E5E57F21B0496799DDA6F53879B2A661 /* Player.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+		E7E033C37656BC7A9E3B04022329446D /* OTTRequestBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTRequestBuilder.swift; sourceTree = "<group>"; };
 		E9196D1A81B1F4F5DACD2786F3DF7337 /* Pods_PlayKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlayKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAD7ADE6B1EE2312FA3C8DF0EEA0C8BD /* PlayerImp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerImp.swift; sourceTree = "<group>"; };
+		EBA7827E4848B27A422E2AA0FA7BD151 /* OTTAssetService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTAssetService.swift; sourceTree = "<group>"; };
 		ECA67FBE7D19B5ECD210A568111407B1 /* Pods-PlayKit_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-PlayKit_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		EF585065BE586DF76A8477DC4EA715F1 /* Pods-PlayKit_Example.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-PlayKit_Example.modulemap"; sourceTree = "<group>"; };
 		F05A2DDA9058082E37FAAA448F008219 /* SwiftyJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftyJSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F30BD1676138246EC59A34949DC977D2 /* PlayerConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
+		F23BDB636A74B0717FA2A7DF80425871 /* OTTFile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTFile.swift; sourceTree = "<group>"; };
+		FAB026E126FD5DB6CB913FB0D42055CF /* OTTSessionManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OTTSessionManager.swift; sourceTree = "<group>"; };
+		FB7F9C1D0E8201121A4F7E49039893DD /* Request.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
+		FF33C6E9F8E30222BB3508359510E6BE /* PlayerConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerConfig.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		358E54E473488FB1D9FC27F4FD7E0025 /* Frameworks */ = {
+		2F7541312E54B7AC9217B66326C61E3F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				232A997885A384CEF669C7E42941C06D /* Foundation.framework in Frameworks */,
-				04B26C5A9F69E3AA7FAA44C4B771B2E7 /* SwiftyJSON.framework in Frameworks */,
+				9985418B2D72648E77571402EBB35ADC /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,19 +163,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		42F201B8933CE7621614F9DA862C2226 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A00E2BD84893559AE4D0CEFF2CBD89F /* Foundation.framework in Frameworks */,
+				1F7F33134A5DEE59501A93156EF882A2 /* SwiftyJSON.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		491F483A1E576774509E68CDA224DDF4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				447C40394EDC6AF2D4875D034FA23C15 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D216E9B657721809127843810EB443AC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				552A6BCECEF4E079593C8C6EFF617A9B /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,20 +201,28 @@
 			path = "Target Support Files/Pods-PlayKit_Example";
 			sourceTree = "<group>";
 		};
-		268AD29876C0CDBF080F830B2F1AA5D3 /* Network */ = {
+		18AFD0D43A9268C39BE80A9091BD781A /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				5CF0487CF910A66BFC2FB0C4876C1D86 /* Result.swift */,
-				843154CC1DD48F7A00D1BB96 /* Request.swift */,
-				843154CE1DD4917600D1BB96 /* RequestConfiguration.swift */,
-				843154D21DD49BFD00D1BB96 /* RequestExecutor.swift */,
-				843154D61DD4A26000D1BB96 /* Response.swift */,
-				843154D81DD4B55D00D1BB96 /* USRExecutor.swift */,
-				84D3DB791DD8D04700E79EBA /* RestRequestBuilder.swift */,
-				84D3DB7B1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift */,
-				84D3DB7F1DD8DC3600E79EBA /* SessionProvider.swift */,
+				BAA6A2CD69A6F9A8A7D75A97AE933DE4 /* Plugin.swift */,
+				631973D29741E527CA678D6DDE91A454 /* ReplaceMe.swift */,
+				2E6CA92B5833D7C4FF10A7CA49FD2C15 /* Managers */,
+				DE6F5DD5472AD67DC005CB5648C9E015 /* Network */,
+				FDD9A17F6B3D04D42AF80BD6C0AAFAF2 /* Player */,
+				5A7A3A1BCAF51D361EF988F5743B9444 /* Providers */,
 			);
-			path = Network;
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		209B51CD2C3D07902046B5BE1217C14A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				DA96FE8D3D68D98B70A25CF0909F2D2B /* OTTAsset.swift */,
+				F23BDB636A74B0717FA2A7DF80425871 /* OTTFile.swift */,
+				8E37BD1DB28068F3E83A2D99C3F97122 /* OTTGetAssetResponse.swift */,
+				02BDE62C33E7CA6FF5632DAECFB7648C /* OTTLoginSession.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		2B6855BF195040256683A16B2A6DE5E8 /* iOS */ = {
@@ -219,37 +233,28 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		421EBFA8C012B1876ABF6633AB41F869 /* Player */ = {
+		2E6CA92B5833D7C4FF10A7CA49FD2C15 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				4303F57B465B830A536EF90803CBDF44 /* MediaEntry.swift */,
-				E5E57F21B0496799DDA6F53879B2A661 /* Player.swift */,
-				F30BD1676138246EC59A34949DC977D2 /* PlayerConfig.swift */,
-				D85929CB4ACE3B622D783281B3A29300 /* PlayerImp.swift */,
+				D64EC3498A2FC27CE189F44F328FC5BB /* PlayKitManager.swift */,
 			);
-			path = Player;
+			path = Managers;
 			sourceTree = "<group>";
 		};
-		43064A1DB8C0C532EFF1C512B3785DDA /* Classes */ = {
+		3BD624290B4A678F522F78EF15EFFBD1 /* Mock */ = {
 			isa = PBXGroup;
 			children = (
-				23688C5787935F688A3A591493380893 /* Plugin.swift */,
-				D26904DDC65A4EAB8C8F156166C344F7 /* ReplaceMe.swift */,
-				7FCF448C76A333B1C648E60AB8292508 /* Managers */,
-				268AD29876C0CDBF080F830B2F1AA5D3 /* Network */,
-				421EBFA8C012B1876ABF6633AB41F869 /* Player */,
-				50A32A23DA0813944CE9DCE332E50089 /* Providers */,
+				0B7C423F1D74BC7ED0F1A4D6FFB90CDD /* MockMediaProvider.swift */,
 			);
-			path = Classes;
+			path = Mock;
 			sourceTree = "<group>";
 		};
-		50A32A23DA0813944CE9DCE332E50089 /* Providers */ = {
+		5A7A3A1BCAF51D361EF988F5743B9444 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
-				51139F3E0E0E46EBFB2AAF2B114B579F /* MediaEntryProvider.swift */,
-				8483C89F1DDAF71600984647 /* Mock */,
-				8483C8A11DDAF71600984647 /* OTT */,
-				8483C8A31DDAF71600984647 /* OVP */,
+				5250637354DDFD10E84160DD6A26664B /* MediaEntryProvider.swift */,
+				3BD624290B4A678F522F78EF15EFFBD1 /* Mock */,
+				E2AA3031772EE6C88DB46CCEAFA0838D /* OTT */,
 			);
 			path = Providers;
 			sourceTree = "<group>";
@@ -283,7 +288,7 @@
 		7BBA61AEA13E9D7587B2F900EE87655B /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				43064A1DB8C0C532EFF1C512B3785DDA /* Classes */,
+				18AFD0D43A9268C39BE80A9091BD781A /* Classes */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -308,12 +313,12 @@
 			path = Sample;
 			sourceTree = "<group>";
 		};
-		7FCF448C76A333B1C648E60AB8292508 /* Managers */ = {
+		83C72D2B9D8808D25750AA05C22AC7CF /* Session */ = {
 			isa = PBXGroup;
 			children = (
-				3091515E9E9C6A2C995314CF5EAC21EA /* PlayKitManager.swift */,
+				FAB026E126FD5DB6CB913FB0D42055CF /* OTTSessionManager.swift */,
 			);
-			path = Managers;
+			path = Session;
 			sourceTree = "<group>";
 		};
 		8428A5855E37E1A1F488349093C890BC /* Plugins */ = {
@@ -322,34 +327,6 @@
 				7EA29000DDCFC4AD342105199921E85D /* Sample */,
 			);
 			path = Plugins;
-			sourceTree = "<group>";
-		};
-		8483C89F1DDAF71600984647 /* Mock */ = {
-			isa = PBXGroup;
-			children = (
-				8483C8A01DDAF71600984647 /* MockMediaProvider.swift */,
-			);
-			path = Mock;
-			sourceTree = "<group>";
-		};
-		8483C8A11DDAF71600984647 /* OTT */ = {
-			isa = PBXGroup;
-			children = (
-				8483C8A41DDAF73F00984647 /* AssetService.swift */,
-				8483C8A51DDAF73F00984647 /* OTTUserService.swift */,
-				8483C8A21DDAF71600984647 /* OTTEntryProvider.swift */,
-				8483C8AA1DDAFB0100984647 /* Asset.swift */,
-				8483C8AC1DDB01DD00984647 /* File.swift */,
-				8483C8AE1DDB32D900984647 /* OTTGetAssetResponse.swift */,
-			);
-			path = OTT;
-			sourceTree = "<group>";
-		};
-		8483C8A31DDAF71600984647 /* OVP */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = OVP;
 			sourceTree = "<group>";
 		};
 		8EC39E1DC11846207722B71AAFE40F98 /* Support Files */ = {
@@ -364,6 +341,15 @@
 			);
 			name = "Support Files";
 			path = "../Target Support Files/SwiftyJSON";
+			sourceTree = "<group>";
+		};
+		8FAD236D336E27244F1B64CB18205558 /* Requests */ = {
+			isa = PBXGroup;
+			children = (
+				48577633881EC313AE148B567F2EDAFE /* OTTMultiRequestBuilder.swift */,
+				E7E033C37656BC7A9E3B04022329446D /* OTTRequestBuilder.swift */,
+			);
+			path = Requests;
 			sourceTree = "<group>";
 		};
 		9E13F80F7CA5C5011AC7645D563E7CEA /* Pods-PlayKit_Tests */ = {
@@ -420,6 +406,32 @@
 			name = SamplePlugin;
 			sourceTree = "<group>";
 		};
+		DE6F5DD5472AD67DC005CB5648C9E015 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				FB7F9C1D0E8201121A4F7E49039893DD /* Request.swift */,
+				5766825764F46B5E51C8BAF6624B459B /* RequestConfiguration.swift */,
+				6BF0A54C7F9DC7ADF20B30B92059A140 /* RequestExecutor.swift */,
+				8D43FC469E143163C85AA54DCF36AE7A /* Response.swift */,
+				45ACAF18B23C8B064041D43833AA96EF /* Result.swift */,
+				6576A5085C77CCB8DE81AC720CFB553C /* SessionProvider.swift */,
+				DE9592E9EFAEF0219E1027A441A57D98 /* USRExecutor.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		E2AA3031772EE6C88DB46CCEAFA0838D /* OTT */ = {
+			isa = PBXGroup;
+			children = (
+				3F13E424BA49641D66A017CAE8A35F5D /* OTTEntryProvider.swift */,
+				209B51CD2C3D07902046B5BE1217C14A /* Model */,
+				8FAD236D336E27244F1B64CB18205558 /* Requests */,
+				EF81C600C0FEF5897B9C84B6DAA25E23 /* Services */,
+				83C72D2B9D8808D25750AA05C22AC7CF /* Session */,
+			);
+			path = OTT;
+			sourceTree = "<group>";
+		};
 		EC5C86A3FB8B4968B4DCAA206F3C0389 /* PlayKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -429,6 +441,16 @@
 			);
 			name = PlayKit;
 			path = ../..;
+			sourceTree = "<group>";
+		};
+		EF81C600C0FEF5897B9C84B6DAA25E23 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				EBA7827E4848B27A422E2AA0FA7BD151 /* OTTAssetService.swift */,
+				3671212B86C1BE42DE9DB50A69BBEE4F /* OTTSessionService.swift */,
+				C06B1B01D30C0C46FBA1AFB846155E17 /* OTTUserService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		F3B0D5155658372388E6C177E49B1534 /* Support Files */ = {
@@ -445,30 +467,41 @@
 			path = "Example/Pods/Target Support Files/PlayKit";
 			sourceTree = "<group>";
 		};
+		FDD9A17F6B3D04D42AF80BD6C0AAFAF2 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				DBF5C640F2DD4795B199491CD1D659A6 /* MediaEntry.swift */,
+				B00ED9FAFF11EDC53D5DF0EDA59575AB /* Player.swift */,
+				FF33C6E9F8E30222BB3508359510E6BE /* PlayerConfig.swift */,
+				EAD7ADE6B1EE2312FA3C8DF0EEA0C8BD /* PlayerImp.swift */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		03E4F4F3B224F00BB9B44D61F4CBF629 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C5A89C9FED84036BEFF91ECC8703ED3 /* SwiftyJSON-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3B29155ED4723083E2F03F242A848C2E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61D419A093B5248B1D6ABBA56833CF53 /* PlayKit-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5269AA7295DBBC26C7504C17D378148A /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				A31CA6C3FB83BC8671FC30B4CF35BF93 /* Pods-PlayKit_Example-umbrella.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		944CF7EDE8B7DCA31ECE4D047DCFB8DB /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				899A4846612B1A3839E7ED12BF43C67B /* PlayKit-umbrella.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9C5B6165176D03AA7B077BCB381EF421 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D498B9A836DDFA5AC7C1CCCD472476DD /* SwiftyJSON-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -483,6 +516,41 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		0280CDDB5CC2A61D6DE906F56AB27FBF /* PlayKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EFFC468FB30ADB36DD36CC7E9FC19AFB /* Build configuration list for PBXNativeTarget "PlayKit" */;
+			buildPhases = (
+				1A00325C7F44A691CB5620E3F0E96F09 /* Sources */,
+				42F201B8933CE7621614F9DA862C2226 /* Frameworks */,
+				3B29155ED4723083E2F03F242A848C2E /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EE1DF5E16EE62402CA6727C887AE2CA7 /* PBXTargetDependency */,
+			);
+			name = PlayKit;
+			productName = PlayKit;
+			productReference = 4381400D98EEAEFFEBE6ECBA5A387A04 /* PlayKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		24DED97F3FC84DF85B375605ABB7B978 /* SwiftyJSON */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1C452D8093E201F7234BFCAC70AB2EA1 /* Build configuration list for PBXNativeTarget "SwiftyJSON" */;
+			buildPhases = (
+				981FAC1C565A11E4798C3FE94C46E0BD /* Sources */,
+				2F7541312E54B7AC9217B66326C61E3F /* Frameworks */,
+				03E4F4F3B224F00BB9B44D61F4CBF629 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwiftyJSON;
+			productName = SwiftyJSON;
+			productReference = 23228E52A0E72AA4F610067420FD178D /* SwiftyJSON.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		7BBABDB3A9EAA3926DC297D68A2DE311 /* Pods-PlayKit_Example */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D62E7C31B622B5BFB97F18EEB80499DC /* Build configuration list for PBXNativeTarget "Pods-PlayKit_Example" */;
@@ -502,23 +570,6 @@
 			productReference = 2A5A943578F345FA39C5E36FB2457068 /* Pods_PlayKit_Example.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		831A7807D8F4689A338EABAEF5B8C46C /* SwiftyJSON */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 382D985BA0DEB4CA3751FEF072412079 /* Build configuration list for PBXNativeTarget "SwiftyJSON" */;
-			buildPhases = (
-				DEBC1A853113BCDC7E7F6C6E787E7298 /* Sources */,
-				D216E9B657721809127843810EB443AC /* Frameworks */,
-				9C5B6165176D03AA7B077BCB381EF421 /* Headers */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = SwiftyJSON;
-			productName = SwiftyJSON;
-			productReference = 23228E52A0E72AA4F610067420FD178D /* SwiftyJSON.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 		9A79FF3685825CD7EFB366971D152C33 /* Pods-PlayKit_Tests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 35716D72AF75FBB8421FFCD389FCF04E /* Build configuration list for PBXNativeTarget "Pods-PlayKit_Tests" */;
@@ -534,24 +585,6 @@
 			name = "Pods-PlayKit_Tests";
 			productName = "Pods-PlayKit_Tests";
 			productReference = E9196D1A81B1F4F5DACD2786F3DF7337 /* Pods_PlayKit_Tests.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		DD852D6B594755725C79B96AC4AF7371 /* PlayKit */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 345A488D6C10D6EC600D665F2C2B2E10 /* Build configuration list for PBXNativeTarget "PlayKit" */;
-			buildPhases = (
-				F602AF4B1087532B478C8516DD6FED96 /* Sources */,
-				358E54E473488FB1D9FC27F4FD7E0025 /* Frameworks */,
-				944CF7EDE8B7DCA31ECE4D047DCFB8DB /* Headers */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				3C2ACB0792D55100A4FFFD480DA2DBF2 /* PBXTargetDependency */,
-			);
-			name = PlayKit;
-			productName = PlayKit;
-			productReference = 4381400D98EEAEFFEBE6ECBA5A387A04 /* PlayKit.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -575,15 +608,51 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DD852D6B594755725C79B96AC4AF7371 /* PlayKit */,
+				0280CDDB5CC2A61D6DE906F56AB27FBF /* PlayKit */,
 				7BBABDB3A9EAA3926DC297D68A2DE311 /* Pods-PlayKit_Example */,
 				9A79FF3685825CD7EFB366971D152C33 /* Pods-PlayKit_Tests */,
-				831A7807D8F4689A338EABAEF5B8C46C /* SwiftyJSON */,
+				24DED97F3FC84DF85B375605ABB7B978 /* SwiftyJSON */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1A00325C7F44A691CB5620E3F0E96F09 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0139ACBECC9D6EA1EAAE69DD4BBE2AA7 /* MediaEntry.swift in Sources */,
+				8D4E9CCF31BE981B697E77F57162E022 /* MediaEntryProvider.swift in Sources */,
+				FB0EA99A3BC1CAE37EC053A173EE6B69 /* MockMediaProvider.swift in Sources */,
+				9C3F00614247CF36524CADAF5C044677 /* OTTAsset.swift in Sources */,
+				22439525CFAACDD85BF5DFF9BB11994E /* OTTAssetService.swift in Sources */,
+				755BE620E1F20E818343BC7617B991C4 /* OTTEntryProvider.swift in Sources */,
+				A588E2D98A45711E92BB4B89C68B2378 /* OTTFile.swift in Sources */,
+				34A9A9218DD90F65F69CC7D4A79341AF /* OTTGetAssetResponse.swift in Sources */,
+				0F8B9A1958C4DA6A01BA517052C59D8F /* OTTLoginSession.swift in Sources */,
+				B58E44209E7D1567B107495AF716B245 /* OTTMultiRequestBuilder.swift in Sources */,
+				93D8F150E0D30ACE7C41E18D9C37967C /* OTTRequestBuilder.swift in Sources */,
+				34839F68E571142C000BA217B8F296AD /* OTTSessionManager.swift in Sources */,
+				D66E2E9EC8B5D761DB935ADA4557F25F /* OTTSessionService.swift in Sources */,
+				588C2ACFC182C01764462A7112A25385 /* OTTUserService.swift in Sources */,
+				5E327BBBB0A98D982536CB8DBDAEE09E /* Player.swift in Sources */,
+				E9A24F9C1F509C7ED10E9F7E456E8B20 /* PlayerConfig.swift in Sources */,
+				D16138CFADDA22575B0F5F809360A553 /* PlayerImp.swift in Sources */,
+				5A339C4BDD5F84E167B4048BFFAC7E3B /* PlayKit-dummy.m in Sources */,
+				DDF47E2715339DA25CDF4E626E9CE83F /* PlayKitManager.swift in Sources */,
+				8EAEB7759F465A28A1CA97A1539B0334 /* Plugin.swift in Sources */,
+				B31EC0266982FCB1647B1B72B057E48C /* ReplaceMe.swift in Sources */,
+				1C151DAC6DF14721D4A91F0D360514DC /* Request.swift in Sources */,
+				B5FF4176E7AFD9C58CD96ABABD3FDA92 /* RequestConfiguration.swift in Sources */,
+				BCDA151FA0C1B9871D38ABC35130DC55 /* RequestExecutor.swift in Sources */,
+				7A518036D78E4BCFB03144E50F9D2395 /* Response.swift in Sources */,
+				F8F1E4DA0BB722D732CBABD037F357F5 /* Result.swift in Sources */,
+				9D328D2E3FECE45D0D83459CE729E212 /* SamplePlugin.swift in Sources */,
+				6DDCB6A2B2F30FB14425EAE63D886A69 /* SessionProvider.swift in Sources */,
+				28950DE76EF1A177749D9F02415A0D08 /* USRExecutor.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		678E16D34FA508D2263B576EE0713F3C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -600,73 +669,72 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DEBC1A853113BCDC7E7F6C6E787E7298 /* Sources */ = {
+		981FAC1C565A11E4798C3FE94C46E0BD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				327BE69F63BB8FA82AD540AE89525A86 /* SwiftyJSON-dummy.m in Sources */,
-				DC9592BE3A822FEF563F4D68DA679EAB /* SwiftyJSON.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F602AF4B1087532B478C8516DD6FED96 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8483C8AD1DDB01DD00984647 /* File.swift in Sources */,
-				D7ECC5C8E2621F999CBE41E736CC212D /* MediaEntry.swift in Sources */,
-				84D3DB7A1DD8D04700E79EBA /* RestRequestBuilder.swift in Sources */,
-				843154CD1DD48F7A00D1BB96 /* Request.swift in Sources */,
-				843154CF1DD4917600D1BB96 /* RequestConfiguration.swift in Sources */,
-				94D52CFFC946CB9F43DEC56A44310A94 /* MediaEntryProvider.swift in Sources */,
-				8483C8AF1DDB32D900984647 /* OTTGetAssetResponse.swift in Sources */,
-				84D3DB7C1DD8D36C00E79EBA /* RestMultiRequestBuilder.swift in Sources */,
-				8483C8AB1DDAFB0100984647 /* Asset.swift in Sources */,
-				735532B42A32B731EA14527451F74C9F /* Player.swift in Sources */,
-				B420C473377722F4D49F0BA0CE93842A /* PlayerConfig.swift in Sources */,
-				B04AE2542EEAE9034697DCC18C0473F9 /* PlayerImp.swift in Sources */,
-				843154D71DD4A26000D1BB96 /* Response.swift in Sources */,
-				8483C8A61DDAF73F00984647 /* AssetService.swift in Sources */,
-				8483C8A81DDAF8DC00984647 /* MockMediaProvider.swift in Sources */,
-				843154D91DD4B55D00D1BB96 /* USRExecutor.swift in Sources */,
-				8483C8A91DDAF8E300984647 /* OTTEntryProvider.swift in Sources */,
-				84D3DB801DD8DC3600E79EBA /* SessionProvider.swift in Sources */,
-				0C37CD52423623547780B75F7530FC15 /* PlayKit-dummy.m in Sources */,
-				ECAD9F1A9219AEF299F43428C4A1A0BE /* PlayKitManager.swift in Sources */,
-				8483C8A71DDAF73F00984647 /* OTTUserService.swift in Sources */,
-				843154D31DD49BFD00D1BB96 /* RequestExecutor.swift in Sources */,
-				31651C4487857A5495299EC40518C467 /* Plugin.swift in Sources */,
-				62B6C6C13ECB795A0CDC1915AFC5100F /* ReplaceMe.swift in Sources */,
-				24E1A9632AF282B62EBD0313178AD037 /* Result.swift in Sources */,
-				096CB2751DAB2CA33DAD9493411357CD /* SamplePlugin.swift in Sources */,
+				1EE88FAFB27958F8FD1BA6F5E1FFA89A /* SwiftyJSON-dummy.m in Sources */,
+				A8CEB14F60E4A37FACBC6608F014984B /* SwiftyJSON.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3C2ACB0792D55100A4FFFD480DA2DBF2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = SwiftyJSON;
-			target = 831A7807D8F4689A338EABAEF5B8C46C /* SwiftyJSON */;
-			targetProxy = 32C928E9D24A36BACA8FE848DAC9C4A7 /* PBXContainerItemProxy */;
-		};
 		BC65310C8E254D01CC80C20D5A221DD5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = SwiftyJSON;
-			target = 831A7807D8F4689A338EABAEF5B8C46C /* SwiftyJSON */;
+			target = 24DED97F3FC84DF85B375605ABB7B978 /* SwiftyJSON */;
 			targetProxy = 7475758B188BA73223DE837FE99EDD6F /* PBXContainerItemProxy */;
 		};
 		CCBF23F4A273E0E1F2109EB13CB1689D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = PlayKit;
-			target = DD852D6B594755725C79B96AC4AF7371 /* PlayKit */;
+			target = 0280CDDB5CC2A61D6DE906F56AB27FBF /* PlayKit */;
 			targetProxy = DE4352E4122B165C843C708F02378C9D /* PBXContainerItemProxy */;
+		};
+		EE1DF5E16EE62402CA6727C887AE2CA7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SwiftyJSON;
+			target = 24DED97F3FC84DF85B375605ABB7B978 /* SwiftyJSON */;
+			targetProxy = A1672ACE124434459A2AA214536809BA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		0499B533A7182C947AFA04A943033268 /* Release */ = {
+		07BFDCF0987190C14212C1F88EC58422 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/SwiftyJSON/SwiftyJSON-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/SwiftyJSON/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/SwiftyJSON/SwiftyJSON.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = SwiftyJSON;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		23DDDC16AF44EA5413C8CB8B3F998929 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 98EC9B3CF9ACB306D34D7BD50F974044 /* PlayKit.xcconfig */;
 			buildSettings = {
@@ -697,39 +765,6 @@
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
-		};
-		34758DB414765BAAE1287468777872DD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 98EC9B3CF9ACB306D34D7BD50F974044 /* PlayKit.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/PlayKit/PlayKit-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/PlayKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/PlayKit/PlayKit.modulemap";
-				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = PlayKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
 		};
 		3E883B59635CADA384462B5BD982AEB0 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -801,7 +836,7 @@
 			};
 			name = Release;
 		};
-		5A727F9883EA328552A29D1D6378D069 /* Debug */ = {
+		8CD82CCACDF1C4BA04ED125BA2E9FBAD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */;
 			buildSettings = {
@@ -833,38 +868,6 @@
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
-		};
-		6AA56D0685420631B45BA587887FC6A0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2E7F7C62EE34D2D271E6E1234A2002B2 /* SwiftyJSON.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/SwiftyJSON/SwiftyJSON-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/SwiftyJSON/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/SwiftyJSON/SwiftyJSON.modulemap";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = SwiftyJSON;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
 		};
 		8DED8AD26D381A6ACFF202E5217EC498 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -905,6 +908,39 @@
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
+		};
+		8F93594DE8F580BAB789DEA4FF9DDB02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 98EC9B3CF9ACB306D34D7BD50F974044 /* PlayKit.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/PlayKit/PlayKit-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/PlayKit/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/PlayKit/PlayKit.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = PlayKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
 		};
 		9E1E4E48AF2EAB23169E611BF694090A /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1024,20 +1060,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1C452D8093E201F7234BFCAC70AB2EA1 /* Build configuration list for PBXNativeTarget "SwiftyJSON" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8CD82CCACDF1C4BA04ED125BA2E9FBAD /* Debug */,
+				07BFDCF0987190C14212C1F88EC58422 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		2D8E8EC45A3A1A1D94AE762CB5028504 /* Build configuration list for PBXProject "Pods" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9E1E4E48AF2EAB23169E611BF694090A /* Debug */,
 				8DED8AD26D381A6ACFF202E5217EC498 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		345A488D6C10D6EC600D665F2C2B2E10 /* Build configuration list for PBXNativeTarget "PlayKit" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				34758DB414765BAAE1287468777872DD /* Debug */,
-				0499B533A7182C947AFA04A943033268 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1051,20 +1087,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		382D985BA0DEB4CA3751FEF072412079 /* Build configuration list for PBXNativeTarget "SwiftyJSON" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				5A727F9883EA328552A29D1D6378D069 /* Debug */,
-				6AA56D0685420631B45BA587887FC6A0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		D62E7C31B622B5BFB97F18EEB80499DC /* Build configuration list for PBXNativeTarget "Pods-PlayKit_Example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B12A801EBD6F6D9521FF309C6E732103 /* Debug */,
 				40E82590F68A940DAF9BC49AE4E6AE59 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EFFC468FB30ADB36DD36CC7E9FC19AFB /* Build configuration list for PBXNativeTarget "PlayKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F93594DE8F580BAB789DEA4FF9DDB02 /* Debug */,
+				23DDDC16AF44EA5413C8CB8B3F998929 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

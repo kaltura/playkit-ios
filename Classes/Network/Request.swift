@@ -38,8 +38,14 @@ public class RequestBuilder : Request {
 
 
     
-    public init?(url:URL){
-        self.url = url
+    public init?(url:String){
+        
+        if let path = URL(string: url) {
+            self.url = path
+        }else{
+            return nil
+        }
+        
     }
     
     public func set(url: URL) -> RequestBuilder{

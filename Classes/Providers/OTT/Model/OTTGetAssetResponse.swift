@@ -11,7 +11,7 @@ import SwiftyJSON
 
 internal class OTTGetAssetResponse: NSObject {
 
-    internal var asset: Asset? = nil
+    internal var asset: OTTAsset? = nil
     
     private let resultKey = "result"
     
@@ -19,7 +19,7 @@ internal class OTTGetAssetResponse: NSObject {
         
         let responseJson = JSON(json)
         let assetJson = responseJson[resultKey]
-        self.asset = Asset(json: assetJson.object)
+        self.asset = OTTAsset(json: assetJson.object)
     }
 }
 

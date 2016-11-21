@@ -31,11 +31,11 @@ internal extension RequestBuilder {
     
 }
 
-public class AssetService {
+internal class OTTAssetService {
 
-    public static func get(baseURL: String, ks: String,assetId: String, type: AssetType) -> RestRequestBuilder? {
+    internal static func get(baseURL: String, ks: String,assetId: String, type: AssetType) -> OTTRequestBuilder? {
         
-        if let request: RestRequestBuilder = RestRequestBuilder(url: baseURL, service: "asset", action: "get") {
+        if let request: OTTRequestBuilder = OTTRequestBuilder(url: baseURL, service: "asset", action: "get") {
             request
             .setBody(key: "id", value: JSON(assetId))
             .setBody(key: "ks", value: JSON(ks))

@@ -9,26 +9,15 @@
 import UIKit
 import SwiftyJSON
 
-public class RestMultiRequestBuilder: RestRequestBuilder {
+internal class OTTMultiRequestBuilder: OTTRequestBuilder {
 
-    internal var requests: [RestRequest] = [RestRequest]()
+    internal var requests: [OTTRequestBuilder] = [OTTRequestBuilder]()
     
-    
-    
-    override init?(url : String, service: String?, action: String?) {
-        super.init(url: url, service: "multiRequest", action: nil)
-    }
-
-    
-    
-    convenience public init?(url: URL) {
-        self.init(url: url.absoluteString, service: nil, action: nil)
+    internal init?(url: String) {
+         super.init(url: url, service: "multiRequest", action: nil)
     }
     
-    
-    
-    
-    public func add(request:RestRequest) -> RestMultiRequestBuilder {
+    internal func add(request:OTTRequestBuilder) -> OTTMultiRequestBuilder {
         
         self.requests.append(request)
         return self
@@ -36,9 +25,7 @@ public class RestMultiRequestBuilder: RestRequestBuilder {
     
     
    override public func build() -> Request {
-        
-//        self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
-//        self.method = "POST"
+        super.build()
         
         if self.jsonBody == nil {
             self.jsonBody = JSON([String:Any]())
@@ -75,7 +62,6 @@ public class RestMultiRequestBuilder: RestRequestBuilder {
     
     data?.append(suffix.data(using: String.Encoding.utf8)!)
     self.dataBody = data
-    print(String(data: data!, encoding: String.Encoding.utf8))
     return self
     }
 }

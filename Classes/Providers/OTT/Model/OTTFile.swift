@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-internal class File {
+internal class OTTFile {
     
     internal var id: String
     internal var type: String? = nil

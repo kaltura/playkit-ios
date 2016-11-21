@@ -677,7 +677,7 @@ For more information on this, and how to apply and follow the GNU AGPL, see
 &lt;http://www.gnu.org/licenses/&gt;.
 </string>
 			<key>License</key>
-			<string>MIT</string>
+			<string>AGPLv3</string>
 			<key>Title</key>
 			<string>PlayKit</string>
 			<key>Type</key>
