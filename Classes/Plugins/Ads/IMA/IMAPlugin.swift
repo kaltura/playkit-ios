@@ -41,6 +41,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
     private var currentPlaybackTime: TimeInterval! = 0 //in seconds
     private var isAdPlayback = false
     private var startAdCalled = false
+    private var loaderFailed = false
     
     public var currentTime: TimeInterval {
         get {
@@ -103,8 +104,17 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
             IMAPlugin.loader.requestAds(with: request)
         }
     }
+
+    @objc func aa() {
+        self.manager?.pause()
+        self.delegate?.adsPlugin(self, managerFailedWith: "aa")
+    }
     
     func start(showLoadingView: Bool) -> Bool {
+        if self.loaderFailed {
+            return false
+        }
+        
         if self.adTagUrl != nil && self.adTagUrl != "" {
             if showLoadingView {
                 self.showLoadingView(true, alpha: 1)
@@ -296,6 +306,8 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
     // MARK: AdsLoaderDelegate
     
     public func adsLoader(_ loader: IMAAdsLoader!, adsLoadedWith adsLoadedData: IMAAdsLoadedData!) {
+        self.loaderFailed = false
+        
         self.manager = adsLoadedData.adsManager
         self.manager!.delegate = self
         self.createRenderingSettings()
@@ -306,8 +318,9 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
     }
     
     public func adsLoader(_ loader: IMAAdsLoader!, failedWith adErrorData: IMAAdLoadingErrorData!) {
+        self.loaderFailed = true
         self.showLoadingView(false, alpha: 0)
-        self.delegate?.adsPlugin(self, failedWith: adErrorData.adError.message)
+        self.delegate?.adsPlugin(self, loaderFailedWith: adErrorData.adError.message)
     }
     
     // MARK: AdsManagerDelegate
@@ -336,6 +349,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
                 let canPlay = self.dataSource.adsPluginShouldPlayAd(self)
                 if canPlay == nil || canPlay == true {
                     adsManager.start()
+                   // Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(IMAPlugin.aa), userInfo: nil, repeats: false)
                 } else {
                     adsManager.skip()
                     self.adsManagerDidRequestContentResume(adsManager)
@@ -354,7 +368,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, AdsPlugi
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
         self.showLoadingView(false, alpha: 0)
-        self.delegate?.adsPlugin(self, failedWith: error.message)
+        self.delegate?.adsPlugin(self, managerFailedWith: error.message)
     }
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {

@@ -14,7 +14,8 @@ protocol AdsPluginDataSource : class {
 }
 
 protocol AdsPluginDelegate : class {
-    func adsPlugin(_ adsPlugin: AdsPlugin, failedWith error: String)
+    func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String)
+    func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String)
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PlayerEventType, with eventData: Any?)
 }
 
