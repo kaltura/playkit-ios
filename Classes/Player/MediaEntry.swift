@@ -69,8 +69,3 @@ open class DRMData {
 public class FairPlayDRMData: DRMData {
     var fpsCertificate: Data?    
 }
-
-
-
-
-

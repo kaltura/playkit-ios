@@ -12,8 +12,10 @@ public class PlayerConfig {
     public var mediaEntry : MediaEntry?
     public var startTime : TimeInterval = 0
     public var autoPlay = false
+    public var allowPlayerEngineExpose = false
     public var subtitleLanguage: String?
     public var audioLanguage: String?
+    public var plugins: [String : AnyObject?]?
 
     public init() {}
     public init(_ player: Player) {
@@ -33,6 +35,12 @@ public class PlayerConfig {
         return self
     }
     
+    @discardableResult
+    public func set(allowPlayerEngineExpose: Bool) -> Self {
+        self.allowPlayerEngineExpose = allowPlayerEngineExpose
+        return self
+    }
+    
     @discardableResult 
     public func set(startTime: TimeInterval) -> Self {
         self.startTime = startTime
@@ -49,7 +57,13 @@ public class PlayerConfig {
     public func set(audioLanguage: String) -> Self {
         self.audioLanguage = audioLanguage
         return self
-    } 
+    }
+    
+    @discardableResult
+    public func set(plugins: [String : AnyObject?]) -> Self {
+        self.plugins = plugins
+        return self
+    }
 }
 
 
