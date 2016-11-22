@@ -14,10 +14,10 @@ private struct Observation {
 }
 
 public class MessageBus: NSObject {
-    private static var observations = [String: [Observation]]()
-    private static let lock: AnyObject = UUID().uuidString as AnyObject
+    private var observations = [String: [Observation]]()
+    private let lock: AnyObject = UUID().uuidString as AnyObject
     
-    public static func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
+    public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
         sync {
             if var array: [Observation]? = observations[event.rawValue] {
                 array!.append(Observation(observer: observer, block: block))
@@ -27,7 +27,7 @@ public class MessageBus: NSObject {
         }
     }
     
-    public static func removeObserver(_ observer: AnyObject, event: PKEvent) {
+    public func removeObserver(_ observer: AnyObject, event: PKEvent) {
         sync {
             if var array: [Observation]? = observations[event.rawValue] {
                 array = array!.filter { $0.observer! !== observer }
@@ -37,7 +37,7 @@ public class MessageBus: NSObject {
         }
     }
     
-    public static func post(_ event: PKEvent) {
+    public func post(_ event: PKEvent) {
         sync {
             if var array: [Observation]? = observations[event.rawValue] {
                 array = array!.filter { $0.observer != nil } // Remove nil observers
@@ -49,7 +49,7 @@ public class MessageBus: NSObject {
         }
     }
     
-    private static func sync(block: () -> ()) {
+    private func sync(block: () -> ()) {
         objc_sync_enter(lock)
         block()
         objc_sync_exit(lock)

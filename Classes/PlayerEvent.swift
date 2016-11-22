@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum PlayerEvents: String, PKEvent {
+public enum PlayerEvents: String, PKEvent {
     /**
      Sent when enough data is available that the media can be played, at least for a couple of frames.
      */
@@ -51,7 +51,7 @@ enum PlayerEvents: String, PKEvent {
     case seeked
 }
 
-enum AdEvents: String, PKEvent {
+public enum AdEvents: String, PKEvent {
     case adBreakReady
     case adBreakEnded
     case adBreakStarted

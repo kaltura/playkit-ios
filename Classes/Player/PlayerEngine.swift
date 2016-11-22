@@ -69,9 +69,7 @@ public protocol PlayerEngine {
      Release player resources.
      */
     func destroy()
-    
-    func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver)
-    
+        
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
 }

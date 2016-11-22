@@ -1,5 +1,5 @@
 //
-//  AdsPlugin.swift
+//  IMAPlugin.swift
 //  AdvancedExample
 //
 //  Created by Vadim Kononov on 19/10/2016.
@@ -8,18 +8,11 @@
 
 import GoogleInteractiveMediaAds
 
-protocol AdsPluginDataSource : class {
-    func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool
-}
-
-protocol AdsPluginDelegate : class {
-    func adsPlugin(_ adsPlugin: AdsPlugin, failedWith error: String)
-    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PlayerEventType, with eventData: Any?)
-}
-
-public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, DecoratedPlayerProvider, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
+public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
 
     private var player: Player!
+    
+    private var messageBus: MessageBus?
     
     weak var dataSource: AdsPluginDataSource! {
         didSet {
@@ -30,10 +23,10 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     weak var pipDelegate: AVPictureInPictureControllerDelegate?
     
     private var contentPlayhead: IMAAVPlayerContentPlayhead?
-    private var adsManager: IMAAdsManager?
+    private var manager: IMAAdsManager?
     private var companionSlot: IMACompanionAdSlot?
-    private var adsRenderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
-    private static var adsLoader: IMAAdsLoader!
+    private var renderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
+    private static var loader: IMAAdsLoader!
     
     private var pictureInPictureProxy: IMAPictureInPictureProxy?
     private var loadingView: UIView?
@@ -50,6 +43,7 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     private var currentPlaybackTime: TimeInterval! = 0 //in seconds
     private var isAdPlayback = false
     private var startAdCalled = false
+    private var loaderFailed = false
     
     public var currentTime: TimeInterval {
         get {
@@ -65,21 +59,24 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     
     public static var pluginName: String {
         get {
-            return String(describing: AdsPlugin.self)
+            return String(describing: IMAPlugin.self)
         }
     }
     
-    public func load(player: Player, config: Any?) {
+    public func load(player: Player, config: Any?, messageBus: MessageBus) {
+        
+        self.messageBus = messageBus
+        
         if let adsConfig = config as? AdsConfig {
             self.config = adsConfig
             self.player = player
             
-            if AdsPlugin.adsLoader == nil {
-                self.setupAdsLoader(with: self.config)
+            if IMAPlugin.loader == nil {
+                self.setupLoader(with: self.config)
             }
             
-            AdsPlugin.adsLoader.contentComplete()
-            AdsPlugin.adsLoader.delegate = self
+            IMAPlugin.loader.contentComplete()
+            IMAPlugin.loader.delegate = self
             
             if let adTagUrl = self.config.adTagUrl {
                 self.adTagUrl = adTagUrl
@@ -88,21 +85,16 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
             }
         }
         
-        Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(AdsPlugin.update), userInfo: nil, repeats: true)
+        Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
 
     public func destroy() {
         self.destroyManager()
     }
-
-    //MARK: DecoratedPlayerProvider protocol methods
     
-    func getDecoratedPlayer() -> PlayerDecoratorBase? {
-        let decorator = AdsEnabledPlayerController()
-        decorator.adsPlugin = self
-        return decorator
+    func getPlayerDecorator() -> PlayerDecoratorBase? {
+        return AdsEnabledPlayerController(adsPlugin: self)
     }
-    
     //MARK: public methods
     
     func requestAds() {
@@ -111,24 +103,28 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
             
             var request: IMAAdsRequest
             
-            if let avPlayer = self.player.playerEngine as? AVPlayer {
-                request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), avPlayerVideoDisplay: IMAAVPlayerVideoDisplay(avPlayer: avPlayer), pictureInPictureProxy: self.pictureInPictureProxy, userContext: nil)
-            } else {
+//            if let avPlayer = self.player.playerEngine as? AVPlayer {
+//                request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), avPlayerVideoDisplay: IMAAVPlayerVideoDisplay(avPlayer: avPlayer), pictureInPictureProxy: self.pictureInPictureProxy, userContext: nil)
+//            } else {
                 request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), contentPlayhead: self, userContext: nil)
-            }
+//            }
             
-            AdsPlugin.adsLoader.requestAds(with: request)
+            IMAPlugin.loader.requestAds(with: request)
         }
     }
     
     func start(showLoadingView: Bool) -> Bool {
+        if self.loaderFailed {
+            return false
+        }
+        
         if self.adTagUrl != nil && self.adTagUrl != "" {
             if showLoadingView {
                 self.showLoadingView(true, alpha: 1)
             }
             
-            if let manager = self.adsManager {
-                manager.initialize(with: self.adsRenderingSettings)
+            if let manager = self.manager {
+                manager.initialize(with: self.renderingSettings)
             } else {
                 self.startAdCalled = true
             }
@@ -138,32 +134,32 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     }
     
     func resume() {
-        self.adsManager?.resume()
+        self.manager?.resume()
     }
     
     func pause() {
-        self.adsManager?.pause()
+        self.manager?.pause()
     }
     
     func contentComplete() {
-        AdsPlugin.adsLoader.contentComplete()
+        IMAPlugin.loader.contentComplete()
     }
     
     //MARK: private methods
     
-    private func setupAdsLoader(with config: AdsConfig) {
+    private func setupLoader(with config: AdsConfig) {
         let imaSettings: IMASettings! = IMASettings()
         imaSettings.language = config.language
         imaSettings.enableBackgroundPlayback = config.enableBackgroundPlayback
         imaSettings.autoPlayAdBreaks = config.autoPlayAdBreaks
         
-        AdsPlugin.adsLoader = IMAAdsLoader(settings: imaSettings)
+        IMAPlugin.loader = IMAAdsLoader(settings: imaSettings)
     }
 
     private func setupMainView() {
-        if let _ = self.player.playerEngine {
-            self.pictureInPictureProxy = IMAPictureInPictureProxy(avPictureInPictureControllerDelegate: self)
-        }
+//        if let _ = self.player.playerEngine {
+//            self.pictureInPictureProxy = IMAPictureInPictureProxy(avPictureInPictureControllerDelegate: self)
+//        }
         
         if (self.config.companionView != nil) {
             self.companionSlot = IMACompanionAdSlot(view: self.config.companionView, width: Int32(self.config.companionView!.frame.size.width), height: Int32(self.config.companionView!.frame.size.height))
@@ -240,16 +236,16 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     }
     
     private func createRenderingSettings() {
-        self.adsRenderingSettings.webOpenerDelegate = self
+        self.renderingSettings.webOpenerDelegate = self
         if let webOpenerPresentingController = self.config.webOpenerPresentingController {
-            self.adsRenderingSettings.webOpenerPresentingController = webOpenerPresentingController
+            self.renderingSettings.webOpenerPresentingController = webOpenerPresentingController
         }
         
         if let bitrate = self.config.videoBitrate {
-            self.adsRenderingSettings.bitrate = bitrate
+            self.renderingSettings.bitrate = bitrate
         }
         if let mimeTypes = self.config.videoMimeTypes {
-            self.adsRenderingSettings.mimeTypes = mimeTypes
+            self.renderingSettings.mimeTypes = mimeTypes
         }
     }
     
@@ -264,73 +260,70 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
         self.player.view?.bringSubview(toFront: self.loadingView!)
     }
     
-    private func resumeContentPlayback() {
-        self.showLoadingView(false, alpha: 0)
-        self.player.play()
-    }
-    
-    private func convertToPlayerEvent(_ event: IMAAdEventType) -> PlayerEventType {
+    private func convertToPlayerEvent(_ event: IMAAdEventType) -> AdEvents {
         switch event {
         case .AD_BREAK_READY:
-            return PlayerEventType.ad_break_ready
+            return AdEvents.adBreakReady
         case .AD_BREAK_ENDED:
-            return PlayerEventType.ad_break_ended
+            return AdEvents.adBreakEnded
         case .AD_BREAK_STARTED:
-            return PlayerEventType.ad_break_started
+            return AdEvents.adBreakStarted
         case .ALL_ADS_COMPLETED:
-            return PlayerEventType.ad_all_completed
+            return AdEvents.adAllCompleted
         case .CLICKED:
-            return PlayerEventType.ad_clicked
+            return AdEvents.adClicked
         case .COMPLETE:
-            return PlayerEventType.ad_complete
+            return AdEvents.adComplete
         case .CUEPOINTS_CHANGED:
-            return PlayerEventType.ad_cuepoints_changed
+            return AdEvents.adCuepointsChanged
         case .FIRST_QUARTILE:
-            return PlayerEventType.ad_first_quartile
+            return AdEvents.adFirstQuartile
         case .LOADED:
-            return PlayerEventType.ad_loaded
+            return AdEvents.adLoaded
         case .LOG:
-            return PlayerEventType.ad_log
+            return AdEvents.adLog
         case .MIDPOINT:
-            return PlayerEventType.ad_midpoint
+            return AdEvents.adMidpoint
         case .PAUSE:
-            return PlayerEventType.ad_paused
+            return AdEvents.adPaused
         case .RESUME:
-            return PlayerEventType.ad_resumed
+            return AdEvents.adResumed
         case .SKIPPED:
-            return PlayerEventType.ad_skipped
+            return AdEvents.adSkipped
         case .STARTED:
-            return PlayerEventType.ad_started
+            return AdEvents.adStarted
         case .STREAM_LOADED:
-            return PlayerEventType.ad_stream_loaded
+            return AdEvents.adStreamLoaded
         case .TAPPED:
-            return PlayerEventType.ad_tapped
+            return AdEvents.adTapped
         case .THIRD_QUARTILE:
-            return PlayerEventType.ad_third_quartile
+            return AdEvents.adThirdQuartile
         }
     }
 
     private func destroyManager() {
-        self.adsManager?.destroy()
-        self.adsManager = nil
+        self.manager?.destroy()
+        self.manager = nil
     }
     
     // MARK: AdsLoaderDelegate
     
     public func adsLoader(_ loader: IMAAdsLoader!, adsLoadedWith adsLoadedData: IMAAdsLoadedData!) {
-        self.adsManager = adsLoadedData.adsManager
-        self.adsManager!.delegate = self
+        self.loaderFailed = false
+        
+        self.manager = adsLoadedData.adsManager
+        self.manager!.delegate = self
         self.createRenderingSettings()
         
         if self.startAdCalled {
-            self.adsManager!.initialize(with: self.adsRenderingSettings)
+            self.manager!.initialize(with: self.renderingSettings)
         }
     }
     
     public func adsLoader(_ loader: IMAAdsLoader!, failedWith adErrorData: IMAAdLoadingErrorData!) {
-        print(adErrorData.adError.message)
-        self.delegate?.adsPlugin(self, failedWith: adErrorData.adError.message)
-        self.resumeContentPlayback()
+        self.loaderFailed = true
+        self.showLoadingView(false, alpha: 0)
+        self.delegate?.adsPlugin(self, loaderFailedWith: adErrorData.adError.message)
     }
     
     // MARK: AdsManagerDelegate
@@ -344,45 +337,60 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
-        if event.type == IMAAdEventType.AD_BREAK_READY || event.type == IMAAdEventType.LOADED {
-            let canPlay = self.dataSource.adsPluginCanPlayAd(self)
+        let converted = self.convertToPlayerEvent(event.type)
+//        print("ads event " + String(describing: converted))
+        
+        switch event.type {
+        case .AD_BREAK_READY:
+            let canPlay = self.dataSource.adsPluginShouldPlayAd(self)
             if canPlay == nil || canPlay == true {
                 adsManager.start()
-            } else {
-                if event.type == IMAAdEventType.LOADED {
+            }
+            break
+        case .LOADED:
+            if adsManager.adCuePoints.count == 0 { //single ad
+                let canPlay = self.dataSource.adsPluginShouldPlayAd(self)
+                if canPlay == nil || canPlay == true {
+                    adsManager.start()
+                } else {
                     adsManager.skip()
+                    self.adsManagerDidRequestContentResume(adsManager)
                 }
             }
-        } else if event.type == IMAAdEventType.AD_BREAK_STARTED || event.type == IMAAdEventType.STARTED {
+            break
+        case .AD_BREAK_STARTED, .STARTED:
             self.showLoadingView(false, alpha: 0)
+            break
+        default:
+            break
         }
-        self.delegate?.adsPlugin(self, didReceive: self.convertToPlayerEvent(event.type), with: nil)
+        
+        self.delegate?.adsPlugin(self, didReceive: converted, with: nil)
+        
+        messageBus?.post(converted)
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
-        self.delegate?.adsPlugin(self, failedWith: error.message)
-        self.resumeContentPlayback()
+        self.showLoadingView(false, alpha: 0)
+        self.delegate?.adsPlugin(self, managerFailedWith: error.message)
     }
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
-        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_did_request_pause, with: nil)
+        self.delegate?.adsPlugin(self, didReceive: AdEvents.adDidRequestPause, with: nil)
         self.isAdPlayback = true
-        self.player.pause()
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
-        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_did_request_resume, with: nil)
+        self.showLoadingView(false, alpha: 0)
+        self.delegate?.adsPlugin(self, didReceive: AdEvents.adDidRequestResume, with: nil)
         self.isAdPlayback = false
-        self.resumeContentPlayback()
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
-        if self.player.playerEngine == nil {
-            var data = [String : TimeInterval]()
-            data["mediaTime"] = mediaTime
-            data["totalTime"] = totalTime
-            self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_did_progress_to_time, with: data)
-        }
+        var data = [String : TimeInterval]()
+        data["mediaTime"] = mediaTime
+        data["totalTime"] = totalTime
+        self.delegate?.adsPlugin(self, didReceive: AdEvents.adDidProgressToTime, with: data)
     }
     
     // MARK: AVPictureInPictureControllerDelegate
@@ -420,22 +428,22 @@ public class AdsPlugin: NSObject, AVPictureInPictureControllerDelegate, Plugin, 
     // MARK: IMAWebOpenerDelegate
     
     public func webOpenerWillOpenExternalBrowser(_ webOpener: NSObject!) {
-        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_will_open_external_browser, with: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerWillOpenExternalBrowser, with: webOpener)
     }
     
     public func webOpenerWillOpen(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_will_open_in_app_browser, with: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerWillOpenInAppBrowser, with: webOpener)
     }
     
     public func webOpenerDidOpen(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_did_open_in_app_browser, with: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerDidOpenInAppBrowser, with: webOpener)
     }
     
     public func webOpenerWillClose(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_will_close_in_app_browser, with: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerWillCloseInAppBrowser, with: webOpener)
     }
     
     public func webOpenerDidClose(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin(self, didReceive: PlayerEventType.ad_web_opener_did_close_in_app_browser, with: webOpener)
+        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerDidCloseInAppBrowser, with: webOpener)
     }
 }

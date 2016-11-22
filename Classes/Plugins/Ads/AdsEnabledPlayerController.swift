@@ -11,10 +11,16 @@ import UIKit
 import AVFoundation
 import AVKit
 
-class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, AdsPluginDelegate {
+class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPluginDataSource {
     
     var isAdPlayback = false
+    var isPlaying = false
     var adsPlugin: AdsPlugin!
+    
+    init(adsPlugin: AdsPlugin) {
+        super.init()
+        self.adsPlugin = adsPlugin
+    }
     
     override func setPlayer(_ player: Player!) {
         super.setPlayer(player)
@@ -24,26 +30,23 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
         })*/
     }
     
-    override var dataSource: PlayerDataSource? {
+    override var delegate: PlayerDelegate? {
         didSet {
+            self.adsPlugin.delegate = self
             self.adsPlugin.dataSource = self
             self.adsPlugin.requestAds()
         }
     }
     
-    override var delegate: PlayerDelegate? {
-        didSet {
-            self.adsPlugin.delegate = self
-        }
-    }
-    
     override func play() {
+        self.isPlaying = true
         if !self.adsPlugin.start(showLoadingView: true) {
             super.play()
         }
     }
     
     override func pause() {
+        self.isPlaying = false
         if isAdPlayback {
             self.adsPlugin.pause()
         } else {
@@ -52,6 +55,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
     }
     
     override func resume() {
+        self.isPlaying = true
         if isAdPlayback {
             self.adsPlugin.resume()
         } else {
@@ -66,21 +70,30 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDataSource, Ads
     }
     
         
-    func adsPluginCanPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
-        return self.dataSource!.playerCanPlayAd(self)
+    func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
+        return self.delegate!.playerShouldPlayAd(self)
     }
-        
-    func adsPlugin(_ adsPlugin: AdsPlugin, failedWith error: String) {
+    
+    func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String) {
+        if self.isPlaying {
+            super.play()
+        }
+        self.delegate?.player(self, failedWith: error)
+    }
+    
+    func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String) {
+        super.play()
         self.isAdPlayback = false
         self.delegate?.player(self, failedWith: error)
     }
     
-    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PlayerEventType, with eventData: Any?) {
-        if event == PlayerEventType.ad_did_request_pause {
+    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent, with eventData: Any?) {
+        if event.rawValue == AdEvents.adDidRequestPause.rawValue {
+            super.pause()
             self.isAdPlayback = true
-        } else if event == PlayerEventType.ad_did_request_resume {
+        } else if event.rawValue == AdEvents.adDidRequestResume.rawValue {
+            super.play()
             self.isAdPlayback = false
         }
-        self.delegate?.player(self, didReceive: event, with: eventData)
     }
 }

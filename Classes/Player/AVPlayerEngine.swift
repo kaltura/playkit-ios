@@ -102,10 +102,6 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         return false
     }
     
-    func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver) {
-        
-    }
-    
     func destroy() {
         
     }

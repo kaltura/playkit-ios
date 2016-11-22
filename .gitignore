@@ -20,4 +20,10 @@ xcuserdata/
 *.xccheckout
 *.xcscmblueprint
 
+<<<<<<< HEAD
 /Example/Pods
+=======
+
+# CocoaPods
+Pods/
+>>>>>>> origin/first_integration
