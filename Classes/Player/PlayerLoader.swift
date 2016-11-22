@@ -21,6 +21,7 @@ class PlayerLoader: PlayerDecoratorBase {
     
    // var loadedPlugins = [PKPlugin]()
     var loadedPlugins = Dictionary<String, LoadedPlugin>()
+    var messageBus = MessageBus()
     
     func load(_ config: PlayerConfig) {
         var playerController: PlayerController

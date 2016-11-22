@@ -79,8 +79,3 @@ enum AdEvents: String, PKEvent {
     case adDidRequestPause
     case adDidRequestResume
 }
-
-let e: PKEvent = AdEvents.adClicked
-
-
-//print(e.rawValue)
