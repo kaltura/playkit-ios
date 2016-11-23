@@ -10,8 +10,8 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: Player {
-    //public var messageBus: PKMessageBus?
+class PlayerController: Player, PlayerEngineDelegate {
+    var messageBus = MessageBus()
 
     var delegate: PlayerDelegate?
     
@@ -90,5 +90,22 @@ class PlayerController: Player {
     
     func destroy() {
         self.currentPlayer?.destroy()
+    }
+    
+    public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
+        messageBus.addObserver(observer, event: event, block: block)
+    }
+    
+    public func removeObserver(_ observer: AnyObject, event: PKEvent) {
+        messageBus.removeObserver(observer, event: event)
+    }
+    
+    func player(changedState: PKEvent) {
+        NSLog("changedState")
+        messageBus.post(changedState)
+    }
+    
+    func player(encounteredError: NSError) {
+        NSLog("encounteredError")
     }
 }

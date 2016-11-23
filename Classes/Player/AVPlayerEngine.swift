@@ -113,7 +113,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         return pip
     }
     
-    // MARK: - KVO
+    // MARK: - KVO Observation
     // KVO contexts
     private var PlayerObserverContext = 0
     private var PlayerItemObserverContext = 0
@@ -141,8 +141,8 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         self.currentItem?.addObserver(self, forKeyPath: PlayerEmptyBufferKey, options: [], context: nil)
         self.currentItem?.addObserver(self, forKeyPath: PlayerStatusKey, options: [], context: nil)
         
-        NotificationCenter.default.addObserver(self, selector: Selector("playerFailed:"), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: Selector("playerPlayedToEnd:"), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: Selector(("playerFailed:")), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: Selector(("playerPlayedToEnd:")), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.currentItem)
     }
     
     func removeObservers() {
@@ -154,23 +154,52 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         NotificationCenter.default.removeObserver(self)
     }
     
-    override func observeValue(forKeyPath
-        keyPath: String?,
-                               of object: Any?,
-                               change: [NSKeyValueChangeKey : Any]?,
-                               context: UnsafeMutableRawPointer?) {
-        if keyPath == "duration" {
-            /*
-             Handle `NSNull` value for `NSKeyValueChangeNewKey`, i.e. when
-             `currentItem` is nil.
-             */
-            
-            if let newDurationAsValue = change?[NSKeyValueChangeKey.newKey] as? NSValue {
-                print("newDurationAsValue:" + String(describing: newDurationAsValue))
-            } else if keyPath == PlayerRateKey {
-                // Update `playPauseButton` image.
-                
+    func playerFailed(notification: NSNotification) {
+        guard let _ = delegate?.player(changedState: PlayerEvents.error) else {
+            NSLog("player changedState is not implimented")
+            return
+        }
+    }
+    
+    func playerPlayedToEnd(notification: NSNotification) {
+        guard let _ = delegate?.player(changedState: PlayerEvents.ended) else {
+            NSLog("player changedState is not implimented")
+            return
+        }
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        var event: PKEvent? = nil
+        
+        if keyPath == #keyPath(currentItem.duration) {
+            event = PlayerEvents.durationChange
+        } else if keyPath == #keyPath(rate) {
+            if rate == 1.0 {
+                event = PlayerEvents.play
+            } else {
+                event = PlayerEvents.pause
             }
+        } else if keyPath == #keyPath(currentItem.status) {
+
+            let newStatus: AVPlayerItemStatus
+            
+            if let newStatusAsNumber = change?[NSKeyValueChangeKey.newKey] as? NSNumber {
+                newStatus = AVPlayerItemStatus(rawValue: newStatusAsNumber.intValue)!
+            } else {
+                newStatus = .unknown
+            }
+            
+            if newStatus == .readyToPlay {
+                event = PlayerEvents.canPlay
+            } else if newStatus == .failed {
+                event = PlayerEvents.error
+            } 
+        }
+        
+        NSLog("changedState::\(event)")
+        guard let _ = delegate?.player(changedState: event!) else {
+            NSLog("player changedState is not implimented")
+            return
         }
     }
 }
