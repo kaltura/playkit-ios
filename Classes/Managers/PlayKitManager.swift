@@ -8,19 +8,15 @@
 
 import UIKit
 
-public enum PlayKitError: Error {
-    case multipleDecoratorsDetected
-}
-
 public class PlayKitManager: NSObject {
 
     public static let sharedInstance : PlayKitManager = PlayKitManager()
     
     var pluginRegistry = Dictionary<String, PKPlugin.Type>()
     
-    public func loadPlayer(config: PlayerConfig) throws -> Player {
+    public func loadPlayer(config: PlayerConfig) -> Player {
         let loader = PlayerLoader()
-        try loader.load(config)
+        loader.load(config)
         return loader
     }
     

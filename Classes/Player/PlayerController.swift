@@ -13,7 +13,6 @@ import AVKit
 class PlayerController: Player {
     //public var messageBus: PKMessageBus?
 
-    var dataSource: PlayerDataSource?
     var delegate: PlayerDelegate?
     
     private var currentPlayer: PlayerEngine?
@@ -51,7 +50,7 @@ class PlayerController: Player {
         }
     }
 
-    public init(mediaEntry: MediaEntry) {
+    public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
     }
 
@@ -82,10 +81,6 @@ class PlayerController: Player {
 
     func loadNext() -> Bool {
         return false
-    }
-    
-    func addBoundaryTimeObserver(origin: Origin, offset: TimeInterval, wait: Bool, observer: TimeObserver) {
-        
     }
     
     @available(iOS 9.0, *)

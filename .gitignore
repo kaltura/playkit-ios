@@ -20,4 +20,5 @@ xcuserdata/
 *.xccheckout
 *.xcscmblueprint
 
-/Example/Pods
+# CocoaPods
+Pods/
