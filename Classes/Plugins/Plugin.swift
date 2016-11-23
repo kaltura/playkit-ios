@@ -9,12 +9,13 @@
 import UIKit
 import AVFoundation
 
-public protocol Plugin {
+public protocol PKPlugin {
     
     static var pluginName: String { get }
 
     init()
     
-    func load(player: Player, config: PlayerConfig)
-    func release()
+    func load(player: Player, config: Any?, messageBus: MessageBus)
+    
+    func destroy()
 }

@@ -1,39 +1,45 @@
 //
-//  Player.swift
-//  PlayKit
+//  PlayerEngine.swift
+//  Pods
 //
-//  Created by Noam Tamim on 28/08/2016.
-//  Copyright © 2016 Kaltura. All rights reserved.
+//  Created by Eliza Sapir on 06/11/2016.
+//
 //
 
-import UIKit
+import Foundation
 import AVFoundation
 import AVKit
 
-public protocol PlayerDelegate: class {
-    func playerShouldPlayAd(_ player: Player) -> Bool
-    func player(_ player: Player, failedWith error: String)
+public protocol PlayerEngineDelegate: class {
+    
+    func player(changedState: PKEvent)
+    func player(encounteredError: NSError)
 }
 
-public protocol Player {
+public protocol PlayerEngine {
+    weak var delegate: PlayerEngineDelegate? {get set}
     
-    var delegate: PlayerDelegate? { get set }
-        
     /**
-     Get the player's layer component.
+     Get the player's view component.
      */
     var view: UIView! { get }
     
     /**
      Get/set the current player position.
      */
-    var currentTime: TimeInterval? { get set }
+    var currentPosition: TimeInterval { get set }
     
     /**
-     Prepare for playing an entry. If `config.autoPlay` is true, the entry will automatically
-     play when it's ready.
+     Should playback start when ready?
+     If set to true after entry is loaded, this will start playback.
+     If set to false while entry is playing, this will pause playback.
      */
-    func prepare(_ config: PlayerConfig)
+    var autoPlay: Bool { get set }
+    
+    /**
+     Convenience method for setting shouldPlayWhenReady to true.
+     */
+    func load()
     
     /**
      Convenience method for setting shouldPlayWhenReady to true.
@@ -45,17 +51,15 @@ public protocol Player {
      */
     func pause()
     
-    func resume()
-    
     func seek(to time: CMTime)
-    
+
     /**
      Prepare for playing the next entry. If `config.shouldAutoPlay` is true, the entry will automatically
      play when it's ready and the current entry is ended.
      
-    */
+     */
     func prepareNext(_ config: PlayerConfig) -> Bool
-
+    
     /**
      Load the entry that was prepared with prepareNext(), without waiting for the current entry to end.
      */
@@ -63,13 +67,9 @@ public protocol Player {
     
     /**
      Release player resources.
-    */
+     */
     func destroy()
-    
+        
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
-}
-
-protocol PlayerDecoratorProvider {
-    func getPlayerDecorator() -> PlayerDecoratorBase?
 }
