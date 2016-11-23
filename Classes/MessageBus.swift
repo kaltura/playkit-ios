@@ -10,7 +10,7 @@ import Foundation
 
 private struct Observation {
     weak var observer: AnyObject?
-    let block: Any
+    let block: (_ info: Any)->Void
 }
 
 public class MessageBus: NSObject {
@@ -39,11 +39,12 @@ public class MessageBus: NSObject {
     
     public func post(_ event: PKEvent) {
         sync {
-            if var array: [Observation]? = observations[event.rawValue] {
-                array = array!.filter { $0.observer != nil } // Remove nil observers
-                array!.forEach {
-                    if let block = $0.block as? (_ info: Any)->Void {
-                       block(event)                    }
+            // TODO: remove nil observers
+            if let array = observations[event.rawValue] {
+                array.forEach {
+                    if let observer = $0.observer {
+                        $0.block(event)
+                    }
                 }
             }
         }
