@@ -54,6 +54,7 @@ class PlayerLoader: PlayerDecoratorBase {
                 }
             }
             setPlayer(player)
+            playerController.prepare(config)
         }
     }
     
