@@ -10,7 +10,7 @@ import UIKit
 
 class OTTMultiResponseParser: NSObject {
 
-    func parse(response:Any?) -> [Response] {
-        
-    }
+//    func parse(response:Any?) -> [Response] {
+//        
+//    }
 }

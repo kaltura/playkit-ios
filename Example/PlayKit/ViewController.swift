@@ -31,7 +31,7 @@ class ViewController: UIViewController {
             if ( e != nil){
                 //login succeded
                 
-                let ottEntryProvider: OTTEntryProvider = OTTEntryProvider(sessionProvider: sessionProvider, mediaId: "", type: AssetType.media, formats: [""], executor: nil)
+//                let ottEntryProvider: OTTEntryProvider = OTTEntryProvider(sessionProvider: sessionProvider, mediaId: "", type: AssetType.media, formats: [""], executor: nil)
 
             }
         }
