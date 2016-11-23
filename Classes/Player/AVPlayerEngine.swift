@@ -92,6 +92,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             if sources.count > 0 {
                 if let contentUrl = sources[0].contentUrl {
                     self.replaceCurrentItem(with: AVPlayerItem(url: contentUrl))
+                    addObservers()
                 }
             }
         }
@@ -146,12 +147,19 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     }
     
     func removeObservers() {
-        self.removeObserver(self, forKeyPath: PlayerRateKey)
-        
-        self.currentItem?.removeObserver(self, forKeyPath: PlayerEmptyBufferKey)
-        self.currentItem?.removeObserver(self, forKeyPath: PlayerStatusKey)
-        
-        NotificationCenter.default.removeObserver(self)
+        do {
+            try
+                self.removeObserver(self, forKeyPath: self.PlayerRateKey)
+                
+                self.currentItem?.removeObserver(self, forKeyPath: self.PlayerEmptyBufferKey)
+                self.currentItem?.removeObserver(self, forKeyPath: self.PlayerStatusKey)
+                
+                NotificationCenter.default.removeObserver(self)
+            
+            
+        } catch  {
+            NSLog("cant removeObservers")
+        }
     }
     
     func playerFailed(notification: NSNotification) {
@@ -179,24 +187,18 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             } else {
                 event = PlayerEvents.pause
             }
-        } else if keyPath == #keyPath(currentItem.status) {
-
-            let newStatus: AVPlayerItemStatus
-            
-            if let newStatusAsNumber = change?[NSKeyValueChangeKey.newKey] as? NSNumber {
-                newStatus = AVPlayerItemStatus(rawValue: newStatusAsNumber.intValue)!
-            } else {
-                newStatus = .unknown
-            }
-            
-            if newStatus == .readyToPlay {
+        } else if keyPath == PlayerStatusKey {
+            if currentItem?.status == .readyToPlay {
                 event = PlayerEvents.canPlay
-            } else if newStatus == .failed {
+            } else if currentItem?.status == .failed {
                 event = PlayerEvents.error
             } 
         }
         
         NSLog("changedState::\(event)")
+        if event == nil {
+            event = PlayerEvents.seeking
+        }
         guard let _ = delegate?.player(changedState: event!) else {
             NSLog("player changedState is not implimented")
             return

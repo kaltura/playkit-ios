@@ -52,6 +52,7 @@ class PlayerController: Player, PlayerEngineDelegate {
 
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
+        self.currentPlayer?.delegate = self
     }
 
     func prepare(_ config: PlayerConfig) {
