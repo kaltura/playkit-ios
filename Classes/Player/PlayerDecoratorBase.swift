@@ -14,13 +14,6 @@ class PlayerDecoratorBase: Player {
     
     private var player: Player!
     
-//    var dataSource: PlayerDataSource? {
-//        didSet {
-//            self.player.dataSource = self
-//        }
-//    }
-    
-    
     public var delegate: PlayerDelegate? {
         get {
             return self.player.delegate
@@ -89,20 +82,4 @@ class PlayerDecoratorBase: Player {
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         return self.player.createPiPController(with: delegate)
     }
-    
-//    //MARK: Player DataSource methods
-//        
-//    func playerShouldPlayAd(_ player: Player) -> Bool {
-//        return self.dataSource!.playerShouldPlayAd(self)
-//    }
-//    
-//    //MARK: Player Delegate methods
-//    
-//    func player(_ player: Player, failedWith error: String) {
-//        self.delegate?.player(self, failedWith: error)
-//    }
-//    
-//    func player(_ player: Player, didReceive event: PKEvent, with eventData: Any?) {
-//       // self.delegate?.player(self, didReceive: event, with: eventData)
-//    }
 }
