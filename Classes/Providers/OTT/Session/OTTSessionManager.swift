@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import SwiftyJSON
 
 public class OTTSessionManager: SessionProvider {
     
@@ -46,25 +45,19 @@ public class OTTSessionManager: SessionProvider {
         
         let loginRequestBuilder = OTTUserService.login(baseURL: self.serverURL, partnerId: partnerId, username: username, password: password)?.set(completion: { (r:Response) in
             
-            if let data: Data = r.data {
-                let jsonResponse = JSON(data: data)
-                let sessionInfo = SessionInfo(json:jsonResponse.object)
+            if let data: Any = r.data {
+                let sessionInfo = SessionInfo(json:data)
                 self.sessionInfo = sessionInfo
             }
+        })
+        
+        let sessionGetRequest = OTTSessionService.get(baseURL: self.serverURL, ks:"1:result:loginSession:ks")?.set(completion: { (r:Response) in
+            
         })
         
         if let request = loginRequestBuilder {
                 USRExecutor.shared.send(request: loginRequestBuilder!)
         }
-        
-        
-//        let sessionStatusRequestBuilder = OTTSessionService.get(baseURL: self.serverURL, ks: "1:result:loginSession:ks")?.set(completion: { (r:Response) in
-//            
-//        })
-//        
-//        
-//        USRExecutor.shared.send(request: )
-    
     }
     
     
@@ -85,8 +78,6 @@ public class OTTSessionManager: SessionProvider {
                 completion(Result(data: nil, error: SessionManagerError.failedToGetKS))
             }
         }
-        
-        
     }
     
     

@@ -15,7 +15,7 @@ public protocol SessionProvider {
     var clientTag: String { get }
     var apiVersion: String { get }
     
-    func refreshKS(completion: (_ result :Result<String>) -> Void)
+    func loadKS(completion: (_ result :Result<String>) -> Void)
 
     
     

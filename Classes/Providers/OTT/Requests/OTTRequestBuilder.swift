@@ -40,11 +40,28 @@ internal class OTTRequestBuilder: RequestBuilder{
        
     }
     
+    
+    
+    internal func setClientTag() -> RequestBuilder {
+        self.setBody(key: "clientTag", value: "java:16-09-10")
+        return self
+    }
+    
+    internal func setApiVersion() -> RequestBuilder {
+        self.setBody(key: "apiVersion", value: "3.6.1078.11798")
+        return self
+    }
+    
+
+    
+    
     public override func build() -> Request {
         super.build()
         
         self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
         self.method = "POST"
+        self.setClientTag()
+        self.setApiVersion()
         
         return self
     }

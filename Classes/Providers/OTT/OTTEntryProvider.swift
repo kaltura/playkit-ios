@@ -19,6 +19,7 @@ public class OTTEntryProvider: MediaEntryProvider {
     
     
     public enum ProviderError: Error {
+        case invalidKS
         case fileIsEmptyOrNotFound
         case invalidJSON
         case mediaNotFound
@@ -33,12 +34,20 @@ public class OTTEntryProvider: MediaEntryProvider {
         self.formats = formats
     }
     
+    
+    
+    
+    
     public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
         
-        //self.sessionProvider.loadKS { (r:Result<String>) in
+        self.sessionProvider.loadKS { (r:Result<String>) in
             
+            guard let ks = r.data else {
+                callback(Result(data: nil, error: ProviderError.invalidKS))
+                return
+            }
             
-            let request = OTTAssetService.get(baseURL: sessionProvider.serverURL, ks: "ks", assetId: self.mediaId, type:self.type)
+            let request = OTTAssetService.get(baseURL: sessionProvider.serverURL, ks: ks, assetId: self.mediaId, type:self.type)
             request?.set(completion: { (r:Response) in
                 
                 guard let data = r.data else {
@@ -46,13 +55,15 @@ public class OTTEntryProvider: MediaEntryProvider {
                     return
                 }
                 
-                let jsonResponse =  JSON(data: data)
+                let jsonResponse =  JSON(data)
                 
                 if let assetResponse: OTTGetAssetResponse = OTTGetAssetResponse(json:jsonResponse.object){
                     
                     if let asset = assetResponse.asset {
                         
                         let mediaEntry: MediaEntry = MediaEntry(id: asset.id)
+                        
+                        let licensedLinkRequests: [OTTRequestBuilder] = [OTTRequestBuilder]()
                         if let files = asset.files, let requestedFormats = self.formats {
                             
                             var sources = [MediaSource]()
@@ -62,6 +73,9 @@ public class OTTEntryProvider: MediaEntryProvider {
                                         let source: MediaSource = MediaSource(id: file.id)
                                         source.contentUrl = file.url
                                         sources.append(source)
+                                        
+                                        let request: OTTRequestBuilder = OTTLicensedURLService.get(baseURL: self.sessionProvider.serverURL,
+                                                                                                   ks: ks, type: AssetType, fileId: <#T##String#>, fileBaseURL: <#T##String#>)
                                     }
                                 }
                             }
@@ -69,9 +83,15 @@ public class OTTEntryProvider: MediaEntryProvider {
                             if sources.count > 0 {
                                 mediaEntry.sources = sources
                             }
+                            
+                            
+                        
                         }
                         
-                        callback(Result(data: mediaEntry, error: nil))
+                        
+                        
+                    
+                        //callback(Result(data: mediaEntry, error: nil))
                     }else{
                         callback(Result(data: nil, error: ProviderError.mediaNotFound))
                     }
@@ -83,10 +103,9 @@ public class OTTEntryProvider: MediaEntryProvider {
             if let assetRequest = request {
                 USRExecutor.shared.send(request: assetRequest)
             }
-            
+        }
     }
 }
 
 
-    
 

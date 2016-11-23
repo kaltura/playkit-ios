@@ -9,24 +9,25 @@
 import UIKit
 
 public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
-
-
+    
+    
     enum ResponseError: Error {
         case emptyOrIncorrectURL
         case inCorrectJSONBody
+        
     }
-
+    
     static let shared = USRExecutor()
     
     public func send(request r:Request){
         
         var request: URLRequest = URLRequest(url: r.url)
         
-        //handle http method 
+        //handle http method
         if let method = r.method {
             request.httpMethod = method
         }
-
+        
         // handle body
         
         if let data = r.dataBody {
@@ -51,24 +52,47 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
                 request.setValue(headerValue, forHTTPHeaderField: headerKey)
             }
         }
-
+        
         
         let session: URLSession = URLSession.shared
         
-
+        
         // settings headers:
         let task = session.dataTask(with: request) { (data, response, error) in
             
             DispatchQueue.main.async {
+                
                 if let completion = r.completion {
                     
-                    let result = Response(data: data, error:nil)
-                    completion(result)
-                }
+                    if let r = error{
+                        let result = Response(data: nil, error:error)
+                        completion(result)
+                        return
+                        
+                    }
+                    
+                    
+                    if let d = data {
+                        do{
+                            let json = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions())
+                            let result = Response(data: json, error:nil)
+                            completion(result)
+                        }catch {
+                            let result = Response(data: nil, error:error)
+                            completion(result)
 
+                        }
+                        
+                        
+                    }else{
+                        let result = Response(data: nil, error:nil)
+                        completion(result)
+                    }
+                    
+                }
             }
         }
-    
+        
         task.resume()
     }
     
@@ -80,7 +104,7 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
     public func clean(){
         
     }
-
+    
     
     
     
@@ -99,8 +123,8 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
     public func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession){
         
     }
-
     
     
-   
+    
+    
 }

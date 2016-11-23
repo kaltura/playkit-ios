@@ -17,20 +17,6 @@ public enum AssetType: String {
 }
 
 
-internal extension RequestBuilder {
-    
-     internal func setClientTag() -> RequestBuilder {
-        self.setBody(key: "clientTag", value: "java:16-09-10")
-        return self
-    }
-    
-     internal func setApiVersion() -> RequestBuilder {
-        self.setBody(key: "apiVersion", value: "3.6.1078.11798")
-        return self
-    }
-    
-}
-
 internal class OTTAssetService {
 
     internal static func get(baseURL: String, ks: String,assetId: String, type: AssetType) -> OTTRequestBuilder? {
@@ -42,9 +28,6 @@ internal class OTTAssetService {
             .setBody(key: "assetReferenceType", value: JSON(type.rawValue))
             .setBody(key: "type", value: JSON(type.rawValue))
             .setBody(key: "with", value: JSON([["type":"files","objectType":"KalturaCatalogWithHolder"]]))
-            .setClientTag()
-            .setApiVersion()
-            
             return request
         }else{
             return nil

@@ -12,6 +12,7 @@ import SwiftyJSON
 internal class SessionInfo {
     
     internal var ks: String?
+    internal var ksExpiration: NSDate?
     internal var refreshToken: String?
     
     private let resultKey = "result"

@@ -30,6 +30,8 @@
 		7A00E2BD84893559AE4D0CEFF2CBD89F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */; };
 		7A518036D78E4BCFB03144E50F9D2395 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D43FC469E143163C85AA54DCF36AE7A /* Response.swift */; };
 		83645471276D8EDBBE5A443D99CF0632 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */; };
+		84648BFA1DE2D2D20085449A /* OTTLicensedURLService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84648BF91DE2D2D20085449A /* OTTLicensedURLService.swift */; };
+		84648BFC1DE2E2580085449A /* OTTLicensedURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84648BFB1DE2E2580085449A /* OTTLicensedURL.swift */; };
 		8D4E9CCF31BE981B697E77F57162E022 /* MediaEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5250637354DDFD10E84160DD6A26664B /* MediaEntryProvider.swift */; };
 		8EAEB7759F465A28A1CA97A1539B0334 /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA6A2CD69A6F9A8A7D75A97AE933DE4 /* Plugin.swift */; };
 		93D8F150E0D30ACE7C41E18D9C37967C /* OTTRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7E033C37656BC7A9E3B04022329446D /* OTTRequestBuilder.swift */; };
@@ -101,6 +103,8 @@
 		6B147A6A4753BEFB57AE500896E3ED0F /* PlayKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "PlayKit-dummy.m"; sourceTree = "<group>"; };
 		6BF0A54C7F9DC7ADF20B30B92059A140 /* RequestExecutor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RequestExecutor.swift; sourceTree = "<group>"; };
 		79A1A841E799F3DF5943919A07374497 /* Pods-PlayKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-PlayKit_Tests.modulemap"; sourceTree = "<group>"; };
+		84648BF91DE2D2D20085449A /* OTTLicensedURLService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTLicensedURLService.swift; sourceTree = "<group>"; };
+		84648BFB1DE2E2580085449A /* OTTLicensedURL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTLicensedURL.swift; sourceTree = "<group>"; };
 		89748EEB01201FA5E39224EC57BE819A /* PlayKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = PlayKit.modulemap; sourceTree = "<group>"; };
 		8A952382B5B94531E747707422A109ED /* SamplePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SamplePlugin.swift; sourceTree = "<group>"; };
 		8D43FC469E143163C85AA54DCF36AE7A /* Response.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
@@ -221,6 +225,7 @@
 				F23BDB636A74B0717FA2A7DF80425871 /* OTTFile.swift */,
 				8E37BD1DB28068F3E83A2D99C3F97122 /* OTTGetAssetResponse.swift */,
 				02BDE62C33E7CA6FF5632DAECFB7648C /* OTTLoginSession.swift */,
+				84648BFB1DE2E2580085449A /* OTTLicensedURL.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -449,6 +454,7 @@
 				EBA7827E4848B27A422E2AA0FA7BD151 /* OTTAssetService.swift */,
 				3671212B86C1BE42DE9DB50A69BBEE4F /* OTTSessionService.swift */,
 				C06B1B01D30C0C46FBA1AFB846155E17 /* OTTUserService.swift */,
+				84648BF91DE2D2D20085449A /* OTTLicensedURLService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -621,6 +627,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84648BFC1DE2E2580085449A /* OTTLicensedURL.swift in Sources */,
 				0139ACBECC9D6EA1EAAE69DD4BBE2AA7 /* MediaEntry.swift in Sources */,
 				8D4E9CCF31BE981B697E77F57162E022 /* MediaEntryProvider.swift in Sources */,
 				FB0EA99A3BC1CAE37EC053A173EE6B69 /* MockMediaProvider.swift in Sources */,
@@ -635,6 +642,7 @@
 				34839F68E571142C000BA217B8F296AD /* OTTSessionManager.swift in Sources */,
 				D66E2E9EC8B5D761DB935ADA4557F25F /* OTTSessionService.swift in Sources */,
 				588C2ACFC182C01764462A7112A25385 /* OTTUserService.swift in Sources */,
+				84648BFA1DE2D2D20085449A /* OTTLicensedURLService.swift in Sources */,
 				5E327BBBB0A98D982536CB8DBDAEE09E /* Player.swift in Sources */,
 				E9A24F9C1F509C7ED10E9F7E456E8B20 /* PlayerConfig.swift in Sources */,
 				D16138CFADDA22575B0F5F809360A553 /* PlayerImp.swift in Sources */,
