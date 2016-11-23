@@ -48,44 +48,44 @@ public class RequestBuilder : Request {
         
     }
     
-    public func set(url: URL) -> RequestBuilder{
+    public func set(url: URL) -> Self{
         self.url = url
         return self
     }
     
-    public func set(method: String?) -> RequestBuilder{
+    public func set(method: String?) -> Self{
         self.method = method
         return self
     }
     
-    public func set(jsonBody:JSON?) -> RequestBuilder{
+    public func set(jsonBody:JSON?) -> Self{
         self.jsonBody = jsonBody
         return self
     }
     
-    public func set(dataBody: Data?)-> RequestBuilder{
+    public func set(dataBody: Data?)-> Self{
         self.dataBody = dataBody
         return self
     }
     
     
-    public func set(headers: [String: String]?) -> RequestBuilder{
+    public func set(headers: [String: String]?) -> Self{
         self.headers = headers
         return self
     }
     
-    public func set(conifiguration:RequestConfiguration?) -> RequestBuilder{
+    public func set(conifiguration:RequestConfiguration?) -> Self{
         self.conifiguration = conifiguration
         return self
     }
     
-    public func set(completion:completionClosures?) -> RequestBuilder{
+    public func set(completion:completionClosures?) -> Self{
         self.completion = completion
         return self
     }
     
     
-    public func add(headerKey:String, headerValue:String) -> RequestBuilder {
+    public func add(headerKey:String, headerValue:String) -> Self {
         
         if (self.headers == nil){
             self.headers = [String:String]()
@@ -96,7 +96,7 @@ public class RequestBuilder : Request {
     }
     
     
-    public func setBody(key: String, value:JSON) -> RequestBuilder {
+    public func setBody(key: String, value:JSON) -> Self {
         
         if var body = self.jsonBody {
             self.jsonBody![key] = value

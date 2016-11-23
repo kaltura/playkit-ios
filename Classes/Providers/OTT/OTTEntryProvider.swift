@@ -16,6 +16,7 @@ public class OTTEntryProvider: MediaEntryProvider {
     var mediaId: String
     var type: AssetType
     var formats: [String]?
+    var executor: RequestExecutor?
     
     
     public enum ProviderError: Error {
@@ -27,15 +28,13 @@ public class OTTEntryProvider: MediaEntryProvider {
         
     }
     
-    public init(sessionProvider:SessionProvider, mediaId: String, type:AssetType,formats: [String]){
+    public init(sessionProvider:SessionProvider, mediaId: String, type:AssetType,formats: [String],executor:RequestExecutor?){
         self.sessionProvider = sessionProvider
         self.mediaId = mediaId
         self.type = type
         self.formats = formats
+        self.executor = executor
     }
-    
-    
-    
     
     
     public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
@@ -74,8 +73,6 @@ public class OTTEntryProvider: MediaEntryProvider {
                                         source.contentUrl = file.url
                                         sources.append(source)
                                         
-                                        let request: OTTRequestBuilder = OTTLicensedURLService.get(baseURL: self.sessionProvider.serverURL,
-                                                                                                   ks: ks, type: AssetType, fileId: <#T##String#>, fileBaseURL: <#T##String#>)
                                     }
                                 }
                             }
@@ -83,15 +80,9 @@ public class OTTEntryProvider: MediaEntryProvider {
                             if sources.count > 0 {
                                 mediaEntry.sources = sources
                             }
-                            
-                            
-                        
                         }
                         
-                        
-                        
-                    
-                        //callback(Result(data: mediaEntry, error: nil))
+                        callback(Result(data: mediaEntry, error: nil))
                     }else{
                         callback(Result(data: nil, error: ProviderError.mediaNotFound))
                     }
@@ -101,7 +92,11 @@ public class OTTEntryProvider: MediaEntryProvider {
             }).build()
             
             if let assetRequest = request {
-                USRExecutor.shared.send(request: assetRequest)
+                if let executor = self.executor{
+                    executor.send(request: assetRequest)
+                }else{
+                  USRExecutor.shared.send(request: assetRequest)
+                }
             }
         }
     }

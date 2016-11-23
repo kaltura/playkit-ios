@@ -42,12 +42,12 @@ internal class OTTRequestBuilder: RequestBuilder{
     
     
     
-    internal func setClientTag() -> RequestBuilder {
+    internal func setClientTag() -> Self {
         self.setBody(key: "clientTag", value: "java:16-09-10")
         return self
     }
     
-    internal func setApiVersion() -> RequestBuilder {
+    internal func setApiVersion() -> Self {
         self.setBody(key: "apiVersion", value: "3.6.1078.11798")
         return self
     }

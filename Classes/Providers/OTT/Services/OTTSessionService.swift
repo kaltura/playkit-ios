@@ -16,7 +16,7 @@ internal class OTTSessionService: NSObject {
         
         if let request = OTTRequestBuilder(url: baseURL, service: "session", action: "get") {
             request
-                .setBody(key: "session", value: JSON(ks))
+                .setBody(key: "ks", value: JSON(ks))
             return request
         }else{
             return nil

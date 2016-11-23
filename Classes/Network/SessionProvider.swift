@@ -12,8 +12,6 @@ public protocol SessionProvider {
     
     var serverURL: String { get }
     var partnerId: Int64 { get }
-    var clientTag: String { get }
-    var apiVersion: String { get }
     
     func loadKS(completion: (_ result :Result<String>) -> Void)
 

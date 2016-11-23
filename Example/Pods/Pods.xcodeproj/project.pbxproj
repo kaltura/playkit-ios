@@ -32,6 +32,8 @@
 		83645471276D8EDBBE5A443D99CF0632 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92C8AAF83FB3D050E8760B7427B0B23 /* Foundation.framework */; };
 		84648BFA1DE2D2D20085449A /* OTTLicensedURLService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84648BF91DE2D2D20085449A /* OTTLicensedURLService.swift */; };
 		84648BFC1DE2E2580085449A /* OTTLicensedURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84648BFB1DE2E2580085449A /* OTTLicensedURL.swift */; };
+		84648C1F1DE5C4330085449A /* OTTResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84648C1E1DE5C4330085449A /* OTTResponseParser.swift */; };
+		84648C211DE5C4910085449A /* OTTMultiResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84648C201DE5C4910085449A /* OTTMultiResponseParser.swift */; };
 		8D4E9CCF31BE981B697E77F57162E022 /* MediaEntryProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5250637354DDFD10E84160DD6A26664B /* MediaEntryProvider.swift */; };
 		8EAEB7759F465A28A1CA97A1539B0334 /* Plugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA6A2CD69A6F9A8A7D75A97AE933DE4 /* Plugin.swift */; };
 		93D8F150E0D30ACE7C41E18D9C37967C /* OTTRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7E033C37656BC7A9E3B04022329446D /* OTTRequestBuilder.swift */; };
@@ -105,6 +107,8 @@
 		79A1A841E799F3DF5943919A07374497 /* Pods-PlayKit_Tests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = "Pods-PlayKit_Tests.modulemap"; sourceTree = "<group>"; };
 		84648BF91DE2D2D20085449A /* OTTLicensedURLService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTLicensedURLService.swift; sourceTree = "<group>"; };
 		84648BFB1DE2E2580085449A /* OTTLicensedURL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTLicensedURL.swift; sourceTree = "<group>"; };
+		84648C1E1DE5C4330085449A /* OTTResponseParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTResponseParser.swift; sourceTree = "<group>"; };
+		84648C201DE5C4910085449A /* OTTMultiResponseParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTMultiResponseParser.swift; sourceTree = "<group>"; };
 		89748EEB01201FA5E39224EC57BE819A /* PlayKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "sourcecode.module-map"; path = PlayKit.modulemap; sourceTree = "<group>"; };
 		8A952382B5B94531E747707422A109ED /* SamplePlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SamplePlugin.swift; sourceTree = "<group>"; };
 		8D43FC469E143163C85AA54DCF36AE7A /* Response.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
@@ -334,6 +338,15 @@
 			path = Plugins;
 			sourceTree = "<group>";
 		};
+		84648C1D1DE5C40E0085449A /* Parsers */ = {
+			isa = PBXGroup;
+			children = (
+				84648C1E1DE5C4330085449A /* OTTResponseParser.swift */,
+				84648C201DE5C4910085449A /* OTTMultiResponseParser.swift */,
+			);
+			path = Parsers;
+			sourceTree = "<group>";
+		};
 		8EC39E1DC11846207722B71AAFE40F98 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -429,6 +442,7 @@
 			isa = PBXGroup;
 			children = (
 				3F13E424BA49641D66A017CAE8A35F5D /* OTTEntryProvider.swift */,
+				84648C1D1DE5C40E0085449A /* Parsers */,
 				209B51CD2C3D07902046B5BE1217C14A /* Model */,
 				8FAD236D336E27244F1B64CB18205558 /* Requests */,
 				EF81C600C0FEF5897B9C84B6DAA25E23 /* Services */,
@@ -641,6 +655,7 @@
 				93D8F150E0D30ACE7C41E18D9C37967C /* OTTRequestBuilder.swift in Sources */,
 				34839F68E571142C000BA217B8F296AD /* OTTSessionManager.swift in Sources */,
 				D66E2E9EC8B5D761DB935ADA4557F25F /* OTTSessionService.swift in Sources */,
+				84648C211DE5C4910085449A /* OTTMultiResponseParser.swift in Sources */,
 				588C2ACFC182C01764462A7112A25385 /* OTTUserService.swift in Sources */,
 				84648BFA1DE2D2D20085449A /* OTTLicensedURLService.swift in Sources */,
 				5E327BBBB0A98D982536CB8DBDAEE09E /* Player.swift in Sources */,
@@ -657,6 +672,7 @@
 				F8F1E4DA0BB722D732CBABD037F357F5 /* Result.swift in Sources */,
 				9D328D2E3FECE45D0D83459CE729E212 /* SamplePlugin.swift in Sources */,
 				6DDCB6A2B2F30FB14425EAE63D886A69 /* SessionProvider.swift in Sources */,
+				84648C1F1DE5C4330085449A /* OTTResponseParser.swift in Sources */,
 				28950DE76EF1A177749D9F02415A0D08 /* USRExecutor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

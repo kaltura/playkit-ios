@@ -10,6 +10,7 @@ import UIKit
 
 public class Response: Result<Any> {
 
+    public let executionTime: TimeInterval = max_do
     public let statusCode: Int = 0
     
 }

@@ -19,29 +19,24 @@ public class OTTSessionManager: SessionProvider {
     
     public var serverURL: String
     public var partnerId: Int64
-    public var clientTag: String
-    public var apiVersion: String
+
+    public var executor: RequestExecutor?
 
     
     private var sessionInfo: SessionInfo?
 
 
-    public init(serverURL:String, partnerId:Int64, clientTag:String, apiVersion:String) {
+    public init(serverURL:String, partnerId:Int64, executor: RequestExecutor?) {
         
         self.serverURL = serverURL
         self.partnerId = partnerId
-        self.clientTag = clientTag
-        self.apiVersion = apiVersion
+        self.executor = executor
     }
 
     
-    public func refreshKS(completion: (Result<String>) -> Void) {
-        
-    }
 
     
     public func login(username:String, password:String, completion:(_ error:Error?)->Void) -> Void {
-        
         
         let loginRequestBuilder = OTTUserService.login(baseURL: self.serverURL, partnerId: partnerId, username: username, password: password)?.set(completion: { (r:Response) in
             
@@ -55,8 +50,18 @@ public class OTTSessionManager: SessionProvider {
             
         })
         
-        if let request = loginRequestBuilder {
-                USRExecutor.shared.send(request: loginRequestBuilder!)
+        if let r1 = loginRequestBuilder, let r2 = sessionGetRequest {
+            
+            let mrb = OTTMultiRequestBuilder(url: self.serverURL)?.add(request: r1).add(request: r2).build()
+            if let request = mrb {
+                
+                if self.executor != nil{
+                    self.executor?.send(request: request)
+                }else{
+                   USRExecutor.shared.send(request: request)
+                }
+                
+            }
         }
     }
     
