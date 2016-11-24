@@ -19,7 +19,9 @@ public class MessageBus: NSObject {
     
     public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
         sync {
-            if var array: [Observation]? = observations[event.rawValue] {
+            var array: [Observation]? = observations[event.rawValue]
+            
+            if (array != nil) {
                 array!.append(Observation(observer: observer, block: block))
             } else {
                 observations[event.rawValue] = [Observation(observer: observer, block: block)]

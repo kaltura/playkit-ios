@@ -10,8 +10,8 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: Player {
-    //public var messageBus: PKMessageBus?
+class PlayerController: Player, PlayerEngineDelegate {
+    var messageBus = MessageBus()
 
     var delegate: PlayerDelegate?
     
@@ -52,6 +52,7 @@ class PlayerController: Player {
 
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
+        self.currentPlayer?.delegate = self
     }
 
     func prepare(_ config: PlayerConfig) {
@@ -90,5 +91,26 @@ class PlayerController: Player {
     
     func destroy() {
         self.currentPlayer?.destroy()
+    }
+    
+    public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
+        // TODO:: finilizing + object validation
+        messageBus.addObserver(observer, event: event, block: block)
+    }
+    
+    public func removeObserver(_ observer: AnyObject, event: PKEvent) {
+        // TODO:: finilizing + object validation
+        messageBus.removeObserver(observer, event: event)
+    }
+    
+    func player(changedState: PKEvent) {
+        // TODO:: finilizing + object validation
+        NSLog("changedState")
+        messageBus.post(changedState)
+    }
+    
+    func player(encounteredError: NSError) {
+        // TODO:: finilizing + object validation
+        NSLog("encounteredError")
     }
 }

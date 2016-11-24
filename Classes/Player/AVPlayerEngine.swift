@@ -92,6 +92,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             if sources.count > 0 {
                 if let contentUrl = sources[0].contentUrl {
                     self.replaceCurrentItem(with: AVPlayerItem(url: contentUrl))
+                    addObservers()
                 }
             }
         }
@@ -113,7 +114,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         return pip
     }
     
-    // MARK: - KVO
+    // MARK: - KVO Observation
     // KVO contexts
     private var PlayerObserverContext = 0
     private var PlayerItemObserverContext = 0
@@ -141,36 +142,67 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         self.currentItem?.addObserver(self, forKeyPath: PlayerEmptyBufferKey, options: [], context: nil)
         self.currentItem?.addObserver(self, forKeyPath: PlayerStatusKey, options: [], context: nil)
         
-        NotificationCenter.default.addObserver(self, selector: Selector("playerFailed:"), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: Selector("playerPlayedToEnd:"), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: Selector(("playerFailed:")), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: Selector(("playerPlayedToEnd:")), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.currentItem)
     }
     
     func removeObservers() {
-        self.removeObserver(self, forKeyPath: PlayerRateKey)
-        
-        self.currentItem?.removeObserver(self, forKeyPath: PlayerEmptyBufferKey)
-        self.currentItem?.removeObserver(self, forKeyPath: PlayerStatusKey)
-        
-        NotificationCenter.default.removeObserver(self)
+        do {
+            try
+                self.removeObserver(self, forKeyPath: self.PlayerRateKey)
+                
+                self.currentItem?.removeObserver(self, forKeyPath: self.PlayerEmptyBufferKey)
+                self.currentItem?.removeObserver(self, forKeyPath: self.PlayerStatusKey)
+                
+                NotificationCenter.default.removeObserver(self)
+            
+            
+        } catch  {
+            NSLog("cant removeObservers")
+        }
     }
     
-    override func observeValue(forKeyPath
-        keyPath: String?,
-                               of object: Any?,
-                               change: [NSKeyValueChangeKey : Any]?,
-                               context: UnsafeMutableRawPointer?) {
-        if keyPath == "duration" {
-            /*
-             Handle `NSNull` value for `NSKeyValueChangeNewKey`, i.e. when
-             `currentItem` is nil.
-             */
-            
-            if let newDurationAsValue = change?[NSKeyValueChangeKey.newKey] as? NSValue {
-                print("newDurationAsValue:" + String(describing: newDurationAsValue))
-            } else if keyPath == PlayerRateKey {
-                // Update `playPauseButton` image.
-                
+    func playerFailed(notification: NSNotification) {
+        guard let _ = delegate?.player(changedState: PlayerEvents.error) else {
+            NSLog("player changedState is not implimented")
+            return
+        }
+    }
+    
+    func playerPlayedToEnd(notification: NSNotification) {
+        guard let _ = delegate?.player(changedState: PlayerEvents.ended) else {
+            NSLog("player changedState is not implimented")
+            return
+        }
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        // TODO:: finilizing + object validation + switch & case
+        var event: PKEvent? = nil
+        
+        if keyPath == #keyPath(currentItem.duration) {
+            event = PlayerEvents.durationChange
+        } else if keyPath == #keyPath(rate) {
+            if rate == 1.0 {
+                event = PlayerEvents.play
+            } else {
+                event = PlayerEvents.pause
             }
+        } else if keyPath == PlayerStatusKey {
+            if currentItem?.status == .readyToPlay {
+                event = PlayerEvents.canPlay
+            } else if currentItem?.status == .failed {
+                event = PlayerEvents.error
+            } 
+        }
+        
+        NSLog("changedState::\(event)")
+        if event == nil {
+            event = PlayerEvents.seeking
+        }
+        guard let _ = delegate?.player(changedState: event!) else {
+            NSLog("player changedState is not implimented")
+            return
         }
     }
 }
