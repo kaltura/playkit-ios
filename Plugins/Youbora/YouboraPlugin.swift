@@ -9,7 +9,7 @@
 import YouboraLib
 import YouboraPluginAVPlayer
 
-class YouboraPlugin : Plugin {
+class YouboraPlugin : PKPlugin {
 
     private var youboraObj : YBPluginAVPlayer!
     static var pluginName: String = "YouboraPlugin"
@@ -19,13 +19,13 @@ class YouboraPlugin : Plugin {
         youboraObj = YBPluginAVPlayer(options: options as NSObject!)
     }
     
-    func load(player: Player, config: PlayerConfig) {
-     
+    func load(player: Player, config: Any?, messageBus: MessageBus) {
+    
         //youboraObj.startMonitoring(withPlayer: player)
         
     }
     
-    func release() {
+    func destroy() {
         
     }
 }
