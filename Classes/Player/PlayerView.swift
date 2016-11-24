@@ -8,6 +8,7 @@
 
 import UIKit
 
+/// A simple `UIView` subclass that is backed by an `AVPlayerLayer` layer.
 class PlayerView: UIView {
 
     var playerLayer: CALayer?
