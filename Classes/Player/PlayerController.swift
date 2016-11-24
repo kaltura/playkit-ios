@@ -94,19 +94,23 @@ class PlayerController: Player, PlayerEngineDelegate {
     }
     
     public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
+        // TODO:: finilizing + object validation
         messageBus.addObserver(observer, event: event, block: block)
     }
     
     public func removeObserver(_ observer: AnyObject, event: PKEvent) {
+        // TODO:: finilizing + object validation
         messageBus.removeObserver(observer, event: event)
     }
     
     func player(changedState: PKEvent) {
+        // TODO:: finilizing + object validation
         NSLog("changedState")
         messageBus.post(changedState)
     }
     
     func player(encounteredError: NSError) {
+        // TODO:: finilizing + object validation
         NSLog("encounteredError")
     }
 }

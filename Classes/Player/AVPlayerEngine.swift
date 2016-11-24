@@ -177,6 +177,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        // TODO:: finilizing + object validation + switch & case
         var event: PKEvent? = nil
         
         if keyPath == #keyPath(currentItem.duration) {
