@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-internal class OTTAsset {
+internal class OTTAsset: OTTBaseObject{
 
     internal var id: String 
     internal var files: [OTTFile]?
@@ -17,7 +17,7 @@ internal class OTTAsset {
     private let idKey = "id"
     private let idfiles = "mediaFiles"
     
-    internal init?(json:Any) {
+    internal required init?(json:Any) {
         
         let assetJson = JSON(json)
         guard let id = assetJson[idKey].number else {

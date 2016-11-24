@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-internal class OTTFile {
+internal class OTTFile: OTTBaseObject {
     
     internal var id: String
     internal var type: String? = nil
@@ -25,7 +25,7 @@ internal class OTTFile {
         self.id = id
     }
     
-    internal init?(json:Any) {
+    internal required init?(json:Any) {
         
         let fileJosn = JSON(json)
         

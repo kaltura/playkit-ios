@@ -7,32 +7,30 @@
 //
 
 import UIKit
+import SwiftyJSON
 
-class OTTResponseParser: NSObject {
+class OTTResponseParser: ResponseParser {
 
-//    func parse(response:Any?) -> Response {
-//     
-//        if let multiCompltion = self.dummyCompletionBlock {
-//            multiCompltion(r)
-//        }
-//        
-//        var responseArray: [Any]? = nil
-//        if let data = r.data  {
-//            let jsonResponse = JSON(data)
-//            responseArray = jsonResponse["result"].arrayObject
-//        }
-//        
-//        for (index,request) in self.requests.enumerated() {
-//            if let requestCompletion = request.completion{
-//                if let multiResponseData = responseArray{
-//                    let responseData = multiResponseData[index]
-//                    requestCompletion(Response(data: responseData, error: r.error))
-//                }else{
-//                    requestCompletion(r)
-//                }
-//                
-//            }
-//        }
-//
-//    }
+    
+    enum error: Error {
+        case typeNotFound
+        case emptyResponse
+    }
+
+    func parse(data:Any) -> Result<OTTBaseObject> {
+     
+        
+            let jsonResponse = JSON(data)
+            let resultObjectJSON = jsonResponse["result"].dictionaryObject
+            let objectType: OTTBaseObject.Type? = ObjectMapper.classByJsonObject(json: resultObjectJSON)
+            if let type = objectType{
+                    let object: OTTBaseObject? = type.init(json: resultObjectJSON)
+                return Result(data: object, error: nil)
+            }else{
+                return Result(data: nil, error: error.typeNotFound)
+            }
+    }
 }
+
+
+

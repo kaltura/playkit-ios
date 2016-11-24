@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-internal class OTTLicensedURL: NSObject {
+internal class OTTLicensedURL: OTTBaseObject {
 
     internal var mainuRL: String
     
@@ -17,7 +17,7 @@ internal class OTTLicensedURL: NSObject {
     private let mainuRLKey = "mainUrl"
     private let resultKey = "result"
     
-    internal init?(json:Any) {
+    internal required init?(json:Any) {
         
         let licensedURLJson = JSON(json)
         guard let url = licensedURLJson[resultKey][mainuRLKey].string else {

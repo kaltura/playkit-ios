@@ -13,8 +13,7 @@ internal class OTTRequestBuilder: RequestBuilder{
 
     public var service: String?
     public var action: String?
-    
-    
+
     init?(url: String?, service: String?, action: String?) {
         
         guard let baseURL = url else {
@@ -34,10 +33,8 @@ internal class OTTRequestBuilder: RequestBuilder{
             path += actionSuffix
         }
 
-        
         super.init(url: path)
         
-       
     }
     
     
@@ -54,9 +51,15 @@ internal class OTTRequestBuilder: RequestBuilder{
     
 
     
+
+    
     
     public override func build() -> Request {
         super.build()
+        
+        self.completion = { (r:Response) in
+            
+        }
         
         self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
         self.method = "POST"

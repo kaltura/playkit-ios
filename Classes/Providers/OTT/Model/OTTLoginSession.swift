@@ -9,10 +9,9 @@
 import UIKit
 import SwiftyJSON
 
-internal class SessionInfo {
+internal class OTTLoginSession: OTTBaseObject {
     
     internal var ks: String?
-    internal var ksExpiration: NSDate?
     internal var refreshToken: String?
     
     private let resultKey = "result"
@@ -20,7 +19,7 @@ internal class SessionInfo {
     private let ksKey = "ks"
     private let refreshTokenKey = "refreshToken"
     
-    init(json:Any) {
+    required init(json:Any) {
         
         let loginJsonResponse = JSON(json)
         let sessionJson = loginJsonResponse[resultKey][sessionKey]

@@ -9,13 +9,13 @@
 import UIKit
 import SwiftyJSON
 
-internal class OTTGetAssetResponse: NSObject {
+internal class OTTGetAssetResponse: OTTBaseObject {
 
     internal var asset: OTTAsset? = nil
     
     private let resultKey = "result"
     
-    internal init(json:Any) {
+    internal required init(json:Any) {
         
         let responseJson = JSON(json)
         let assetJson = responseJson[resultKey]

@@ -19,46 +19,53 @@ public class OTTSessionManager: SessionProvider {
     
     public var serverURL: String
     public var partnerId: Int64
-
-    public var executor: RequestExecutor?
-
     
-    private var sessionInfo: SessionInfo?
-
-
+    public var executor: RequestExecutor?
+    
+    
+    private var sessionInfo: OTTLoginSession?
+    
+    
     public init(serverURL:String, partnerId:Int64, executor: RequestExecutor?) {
         
         self.serverURL = serverURL
         self.partnerId = partnerId
         self.executor = executor
     }
-
     
-
+    
+    
     
     public func login(username:String, password:String, completion:(_ error:Error?)->Void) -> Void {
         
-        let loginRequestBuilder = OTTUserService.login(baseURL: self.serverURL, partnerId: partnerId, username: username, password: password)?.set(completion: { (r:Response) in
-            
-            if let data: Any = r.data {
-                let sessionInfo = SessionInfo(json:data)
-                self.sessionInfo = sessionInfo
-            }
-        })
+        let loginRequestBuilder = OTTUserService.login(baseURL: self.serverURL,
+                                                       partnerId: partnerId,
+                                                       username: username,
+                                                       password: password)
         
-        let sessionGetRequest = OTTSessionService.get(baseURL: self.serverURL, ks:"1:result:loginSession:ks")?.set(completion: { (r:Response) in
-            
-        })
+        let sessionGetRequest = OTTSessionService.get(baseURL: self.serverURL,
+                                                      ks:"1:result:loginSession:ks")
         
         if let r1 = loginRequestBuilder, let r2 = sessionGetRequest {
             
-            let mrb = OTTMultiRequestBuilder(url: self.serverURL)?.add(request: r1).add(request: r2).build()
+            let mrb = OTTMultiRequestBuilder(url: self.serverURL)?.add(request: r1).add(request: r2)
+            mrb?.set(completion: { (r:Response) in
+                
+                if let data = r.data
+                {
+                    let result: [Result<OTTBaseObject>] = OTTMultiResponseParser.parse(data:data)
+                    
+                }
+                
+            })
+            .build()
+            
             if let request = mrb {
                 
                 if self.executor != nil{
                     self.executor?.send(request: request)
                 }else{
-                   USRExecutor.shared.send(request: request)
+                    USRExecutor.shared.send(request: request)
                 }
                 
             }
@@ -69,7 +76,7 @@ public class OTTSessionManager: SessionProvider {
     public func loadKS(completion: (_ result :Result<String>) -> Void) {
         
         if let refreshToken = sessionInfo?.refreshToken {
-         
+            
             let requestBuilder = OTTUserService.refreshSession(baseURL: self.serverURL, refreshToken: refreshToken)?.set(completion: { (r:Response) in
                 r.statusCode
                 
@@ -89,7 +96,7 @@ public class OTTSessionManager: SessionProvider {
     public func test () {
         
     }
-
-
-
+    
+    
+    
 }
