@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-public class MediaEntry {
+public class MediaEntry: CustomStringConvertible{
     internal var id: String
     internal var sources: [MediaSource]?
     internal var duration: Int64?
@@ -37,9 +37,15 @@ public class MediaEntry {
         
         self.sources = sources
     }
+    
+    public var description: String {
+        get{
+            return "id : \(self.id), sources: \(self.sources)"
+        }
+    }
 }
 
-public class MediaSource {
+public class MediaSource: CustomStringConvertible {
     internal var id: String
     internal var contentUrl: URL?
     internal var mimeType: String?
@@ -66,6 +72,12 @@ public class MediaSource {
         
         if let mimeTypeString = json[mimeTypeKey].string {
             self.mimeType = mimeTypeString
+        }
+    }
+    
+    public var description: String {
+        get{
+            return "id : \(self.id), url: \(self.contentUrl)"
         }
     }
 }

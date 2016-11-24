@@ -55,6 +55,14 @@ public class OTTSessionManager: SessionProvider {
                 {
                     let result: [Result<OTTBaseObject>] = OTTMultiResponseParser.parse(data:data)
                     
+                    if result.count == 2{
+                        let loginResult: Result<OTTBaseObject> = result[0]
+                        let sessionResult: Result<OTTBaseObject> = result[1]
+                        
+                        
+                    }
+                    
+                    
                 }
                 
             })
