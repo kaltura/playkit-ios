@@ -28,6 +28,9 @@ class PlayerLoader: PlayerDecoratorBase {
         
         if let mediaEntry = config.mediaEntry {
             playerController = PlayerController(mediaEntry: config)
+            playerController.registerEventChange({ (event:PKEvent) in
+                self.messageBus.post(event)
+            })
             
             // TODO::
             // add event listener on player controller
@@ -41,7 +44,7 @@ class PlayerLoader: PlayerDecoratorBase {
                         // send message bus
                         var decorator: PlayerDecoratorBase? = nil
                         
-                        pluginObject.load(player: player, config: plugins[pluginName], messageBus: messageBus)
+                        pluginObject.load(player: player, config: plugins[pluginName], messageBus: self.messageBus)
                         
                         if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
                             d.setPlayer(player)
@@ -85,5 +88,15 @@ class PlayerLoader: PlayerDecoratorBase {
     override func destroy() {
         self.destroyPlugins()
         self.destroyPlayer()
+    }
+    
+    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
+        // TODO:: finilizing + object validation
+        messageBus.addObserver(observer, events: events, block: block)
+    }
+    
+    public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
+        // TODO:: finilizing + object validation
+        messageBus.removeObserver(observer, events: events)
     }
 }

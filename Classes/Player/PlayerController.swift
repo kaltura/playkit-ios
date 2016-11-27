@@ -11,12 +11,24 @@ import AVFoundation
 import AVKit
 
 class PlayerController: Player, PlayerEngineDelegate {
+
+    public var duration: Double {
+        get {
+            return (self.currentPlayer?.duration)!
+        }
+    }
+
     var messageBus = MessageBus()
+    var eventChangedblock: ((_ event: PKEvent)->Void)?
 
     var delegate: PlayerDelegate?
     
     private var currentPlayer: PlayerEngine?
     private var allowPlayerEngineExpose: Bool = false
+    
+    public func registerEventChange(_ block: @escaping (_ event: PKEvent)->Void) {
+        eventChangedblock = block;
+    }
     
     public var playerEngine: PlayerEngine? {
         get {
@@ -53,6 +65,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.delegate = self
+        self.eventChangedblock = nil
     }
 
     func prepare(_ config: PlayerConfig) {
@@ -61,6 +74,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     }
     
     func play() {
+        PKLog.trace("Enter Play")
         self.currentPlayer?.play()
     }
 
@@ -93,20 +107,12 @@ class PlayerController: Player, PlayerEngineDelegate {
         self.currentPlayer?.destroy()
     }
     
-    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
-        // TODO:: finilizing + object validation
-        messageBus.addObserver(observer, events: events, block: block)
-    }
-    
-    public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
-        // TODO:: finilizing + object validation
-        messageBus.removeObserver(observer, events: events)
-    }
-    
-    func player(changedState: PKEvent) {
+    func player(changedEvent: PKEvent) {
         // TODO:: finilizing + object validation
         NSLog("changedState")
-        messageBus.post(changedState)
+        if let block = eventChangedblock {
+            eventChangedblock!(changedEvent)
+        }
     }
     
     func player(encounteredError: NSError) {

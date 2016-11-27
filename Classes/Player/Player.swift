@@ -30,6 +30,11 @@ public protocol Player {
     var currentTime: TimeInterval? { get set }
     
     /**
+     Get the player's duration.
+     */
+    var duration: Double { get }
+    
+    /**
      Prepare for playing an entry. If `config.autoPlay` is true, the entry will automatically
      play when it's ready.
      */
@@ -77,3 +82,14 @@ public protocol Player {
 protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
+
+extension Player {
+    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
+        assertionFailure("Should not reach here")
+    }
+    
+    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
+        assertionFailure("Should not reach here")
+    }
+}
+

@@ -11,7 +11,7 @@ import AVFoundation
 import AVKit
 
 class PlayerDecoratorBase: Player {
-    
+  
     private var player: Player!
     
     public var delegate: PlayerDelegate? {
@@ -29,6 +29,12 @@ class PlayerDecoratorBase: Player {
         }
         set {
             self.player.currentTime = newValue
+        }
+    }
+    
+    public var duration: Double {
+        get {
+            return self.player.duration
         }
     }
     
@@ -81,13 +87,5 @@ class PlayerDecoratorBase: Player {
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         return self.player.createPiPController(with: delegate)
-    }
-    
-    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
-        self.player.addObserver(observer, events: events, block: block)
-    }
-    
-    public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
-        self.player.removeObserver(observer, events: events)
     }
 }

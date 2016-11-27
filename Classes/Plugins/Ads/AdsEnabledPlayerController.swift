@@ -16,6 +16,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     var isAdPlayback = false
     var isPlaying = false
     var adsPlugin: AdsPlugin!
+    weak var messageBus: MessageBus?
     
     init(adsPlugin: AdsPlugin) {
         super.init()
@@ -25,9 +26,9 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     override func setPlayer(_ player: Player!) {
         super.setPlayer(player)
         
-        /*self.subscribe(to: PlayerEventType.item_did_play_to_end_time, using: { (eventData: AnyObject?) -> Void in
+        messageBus?.addObserver(self, events: [PlayerEvents.ended.self], block: { (data: Any) -> Void in
             self.adsPlugin.contentComplete()
-        })*/
+        })
     }
     
     override var delegate: PlayerDelegate? {
