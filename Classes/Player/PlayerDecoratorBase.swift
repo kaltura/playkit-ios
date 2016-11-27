@@ -83,11 +83,11 @@ class PlayerDecoratorBase: Player {
         return self.player.createPiPController(with: delegate)
     }
     
-    public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (_ info: Any)->Void) {
-        self.player.addObserver(observer, event: event, block: block)
+    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
+        self.player.addObserver(observer, events: events, block: block)
     }
     
-    public func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
-        self.player.removeObserver(observer, event: event)
+    public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
+        self.player.removeObserver(observer, events: events)
     }
 }

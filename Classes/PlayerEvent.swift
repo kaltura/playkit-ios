@@ -9,6 +9,12 @@
 import Foundation
 
 public class PlayerEvents: PKEvent {
+    
+    // All events EXCLUDING error. Assuming error events are treated differently.
+    public static let allEventTypes: [PlayerEvents.Type] = [
+        canPlay.self, durationChange.self, ended.self, loadedMetadata.self, play.self, pause.self, playing.self, seeking.self, seeked.self
+    ]
+    
     /**
      Sent when enough data is available that the media can be played, at least for a couple of frames.
      */
@@ -52,6 +58,11 @@ public class PlayerEvents: PKEvent {
 }
 
 public class AdEvents: PKEvent {
+    
+    public static let allEventTypes: [AdEvents.Type] = [
+        adBreakReady.self, adBreakEnded.self, adBreakStarted.self, adAllCompleted.self, adComplete.self, adClicked.self, adCuepointsChanged.self, adFirstQuartile.self, adLoaded.self, adLog.self, adMidpoint.self, adPaused.self, adResumed.self, adSkipped.self, adStarted.self, adStreamLoaded.self, adTapped.self, adThirdQuartile.self, adDidProgressToTime.self, adDidRequestPause.self, adDidRequestResume.self, adWebOpenerWillOpenExternalBrowser.self, adWebOpenerWillOpenInAppBrowser.self, adWebOpenerDidOpenInAppBrowser.self, adWebOpenerWillCloseInAppBrowser.self, adWebOpenerDidCloseInAppBrowser.self 
+    ]
+    
     public class adBreakReady : AdEvents {}
     public class adBreakEnded : AdEvents {}
     public class adBreakStarted : AdEvents {}
@@ -100,6 +111,8 @@ public class AdEvents: PKEvent {
     public class adWebOpenerDidOpenInAppBrowser : WebOpenerEvent {}
     public class adWebOpenerWillCloseInAppBrowser : WebOpenerEvent {}
     public class adWebOpenerDidCloseInAppBrowser : WebOpenerEvent {}
+    
+    
     
     public required override init() {}
 }
