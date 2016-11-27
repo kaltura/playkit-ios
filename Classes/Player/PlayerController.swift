@@ -67,6 +67,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     }
     
     func play() {
+        PKLog.trace("Enter Play")
         self.currentPlayer?.play()
     }
 
