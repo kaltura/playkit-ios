@@ -88,12 +88,4 @@ class PlayerDecoratorBase: Player {
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         return self.player.createPiPController(with: delegate)
     }
-    
-    public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
-        //Assert.shouldNeverHappen();
-    }
-    
-    public func removeObserver(_ observer: AnyObject, event: PKEvent) {
-        //Assert.shouldNeverHappen();
-    }
 }

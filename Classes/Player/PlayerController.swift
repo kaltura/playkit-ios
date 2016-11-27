@@ -19,22 +19,11 @@ class PlayerController: Player, PlayerEngineDelegate {
     }
 
     var messageBus = MessageBus()
-    var eventChangedblock: ((_ event: PKEvent)->Void)?
+    var onEventBlock: ((PKEvent)->Void)?
 
     var delegate: PlayerDelegate?
     
     private var currentPlayer: PlayerEngine?
-    private var allowPlayerEngineExpose: Bool = false
-    
-    public func registerEventChange(_ block: @escaping (_ event: PKEvent)->Void) {
-        eventChangedblock = block;
-    }
-    
-    public var playerEngine: PlayerEngine? {
-        get {
-            return allowPlayerEngineExpose ? currentPlayer : nil
-        }
-    }
     
     public var autoPlay: Bool? {
         get {
@@ -65,12 +54,11 @@ class PlayerController: Player, PlayerEngineDelegate {
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.delegate = self
-        self.eventChangedblock = nil
+        self.onEventBlock = nil
     }
 
     func prepare(_ config: PlayerConfig) {
         currentPlayer?.prepareNext(config)
-        allowPlayerEngineExpose = config.allowPlayerEngineExpose
     }
     
     func play() {
@@ -110,21 +98,13 @@ class PlayerController: Player, PlayerEngineDelegate {
     func player(changedEvent: PKEvent) {
         // TODO:: finilizing + object validation
         NSLog("changedState")
-        if let block = eventChangedblock {
-            eventChangedblock!(changedEvent)
+        if let block = onEventBlock {
+            block(changedEvent)
         }
     }
     
     func player(encounteredError: NSError) {
         // TODO:: finilizing + object validation
         NSLog("encounteredError")
-    }
-    
-    func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (Any) -> Void) {
-        //Assert.shouldNeverHappen();
-    }
-    
-    func removeObserver(_ observer: AnyObject, event: PKEvent) {
-        //Assert.shouldNeverHappen();
     }
 }

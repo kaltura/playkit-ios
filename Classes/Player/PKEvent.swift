@@ -8,6 +8,9 @@
 
 import Foundation
 
-public protocol PKEvent  {
-    var rawValue: String { get }
+public class PKEvent {
+    init() {
+        
+    }
+//    var rawValue: String { get }
 }

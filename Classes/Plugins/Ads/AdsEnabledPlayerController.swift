@@ -16,6 +16,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     var isAdPlayback = false
     var isPlaying = false
     var adsPlugin: AdsPlugin!
+    weak var messageBus: MessageBus?
     
     init(adsPlugin: AdsPlugin) {
         super.init()
@@ -25,7 +26,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     override func setPlayer(_ player: Player!) {
         super.setPlayer(player)
         
-        self.addObserver(self, event: PlayerEvents.ended, block: { (data: Any) -> Void in
+        messageBus?.addObserver(self, events: [PlayerEvents.ended.self], block: { (data: Any) -> Void in
             self.adsPlugin.contentComplete()
         })
     }
@@ -87,11 +88,11 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         self.delegate?.player(self, failedWith: error)
     }
     
-    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent, with eventData: Any?) {
-        if event.rawValue == AdEvents.adDidRequestPause.rawValue {
+    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
+        if event is AdEvents.adDidRequestPause {
             super.pause()
             self.isAdPlayback = true
-        } else if event.rawValue == AdEvents.adDidRequestResume.rawValue {
+        } else if event is AdEvents.adDidRequestResume {
             super.play()
             self.isAdPlayback = false
         }
