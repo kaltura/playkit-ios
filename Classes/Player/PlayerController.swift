@@ -93,12 +93,12 @@ class PlayerController: Player, PlayerEngineDelegate {
         self.currentPlayer?.destroy()
     }
     
-    public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
+    public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (_ info: Any)->Void) {
         // TODO:: finilizing + object validation
         messageBus.addObserver(observer, event: event, block: block)
     }
     
-    public func removeObserver(_ observer: AnyObject, event: PKEvent) {
+    public func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
         // TODO:: finilizing + object validation
         messageBus.removeObserver(observer, event: event)
     }

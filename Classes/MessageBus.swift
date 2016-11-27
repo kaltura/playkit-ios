@@ -17,21 +17,23 @@ public class MessageBus: NSObject {
     private var observations = [String: [Observation]]()
     private let lock: AnyObject = UUID().uuidString as AnyObject
     
-    public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
+    public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (_ info: Any)->Void) {
+        let typeId = NSStringFromClass(event)
         sync {
-            var array: [Observation]? = observations[event.rawValue]
+            var array: [Observation]? = observations[typeId]
             
             if (array != nil) {
                 array!.append(Observation(observer: observer, block: block))
             } else {
-                observations[event.rawValue] = [Observation(observer: observer, block: block)]
+                observations[typeId] = [Observation(observer: observer, block: block)]
             }
         }
     }
     
-    public func removeObserver(_ observer: AnyObject, event: PKEvent) {
+    public func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
+        let typeId = NSStringFromClass(event)
         sync {
-            if var array: [Observation]? = observations[event.rawValue] {
+            if var array: [Observation]? = observations[typeId] {
                 array = array!.filter { $0.observer! !== observer }
             } else {
                 print("removeObserver:: array is empty")
@@ -40,9 +42,10 @@ public class MessageBus: NSObject {
     }
     
     public func post(_ event: PKEvent) {
+        let typeId = NSStringFromClass(type(of:event))
         sync {
             // TODO: remove nil observers
-            if let array = observations[event.rawValue] {
+            if let array = observations[typeId] {
                 array.forEach {
                     if let observer = $0.observer {
                         $0.block(event)

@@ -66,9 +66,9 @@ public protocol Player {
     */
     func destroy()
     
-    func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void)
+    func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (_ info: Any)->Void)
     
-    func removeObserver(_ observer: AnyObject, event: PKEvent) 
+    func removeObserver(_ observer: AnyObject, event: PKEvent.Type) 
     
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?

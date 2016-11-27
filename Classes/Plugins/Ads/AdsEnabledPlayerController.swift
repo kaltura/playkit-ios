@@ -87,11 +87,11 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         self.delegate?.player(self, failedWith: error)
     }
     
-    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent, with eventData: Any?) {
-        if event.rawValue == AdEvents.adDidRequestPause.rawValue {
+    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
+        if event is AdEvents.adDidRequestPause {
             super.pause()
             self.isAdPlayback = true
-        } else if event.rawValue == AdEvents.adDidRequestResume.rawValue {
+        } else if event is AdEvents.adDidRequestResume {
             super.play()
             self.isAdPlayback = false
         }
