@@ -12,11 +12,16 @@ import AVKit
 
 class PlayerController: Player, PlayerEngineDelegate {
     var messageBus = MessageBus()
+    var eventChangedblock: ((_ event: PKEvent)->Void)?
 
     var delegate: PlayerDelegate?
     
     private var currentPlayer: PlayerEngine?
     private var allowPlayerEngineExpose: Bool = false
+    
+    public func registerEventChange(_ block: @escaping (_ event: PKEvent)->Void) {
+        eventChangedblock = block;
+    }
     
     public var playerEngine: PlayerEngine? {
         get {
@@ -53,6 +58,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.delegate = self
+        self.eventChangedblock = nil
     }
 
     func prepare(_ config: PlayerConfig) {
@@ -93,24 +99,24 @@ class PlayerController: Player, PlayerEngineDelegate {
         self.currentPlayer?.destroy()
     }
     
-    public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
-        // TODO:: finilizing + object validation
-        messageBus.addObserver(observer, event: event, block: block)
-    }
-    
-    public func removeObserver(_ observer: AnyObject, event: PKEvent) {
-        // TODO:: finilizing + object validation
-        messageBus.removeObserver(observer, event: event)
-    }
-    
-    func player(changedState: PKEvent) {
+    func player(changedEvent: PKEvent) {
         // TODO:: finilizing + object validation
         NSLog("changedState")
-        messageBus.post(changedState)
+        if let block = eventChangedblock {
+            eventChangedblock!(changedEvent)
+        }
     }
     
     func player(encounteredError: NSError) {
         // TODO:: finilizing + object validation
         NSLog("encounteredError")
+    }
+    
+    func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (Any) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
+    func removeObserver(_ observer: AnyObject, event: PKEvent) {
+        //Assert.shouldNeverHappen();
     }
 }

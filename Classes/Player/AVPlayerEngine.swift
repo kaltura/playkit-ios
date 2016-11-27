@@ -163,14 +163,14 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     }
     
     func playerFailed(notification: NSNotification) {
-        guard let _ = delegate?.player(changedState: PlayerEvents.error) else {
+        guard let _ = delegate?.player(changedEvent: PlayerEvents.error) else {
             NSLog("player changedState is not implimented")
             return
         }
     }
     
     func playerPlayedToEnd(notification: NSNotification) {
-        guard let _ = delegate?.player(changedState: PlayerEvents.ended) else {
+        guard let _ = delegate?.player(changedEvent: PlayerEvents.ended) else {
             NSLog("player changedState is not implimented")
             return
         }
@@ -200,7 +200,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         if event == nil {
             event = PlayerEvents.seeking
         }
-        guard let _ = delegate?.player(changedState: event!) else {
+        guard let _ = delegate?.player(changedEvent: event!) else {
             NSLog("player changedState is not implimented")
             return
         }
