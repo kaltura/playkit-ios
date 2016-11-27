@@ -54,8 +54,15 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
         }
         
         
-        let session: URLSession = URLSession.shared
+        let session: URLSession!
         
+        if let conf = r.conifiguration, conf.ignoreLocalCache {
+            var configuration = URLSessionConfiguration.default
+            configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+            session = URLSession(configuration: configuration)
+        } else {
+            session = URLSession.shared
+        }
         
         // settings headers:
         let task = session.dataTask(with: request) { (data, response, error) in
