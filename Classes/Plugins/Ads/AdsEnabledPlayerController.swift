@@ -25,9 +25,9 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     override func setPlayer(_ player: Player!) {
         super.setPlayer(player)
         
-        /*self.subscribe(to: PlayerEventType.item_did_play_to_end_time, using: { (eventData: AnyObject?) -> Void in
+        self.addObserver(self, event: PlayerEvents.ended, block: { (data: Any) -> Void in
             self.adsPlugin.contentComplete()
-        })*/
+        })
     }
     
     override var delegate: PlayerDelegate? {
