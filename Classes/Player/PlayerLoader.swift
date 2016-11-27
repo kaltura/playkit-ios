@@ -28,9 +28,9 @@ class PlayerLoader: PlayerDecoratorBase {
         
         if let mediaEntry = config.mediaEntry {
             playerController = PlayerController(mediaEntry: config)
-            playerController.registerEventChange({ (event:PKEvent) in
+            playerController.onEventBlock = { (event:PKEvent) in
                 self.messageBus.post(event)
-            })
+            }
             
             // TODO::
             // add event listener on player controller
