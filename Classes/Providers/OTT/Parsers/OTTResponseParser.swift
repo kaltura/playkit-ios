@@ -17,7 +17,7 @@ class OTTResponseParser: ResponseParser {
         case emptyResponse
     }
 
-    func parse(data:Any) -> Result<OTTBaseObject> {
+    static func parse(data:Any) -> Result<OTTBaseObject> {
      
         
             let jsonResponse = JSON(data)

@@ -31,30 +31,30 @@ class ViewController: UIViewController, SessionProvider {
         
 
         
-       let entryProvider =  OTTEntryProvider.init(sessionProvider: self, mediaId: "258656", type: AssetType.media, formats: ["Mobile_Devices_Main_HD"], executor: nil)
-        entryProvider.loadMedia { (r:Result<MediaEntry>) in
-            
-            if let data = r.data {
-                print(data)
-            }
-        }
-        
-        
-        
-//        let sessionProvider = OTTSessionManager(serverURL: self.serverURL, partnerId: self.partnerId, executor: nil)
-//        
-//        sessionProvider.login(username: "rivka@p.com", password: "123456") { (e:Error?) in
-//            if ( e != nil){
-//                //login succeded
-//                
-//
-//
+//       let entryProvider =  OTTEntryProvider.init(sessionProvider: self, mediaId: "258656", type: AssetType.media, formats: ["Mobile_Devices_Main_HD"], executor: nil)
+//        entryProvider.loadMedia { (r:Result<MediaEntry>) in
+//            
+//            if let data = r.data {
+//                print(data)
 //            }
 //        }
         
+    
+        let sessionProvider = OTTSessionManager(serverURL: self.serverURL, partnerId: self.partnerId, executor: nil)
         
-        
-        
+        sessionProvider.login(username: "rivka@p.com", password: "123456") { (e:Error?) in
+            if ( e == nil){
+                //login succeded
+                sessionProvider.loadKS(completion: { (r:Result<String>) in
+                    print(r.data)
+                }
+            )
+                
+
+
+            }
+        }
+
     }
 
     override func didReceiveMemoryWarning() {

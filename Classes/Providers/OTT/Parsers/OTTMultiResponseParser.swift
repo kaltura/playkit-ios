@@ -25,9 +25,9 @@ class OTTMultiResponseParser: NSObject {
             
             var resultArray: [Result<OTTBaseObject>] = [Result<OTTBaseObject>]()
             for jsonObject: JSON in resultArrayJSON{
-                let objectType: OTTBaseObject.Type? = ObjectMapper.classByJsonObject(json: jsonObject)
+                let objectType: OTTBaseObject.Type? = ObjectMapper.classByJsonObject(json: jsonObject.dictionaryObject)
                 if let type = objectType{
-                    let object: OTTBaseObject? = type.init(json: jsonObject)
+                    let object: OTTBaseObject? = type.init(json: jsonObject.object)
                     resultArray.append(Result(data: object, error: nil))
                 }else{
                     resultArray.append(Result(data: nil, error: error.typeNotFound))

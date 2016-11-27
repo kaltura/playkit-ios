@@ -46,12 +46,11 @@ public class MediaEntry: CustomStringConvertible{
 }
 
 public class MediaSource: CustomStringConvertible {
+    
     internal var id: String
     internal var contentUrl: URL?
     internal var mimeType: String?
     internal var drmData: DRMData?
-    
-    
     
     private let idKey: String = "id"
     private let contentUrlKey: String = "url"

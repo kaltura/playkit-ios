@@ -26,7 +26,11 @@ class ObjectMapper: NSObject {
         if let name = className{
             switch name {
             case "KalturaLoginResponse":
-                return OTTLoginSession.self
+                return OTTLogin.self
+            case "KalturaSession":
+                return OTTSession.self
+                
+
             default:
                 return nil
             }

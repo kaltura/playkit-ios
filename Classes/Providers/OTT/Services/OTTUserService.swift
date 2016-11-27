@@ -26,10 +26,11 @@ public class OTTUserService: NSObject {
         }
     }
     
-    internal static func refreshSession(baseURL:String,refreshToken:String) -> OTTRequestBuilder? {
+    internal static func refreshSession(baseURL:String,refreshToken:String,ks:String) -> OTTRequestBuilder? {
         if let request = OTTRequestBuilder(url: baseURL, service: "ottUser", action: "refreshSession") {
             request
                 .setBody(key: "refreshToken", value: JSON(refreshToken))
+                .setBody(key: "ks", value: JSON(ks))
             return request
         }else{
             return nil
