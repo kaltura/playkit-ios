@@ -142,8 +142,8 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         self.currentItem?.addObserver(self, forKeyPath: PlayerEmptyBufferKey, options: [], context: nil)
         self.currentItem?.addObserver(self, forKeyPath: PlayerStatusKey, options: [], context: nil)
         
-        NotificationCenter.default.addObserver(self, selector: Selector(("playerFailed:")), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: Selector(("playerPlayedToEnd:")), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.playerFailed(notification:)), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.playerPlayedToEnd(notification:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.currentItem)
     }
     
     func removeObservers() {
