@@ -84,10 +84,10 @@ class PlayerDecoratorBase: Player {
     }
     
     public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
-        self.player.addObserver(observer, event: event, block: block)
+        //Assert.shouldNeverHappen();
     }
     
     public func removeObserver(_ observer: AnyObject, event: PKEvent) {
-        self.player.removeObserver(observer, event: event)
+        //Assert.shouldNeverHappen();
     }
 }
