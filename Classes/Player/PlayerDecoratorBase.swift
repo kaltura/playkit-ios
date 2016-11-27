@@ -11,7 +11,7 @@ import AVFoundation
 import AVKit
 
 class PlayerDecoratorBase: Player {
-    
+  
     private var player: Player!
     
     public var delegate: PlayerDelegate? {
@@ -29,6 +29,12 @@ class PlayerDecoratorBase: Player {
         }
         set {
             self.player.currentTime = newValue
+        }
+    }
+    
+    public var duration: Double {
+        get {
+            return self.player.duration
         }
     }
     

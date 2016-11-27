@@ -30,6 +30,11 @@ public protocol Player {
     var currentTime: TimeInterval? { get set }
     
     /**
+     Get the player's duration.
+     */
+    var duration: Double { get }
+    
+    /**
      Prepare for playing an entry. If `config.autoPlay` is true, the entry will automatically
      play when it's ready.
      */

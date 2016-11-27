@@ -11,6 +11,13 @@ import AVFoundation
 import AVKit
 
 class PlayerController: Player, PlayerEngineDelegate {
+
+    public var duration: Double {
+        get {
+            return (self.currentPlayer?.duration)!
+        }
+    }
+
     var messageBus = MessageBus()
     var eventChangedblock: ((_ event: PKEvent)->Void)?
 

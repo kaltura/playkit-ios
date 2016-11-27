@@ -20,6 +20,11 @@ public protocol PlayerEngine {
     weak var delegate: PlayerEngineDelegate? {get set}
     
     /**
+     Get the player's duration.
+     */
+    var duration: Double { get }
+    
+    /**
      Get the player's view component.
      */
     var view: UIView! { get }
