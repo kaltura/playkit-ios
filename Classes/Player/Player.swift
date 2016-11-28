@@ -83,13 +83,3 @@ protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
 
-extension Player {
-    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
-        assertionFailure("Should not reach here")
-    }
-    
-    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
-        assertionFailure("Should not reach here")
-    }
-}
-
