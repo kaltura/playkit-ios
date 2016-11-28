@@ -18,6 +18,8 @@ public class YouboraPlugin : PKPlugin {
     private var youboraManager : YBPluginAVPlayer!
     public static var pluginName: String = "YouboraPlugin"
 
+    private var isFirstPlay = true
+    
     required public init() {
 
     }
@@ -44,6 +46,9 @@ public class YouboraPlugin : PKPlugin {
     }
     
     private func startMonitoring(player: Player) {
+        
+        PKLog.trace("Start monitoring using Youbora")
+
         var yConfig = YouboraConfig.defaultYouboraConfig
         var media : [String: Any] = yConfig["media"] as! [String : Any]
         
@@ -59,25 +64,64 @@ public class YouboraPlugin : PKPlugin {
     }
     
     private func stopMonitoring() {
+        PKLog.trace("Stop monitoring using Youbora")
         youboraManager.stopMonitoring()
     }
     
     private func registerToAllEvents() {
         
-        self.messageBus?.addObserver(self, event: PlayerEvents.play, block: { (info) in
+        PKLog.trace()
+        
+        self.messageBus?.addObserver(self, events: [PlayerEvents.canPlay.self], block: { (info) in
+
+            PKLog.trace("canPlay info: \(info)")
+            self.youboraManager.joinHandler()
+        
+        })
+        
+        self.messageBus?.addObserver(self, events: [PlayerEvents.play.self], block: { (info) in
             
-            print("Play: \(info)")
-            //self.youboraManager.playHandler()
+            PKLog.trace("========== play info: \(info)")
+            /*
+            if self.isFirstPlay {
+                self.youboraManager.playHandler()
+                self.isFirstPlay = false
+            } else {
+                self.youboraManager.resumeHandler()
+            }*/
             
         })
         
-        self.messageBus?.addObserver(self, event: PlayerEvents.pause, block: { (info) in
-            print("Pause: \(info)")
+        self.messageBus?.addObserver(self, events: [PlayerEvents.playing.self], block: { (info) in
+            PKLog.trace("========== playing info: \(info)")
+            //self.youboraManager.pauseHandler()
         })
         
-        self.messageBus?.addObserver(self, event: PlayerEvents.canPlay, block: { (info) in
-            print("CanPlay: \(info)")
+        self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
+            PKLog.trace("pause info: \(info)")
+            self.youboraManager.pauseHandler()
+        })
+        
+        self.messageBus?.addObserver(self, events: [PlayerEvents.seeking.self], block: { (info) in
+            PKLog.trace("seeking info: \(info)")
+            self.youboraManager.seekingHandler()
+        })
+        
+        self.messageBus?.addObserver(self, events: [PlayerEvents.seeked.self], block: { (info) in
+            PKLog.trace("seeked info: \(info)")
+            self.youboraManager.seekedHandler()
+        })
+        
+        self.messageBus?.addObserver(self, events: [PlayerEvents.ended.self], block: { (info) in
+            PKLog.trace("ended info: \(info)")
+            self.youboraManager.endedHandler()
         })
     }
 }
+
+
+
+
+
+
 
