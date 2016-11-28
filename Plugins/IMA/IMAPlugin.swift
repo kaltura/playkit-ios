@@ -74,9 +74,9 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
             if IMAPlugin.loader == nil {
                 self.setupLoader(with: self.config)
             }
-            IMAPlugin.loader.delegate = self
             
-            self.contentComplete()
+            IMAPlugin.loader.contentComplete()
+            IMAPlugin.loader.delegate = self
             
             if let adTagUrl = self.config.adTagUrl {
                 self.adTagUrl = adTagUrl
@@ -85,9 +85,6 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
             }
         }
         
-        self.messageBus?.addObserver(self, event: PlayerEvents.ended, block: { (data: Any) -> Void in
-            self.contentComplete()
-        })
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
 
