@@ -83,7 +83,13 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
                 self.tagsTimes = adTagsTimes
             }
         }
-        
+
+        var events: [PKEvent.Type] = []
+        events.append(PlayerEvents.ended)
+        self.messageBus?.addObserver(self, events: events, block: { (data: Any) -> Void in
+            self.contentComplete()
+        })
+
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
 
@@ -300,6 +306,11 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
     }
 
+    private func notify(event: AdEvents) {
+        self.delegate?.adsPlugin(self, didReceive: event)
+        self.messageBus?.post(event)
+    }
+    
     private func destroyManager() {
         self.manager?.destroy()
         self.manager = nil
@@ -365,9 +376,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
         
         let event = converted.init()
-        self.delegate?.adsPlugin(self, didReceive: event)
-        
-        messageBus?.post(event)
+        self.notify(event: event)
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
@@ -376,13 +385,13 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     }
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
-        self.delegate?.adsPlugin(self, didReceive: AdEvents.adDidRequestPause())
+        self.notify(event: AdEvents.adDidRequestPause())
         self.isAdPlayback = true
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(false, alpha: 0)
-        self.delegate?.adsPlugin(self, didReceive: AdEvents.adDidRequestResume())
+        self.notify(event: AdEvents.adDidRequestResume())
         self.isAdPlayback = false
     }
     
@@ -390,7 +399,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         var data = [String : TimeInterval]()
         data["mediaTime"] = mediaTime
         data["totalTime"] = totalTime
-        self.delegate?.adsPlugin(self, didReceive: AdEvents.adDidProgressToTime(mediaTime: mediaTime, totalTime: totalTime))
+        self.notify(event: AdEvents.adDidProgressToTime(mediaTime: mediaTime, totalTime: totalTime))
     }
     
     // MARK: AVPictureInPictureControllerDelegate
@@ -428,22 +437,22 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     // MARK: IMAWebOpenerDelegate
     
     public func webOpenerWillOpenExternalBrowser(_ webOpener: NSObject) {
-        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerWillOpenExternalBrowser(webOpener: webOpener))
+        self.notify(event: AdEvents.adWebOpenerWillOpenExternalBrowser(webOpener: webOpener))
     }
     
     public func webOpenerWillOpen(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerWillOpenInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvents.adWebOpenerWillOpenInAppBrowser(webOpener: webOpener))
     }
     
     public func webOpenerDidOpen(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerDidOpenInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvents.adWebOpenerDidOpenInAppBrowser(webOpener: webOpener))
     }
     
     public func webOpenerWillClose(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerWillCloseInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvents.adWebOpenerWillCloseInAppBrowser(webOpener: webOpener))
     }
     
     public func webOpenerDidClose(inAppBrowser webOpener: NSObject!) {
-        self.delegate?.adsPlugin(self, didReceive: AdEvents.adWebOpenerDidCloseInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvents.adWebOpenerDidCloseInAppBrowser(webOpener: webOpener))
     }
 }
