@@ -28,9 +28,9 @@ class PlayerLoader: PlayerDecoratorBase {
         
         if let mediaEntry = config.mediaEntry {
             playerController = PlayerController(mediaEntry: config)
-            playerController.registerEventChange({ (event:PKEvent) in
+            playerController.onEventBlock = { (event:PKEvent) in
                 self.messageBus.post(event)
-            })
+            }
             
             // TODO::
             // add event listener on player controller
@@ -90,13 +90,13 @@ class PlayerLoader: PlayerDecoratorBase {
         self.destroyPlayer()
     }
     
-    public override func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
+    public override func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
         // TODO:: finilizing + object validation
-        messageBus.addObserver(observer, event: event, block: block)
+        messageBus.addObserver(observer, events: events, block: block)
     }
     
-    public override func removeObserver(_ observer: AnyObject, event: PKEvent) {
+    public override func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         // TODO:: finilizing + object validation
-        messageBus.removeObserver(observer, event: event)
+        messageBus.removeObserver(observer, events: events)
     }
 }

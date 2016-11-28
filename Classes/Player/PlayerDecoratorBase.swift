@@ -11,7 +11,6 @@ import AVFoundation
 import AVKit
 
 class PlayerDecoratorBase: Player {
-  
     private var player: Player!
     
     public var delegate: PlayerDelegate? {
@@ -89,11 +88,11 @@ class PlayerDecoratorBase: Player {
         return self.player.createPiPController(with: delegate)
     }
     
-    public func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void) {
+    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {
         //Assert.shouldNeverHappen();
     }
     
-    public func removeObserver(_ observer: AnyObject, event: PKEvent) {
+    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         //Assert.shouldNeverHappen();
     }
 }

@@ -31,6 +31,11 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         set {
             let newTime = CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+            
+            guard let _ = delegate?.player(changedEvent: PlayerEvents.seeking()) else {
+                NSLog("player changedState is not implimented")
+                return
+            }
         }
     }
     
@@ -84,6 +89,11 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         if self.rate != 1.0 {
             print("play")
             super.play()
+            
+            guard let _ = delegate?.player(changedEvent: PlayerEvents.play()) else {
+                NSLog("player changedState is not implimented")
+                return
+            }
         }
     }
     
@@ -162,15 +172,15 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         }
     }
     
-    func playerFailed(notification: NSNotification) {
-        guard let _ = delegate?.player(changedEvent: PlayerEvents.error) else {
+    public func playerFailed(notification: NSNotification) {
+        guard let _ = delegate?.player(changedEvent: PlayerEvents.error()) else {
             NSLog("player changedState is not implimented")
             return
         }
     }
     
-    func playerPlayedToEnd(notification: NSNotification) {
-        guard let _ = delegate?.player(changedEvent: PlayerEvents.ended) else {
+    public func playerPlayedToEnd(notification: NSNotification) {
+        guard let _ = delegate?.player(changedEvent: PlayerEvents.ended()) else {
             NSLog("player changedState is not implimented")
             return
         }
@@ -181,24 +191,24 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         var event: PKEvent? = nil
         
         if keyPath == #keyPath(currentItem.duration) {
-            event = PlayerEvents.durationChange
+            event = PlayerEvents.durationChange()
         } else if keyPath == #keyPath(rate) {
             if rate == 1.0 {
-                event = PlayerEvents.play
+                event = PlayerEvents.playing()
             } else {
-                event = PlayerEvents.pause
+                event = PlayerEvents.pause()
             }
         } else if keyPath == PlayerStatusKey {
             if currentItem?.status == .readyToPlay {
-                event = PlayerEvents.canPlay
+                event = PlayerEvents.canPlay()
             } else if currentItem?.status == .failed {
-                event = PlayerEvents.error
+                event = PlayerEvents.error()
             } 
         }
         
         NSLog("changedState::\(event)")
         if event == nil {
-            event = PlayerEvents.seeking
+            event = PlayerEvents.seeking()
         }
         guard let _ = delegate?.player(changedEvent: event!) else {
             NSLog("player changedState is not implimented")

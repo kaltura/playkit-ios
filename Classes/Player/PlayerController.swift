@@ -11,30 +11,19 @@ import AVFoundation
 import AVKit
 
 class PlayerController: Player, PlayerEngineDelegate {
-
+    
     public var duration: Double {
         get {
             return (self.currentPlayer?.duration)!
         }
     }
-
+    
     var messageBus = MessageBus()
-    var eventChangedblock: ((_ event: PKEvent)->Void)?
-
+    var onEventBlock: ((PKEvent)->Void)?
+    
     var delegate: PlayerDelegate?
     
     private var currentPlayer: PlayerEngine?
-    private var allowPlayerEngineExpose: Bool = false
-    
-    public func registerEventChange(_ block: @escaping (_ event: PKEvent)->Void) {
-        eventChangedblock = block;
-    }
-    
-    public var playerEngine: PlayerEngine? {
-        get {
-            return allowPlayerEngineExpose ? currentPlayer : nil
-        }
-    }
     
     public var autoPlay: Bool? {
         get {
@@ -61,27 +50,26 @@ class PlayerController: Player, PlayerEngineDelegate {
             return self.currentPlayer?.view
         }
     }
-
+    
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.delegate = self
-        self.eventChangedblock = nil
+        self.onEventBlock = nil
     }
-
+    
     func prepare(_ config: PlayerConfig) {
         currentPlayer?.prepareNext(config)
-        allowPlayerEngineExpose = config.allowPlayerEngineExpose
     }
     
     func play() {
         PKLog.trace("Enter Play")
         self.currentPlayer?.play()
     }
-
+    
     func pause() {
         self.currentPlayer?.pause()
     }
-
+    
     func resume() {
         self.currentPlayer?.play()
     }
@@ -93,7 +81,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     func prepareNext(_ config: PlayerConfig) -> Bool {
         return false
     }
-
+    
     func loadNext() -> Bool {
         return false
     }
@@ -110,8 +98,8 @@ class PlayerController: Player, PlayerEngineDelegate {
     func player(changedEvent: PKEvent) {
         // TODO:: finilizing + object validation
         NSLog("changedState")
-        if let block = eventChangedblock {
-            eventChangedblock!(changedEvent)
+        if let block = onEventBlock {
+            block(changedEvent)
         }
     }
     
@@ -120,11 +108,11 @@ class PlayerController: Player, PlayerEngineDelegate {
         NSLog("encounteredError")
     }
     
-    func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (Any) -> Void) {
+    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {
         //Assert.shouldNeverHappen();
     }
     
-    func removeObserver(_ observer: AnyObject, event: PKEvent) {
+    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         //Assert.shouldNeverHappen();
     }
 }
