@@ -8,14 +8,15 @@
 
 import YouboraLib
 import YouboraPluginAVPlayer
+import AVFoundation
 
-public class YouboraPlugin : PKPlugin {
+public class YouboraPlugin: PKPlugin {
 
     private var player: Player!
     private var messageBus: MessageBus?
     private var config: AnalyticsConfig!
     
-    private var youboraManager : YBPluginAVPlayer!
+    private var youboraManager : YouboraManager!
     public static var pluginName: String = "YouboraPlugin"
 
     private var isFirstPlay = true
@@ -31,10 +32,12 @@ public class YouboraPlugin : PKPlugin {
         if let aConfig = config as? AnalyticsConfig {
             self.config = aConfig
             self.player = player
+        } else {
+            PKLog.warning("There is no Analytics Config.")
         }
         
         let options = [String : Any]()
-        youboraManager = YBPluginAVPlayer(options: options as NSObject!)
+        youboraManager = YouboraManager(options: options as NSObject!, player: player)
         
         registerToAllEvents()
         
@@ -55,11 +58,14 @@ public class YouboraPlugin : PKPlugin {
         if let entry = self.config.mediaEntry {
             media["resource"] = entry.id
             media["title"] = entry.id
-            media["duration"] = entry.duration
+            media["duration"] = self.player.duration
             
-            youboraManager.setOptions(yConfig as NSObject!)
-            youboraManager.startMonitoring(withPlayer: player as! NSObject)
+        } else {
+            PKLog.warning("There is no MediaEntry")
         }
+        
+        youboraManager.setOptions(yConfig as NSObject!)
+        youboraManager.startMonitoring(withPlayer: player as! NSObject)
 
     }
     
@@ -75,26 +81,28 @@ public class YouboraPlugin : PKPlugin {
         self.messageBus?.addObserver(self, events: [PlayerEvents.canPlay.self], block: { (info) in
 
             PKLog.trace("canPlay info: \(info)")
-            self.youboraManager.joinHandler()
+            //self.youboraManager.joinHandler()
         
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.play.self], block: { (info) in
-            
             PKLog.trace("========== play info: \(info)")
-            /*
-            if self.isFirstPlay {
-                self.youboraManager.playHandler()
-                self.isFirstPlay = false
-            } else {
-                self.youboraManager.resumeHandler()
-            }*/
-            
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.playing.self], block: { (info) in
             PKLog.trace("========== playing info: \(info)")
-            //self.youboraManager.pauseHandler()
+            if self.isFirstPlay {
+
+                let timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(YouboraPlugin.didStartPlaying), userInfo: nil, repeats: false)
+                timer.fire()
+                
+                self.youboraManager.playHandler()
+                self.youboraManager.joinHandler()
+                self.youboraManager.bufferedHandler()
+                self.isFirstPlay = false
+            } else {
+                self.youboraManager.resumeHandler()
+            }
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
@@ -116,6 +124,11 @@ public class YouboraPlugin : PKPlugin {
             PKLog.trace("ended info: \(info)")
             self.youboraManager.endedHandler()
         })
+    }
+    
+    @objc private func didStartPlaying() {
+        PKLog.trace("didStartPlaying")
+        self.youboraManager.joinHandler()
     }
 }
 
