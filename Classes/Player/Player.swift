@@ -30,6 +30,11 @@ public protocol Player {
     var currentTime: TimeInterval? { get set }
     
     /**
+     Get the player's duration.
+     */
+    var duration: Double { get }
+    
+    /**
      Prepare for playing an entry. If `config.autoPlay` is true, the entry will automatically
      play when it's ready.
      */
@@ -66,9 +71,9 @@ public protocol Player {
     */
     func destroy()
     
-    func addObserver(_ observer: AnyObject, event: PKEvent, block: @escaping (_ info: Any)->Void)
+    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void)
     
-    func removeObserver(_ observer: AnyObject, event: PKEvent) 
+    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) 
     
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
@@ -77,3 +82,4 @@ public protocol Player {
 protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
+

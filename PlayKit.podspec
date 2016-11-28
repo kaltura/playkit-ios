@@ -14,6 +14,7 @@ s.ios.deployment_target = '8.0'
 s.subspec 'Core' do |sp|
     sp.source_files = 'Classes/**/*'
     sp.dependency 'SwiftyJSON'
+    sp.dependency 'Log'
 end
 
 s.subspec 'SamplePlugin' do |ssp|
