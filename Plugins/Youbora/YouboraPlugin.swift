@@ -19,8 +19,7 @@ public class YouboraPlugin : PKPlugin {
     public static var pluginName: String = "YouboraPlugin"
 
     required public init() {
-        //let options : [String : Any]// = ["enableAnalytics" : true, "accountCode": ""]
-        //youboraManager = YBPluginAVPlayer(options: options as NSObject!)
+
     }
     
     public func load(player: Player, config: Any?, messageBus: MessageBus) {
@@ -67,9 +66,17 @@ public class YouboraPlugin : PKPlugin {
         
         self.messageBus?.addObserver(self, event: PlayerEvents.play, block: { (info) in
             
-            print("YAY!")
+            print("Play: \(info)")
             //self.youboraManager.playHandler()
             
+        })
+        
+        self.messageBus?.addObserver(self, event: PlayerEvents.pause, block: { (info) in
+            print("Pause: \(info)")
+        })
+        
+        self.messageBus?.addObserver(self, event: PlayerEvents.canPlay, block: { (info) in
+            print("CanPlay: \(info)")
         })
     }
 }
