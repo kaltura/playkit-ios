@@ -63,11 +63,10 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
     }
     
-    public func load(player: Player, config: Any?, messageBus: MessageBus) {
-        
+    public func didLoad(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
         self.messageBus = messageBus
         
-        if let adsConfig = config as? AdsConfig {
+        if let adsConfig = pluginConfig as? AdsConfig {
             self.config = adsConfig
             self.player = player
             

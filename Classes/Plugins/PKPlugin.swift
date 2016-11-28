@@ -15,7 +15,7 @@ public protocol PKPlugin {
 
     init()
     
-    func load(player: Player, config: Any?, messageBus: MessageBus)
+    func didLoad(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus)
     
     func destroy()
 }

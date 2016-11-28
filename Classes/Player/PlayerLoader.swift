@@ -44,7 +44,7 @@ class PlayerLoader: PlayerDecoratorBase {
                         // send message bus
                         var decorator: PlayerDecoratorBase? = nil
                         
-                        pluginObject.load(player: player, config: plugins[pluginName], messageBus: self.messageBus)
+                        pluginObject.didLoad(player: player, mediaConfig: config.mediaEntry!, pluginConfig: plugins[pluginName], messageBus: self.messageBus)
                         
                         if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
                             d.setPlayer(player)
