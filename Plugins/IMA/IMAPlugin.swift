@@ -84,7 +84,13 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
                 self.tagsTimes = adTagsTimes
             }
         }
-        
+
+        var events: [PKEvent.Type] = []
+        events.append(PlayerEvents.ended)
+        self.messageBus?.addObserver(self, events: events, block: { (data: Any) -> Void in
+            self.contentComplete()
+        })
+
         Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
 
