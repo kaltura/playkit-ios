@@ -31,6 +31,11 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         set {
             let newTime = CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
+            
+            guard let _ = delegate?.player(changedEvent: PlayerEvents.seeking()) else {
+                NSLog("player changedState is not implimented")
+                return
+            }
         }
     }
     
@@ -84,6 +89,11 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         if self.rate != 1.0 {
             print("play")
             super.play()
+            
+            guard let _ = delegate?.player(changedEvent: PlayerEvents.play()) else {
+                NSLog("player changedState is not implimented")
+                return
+            }
         }
     }
     
@@ -184,7 +194,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             event = PlayerEvents.durationChange()
         } else if keyPath == #keyPath(rate) {
             if rate == 1.0 {
-                event = PlayerEvents.play()
+                event = PlayerEvents.playing()
             } else {
                 event = PlayerEvents.pause()
             }
