@@ -10,9 +10,23 @@ import UIKit
 
 class PhoenixAnalyticsPlugin: PKPlugin {
 
+    enum PhoenixAnalyticsType {
+        case hit
+        case play
+        case stop
+        case pause
+        case first_play
+        case swoosh
+        case load
+        case finish
+        case bitrate_change
+        case error
+    }
+
     private var player: Player!
     private var messageBus: MessageBus?
     private var config: AnalyticsConfig!
+    private var mediaEntry: MediaEntry!
 
     public static var pluginName: String = "PhoenixAnalytics"
     
@@ -20,9 +34,10 @@ class PhoenixAnalyticsPlugin: PKPlugin {
         
     }
     
-    public func load(player: Player, config: Any?, messageBus: MessageBus) {
+    public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
         
         self.messageBus = messageBus
+        self.mediaEntry = mediaConfig
         
         if let aConfig = config as? AnalyticsConfig {
             self.config = aConfig
@@ -34,10 +49,15 @@ class PhoenixAnalyticsPlugin: PKPlugin {
     }
     
     public func destroy() {
-
+        setMessageParams(action: .stop)
     }
     
     func registerToAllEvents() {
         
     }
+    
+    private func setMessageParams(action: PhoenixAnalyticsType) {
+    
+    }
+    
 }
