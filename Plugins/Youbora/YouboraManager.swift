@@ -16,10 +16,12 @@ import AVKit
 class YouboraManager: YBPluginGeneric {
 
     private var pkPlayer: Player!
+    private var mediaEntry: MediaEntry!
     
-    init!(options: NSObject!, player: Player) {
+    init!(options: NSObject!, player: Player, media: MediaEntry) {
         super.init(options: options)
         self.pkPlayer = player
+        self.mediaEntry = media
     }
     
     override init() {
@@ -34,8 +36,10 @@ class YouboraManager: YBPluginGeneric {
     override func getResource() -> String! {
         PKLog.trace("Resource")
 
-    //TODO:
-    return "AAA"
+        if let title = self.mediaEntry.id {
+            return title
+        }
+        return ""
     }
     
     override func getPlayhead() -> NSNumber! {
@@ -47,8 +51,4 @@ class YouboraManager: YBPluginGeneric {
     override func getPlayerVersion() -> String! {
         return "PlayKit-0.1.0"
     }
-    /*
-    override func getBitrate() -> NSNumber! {
-        return super.getBitrate()
-    }*/
 }

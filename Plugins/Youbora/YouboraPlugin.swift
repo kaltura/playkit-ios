@@ -15,6 +15,7 @@ public class YouboraPlugin: PKPlugin {
     private var player: Player!
     private var messageBus: MessageBus?
     private var config: AnalyticsConfig!
+    private var mediaEntry: MediaEntry!
     
     private var youboraManager : YouboraManager!
     public static var pluginName: String = "YouboraPlugin"
@@ -25,9 +26,10 @@ public class YouboraPlugin: PKPlugin {
 
     }
     
-    public func load(player: Player, config: Any?, messageBus: MessageBus) {
+    public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
     
         self.messageBus = messageBus
+        self.mediaEntry = mediaConfig
         
         if let aConfig = config as? AnalyticsConfig {
             self.config = aConfig
@@ -37,7 +39,7 @@ public class YouboraPlugin: PKPlugin {
         }
         
         let options = [String : Any]()
-        youboraManager = YouboraManager(options: options as NSObject!, player: player)
+        youboraManager = YouboraManager(options: options as NSObject!, player: player, media: mediaConfig)
         
         registerToAllEvents()
         
@@ -55,7 +57,7 @@ public class YouboraPlugin: PKPlugin {
         var yConfig = YouboraConfig.defaultYouboraConfig
         var media : [String: Any] = yConfig["media"] as! [String : Any]
         
-        if let entry = self.config.mediaEntry {
+        if let entry = self.mediaEntry {
             media["resource"] = entry.id
             media["title"] = entry.id
             media["duration"] = self.player.duration
@@ -93,8 +95,8 @@ public class YouboraPlugin: PKPlugin {
             PKLog.trace("========== playing info: \(info)")
             if self.isFirstPlay {
 
-                let timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(YouboraPlugin.didStartPlaying), userInfo: nil, repeats: false)
-                timer.fire()
+                //let timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(YouboraPlugin.didStartPlaying), userInfo: nil, repeats: false)
+                //timer.fire()
                 
                 self.youboraManager.playHandler()
                 self.youboraManager.joinHandler()
