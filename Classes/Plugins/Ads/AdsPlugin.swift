@@ -20,7 +20,7 @@ protocol AdsPluginDelegate : class {
 }
 
 protocol AdsPlugin: PKPlugin, AVPictureInPictureControllerDelegate {
-    var dataSource: AdsPluginDataSource! { get set }
+    var dataSource: AdsPluginDataSource? { get set }
     var delegate: AdsPluginDelegate? { get set }
     var pipDelegate: AVPictureInPictureControllerDelegate? { get set }
     
