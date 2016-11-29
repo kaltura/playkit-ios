@@ -14,7 +14,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     
     private var messageBus: MessageBus?
     
-    weak var dataSource: AdsPluginDataSource! {
+    weak var dataSource: AdsPluginDataSource? {
         didSet {
             self.setupMainView()
         }
@@ -352,14 +352,14 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         
         switch event.type {
         case .AD_BREAK_READY:
-            let canPlay = self.dataSource.adsPluginShouldPlayAd(self)
+            let canPlay = self.dataSource?.adsPluginShouldPlayAd(self)
             if canPlay == nil || canPlay == true {
                 adsManager.start()
             }
             break
         case .LOADED:
             if adsManager.adCuePoints.count == 0 { //single ad
-                let canPlay = self.dataSource.adsPluginShouldPlayAd(self)
+                let canPlay = self.dataSource?.adsPluginShouldPlayAd(self)
                 if canPlay == nil || canPlay == true {
                     adsManager.start()
                 } else {
