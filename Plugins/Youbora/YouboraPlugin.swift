@@ -52,8 +52,6 @@ public class YouboraPlugin: PKPlugin {
     
     private func startMonitoring(player: Player) {
         
-        PKLog.trace("Start monitoring using Youbora")
-
         var yConfig = YouboraConfig.defaultYouboraConfig
         var media : [String: Any] = yConfig["media"] as! [String : Any]
         
@@ -67,6 +65,7 @@ public class YouboraPlugin: PKPlugin {
         }
         
         youboraManager.setOptions(yConfig as NSObject!)
+        PKLog.trace("Start monitoring using Youbora")
         youboraManager.startMonitoring(withPlayer: player as! NSObject)
 
     }
@@ -81,18 +80,15 @@ public class YouboraPlugin: PKPlugin {
         PKLog.trace()
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.canPlay.self], block: { (info) in
-
             PKLog.trace("canPlay info: \(info)")
-            //self.youboraManager.joinHandler()
-        
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.play.self], block: { (info) in
-            PKLog.trace("========== play info: \(info)")
+            PKLog.trace("play info: \(info)")
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.playing.self], block: { (info) in
-            PKLog.trace("========== playing info: \(info)")
+            PKLog.trace("playing info: \(info)")
             if self.isFirstPlay {
 
                 //let timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(YouboraPlugin.didStartPlaying), userInfo: nil, repeats: false)
