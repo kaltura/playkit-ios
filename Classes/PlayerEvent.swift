@@ -5,14 +5,14 @@
 //  Created by Eliza Sapir on 14/11/2016.
 //
 //
-
 import Foundation
 
 public class PlayerEvents: PKEvent {
     
     // All events EXCLUDING error. Assuming error events are treated differently.
     public static let allEventTypes: [PlayerEvents.Type] = [
-        canPlay.self, durationChange.self, ended.self, loadedMetadata.self, play.self, pause.self, playing.self, seeking.self, seeked.self
+        canPlay.self, durationChange.self, ended.self, loadedMetadata.self,
+        play.self, pause.self, playing.self, seeking.self, seeked.self, stateChanged.self
     ]
     
     /**
@@ -22,7 +22,13 @@ public class PlayerEvents: PKEvent {
     /**
      The metadata has loaded or changed, indicating a change in duration of the media. This is sent, for example, when the media has loaded enough that the duration is known.
      */
-    public class durationChange : PlayerEvents {}
+    public class durationChange : PlayerEvents {
+        public var duration: TimeInterval
+        
+        init(duration: TimeInterval) {
+            self.duration = duration
+        }
+    }
     /**
      Sent when playback completes.
      */
@@ -43,18 +49,34 @@ public class PlayerEvents: PKEvent {
      Sent when playback is paused.
      */
     public class pause : PlayerEvents {}
+    
     /**
      Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).
      */
     public class playing : PlayerEvents {}
+    
     /**
      Sent when a seek operation begins.
      */
     public class seeking : PlayerEvents {}
+   
     /**
      Sent when a seek operation completes.
      */
     public class seeked : PlayerEvents {}
+
+    /**
+     Sent when player state is changed.
+     */
+    public class stateChanged : PlayerEvents {
+        public var newSate: PlayerState
+        public var oldSate: PlayerState
+        
+        public init(newState: PlayerState, oldState: PlayerState) {
+            self.newSate = newState
+            self.oldSate = oldState
+        }
+    }
 }
 
 public class AdEvents: PKEvent {
