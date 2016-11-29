@@ -24,16 +24,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     var delegate: PlayerDelegate?
     
     private var currentPlayer: PlayerEngine?
-    
-    public var autoPlay: Bool? {
-        get {
-            return false
-            //  return
-        }
-        set {
-            //
-        }
-    }
+    private var assetBuilder: AssetBuilder?
     
     public var currentTime: TimeInterval? {
         get {
@@ -54,11 +45,14 @@ class PlayerController: Player, PlayerEngineDelegate {
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.delegate = self
+        self.assetBuilder = nil
         self.onEventBlock = nil
     }
     
     func prepare(_ config: PlayerConfig) {
-        currentPlayer?.prepareNext(config)
+        self.assetBuilder = AssetBuilder(config: config, readyBlock: { (asset: Any) in
+            self.currentPlayer?.prepareNext(config)
+        })
     }
     
     func play() {
@@ -109,10 +103,10 @@ class PlayerController: Player, PlayerEngineDelegate {
     }
     
     func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {
-        //Assert.shouldNeverHappen();
+        preconditionFailure("This method must be overridden")
     }
     
     func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
-        //Assert.shouldNeverHappen();
+        preconditionFailure("This method must be overridden")
     }
 }
