@@ -14,7 +14,10 @@ internal class OTTMultiRequestBuilder: OTTRequestBuilder {
     internal var requests: [OTTRequestBuilder] = [OTTRequestBuilder]()
 
     internal init?(url: String) {
-        super.init(url: url, service: "multiRequest", action: nil)
+        //TODO:
+        //OTT:super.init(url: url, service: "multiRequest", action: nil)
+        super.init(url: url, service: "multirequest", action: nil)
+        
         
         
     }
@@ -55,9 +58,10 @@ internal class OTTMultiRequestBuilder: OTTRequestBuilder {
         
         for  index in 1..<requestCount {
             do{
-                let requestBody = try self.jsonBody?[String(index)].rawData()
+                let requestBody = try self.jsonBody?[String(index)].rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+                let requestBodyData = requestBody?.data(using: String.Encoding.utf8)
                 data?.append("\"\(index)\":".data(using: String.Encoding.utf8)!)
-                data?.append(requestBody!)
+                data?.append(requestBodyData!)
                 data?.append(",".data(using: String.Encoding.utf8)!)
                 self.jsonBody?.dictionaryObject?.removeValue(forKey: String(index))
             }catch{
@@ -65,7 +69,6 @@ internal class OTTMultiRequestBuilder: OTTRequestBuilder {
             }
         }
         
-        String.init("test".characters.dropFirst())
         do{
             
             if let jsonBody = self.jsonBody{

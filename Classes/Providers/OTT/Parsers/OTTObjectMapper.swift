@@ -11,7 +11,7 @@ import SwiftyJSON
 
 
 
-class ObjectMapper: NSObject {
+class OTTObjectMapper: NSObject {
 
     static let classNameKey = "objectType"
     static let errorKey = "objectType"

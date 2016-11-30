@@ -16,6 +16,9 @@
 		6C1661639467768BB9BAA2D9 /* Pods_PlayKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F22FBF5CD0C0446ED67E8399 /* Pods_PlayKit_Example.framework */; };
 		8460889C1DD1AB1A009E0E7A /* Entries.json in Resources */ = {isa = PBXBuildFile; fileRef = 8460889B1DD1AB1A009E0E7A /* Entries.json */; };
 		846088A91DD2619A009E0E7A /* MockMediaProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846088A81DD2619A009E0E7A /* MockMediaProviderTest.swift */; };
+		C24770AB1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C24770AA1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift */; };
+		C24770AD1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
+		C24770B01DEDF36900E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +48,8 @@
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8460889B1DD1AB1A009E0E7A /* Entries.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Entries.json; sourceTree = "<group>"; };
 		846088A81DD2619A009E0E7A /* MockMediaProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockMediaProviderTest.swift; sourceTree = "<group>"; };
+		C24770AA1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OVPMediaProviederTest.swift; sourceTree = "<group>"; };
+		C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ovp.multirequest._.1_1h1vsv3z.json; sourceTree = "<group>"; };
 		C6039FAD64FBD55034BCB260 /* Pods-PlayKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlayKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PlayKit_Tests/Pods-PlayKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		D1F7DD9C5361102A75AA1CAB /* Pods_PlayKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlayKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0608E8A07C05613B6F7157E /* Pods-PlayKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlayKit_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-PlayKit_Example/Pods-PlayKit_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -119,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				846088A81DD2619A009E0E7A /* MockMediaProviderTest.swift */,
+				C24770AA1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -157,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				8460889B1DD1AB1A009E0E7A /* Entries.json */,
+				C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -259,6 +266,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C24770AD1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				8460889C1DD1AB1A009E0E7A /* Entries.json in Resources */,
@@ -270,6 +278,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C24770B01DEDF36900E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,6 +392,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				846088A91DD2619A009E0E7A /* MockMediaProviderTest.swift in Sources */,
+				C24770AB1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

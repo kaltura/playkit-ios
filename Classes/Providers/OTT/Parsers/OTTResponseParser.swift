@@ -22,7 +22,7 @@ class OTTResponseParser: ResponseParser {
         
             let jsonResponse = JSON(data)
             let resultObjectJSON = jsonResponse["result"].dictionaryObject
-            let objectType: OTTBaseObject.Type? = ObjectMapper.classByJsonObject(json: resultObjectJSON)
+            let objectType: OTTBaseObject.Type? = OTTObjectMapper.classByJsonObject(json: resultObjectJSON)
             if let type = objectType{
                     let object: OTTBaseObject? = type.init(json: resultObjectJSON)
                 return Result(data: object, error: nil)
