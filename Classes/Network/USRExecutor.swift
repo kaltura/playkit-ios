@@ -21,7 +21,7 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
         
     }
     
-    static let shared = USRExecutor()
+    public static let shared = USRExecutor()
     
     public func send(request r:Request){
         
