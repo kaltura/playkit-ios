@@ -67,16 +67,8 @@ class YouboraConfig: NSObject {
             ]
 
             config["extraParams"] = [
-                "param1" : "Param 1 value",
-                "param2" : "Param 2 value",
-                "param3" : "Param 3 value",
-                "param4" : "Param 4 value",
-                "param5" : "Param 5 value",
-                "param6" : "Param 6 value",
-                "param7" : "Param 7 value",
-                "param8" : "Param 8 value",
-                "param9" : "Param 9 value",
-                "param10" : "Param 10 value"]
+                "param1" : "value1"
+            ]
             
             return config
         }
