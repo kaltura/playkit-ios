@@ -18,16 +18,16 @@ public class OTTEntryProvider: MediaEntryProvider {
     var mediaId: String
     var type: AssetType
     var formats: [String]?
-    var executor: RequestExecutor?
+    var executor: RequestExecutor
     
-    
+    private var currentRequest: Request? = nil
+
     public enum ProviderError: Error {
         case invalidKS
         case fileIsEmptyOrNotFound
         case invalidJSON
         case mediaNotFound
-        
-        
+        case currentlyProcessingOtherRequest
     }
     
     public init(sessionProvider:SessionProvider, mediaId: String, type:AssetType,formats: [String],executor:RequestExecutor?){
@@ -35,11 +35,21 @@ public class OTTEntryProvider: MediaEntryProvider {
         self.mediaId = mediaId
         self.type = type
         self.formats = formats
-        self.executor = executor
+        
+        if let exe = executor {
+            self.executor = exe
+        }else{
+            self.executor = USRExecutor.shared
+        }
     }
     
     
     public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
+        
+        if self.currentRequest != nil{
+            callback(Result(data: nil, error: ProviderError.currentlyProcessingOtherRequest ))
+            return
+        }
         
         self.sessionProvider.loadKS { (r:Result<String>) in
             
@@ -59,6 +69,7 @@ public class OTTEntryProvider: MediaEntryProvider {
                 let jsonResponse =  JSON(data)
                 
                 if let assetResponse: OTTGetAssetResponse = OTTGetAssetResponse(json:jsonResponse.object){
+                    self.currentRequest = nil
                     
                     if let asset = assetResponse.asset {
                         
@@ -94,17 +105,16 @@ public class OTTEntryProvider: MediaEntryProvider {
             }).build()
             
             if let assetRequest = request {
-                if let executor = self.executor{
-                    executor.send(request: assetRequest)
-                }else{
-                  USRExecutor.shared.send(request: assetRequest)
-                }
+                self.currentRequest = request
+                executor.send(request: assetRequest)
             }
         }
     }
     
     public func cancel() {
-        
+        if let currentRequest = self.currentRequest {
+            self.executor.cancel(request: currentRequest)
+        }
     }
 }
 

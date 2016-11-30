@@ -16,7 +16,7 @@ public class OVPMediaProvider: MediaEntryProvider {
         case invalidParams
         case invalidResponse
         case currentlyProcessingOtherRequest
-    }
+  }
     
     
     
