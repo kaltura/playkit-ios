@@ -12,6 +12,8 @@ import SwiftyJSON
 
 
 public class MockMediaEntryProvider: MediaEntryProvider {
+  
+
     
     
    public enum MockError: Error {
@@ -113,6 +115,10 @@ public class MockMediaEntryProvider: MediaEntryProvider {
         
         let mediaEntry : MediaEntry? = MediaEntry(json: jsonObject)
         callback(Result(data: mediaEntry, error: nil))
+    }
+    
+    public func cancel() {
+        
     }
     
 }
