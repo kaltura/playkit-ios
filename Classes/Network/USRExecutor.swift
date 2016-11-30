@@ -74,16 +74,25 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
         // settings headers:
         task = session.dataTask(with: request) { (data, response, error) in
             
-            self.removeTaskForRequest(request: r)
+            let index = self.taskIndexForRequest(request: r)
+            if let i = index {
+               self.tasks.remove(at: i)
+            }
+        
+            
             DispatchQueue.main.async {
                 
                 if let completion = r.completion {
                     
-                    if let r = error{
-                        let result = Response(data: nil, error:error)
-                        completion(result)
+                    if let error = error as? NSError {
+                        if error.code == NSURLErrorCancelled {
+                            // canceled
+                        } else {
+                            let result = Response(data: nil, error:error)
+                            completion(result)
+                            // some other error
+                        }
                         return
-                        
                     }
                     
                     
@@ -122,11 +131,17 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
     
     public func cancel(request:Request){
         
-        let taskToCancel = self.removeTaskForRequest(request: request)
-        taskToCancel?.cancel()
+        let index = self.taskIndexForRequest(request: request)
+        if let i = index {
+            let task = self.tasks[i]
+            task.cancel()
+        }
+        
+        
+        //taskToCancel?.cancel()
     }
     
-    public func removeTaskForRequest(request:Request) -> URLSessionDataTask?{
+    public func taskIndexForRequest(request:Request) -> Int?{
     
         if let taskId = self.taskIdByRequestID[request.requestId]{
             
@@ -141,7 +156,7 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
             })
             
             if let index = taskIndex{
-                return self.tasks.remove(at: index)
+                return index
             }else{
                 return nil
             }
