@@ -44,7 +44,6 @@ class YouboraManager: YBPluginGeneric {
     
     override func getPlayhead() -> NSNumber! {
         let currentTIme = self.pkPlayer.currentTime
-        PKLog.trace("Current time: \(currentTIme)")
         return currentTIme as NSNumber!
     }
     

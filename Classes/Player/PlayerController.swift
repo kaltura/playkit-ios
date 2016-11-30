@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: Player, PlayerEngineDelegate {
+class PlayerController: NSObject, Player, PlayerEngineDelegate {
     
     public var duration: Double {
         get {
@@ -52,6 +52,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     }
     
     public init(mediaEntry: PlayerConfig) {
+        super.init()
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.delegate = self
         self.onEventBlock = nil
@@ -97,7 +98,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     
     func player(changedEvent: PKEvent) {
         // TODO:: finilizing + object validation
-        NSLog("changedState")
+        PKLog.trace("changedState: \(changedEvent)")
         if let block = onEventBlock {
             block(changedEvent)
         }

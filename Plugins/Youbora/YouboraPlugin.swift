@@ -31,7 +31,7 @@ public class YouboraPlugin: PKPlugin {
         self.messageBus = messageBus
         self.mediaEntry = mediaConfig
         
-        if let aConfig = config as? AnalyticsConfig {
+        if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
             self.player = player
         } else {
@@ -85,6 +85,8 @@ public class YouboraPlugin: PKPlugin {
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.play.self], block: { (info) in
             PKLog.trace("play info: \(info)")
+            self.youboraManager.playHandler()
+
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.playing.self], block: { (info) in
@@ -93,8 +95,7 @@ public class YouboraPlugin: PKPlugin {
 
                 //let timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(YouboraPlugin.didStartPlaying), userInfo: nil, repeats: false)
                 //timer.fire()
-                
-                self.youboraManager.playHandler()
+
                 self.youboraManager.joinHandler()
                 self.youboraManager.bufferedHandler()
                 self.isFirstPlay = false

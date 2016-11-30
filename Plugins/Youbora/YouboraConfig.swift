@@ -21,9 +21,9 @@ class YouboraConfig: NSObject {
             config["httpSecure"] = false
             config["enableNiceBuffer"] = true
             config["enableNiceSeek"] = true
-            config["accountCode"] = "kaltura"
+            config["accountCode"] = "kalturatest"
             config["service"] = "nqs.nice264.com"
-            config["username"] = ""
+            config["username"] = "kalturatestadmin"
             config["transactionCode"] = ""
             config["isBalanced"] = "0"
             config["isResumed"] = "0"
@@ -47,11 +47,11 @@ class YouboraConfig: NSObject {
                              "duration": NSNull()]
             
             config["properties"] = [
-                             "contentId": NSNull(),
+                             "content_id": NSNull(),
                              "transaction_type": NSNull(),
                              "language": NSNull(),
                              "type": "video",
-                             "genre": "Action",
+                             "genre": NSNull(),
                              
                              "year": "",
                              "cast": NSNull(),
@@ -63,7 +63,8 @@ class YouboraConfig: NSObject {
                              "audioType": NSNull(),
                              "audioChannels": NSNull(),
                              "device": NSNull(),
-                             "quality": NSNull()]
+                             "quality": NSNull()
+            ]
 
             config["extraParams"] = [
                 "param1" : "Param 1 value",
