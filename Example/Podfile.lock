@@ -1,7 +1,9 @@
 PODS:
+  - Log (1.0)
   - PlayKit (0.1.0):
     - PlayKit/Core (= 0.1.0)
   - PlayKit/Core (0.1.0):
+    - Log
     - SwiftyJSON
   - PlayKit/SamplePlugin (0.1.0)
   - SwiftyJSON (3.1.1)
@@ -15,9 +17,10 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  PlayKit: f2f99846a3f84b7a6a3aabbfabefaef1612d3706
+  Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
+  PlayKit: 3b76cbb340c2b65792eb63e23e84b5e6e0a594ac
   SwiftyJSON: f0be2e604f83e8405a624e9f891898bf6ed4e019
 
 PODFILE CHECKSUM: 8abb3254c0a88e4f32d7905030da33778e13e83e
 
-COCOAPODS: 1.1.0
+COCOAPODS: 1.1.1

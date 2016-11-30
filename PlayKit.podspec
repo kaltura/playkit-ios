@@ -30,8 +30,8 @@ s.subspec 'IMAPlugin' do |ssp|
     ssp.dependency 'GoogleAds-IMA-iOS-SDK', '~> 3.3'
 end
 
-s.subspec 'AnalyticsPlugin' do |ssp|
-    ssp.source_files = 'Plugins/Analytics'
+s.subspec 'YouboraPlugin' do |ssp|
+    ssp.source_files = 'Plugins/Youbora'
     ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
     'OTHER_LDFLAGS' => '$(inherited) -framework "YouboraLib" -framework "YouboraPluginAVPlayer"',
     'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',

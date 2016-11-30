@@ -81,12 +81,13 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         
         if self.rate != 1.0 {
             PKLog.trace("play player")
-            super.play()
             
             guard let _ = delegate?.player(changedEvent: PlayerEvents.play()) else {
                 NSLog("player changedState is not implimented")
                 return
             }
+            
+            super.play()
         }
     }
     
