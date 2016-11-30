@@ -15,12 +15,12 @@ let entryID = "1_1h1vsv3z"
 class OVPMediaProviederTest: XCTestCase, SessionProvider {
     
     
-    var partnerId: Int64 = 0
-    var serverURL: String  = "http://www.kaltura.com/api_v3"
+    var partnerId: Int64 = 2209591
+    var serverURL: String  = "http://cdnapi.kaltura.com"
     
     func loadKS(completion: (_ result :Result<String>) -> Void){
         
-        completion(Result(data: "djJ8MjIwOTU5MXwyIZSCaXFEPW-YsddV0iXms3_oW1-8Y11RSakwymknSVvJ9SSQvQ5dndAeHCRFFFtQ6WqT6LtHRDgRtOYlNJYJ85Z28AX-cGKGczC6269Ym0dtLnOXua4pLa3i46qut9M=", error: nil))
+        completion(Result(data: "djJ8MjIwOTU5MXyDmkKuVhHfzNvca2oQWbhyKBVWMCvAGLcEH2QBS1VBmpqoszqPLwCFwl_V-Qdc2-nt9M21RaJIoea-VP0wpcxOHIHlzXADcdKUZ4rovtCRx-U5bnFIwSx17UUfBB80vzM=", error: nil))
     }
 
     
@@ -40,7 +40,7 @@ class OVPMediaProviederTest: XCTestCase, SessionProvider {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         
-        let provider = OVPMediaProvider(sessionProvider: self, entryId: "1_1h1vsv3z" ,basePlayURL: "http://cdnapi.kaltura.com", uiconfId:nil , executor: OVPMockExecutor() )
+        let provider = OVPMediaProvider(sessionProvider: self, entryId: "1_1h1vsv3z", uiconfId:nil , executor: OVPMockExecutor() )
         provider.loadMedia { (r:Result<MediaEntry>) in
             print(r)
         }

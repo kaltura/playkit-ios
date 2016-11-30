@@ -8,8 +8,12 @@
 
 import UIKit
 
+
 public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
     
+    
+    var tasks: [URLSessionDataTask] = [URLSessionDataTask]()
+    var taskIdByRequestID: [String:Int] = [String:Int]()
     
     enum ResponseError: Error {
         case emptyOrIncorrectURL
@@ -64,9 +68,13 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
             session = URLSession.shared
         }
         
+        
+        
+        var task: URLSessionDataTask? = nil
         // settings headers:
-        let task = session.dataTask(with: request) { (data, response, error) in
+        task = session.dataTask(with: request) { (data, response, error) in
             
+            self.removeTaskForRequest(request: r)
             DispatchQueue.main.async {
                 
                 if let completion = r.completion {
@@ -100,12 +108,48 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
             }
         }
         
-        task.resume()
+        
+        if let tsk = task{
+            self.taskIdByRequestID[r.requestId] = task?.taskIdentifier
+            self.tasks.append(tsk)
+            tsk.resume()
+        }
+        
+        
+        
     }
     
     
     public func cancel(request:Request){
         
+        let taskToCancel = self.removeTaskForRequest(request: request)
+        taskToCancel?.cancel()
+    }
+    
+    public func removeTaskForRequest(request:Request) -> URLSessionDataTask?{
+    
+        if let taskId = self.taskIdByRequestID[request.requestId]{
+            
+            let taskIndex = self.tasks.index(where: { (taskInArray:URLSessionDataTask) -> Bool in
+                
+                if taskInArray.taskIdentifier == taskId {
+                    return true
+                }else{
+                    return false
+                }
+                
+            })
+            
+            if let index = taskIndex{
+                return self.tasks.remove(at: index)
+            }else{
+                return nil
+            }
+ 
+        }else{
+            
+            return nil
+        }
     }
     
     public func clean(){

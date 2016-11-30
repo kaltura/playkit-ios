@@ -20,18 +20,18 @@ public class OVPMediaProvider: MediaEntryProvider {
     
     var sessionProvider: SessionProvider
     var entryId: String
-    var basePlayURL: String
     var executor: RequestExecutor?
     var uiconfId: Int64?
+    var apiServerURL: String
     
     
-    public init (sessionProvider:SessionProvider, entryId: String, basePlayURL:String,uiconfId:Int64?, executor: RequestExecutor?){
+    public init (sessionProvider:SessionProvider, entryId: String,uiconfId:Int64?, executor: RequestExecutor?){
         
         self.sessionProvider = sessionProvider
         self.entryId = entryId
-        self.basePlayURL = basePlayURL
         self.executor = executor
         self.uiconfId = uiconfId
+        self.apiServerURL = sessionProvider.serverURL.appending("/api_v3")
         
     }
     
@@ -42,13 +42,13 @@ public class OVPMediaProvider: MediaEntryProvider {
         self.sessionProvider .loadKS { (r:Result<String>) in
             if let ks = r.data{
                 
-                let listRequest = OVPBaseEntryService.list(baseURL: self.sessionProvider.serverURL, ks: ks, entryID: self.entryId)
-                let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: self.sessionProvider.serverURL, ks: ks, entryID: self.entryId)
+                let listRequest = OVPBaseEntryService.list(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
+                let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
                 
                 
                 if let req1 = listRequest, let req2 = getContextDataRequest{
                     
-                    let mrb = OTTMultiRequestBuilder(url: sessionProvider.serverURL)?.add(request: req1).add(request: req2).set(completion: { (r:Response) in
+                    let mrb = OTTMultiRequestBuilder(url: self.apiServerURL)?.add(request: req1).add(request: req2).set(completion: { (r:Response) in
                         
                         let responses: [Result<OVPBaseObject>] = OVPMultiResponseParser.parse(data: r.data)
                         print(responses)
@@ -85,12 +85,12 @@ public class OVPMediaProvider: MediaEntryProvider {
                                 let supportedFlavors = self.flavorsByFlavorsParamIds(flavorsIds: source.flavors, flavorAsset: flavorAssets)
                                 let flavorsId = self.flavorsId(flavors: supportedFlavors)
                                 
-                                sourceBuilder.set(baseURL: self.basePlayURL)
+                                sourceBuilder.set(baseURL: self.sessionProvider.serverURL)
                                 sourceBuilder.set(ks: ks)
                                 sourceBuilder.set(format: source.format)
                                 sourceBuilder.set(entryId: self.entryId)
                                 sourceBuilder.set(uiconfId: self.uiconfId)
-                                sourceBuilder.set(flavors: flavorsId)
+                                sourceBuilder.set(flavors: source.flavors)
                                 sourceBuilder.set(partnerId: self.sessionProvider.partnerId)
                                 sourceBuilder.set(playSessionId: UUID().uuidString) // insert - session
                                 sourceBuilder.set(sourceProtocol: source.protocols?.last)

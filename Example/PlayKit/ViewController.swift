@@ -30,11 +30,11 @@ class ViewController: UIViewController, SessionProvider {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        let provider: OVPMediaProvider = OVPMediaProvider(sessionProvider: self, entryId: "1_1h1vsv3z", executor: nil)
-//        provider.loadMedia { (r:Result<MediaEntry>) in
-//            print(r)
-//        }
-//
+        let provider: OVPMediaProvider = OVPMediaProvider(sessionProvider: self, entryId: "1_1h1vsv3z",uiconfId:1234, executor: nil)
+        provider.loadMedia { (r:Result<MediaEntry>) in
+            print(r)
+        }
+
     }
 
     override func didReceiveMemoryWarning() {

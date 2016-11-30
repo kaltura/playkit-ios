@@ -32,7 +32,7 @@
         "deliveryProfileId": 1234,
         "format": "applehttp",
         "protocols": ["http", "https"],
-        "flavors": ["flavor1", "flavor2"],
+        "flavors": ["1_ude4l5pb", "1_izgi81qa"],
         "url": "http://cdnapi.kaltura.com/p/123/playManifest/entryId/0_11223344/flavorIds/1_ude4l5pb,1_izgi81qa,1_3l6wh2jz,1_fafwf2t7,1_k6gs4dju,1_nzen8kfl/format/url/protocol/http/a.mp4",
         "drm": [{
           "scheme": "FairPlay",
@@ -44,7 +44,7 @@
         "deliveryProfileId": 1235,
         "format": "mpegdash",
         "protocols": ["http", "https"],
-        "flavors": ["flavor1", "flavor2"],
+        "flavors": ["1_ude4l5pb", "1_izgi81qa"],
         "url": "http://cdnapi.kaltura.com/p/123/playManifest/entryId/0_11223344/flavorIds/1_ude4l5pb,1_izgi81qa,1_3l6wh2jz,1_fafwf2t7,1_k6gs4dju,1_nzen8kfl/format/url/protocol/http/a.mp4",
         "drm": [
           {

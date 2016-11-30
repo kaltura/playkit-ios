@@ -13,6 +13,7 @@ public typealias completionClosures =  (_ response:Response)->Void
 
 public protocol Request {
 
+     var requestId: String { get }
      var method: String? { get }
      var url: URL { get }
      var jsonBody: JSON? { get }
@@ -24,9 +25,11 @@ public protocol Request {
 }
 
 public class RequestBuilder : Request {
+
+   public lazy var requestId: String =  {
+        return UUID().uuidString
+    }()
     
-
-
     public var method: String? = nil
     public var url: URL
     public var jsonBody: JSON? = nil
