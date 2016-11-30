@@ -66,8 +66,7 @@ public class YouboraPlugin: PKPlugin {
         
         youboraManager.setOptions(yConfig as NSObject!)
         PKLog.trace("Start monitoring using Youbora")
-        youboraManager.startMonitoring(withPlayer: player as! NSObject)
-
+        youboraManager.startMonitoring(withPlayer: youboraManager)
     }
     
     private func stopMonitoring() {

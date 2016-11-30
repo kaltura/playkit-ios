@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: NSObject, Player, PlayerEngineDelegate {
+class PlayerController: Player, PlayerEngineDelegate {
     
     public var duration: Double {
         get {
@@ -52,7 +52,6 @@ class PlayerController: NSObject, Player, PlayerEngineDelegate {
     }
     
     public init(mediaEntry: PlayerConfig) {
-        super.init()
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.delegate = self
         self.onEventBlock = nil
