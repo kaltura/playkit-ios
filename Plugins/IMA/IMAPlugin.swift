@@ -16,6 +16,8 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     
     weak var dataSource: AdsPluginDataSource? {
         didSet {
+            PKLog.trace("data source set")
+            
             self.setupMainView()
         }
     }
@@ -45,6 +47,8 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     private var startAdCalled = false
     private var loaderFailed = false
     
+    private var timer: Timer?
+    
     public var currentTime: TimeInterval {
         get {
             return self.currentPlaybackTime
@@ -64,6 +68,8 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     }
     
     public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
+        PKLog.trace("load")
+        
         self.messageBus = messageBus
         
         if let adsConfig = pluginConfig as? AdsConfig {
@@ -90,11 +96,14 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
             self.contentComplete()
         })
 
-        Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
+        self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
 
     public func destroy() {
+        PKLog.trace("destroy")
         self.destroyManager()
+        self.player = nil
+        self.timer?.invalidate()
     }
     
     func getPlayerDecorator() -> PlayerDecoratorBase? {
@@ -115,6 +124,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
 //            }
             
             IMAPlugin.loader.requestAds(with: request)
+            PKLog.trace("request Ads")
         }
     }
     
@@ -319,14 +329,18 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     // MARK: AdsLoaderDelegate
     
     public func adsLoader(_ loader: IMAAdsLoader!, adsLoadedWith adsLoadedData: IMAAdsLoadedData!) {
-        self.loaderFailed = false
-        
-        self.manager = adsLoadedData.adsManager
-        self.manager!.delegate = self
-        self.createRenderingSettings()
-        
-        if self.startAdCalled {
-            self.manager!.initialize(with: self.renderingSettings)
+        if let _ = self.player {
+            self.loaderFailed = false
+            
+            self.manager = adsLoadedData.adsManager
+            self.manager!.delegate = self
+            self.createRenderingSettings()
+            
+            if self.startAdCalled {
+                self.manager!.initialize(with: self.renderingSettings)
+            }
+            
+            PKLog.trace("ads manager set")
         }
     }
     
@@ -334,6 +348,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         self.loaderFailed = true
         self.showLoadingView(false, alpha: 0)
         self.delegate?.adsPlugin(self, loaderFailedWith: adErrorData.adError.message)
+        PKLog.error(adErrorData.adError.message)
     }
     
     // MARK: AdsManagerDelegate
@@ -348,7 +363,6 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
         let converted = self.convertToPlayerEvent(event.type)
-//        print("ads event " + String(describing: converted))
         
         switch event.type {
         case .AD_BREAK_READY:
@@ -377,11 +391,13 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         
         let event = converted.init()
         self.notify(event: event)
+        PKLog.trace("ads manager event: " + String(describing: converted))
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
         self.showLoadingView(false, alpha: 0)
         self.delegate?.adsPlugin(self, managerFailedWith: error.message)
+        PKLog.error(error.message)
     }
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
