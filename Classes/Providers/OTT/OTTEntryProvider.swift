@@ -10,6 +10,8 @@ import UIKit
 import SwiftyJSON
 
 public class OTTEntryProvider: MediaEntryProvider {
+  
+
     
     
     let sessionProvider: SessionProvider
@@ -99,6 +101,10 @@ public class OTTEntryProvider: MediaEntryProvider {
                 }
             }
         }
+    }
+    
+    public func cancel() {
+        
     }
 }
 

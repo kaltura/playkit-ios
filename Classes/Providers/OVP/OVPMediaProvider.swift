@@ -15,12 +15,16 @@ public class OVPMediaProvider: MediaEntryProvider {
         case invalidKS
         case invalidParams
         case invalidResponse
+        case currentlyProcessingOtherRequest
     }
     
     
+    
+    private var currentRequest: Request? = nil
+    
     var sessionProvider: SessionProvider
     var entryId: String
-    var executor: RequestExecutor?
+    var executor: RequestExecutor
     var uiconfId: Int64?
     var apiServerURL: String
     
@@ -29,19 +33,28 @@ public class OVPMediaProvider: MediaEntryProvider {
         
         self.sessionProvider = sessionProvider
         self.entryId = entryId
-        self.executor = executor
         self.uiconfId = uiconfId
         self.apiServerURL = sessionProvider.serverURL.appending("/api_v3")
+        
+        if let exe = executor {
+            self.executor = exe
+        }else{
+            self.executor = USRExecutor.shared
+        }
         
     }
     
     
     public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void){
         
+        if self.currentRequest != nil{
+            callback(Result(data: nil, error: error.currentlyProcessingOtherRequest ))
+            return
+        }
         
-        self.sessionProvider .loadKS { (r:Result<String>) in
+        self.sessionProvider.loadKS { (r:Result<String>) in
+            
             if let ks = r.data{
-                
                 let listRequest = OVPBaseEntryService.list(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
                 let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
                 
@@ -50,6 +63,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                     
                     let mrb = OTTMultiRequestBuilder(url: self.apiServerURL)?.add(request: req1).add(request: req2).set(completion: { (r:Response) in
                         
+                        self.currentRequest = nil
                         let responses: [Result<OVPBaseObject>] = OVPMultiResponseParser.parse(data: r.data)
                         print(responses)
                         
@@ -76,7 +90,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                             
                             let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
                             mediaEntry.duration = entry.duration
-
+                            
                             var mediaSources: [MediaSource] = [MediaSource]()
                             sources.forEach({ (source:OVPSource) in
                                 
@@ -107,29 +121,25 @@ public class OVPMediaProvider: MediaEntryProvider {
                         }else{
                             callback(Result(data: nil, error: error.invalidResponse ))
                         }
-                })
-                .build()
-                
-                if let request = mrb {
+                    })
+                        .build()
                     
-                    if let executor = self.executor{
-                        executor.send(request: request)
+                    if let request = mrb {
+                        self.currentRequest = request
+                        self.executor.send(request: request)
+                        
                     }else{
-                        USRExecutor.shared.send(request: request)
+                        callback(Result(data: nil, error: error.invalidParams))
                     }
-                    
                 }else{
                     callback(Result(data: nil, error: error.invalidParams))
                 }
+                
             }else{
-                callback(Result(data: nil, error: error.invalidParams))
+                callback(Result(data: nil, error: error.invalidKS))
             }
-            
-        }else{
-            callback(Result(data: nil, error: error.invalidKS))
         }
     }
-}
     
     func flavorsByFlavorsParamIds(flavorsIds:[String]?,flavorAsset:[OVPFlavorAsset]) -> [OVPFlavorAsset] {
         
@@ -156,8 +166,15 @@ public class OVPMediaProvider: MediaEntryProvider {
         
         return flavorsId
     }
-
-
+    
+    
+    public func cancel() {
+        if let currentRequest = self.currentRequest {
+            self.executor.cancel(request: currentRequest)
+        }
+    }
+    
+    
 }
 
 
