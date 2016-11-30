@@ -16,11 +16,11 @@ protocol AdsPluginDataSource : class {
 protocol AdsPluginDelegate : class {
     func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String)
     func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String)
-    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent, with eventData: Any?)
+    func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent)
 }
 
 protocol AdsPlugin: PKPlugin, AVPictureInPictureControllerDelegate {
-    var dataSource: AdsPluginDataSource! { get set }
+    var dataSource: AdsPluginDataSource? { get set }
     var delegate: AdsPluginDelegate? { get set }
     var pipDelegate: AVPictureInPictureControllerDelegate? { get set }
     

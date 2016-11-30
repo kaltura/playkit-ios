@@ -12,12 +12,17 @@ import AVKit
 
 public protocol PlayerEngineDelegate: class {
     
-    func player(changedState: PKEvent)
+    func player(changedEvent: PKEvent)
     func player(encounteredError: NSError)
 }
 
 public protocol PlayerEngine {
     weak var delegate: PlayerEngineDelegate? {get set}
+    
+    /**
+     Get the player's duration.
+     */
+    var duration: Double { get }
     
     /**
      Get the player's view component.
@@ -28,13 +33,6 @@ public protocol PlayerEngine {
      Get/set the current player position.
      */
     var currentPosition: TimeInterval { get set }
-    
-    /**
-     Should playback start when ready?
-     If set to true after entry is loaded, this will start playback.
-     If set to false while entry is playing, this will pause playback.
-     */
-    var autoPlay: Bool { get set }
     
     /**
      Convenience method for setting shouldPlayWhenReady to true.
