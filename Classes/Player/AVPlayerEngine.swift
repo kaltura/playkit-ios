@@ -19,6 +19,9 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     private var currentState: PlayerState = PlayerState.idle
     var delegate: PlayerEngineDelegate?
     
+    // AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
+    private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
+   
     public var view: UIView! {
         get {
             PKLog.trace("get player view: \(_view)")
@@ -55,6 +58,13 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     public override init() {
         PKLog.trace("init AVPlayer")
         super.init()
+        
+        nonObservablePropertiesUpdateTimer.setEventHandler { [weak self] in
+            self?.updateNonObservableProperties()
+        }
+        nonObservablePropertiesUpdateTimer.scheduleRepeating(deadline: DispatchTime.now(),
+                                                             interval: DispatchTimeInterval.milliseconds(50))
+        
         avPlayerLayer = AVPlayerLayer(player: self)
         _view = PlayerView(playerLayer: avPlayerLayer)
     }
@@ -206,7 +216,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             event = PlayerEvents.durationChange(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
         } else if keyPath == #keyPath(rate) {
             if rate == 1.0 {
-                event = PlayerEvents.playing()
+                nonObservablePropertiesUpdateTimer.resume()
             } else {
                 event = PlayerEvents.pause()
             }
@@ -248,6 +258,20 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         guard let _ = delegate?.player(changedEvent: event) else {
             PKLog.trace("state is not valid \(event)")
             return
+        }
+    }
+    
+    private func updateNonObservableProperties() {
+        if let timebaseRate: Float64 = CMTimebaseGetRate(self.currentItem!.timebase!){
+            if timebaseRate == 1.0 {
+                guard let _ = delegate?.player(changedEvent: PlayerEvents.playing()) else {
+                    PKLog.trace("player changedState is not implimented")
+                    return
+                }
+                nonObservablePropertiesUpdateTimer.suspend()
+            }
+            
+            PKLog.trace("timebaseRate:: \(timebaseRate)")
         }
     }
 }
