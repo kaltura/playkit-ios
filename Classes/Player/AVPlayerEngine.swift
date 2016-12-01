@@ -69,9 +69,7 @@ class AVPlayerEngine : AVPlayer {
         nonObservablePropertiesUpdateTimer.setEventHandler { [weak self] in
             self?.updateNonObservableProperties()
         }
-        
-        nonObservablePropertiesUpdateTimer.scheduleRepeating(deadline: DispatchTime.now(),
-                                                             interval: DispatchTimeInterval.milliseconds(50))
+        nonObservablePropertiesUpdateTimer.scheduleRepeating(deadline: DispatchTime.now(), interval: DispatchTimeInterval.milliseconds(50))
     }
     
     /**
@@ -82,8 +80,7 @@ class AVPlayerEngine : AVPlayer {
     }
     
     public override func pause() {
-        // autoPlay = false
-        
+
         if self.rate == 1.0 {
             // Playing, so pause.
             PKLog.trace("pause player")
@@ -92,8 +89,7 @@ class AVPlayerEngine : AVPlayer {
     }
     
     public override func play() {
-        // autoPlay = true
-        
+
         if self.rate != 1.0 {
             PKLog.trace("play player")
             
@@ -108,10 +104,8 @@ class AVPlayerEngine : AVPlayer {
                 if let contentUrl = sources[0].contentUrl {
                     PKLog.trace("prepareNext item for player")
                     self.replaceCurrentItem(with: AVPlayerItem(url: contentUrl))
-                    
-                    self.addObservers()
-                    self.nonObservablePropertiesUpdateTimer.suspend()
                     self.setupNonObservablePropertiesUpdateTimer()
+                    self.addObservers()
                 }
             }
         }
@@ -225,7 +219,6 @@ class AVPlayerEngine : AVPlayer {
             if rate == 1.0 {
                 nonObservablePropertiesUpdateTimer.resume()
             } else {
-                nonObservablePropertiesUpdateTimer.suspend()
                 event = PlayerEvents.pause()
             }
         } else if keyPath == #keyPath(currentItem.status) {
@@ -269,13 +262,17 @@ class AVPlayerEngine : AVPlayer {
     }
     
     private func updateNonObservableProperties() {
-        if let timebaseRate: Float64 = CMTimebaseGetRate(self.currentItem!.timebase!){
-            if timebaseRate == 1.0 {
-                self.postEvent(event: PlayerEvents.playing())
-                nonObservablePropertiesUpdateTimer.suspend()
+        if let currItem = self.currentItem {
+            if let timebase = currItem.timebase {
+                if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
+                    if timebaseRate == 1.0 {
+                        self.postEvent(event: PlayerEvents.playing())
+                        nonObservablePropertiesUpdateTimer.suspend()
+                    }
+                    
+                    PKLog.trace("timebaseRate:: \(timebaseRate)")
+                }
             }
-            
-            PKLog.trace("timebaseRate:: \(timebaseRate)")
         }
     }
 }
