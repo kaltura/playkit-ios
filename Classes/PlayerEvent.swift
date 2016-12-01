@@ -138,3 +138,14 @@ public class AdEvents: PKEvent {
     
     public required override init() {}
 }
+
+public class AnalyticsLogEvents : PlayerEvents {
+    
+    public class analyticsLogEvent : AnalyticsLogEvents {
+        public var logDescription: String
+        init(log: String) {
+            self.logDescription = log
+        }
+    }
+    
+}
