@@ -12,7 +12,7 @@ import AVKit
 
 public protocol PlayerEngineDelegate: class {
     
-    func player(changedEvent: PKEvent)
+    func playerDid(updateEvent: PKEvent)
     func player(encounteredError: NSError)
 }
 

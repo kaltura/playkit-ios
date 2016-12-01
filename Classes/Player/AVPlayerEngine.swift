@@ -17,11 +17,12 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     
     private var _view: PlayerView!
     private var currentState: PlayerState = PlayerState.idle
+    
+//  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
+    private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
+    
     var delegate: PlayerEngineDelegate?
     
-    // AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
-    private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
-   
     public var view: UIView! {
         get {
             PKLog.trace("get player view: \(_view)")
@@ -39,10 +40,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             let newTime = CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
             
-            guard let _ = delegate?.player(changedEvent: PlayerEvents.seeking()) else {
-                PKLog.trace("player changedEvent is not implimented")
-                return
-            }
+            self.postEvent(event: PlayerEvents.seeking())
         }
     }
     
@@ -52,21 +50,27 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         return CMTimeGetSeconds(self.currentItem!.duration)
     }
     
-    /// TODO::
-    //private var asset: PlayerAsset?
-    
     public override init() {
         PKLog.trace("init AVPlayer")
         super.init()
         
+        avPlayerLayer = AVPlayerLayer(player: self)
+        _view = PlayerView(playerLayer: avPlayerLayer)
+    }
+    
+    deinit {
+        self.destroy()
+    }
+    
+    private func setupNonObservablePropertiesUpdateTimer() {
+        PKLog.trace("setupNonObservablePropertiesUpdateTimer")
+        
         nonObservablePropertiesUpdateTimer.setEventHandler { [weak self] in
             self?.updateNonObservableProperties()
         }
+        
         nonObservablePropertiesUpdateTimer.scheduleRepeating(deadline: DispatchTime.now(),
                                                              interval: DispatchTimeInterval.milliseconds(50))
-        
-        avPlayerLayer = AVPlayerLayer(player: self)
-        _view = PlayerView(playerLayer: avPlayerLayer)
     }
     
     /**
@@ -92,11 +96,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         if self.rate != 1.0 {
             PKLog.trace("play player")
             
-            guard let _ = delegate?.player(changedEvent: PlayerEvents.play()) else {
-                NSLog("player changedState is not implimented")
-                return
-            }
-            
+            self.postEvent(event: PlayerEvents.play())
             super.play()
         }
     }
@@ -107,6 +107,8 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
                 if let contentUrl = sources[0].contentUrl {
                     PKLog.trace("prepareNext item for player")
                     self.replaceCurrentItem(with: AVPlayerItem(url: contentUrl))
+                    self.nonObservablePropertiesUpdateTimer.suspend()
+                    self.setupNonObservablePropertiesUpdateTimer()
                     self.addObservers()
                 }
             }
@@ -133,25 +135,27 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     
     // MARK: - KVO Observation
     
-    // KVO player keys
-    private let PlayerTracksKey = "tracks"
-    private let PlayerPlayableKey = "playable"
-    private let PlayerDurationKey = "duration"
-    private let PlayerRateKey = "rate"
+    // An array of key paths for the properties we want to observe.
+    private let observedKeyPaths = [
+        #keyPath(rate),
+        #keyPath(currentItem.status),
+        #keyPath(currentItem),
+        #keyPath(currentItem.playbackLikelyToKeepUp),
+        #keyPath(currentItem.playbackBufferEmpty),
+        #keyPath(currentItem.duration)
+        //        #keyPath(currentItem.tracks)
+    ]
     
-    // KVO player item keys
-    private let PlayerStatusKey = "status"
-    private let PlayerEmptyBufferKey = "playbackBufferEmpty"
-    private let PlayerKeepUpKey = "playbackLikelyToKeepUp"
-    private let PlayerCurrentItemKey = "currentItem"
+    private var observerContext = 0
     
     // - Observers
     func addObservers() {
         PKLog.trace("addObservers")
-        self.addObserver(self, forKeyPath: PlayerRateKey, options: [], context: nil)
         
-        self.currentItem?.addObserver(self, forKeyPath: PlayerEmptyBufferKey, options: [], context: nil)
-        self.currentItem?.addObserver(self, forKeyPath: PlayerStatusKey, options: [], context: nil)
+        // Register observers for the properties we want to display.
+        for keyPath in observedKeyPaths {
+            addObserver(self, forKeyPath: keyPath, options: [.new, .initial], context: &observerContext)
+        }
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.playerFailed(notification:)), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.playerPlayedToEnd(notification:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.currentItem)
@@ -161,10 +165,10 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         do {
             try
                 PKLog.trace("removeObservers")
-                self.removeObserver(self, forKeyPath: self.PlayerRateKey)
-            
-            self.currentItem?.removeObserver(self, forKeyPath: self.PlayerEmptyBufferKey)
-            self.currentItem?.removeObserver(self, forKeyPath: self.PlayerStatusKey)
+            // Un-register observers
+            for keyPath in observedKeyPaths {
+                removeObserver(self, forKeyPath: keyPath, context: &observerContext)
+            }
             
             NotificationCenter.default.removeObserver(self)
             
@@ -179,34 +183,32 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         
-        guard let _ = delegate?.player(changedEvent: PlayerEvents.error()) else {
-            PKLog.trace("player changedEvent is not implimented")
-            return
-        }
+        self.postEvent(event: PlayerEvents.error())
     }
     
     public func playerPlayedToEnd(notification: NSNotification) {
-            let newState = PlayerState.idle
-            self.postStateChange(newState: newState, oldState: self.currentState)
-            self.currentState = newState
-            
-            guard let _ = delegate?.player(changedEvent: PlayerEvents.ended()) else {
-                PKLog.trace("player changedEvent is not implimented")
-                return
-            
-        }
+        let newState = PlayerState.idle
+        self.postStateChange(newState: newState, oldState: self.currentState)
+        self.currentState = newState
+        
+        self.postEvent(event: PlayerEvents.ended())
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard context == &observerContext else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            return
+        }
+
         var event: PKEvent? = nil
         
-        if keyPath == PlayerKeepUpKey {
+        if keyPath == #keyPath(currentItem.isPlaybackLikelyToKeepUp) {
             if let item = self.currentItem {
                 let newState = PlayerState.ready
                 self.postStateChange(newState: newState, oldState: self.currentState)
                 self.currentState = newState
             }
-        } else if keyPath == PlayerEmptyBufferKey {
+        } else if keyPath == #keyPath(currentItem.isPlaybackBufferEmpty) {
             if let item = self.currentItem {
                 let newState = PlayerState.idle
                 self.postStateChange(newState: newState, oldState: self.currentState)
@@ -218,9 +220,10 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             if rate == 1.0 {
                 nonObservablePropertiesUpdateTimer.resume()
             } else {
+                nonObservablePropertiesUpdateTimer.suspend()
                 event = PlayerEvents.pause()
             }
-        } else if keyPath == PlayerStatusKey {
+        } else if keyPath == #keyPath(currentItem.status) {
             if currentItem?.status == .readyToPlay {
                 let newState = PlayerState.ready
                 self.postStateChange(newState: newState, oldState: self.currentState)
@@ -234,40 +237,38 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
                 
                 event = PlayerEvents.error()
             }
-        } else if keyPath == PlayerCurrentItemKey {
+        } else if keyPath == #keyPath(currentItem) {
             let newState = PlayerState.idle
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
         }
         
         PKLog.trace("EventChanged::\(event)")
-        
-        if event == nil {
-            event = PlayerEvents.seeking()
+
+        if let currentEvent: PKEvent = event {
+           self.postEvent(event: currentEvent)
         }
-        guard let _ = delegate?.player(changedEvent: event!) else {
-            PKLog.trace("player changedState is not implimented")
+    }
+    
+    private func postEvent(event: PKEvent) {
+        PKLog.trace("eventChange:: \(event)")
+        guard let _ = delegate?.playerDid(updateEvent: event) else {
+            PKLog.trace("event is not valid \(event)")
             return
         }
     }
     
     private func postStateChange(newState: PlayerState, oldState: PlayerState) {
         PKLog.trace("stateChanged:: new:\(newState) old:\(oldState)")
-        let event: PKEvent = PlayerEvents.stateChanged(newState: newState, oldState: oldState)
+        let stateChangedEvent: PKEvent = PlayerEvents.stateChanged(newState: newState, oldState: oldState)
         
-        guard let _ = delegate?.player(changedEvent: event) else {
-            PKLog.trace("state is not valid \(event)")
-            return
-        }
+        self.postEvent(event: stateChangedEvent)
     }
     
     private func updateNonObservableProperties() {
         if let timebaseRate: Float64 = CMTimebaseGetRate(self.currentItem!.timebase!){
             if timebaseRate == 1.0 {
-                guard let _ = delegate?.player(changedEvent: PlayerEvents.playing()) else {
-                    PKLog.trace("player changedState is not implimented")
-                    return
-                }
+                self.postEvent(event: PlayerEvents.playing())
                 nonObservablePropertiesUpdateTimer.suspend()
             }
             
