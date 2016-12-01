@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: Player, PlayerEngineDelegate {
+class PlayerController: Player {
     
     public var duration: Double {
         get {
@@ -23,7 +23,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     
     var delegate: PlayerDelegate?
     
-    private var currentPlayer: PlayerEngine?
+    private var currentPlayer: AVPlayerEngine?
     
     public var autoPlay: Bool? {
         get {
@@ -53,7 +53,10 @@ class PlayerController: Player, PlayerEngineDelegate {
     
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
-        self.currentPlayer?.delegate = self
+        self.currentPlayer?.onEventBlock = { (event:PKEvent) in
+            self.messageBus.post(event)
+        }
+        
         self.onEventBlock = nil
     }
     

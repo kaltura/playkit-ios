@@ -11,7 +11,7 @@ import AVFoundation
 import AVKit
 import CoreMedia
 
-class AVPlayerEngine : AVPlayer, PlayerEngine {
+class AVPlayerEngine : AVPlayer {
     
     private var avPlayerLayer: AVPlayerLayer!
     
@@ -21,7 +21,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
 //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
     private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
     
-    var delegate: PlayerEngineDelegate?
+    public var onEventBlock: ((PKEvent)->Void)?
     
     public var view: UIView! {
         get {
@@ -56,6 +56,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         
         avPlayerLayer = AVPlayerLayer(player: self)
         _view = PlayerView(playerLayer: avPlayerLayer)
+        self.onEventBlock = nil
     }
     
     deinit {
@@ -107,9 +108,10 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
                 if let contentUrl = sources[0].contentUrl {
                     PKLog.trace("prepareNext item for player")
                     self.replaceCurrentItem(with: AVPlayerItem(url: contentUrl))
+                    
+                    self.addObservers()
                     self.nonObservablePropertiesUpdateTimer.suspend()
                     self.setupNonObservablePropertiesUpdateTimer()
-                    self.addObservers()
                 }
             }
         }
@@ -195,6 +197,9 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        PKLog.debug("observeValue:: onEvent/onState")
+        
         guard context == &observerContext else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
             return
@@ -242,8 +247,6 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
         }
-        
-        PKLog.trace("EventChanged::\(event)")
 
         if let currentEvent: PKEvent = event {
            self.postEvent(event: currentEvent)
@@ -251,10 +254,10 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     }
     
     private func postEvent(event: PKEvent) {
-        PKLog.trace("eventChange:: \(event)")
-        guard let _ = delegate?.playerDid(updateEvent: event) else {
-            PKLog.trace("event is not valid \(event)")
-            return
+        PKLog.trace("onEvent:: \(event)")
+        
+        if let block = onEventBlock {
+            block(event)
         }
     }
     
