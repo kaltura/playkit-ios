@@ -96,7 +96,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     }
     
     func player(changedEvent: PKEvent) {
-        // TODO:: finilizing + object validation
+        // TODO:: finalizing + object validation
         PKLog.trace("changedState: \(changedEvent)")
         if let block = onEventBlock {
             block(changedEvent)
@@ -104,7 +104,7 @@ class PlayerController: Player, PlayerEngineDelegate {
     }
     
     func player(encounteredError: NSError) {
-        // TODO:: finilizing + object validation
+        // TODO:: finalizing + object validation
         NSLog("encounteredError")
     }
     
