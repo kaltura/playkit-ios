@@ -95,11 +95,11 @@ class PlayerController: Player, PlayerEngineDelegate {
         self.currentPlayer?.destroy()
     }
     
-    func player(changedEvent: PKEvent) {
+    func playerDid(updateEvent: PKEvent) {
         // TODO:: finilizing + object validation
-        PKLog.trace("changedState: \(changedEvent)")
+        PKLog.trace("changedState: \(updateEvent)")
         if let block = onEventBlock {
-            block(changedEvent)
+            block(updateEvent)
         }
     }
     
