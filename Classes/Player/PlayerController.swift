@@ -24,6 +24,7 @@ class PlayerController: Player {
     var delegate: PlayerDelegate?
     
     private var currentPlayer: AVPlayerEngine?
+    private var assetBuilder: AssetBuilder?
     
     public var autoPlay: Bool? {
         get {
@@ -54,6 +55,7 @@ class PlayerController: Player {
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.onEventBlock = { (event:PKEvent) in
+            PKLog.trace("postEvent:: \(event)")
             self.messageBus.post(event)
         }
         
@@ -61,23 +63,35 @@ class PlayerController: Player {
     }
     
     func prepare(_ config: PlayerConfig) {
-        currentPlayer?.prepareNext(config)
+        if let mediaEntry: MediaEntry = config.mediaEntry  {
+            self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
+            self.assetBuilder?.build(readyCallback: { (asset: AVAsset?) in
+                if let avAsset: AVAsset = asset {
+                    self.currentPlayer?.asset = avAsset
+                }
+            })
+        } else {
+            PKLog.warning("mediaEntry is empty")
+        }
     }
     
     func play() {
-        PKLog.trace("Enter Play")
+        PKLog.trace("play::")
         self.currentPlayer?.play()
     }
     
     func pause() {
+        PKLog.trace("pause::")
         self.currentPlayer?.pause()
     }
     
     func resume() {
+        PKLog.trace("resume::")
         self.currentPlayer?.play()
     }
     
     func seek(to time: CMTime) {
+        PKLog.trace("seek::\(time)")
         self.currentPlayer?.seek(to: time)
     }
     
@@ -96,15 +110,6 @@ class PlayerController: Player {
     
     func destroy() {
         self.currentPlayer?.destroy()
-    }
-    
-    func playerDid(updateEvent: PKEvent) {
-        // TODO:: finilizing + object validation
-        PKLog.trace("changedState: \(updateEvent)")
-
-        if let block = onEventBlock {
-            block(updateEvent)
-        }
     }
     
     func player(encounteredError: NSError) {
