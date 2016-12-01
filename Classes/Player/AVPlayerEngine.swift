@@ -40,7 +40,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             let newTime = CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
             
-            self.postEventUpdate(event: PlayerEvents.seeking())
+            self.postEvent(event: PlayerEvents.seeking())
         }
     }
     
@@ -59,10 +59,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     }
     
     deinit {
-        // Un-register observers
-        for keyPath in observedKeyPaths {
-            removeObserver(self, forKeyPath: keyPath, context: &observerContext)
-        }
+        self.destroy()
     }
     
     private func setupNonObservablePropertiesUpdateTimer() {
@@ -99,7 +96,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         if self.rate != 1.0 {
             PKLog.trace("play player")
             
-            self.postEventUpdate(event: PlayerEvents.play())
+            self.postEvent(event: PlayerEvents.play())
             super.play()
         }
     }
@@ -186,7 +183,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         
-        self.postEventUpdate(event: PlayerEvents.error())
+        self.postEvent(event: PlayerEvents.error())
     }
     
     public func playerPlayedToEnd(notification: NSNotification) {
@@ -194,7 +191,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         
-        self.postEventUpdate(event: PlayerEvents.ended())
+        self.postEvent(event: PlayerEvents.ended())
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -249,11 +246,11 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         PKLog.trace("EventChanged::\(event)")
 
         if let currentEvent: PKEvent = event {
-           self.postEventUpdate(event: currentEvent)
+           self.postEvent(event: currentEvent)
         }
     }
     
-    private func postEventUpdate(event: PKEvent) {
+    private func postEvent(event: PKEvent) {
         PKLog.trace("eventChange:: \(event)")
         guard let _ = delegate?.playerDid(updateEvent: event) else {
             PKLog.trace("event is not valid \(event)")
@@ -263,15 +260,15 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
     
     private func postStateChange(newState: PlayerState, oldState: PlayerState) {
         PKLog.trace("stateChanged:: new:\(newState) old:\(oldState)")
-        let stateChnagedEvent: PKEvent = PlayerEvents.stateChanged(newState: newState, oldState: oldState)
+        let stateChangedEvent: PKEvent = PlayerEvents.stateChanged(newState: newState, oldState: oldState)
         
-        self.postEventUpdate(event: stateChnagedEvent)
+        self.postEvent(event: stateChangedEvent)
     }
     
     private func updateNonObservableProperties() {
         if let timebaseRate: Float64 = CMTimebaseGetRate(self.currentItem!.timebase!){
             if timebaseRate == 1.0 {
-                self.postEventUpdate(event: PlayerEvents.playing())
+                self.postEvent(event: PlayerEvents.playing())
                 nonObservablePropertiesUpdateTimer.suspend()
             }
             
