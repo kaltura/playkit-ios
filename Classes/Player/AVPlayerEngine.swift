@@ -59,14 +59,18 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
         PKLog.trace("init AVPlayer")
         super.init()
         
+        avPlayerLayer = AVPlayerLayer(player: self)
+        _view = PlayerView(playerLayer: avPlayerLayer)
+    }
+    
+    private func setupNonObservablePropertiesUpdateTimer() {
+        PKLog.trace("setupNonObservablePropertiesUpdateTimer")
+        
         nonObservablePropertiesUpdateTimer.setEventHandler { [weak self] in
             self?.updateNonObservableProperties()
         }
         nonObservablePropertiesUpdateTimer.scheduleRepeating(deadline: DispatchTime.now(),
                                                              interval: DispatchTimeInterval.milliseconds(50))
-        
-        avPlayerLayer = AVPlayerLayer(player: self)
-        _view = PlayerView(playerLayer: avPlayerLayer)
     }
     
     /**
@@ -107,6 +111,8 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
                 if let contentUrl = sources[0].contentUrl {
                     PKLog.trace("prepareNext item for player")
                     self.replaceCurrentItem(with: AVPlayerItem(url: contentUrl))
+                    self.nonObservablePropertiesUpdateTimer.suspend()
+                    self.setupNonObservablePropertiesUpdateTimer()
                     self.addObservers()
                 }
             }
@@ -218,6 +224,7 @@ class AVPlayerEngine : AVPlayer, PlayerEngine {
             if rate == 1.0 {
                 nonObservablePropertiesUpdateTimer.resume()
             } else {
+                nonObservablePropertiesUpdateTimer.suspend()
                 event = PlayerEvents.pause()
             }
         } else if keyPath == PlayerStatusKey {
