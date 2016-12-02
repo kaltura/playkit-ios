@@ -17,8 +17,7 @@ class PlayerController: Player {
             return (self.currentPlayer?.duration)!
         }
     }
-    
-    var messageBus = MessageBus()
+
     var onEventBlock: ((PKEvent)->Void)?
     
     var delegate: PlayerDelegate?
@@ -56,7 +55,10 @@ class PlayerController: Player {
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.onEventBlock = { (event:PKEvent) in
             PKLog.trace("postEvent:: \(event)")
-            self.messageBus.post(event)
+            
+            if let block = self.onEventBlock {
+                block(event)
+            }
         }
         
         self.onEventBlock = nil
@@ -110,11 +112,6 @@ class PlayerController: Player {
     
     func destroy() {
         self.currentPlayer?.destroy()
-    }
-    
-    func player(encounteredError: NSError) {
-        // TODO:: finalizing + object validation
-        NSLog("encounteredError")
     }
     
     func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {
