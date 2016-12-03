@@ -25,6 +25,7 @@ class AVPlayerEngine : AVPlayer {
     private var _view: PlayerView!
     private var currentState: PlayerState = PlayerState.idle
     private var isObserved: Bool = false
+    private var isSeeking: Bool = false
     
 //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
     private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
@@ -55,7 +56,7 @@ class AVPlayerEngine : AVPlayer {
             PKLog.trace("set currentPosition: \(currentPosition)")
             let newTime = CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
-            
+            self.isSeeking = true
             self.postEvent(event: PlayerEvents.seeking())
         }
     }
@@ -186,7 +187,6 @@ class AVPlayerEngine : AVPlayer {
                  it our player's current item.
                  */
                 self.replaceCurrentItem(with: AVPlayerItem(asset: newAsset))
-                self.setupNonObservablePropertiesUpdateTimer()
                 self.removeObservers()
                 self.addObservers()
             }
@@ -279,6 +279,11 @@ class AVPlayerEngine : AVPlayer {
         } else if keyPath == #keyPath(currentItem.duration) {
             event = PlayerEvents.durationChange(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
         } else if keyPath == #keyPath(rate) {
+            if self.isSeeking {
+                self.isSeeking = false
+                self.postEvent(event: PlayerEvents.seeked())
+            }
+            
             if rate == 1.0 {
                 nonObservablePropertiesUpdateTimer.resume()
             } else {
@@ -286,7 +291,10 @@ class AVPlayerEngine : AVPlayer {
             }
         } else if keyPath == #keyPath(currentItem.status) {
             if currentItem?.status == .readyToPlay {
+                self.setupNonObservablePropertiesUpdateTimer()
+                
                 let newState = PlayerState.ready
+                self.postEvent(event: PlayerEvents.loadedMetadata())
                 self.postStateChange(newState: newState, oldState: self.currentState)
                 self.currentState = newState
                 
@@ -330,8 +338,9 @@ class AVPlayerEngine : AVPlayer {
             if let timebase = currItem.timebase {
                 if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
                     if timebaseRate == 1.0 {
-                        self.postEvent(event: PlayerEvents.playing())
                         nonObservablePropertiesUpdateTimer.suspend()
+                        
+                        self.postEvent(event: PlayerEvents.playing())
                     }
                     
                     PKLog.trace("timebaseRate:: \(timebaseRate)")

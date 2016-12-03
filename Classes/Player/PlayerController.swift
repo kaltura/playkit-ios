@@ -42,6 +42,7 @@ class PlayerController: Player {
         }
         set {
             //
+            self.currentPlayer?.currentPosition = currentTime!
         }
     }
     
@@ -94,7 +95,8 @@ class PlayerController: Player {
     
     func seek(to time: CMTime) {
         PKLog.trace("seek::\(time)")
-        self.currentPlayer?.seek(to: time)
+        self.currentPlayer?.currentPosition = CMTimeGetSeconds(time)
+//        self.currentPlayer?.seek(to: time)
     }
     
     func prepareNext(_ config: PlayerConfig) -> Bool {
