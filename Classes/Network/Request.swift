@@ -11,12 +11,15 @@ import SwiftyJSON
 
 public typealias completionClosures =  (_ response:Response)->Void
 
+
+
+
+
 public protocol Request {
 
      var requestId: String { get }
      var method: String? { get }
      var url: URL { get }
-     var jsonBody: JSON? { get }
      var dataBody: Data? { get }
      var headers: [String:String]? { get }
      var timeout: Double { get }
@@ -24,7 +27,21 @@ public protocol Request {
      var completion: completionClosures? { get }
 }
 
-public class RequestBuilder : Request {
+
+public struct RequestElement : Request {
+    
+    public var requestId: String
+    public var method: String?
+    public var url: URL
+    public var dataBody: Data?
+    public var headers: [String:String]?
+    public var timeout: Double
+    public var conifiguration: RequestConfiguration?
+    public var completion: completionClosures?
+}
+
+
+public class RequestBuilder {
 
    public lazy var requestId: String =  {
         return UUID().uuidString
@@ -33,14 +50,12 @@ public class RequestBuilder : Request {
     public var method: String? = nil
     public var url: URL
     public var jsonBody: JSON? = nil
-    public var dataBody: Data? = nil
     public var headers: [String:String]? = nil
     public var timeout: Double = 3
     public var conifiguration: RequestConfiguration? = nil
     public var completion: completionClosures? = nil
 
 
-    
     public init?(url:String){
         
         if let path = URL(string: url) {
@@ -65,12 +80,6 @@ public class RequestBuilder : Request {
         self.jsonBody = jsonBody
         return self
     }
-    
-    public func set(dataBody: Data?)-> Self{
-        self.dataBody = dataBody
-        return self
-    }
-    
     
     public func set(headers: [String: String]?) -> Self{
         self.headers = headers
@@ -110,7 +119,15 @@ public class RequestBuilder : Request {
     }
     
     public func build() -> Request {
-        return self
+        
+        do {
+         let data = try JSONSerialization.data(withJSONObject: self.jsonBody, options: JSONSerialization.WritingOptions())
+           return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: data, headers: self.headers, timeout: self.timeout, conifiguration: self.conifiguration, completion: self.completion)
+            
+        }catch{
+            return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: nil, headers: self.headers, timeout: self.timeout, conifiguration: self.conifiguration, completion: self.completion)
+            
+        }
     }
     
     

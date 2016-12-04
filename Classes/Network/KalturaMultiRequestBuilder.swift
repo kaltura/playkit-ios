@@ -23,16 +23,17 @@ internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
         return self
     }
     override public func build() -> Request {
-        super.build()
         
+        let data = self.kalturaMultiRequestData()
+        let request = RequestElement(requestId: self.requestId, method: self.method, url: self.url, dataBody: data, headers: self.headers, timeout: self.timeout, conifiguration: self.conifiguration, completion: self.completion)
         
+        return request
+    }
+    
+    func kalturaMultiRequestData() -> Data? {
         
-        if self.jsonBody == nil {
-            self.jsonBody = JSON([String:Any]())
-        }
-        
-        var requestCount = 1
-        
+        let json = JSON([String:Any]())
+        var requestCount = 0
         for request in self.requests {
             
             if let body = request.jsonBody{
@@ -50,8 +51,7 @@ internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
         var data = prefix.data(using: String.Encoding.utf8)
         
         
-        
-        for  index in 1..<requestCount {
+        for  index in 1...requestCount {
             do{
                 let requestBody = try self.jsonBody?[String(index)].rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                 let requestBodyData = requestBody?.data(using: String.Encoding.utf8)
@@ -82,11 +82,12 @@ internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
         }
         
         data?.append(suffix.data(using: String.Encoding.utf8)!)
-        self.dataBody = data
-        //    let string = String(data: data!, encoding: String.Encoding.utf8)
-        //    print(string)
         
+        return data
         
-        return self
     }
+    
+    
 }
+
+

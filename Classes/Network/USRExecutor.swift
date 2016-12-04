@@ -37,17 +37,17 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
         if let data = r.dataBody {
             request.httpBody = data
         }
-        else{
-            var data: Data? = nil
-            do{
-                data = try r.jsonBody?.rawData()
-            }catch{
-                if let completion = r.completion{
-                    completion(Response(data: nil, error: ResponseError.inCorrectJSONBody))
-                }
-            }
-            request.httpBody = data
-        }
+//        else{
+//            var data: Data? = nil
+//            do{
+//                data = try r.jsonBody?.rawData()
+//            }catch{
+//                if let completion = r.completion{
+//                    completion(Response(data: nil, error: ResponseError.inCorrectJSONBody))
+//                }
+//            }
+//            request.httpBody = data
+//        }
         
         
         // handle headers

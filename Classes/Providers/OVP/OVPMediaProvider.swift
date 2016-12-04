@@ -110,9 +110,9 @@ public class OVPMediaProvider: MediaEntryProvider {
                             callback(Result(data: nil, error: error.invalidResponse ))
                         }
                     })
-                        .build()
                     
-                    if let request = mrb {
+                    
+                    if let request = mrb?.build() {
                         self.currentRequest = request
                         self.executor.send(request: request)
                         

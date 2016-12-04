@@ -77,9 +77,9 @@ public class OTTSessionManager: SessionProvider {
                   completion(SessionManagerError.failedToGetLoginResponse)
                 }
             })
-            .build()
             
-            if let request = mrb {
+            
+            if let request = mrb?.build() {
                 
                 if self.executor != nil{
                     self.executor?.send(request: request)
@@ -116,7 +116,7 @@ public class OTTSessionManager: SessionProvider {
                         
                     }))
 
-                if let request = mrb {
+                if let request = mrb?.build() {
                     
                     if self.executor != nil{
                         self.executor?.send(request: request)

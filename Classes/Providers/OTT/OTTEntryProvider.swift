@@ -20,7 +20,6 @@ public class OTTEntryProvider: MediaEntryProvider {
     var formats: [String]?
     var executor: RequestExecutor
     
-    private var currentRequest: Request? = nil
     
     public enum ProviderError: Error {
         case invalidKS
@@ -46,10 +45,10 @@ public class OTTEntryProvider: MediaEntryProvider {
     
     public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
         
-        if self.currentRequest != nil{
-            callback(Result(data: nil, error: ProviderError.currentlyProcessingOtherRequest ))
-            return
-        }
+        //        if self.currentRequest != nil{
+        //            callback(Result(data: nil, error: ProviderError.currentlyProcessingOtherRequest ))
+        //            return
+        //        }
         
         self.sessionProvider.loadKS { (r:Result<String>) in
             
@@ -58,9 +57,8 @@ public class OTTEntryProvider: MediaEntryProvider {
                 return
             }
             
-            let request = OTTAssetService.get(baseURL: sessionProvider.serverURL, ks: ks, assetId: self.mediaId, type:self.type)?.setOTTBasicParams()
-            request?.set(completion: { (r:Response) in
-                self.currentRequest = nil
+            let requestBuilder = OTTAssetService.get(baseURL: sessionProvider.serverURL, ks: ks, assetId: self.mediaId, type:self.type)?.setOTTBasicParams()
+            requestBuilder?.set(completion: { (r:Response) in
                 
                 guard let data = r.data else {
                     callback(Result(data: nil, error: ProviderError.mediaNotFound))
@@ -95,22 +93,18 @@ public class OTTEntryProvider: MediaEntryProvider {
                 }else{
                     callback(Result(data: nil, error: ProviderError.mediaNotFound))
                 }
+                
+            })
             
-        }).build()
-        
-        if let assetRequest = request {
-            self.currentRequest = request
-            executor.send(request: assetRequest)
+            if let assetRequest = requestBuilder?.build() {
+                executor.send(request: assetRequest)
+            }
         }
     }
-}
-
-public func cancel() {
-    if let currentRequest = self.currentRequest {
-        self.executor.cancel(request: currentRequest)
+    
+    public func cancel() {
+        
     }
+    
+    
 }
-}
-
-
-
