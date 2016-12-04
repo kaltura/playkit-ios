@@ -25,7 +25,6 @@ class AVPlayerEngine : AVPlayer {
     private var _view: PlayerView!
     private var currentState: PlayerState = PlayerState.idle
     private var isObserved: Bool = false
-    private var isSeeking: Bool = false
     
 //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
     private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
@@ -55,8 +54,15 @@ class AVPlayerEngine : AVPlayer {
         set {
             PKLog.trace("set currentPosition: \(currentPosition)")
             let newTime = CMTimeMakeWithSeconds(newValue, 1)
-            super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
-            self.isSeeking = true
+            super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { (isSeeked: Bool) in
+                if isSeeked {
+                    self.postEvent(event: PlayerEvents.seeked())
+                    PKLog.trace("seeked")
+                } else {
+                    PKLog.error("seek faild")
+                }
+            }
+            
             self.postEvent(event: PlayerEvents.seeking())
         }
     }
@@ -279,11 +285,6 @@ class AVPlayerEngine : AVPlayer {
         } else if keyPath == #keyPath(currentItem.duration) {
             event = PlayerEvents.durationChange(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
         } else if keyPath == #keyPath(rate) {
-            if self.isSeeking {
-                self.isSeeking = false
-                self.postEvent(event: PlayerEvents.seeked())
-            }
-            
             if rate == 1.0 {
                 nonObservablePropertiesUpdateTimer.resume()
             } else {
