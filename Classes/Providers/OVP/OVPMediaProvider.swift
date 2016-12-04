@@ -20,7 +20,6 @@ public class OVPMediaProvider: MediaEntryProvider {
     
     
     
-    private var currentRequest: Request? = nil
     
     var sessionProvider: SessionProvider
     var entryId: String
@@ -54,12 +53,17 @@ public class OVPMediaProvider: MediaEntryProvider {
                 return
             }
             
-            let listRequest = OVPBaseEntryService.list(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
-            let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
+            let listRequest = OVPBaseEntryService.list(baseURL: self.apiServerURL,
+                                                       ks: ks,
+                                                       entryID: self.entryId)
+            let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: self.apiServerURL,
+                                                                           ks: ks,
+                                                                           entryID: self.entryId)
             
-            guard let req1 = listRequest, let req2 = getContextDataRequest else {
-                callback(Result(data: nil, error: Err.invalidParams))
-                return
+            guard let req1 = listRequest,
+                  let req2 = getContextDataRequest else {
+                    callback(Result(data: nil, error: Err.invalidParams))
+                    return
             }
             
             let mrb = KalturaMultiRequestBuilder(url: self.apiServerURL)?
@@ -67,7 +71,6 @@ public class OVPMediaProvider: MediaEntryProvider {
                 .setOVPBasicParams()
                 .set(completion: { (r:Response) in
                     
-                    self.currentRequest = nil
                     let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: r.data)
                     
                     guard responses.count == 2,
@@ -118,7 +121,6 @@ public class OVPMediaProvider: MediaEntryProvider {
             
             
             if let request = mrb?.build() {
-                self.currentRequest = request
                 self.executor.send(request: request)
                 
             }else{
@@ -156,9 +158,6 @@ public class OVPMediaProvider: MediaEntryProvider {
     
     
     public func cancel() {
-        if let currentRequest = self.currentRequest {
-            self.executor.cancel(request: currentRequest)
-        }
     }
 }
 
