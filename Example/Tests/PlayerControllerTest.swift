@@ -14,7 +14,7 @@ import SwiftyJSON
 //If somthing is break here we should raise a red flag - since this is our public API
 class PlayerControllerTest: XCTestCase {
     var player : Player!
-
+    
     
     override func setUp() {
         super.setUp()
@@ -51,10 +51,10 @@ class PlayerControllerTest: XCTestCase {
             } else {
                 XCTFail()
             }
-        
-        
+            
+            
         }
-         waitForExpectations(timeout: 10.0) { (_) -> Void in}
+        waitForExpectations(timeout: 10.0) { (_) -> Void in}
     }
     
     func testPauseCommand() {
@@ -73,8 +73,30 @@ class PlayerControllerTest: XCTestCase {
         waitForExpectations(timeout: 10.0) { (_) -> Void in}
     }
     
-
-
+    
+    func testIsPlayingValue() {
+        let theExeption = expectation(description: "play command")
+        self.player.play();
+        self.player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.pause.self]) { (info: Any) in
+            
+            if info as! PKEvent is PlayerEvents.playing {
+                if self.player.isPlaying {
+                    self.player.pause()
+                } else {
+                    XCTFail()
+                }
+                
+            } else if info as! PKEvent is PlayerEvents.pause {
+                if !self.player.isPlaying {
+                    theExeption.fulfill()
+                } else {
+                    XCTFail()
+                }
+            }
+        }
+       
+        waitForExpectations(timeout: 10.0) { (_) -> Void in}
+    }
     
     func testPerformanceExample() {
         // This is an example of a performance test case.

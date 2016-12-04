@@ -73,6 +73,25 @@ class AVPlayerEngine : AVPlayer {
         return CMTimeGetSeconds(self.currentItem!.duration)
     }
     
+    public var isPlaying: Bool {
+        guard let currentItem = self.currentItem else {
+            PKLog.error("current item is empty")
+            return false
+        }
+        
+        if self.rate == 1.0 {
+            if let timebase = currentItem.timebase {
+                if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
+                    if timebaseRate == 1.0 {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
+    
     // MARK: Player Methods
     
     public override init() {
