@@ -12,8 +12,6 @@ import SwiftyJSON
 public class OTTEntryProvider: MediaEntryProvider {
     
     
-    
-    
     let sessionProvider: SessionProvider
     var mediaId: String
     var type: AssetType
@@ -21,7 +19,7 @@ public class OTTEntryProvider: MediaEntryProvider {
     var executor: RequestExecutor
     
     
-    public enum ProviderError: Error {
+    public enum Err: Error {
         case invalidKS
         case fileIsEmptyOrNotFound
         case invalidJSON
@@ -29,6 +27,7 @@ public class OTTEntryProvider: MediaEntryProvider {
         case currentlyProcessingOtherRequest
         case unableToParseObject
     }
+    
     
     public init(sessionProvider:SessionProvider, mediaId: String, type:AssetType,formats: [String],executor:RequestExecutor?){
         self.sessionProvider = sessionProvider
@@ -46,23 +45,19 @@ public class OTTEntryProvider: MediaEntryProvider {
     
     public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
         
-        //        if self.currentRequest != nil{
-        //            callback(Result(data: nil, error: ProviderError.currentlyProcessingOtherRequest ))
-        //            return
-        //        }
-        
         self.sessionProvider.loadKS { (r:Result<String>) in
             
             guard let ks = r.data else {
-                callback(Result(data: nil, error: ProviderError.invalidKS))
+                callback(Result(data: nil, error: Err.invalidKS))
                 return
             }
             
-            let requestBuilder = OTTAssetService.get(baseURL: self.sessionProvider.serverURL, ks: ks, assetId: self.mediaId, type:self.type)?.setOTTBasicParams()
-            requestBuilder?.set(completion: { (r:Response) in
+            let requestBuilder = OTTAssetService.get(baseURL: self.sessionProvider.serverURL, ks: ks, assetId: self.mediaId, type:self.type)?
+                .setOTTBasicParams()
+                .set(completion: { (r:Response) in
                 
                 guard let data = r.data else {
-                    callback(Result(data: nil, error: ProviderError.mediaNotFound))
+                    callback(Result(data: nil, error: Err.mediaNotFound))
                     return
                 }
                 
@@ -98,7 +93,7 @@ public class OTTEntryProvider: MediaEntryProvider {
                     
                     callback(Result(data: mediaEntry, error: nil))
                 }else{
-                    callback(Result(data: nil, error: ProviderError.mediaNotFound))
+                    callback(Result(data: nil, error: Err.mediaNotFound))
                 }
                 
             })

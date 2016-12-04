@@ -11,12 +11,12 @@ import UIKit
 public class OVPMediaProvider: MediaEntryProvider {
     
     
-    enum error: Error {
+    enum Err: Error {
         case invalidKS
         case invalidParams
         case invalidResponse
         case currentlyProcessingOtherRequest
-  }
+    }
     
     
     
@@ -47,86 +47,85 @@ public class OVPMediaProvider: MediaEntryProvider {
     
     public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void){
         
-        if self.currentRequest != nil{
-            callback(Result(data: nil, error: error.currentlyProcessingOtherRequest ))
-            return
-        }
-        
         self.sessionProvider.loadKS { (r:Result<String>) in
             
-            if let ks = r.data{
-                let listRequest = OVPBaseEntryService.list(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
-                let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
-                
-                
-                if let req1 = listRequest, let req2 = getContextDataRequest{
+            guard let ks = r.data else {
+                callback(Result(data: nil, error: Err.invalidKS))
+                return
+            }
+            
+            let listRequest = OVPBaseEntryService.list(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
+            let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: self.apiServerURL, ks: ks, entryID: self.entryId)
+            
+            guard let req1 = listRequest, let req2 = getContextDataRequest else {
+                callback(Result(data: nil, error: Err.invalidParams))
+                return
+            }
+            
+            let mrb = KalturaMultiRequestBuilder(url: self.apiServerURL)?
+                .add(request: req1).add(request: req2)
+                .setOVPBasicParams()
+                .set(completion: { (r:Response) in
                     
-                    let mrb = KalturaMultiRequestBuilder(url: self.apiServerURL)?.add(request: req1).add(request: req2).setOVPBasicParams().set(completion: { (r:Response) in
-                        
-                        self.currentRequest = nil
-                        let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: r.data)
-                        
-                        if (responses.count == 2){
-                            
-                            let mainResponse: OVPBaseObject = responses[0]
-                            let contextDataResponse: OVPBaseObject = responses[1]
-                            
-                            guard let mainResponseData = mainResponse as? OVPList, let entry = mainResponseData.objects?.last as? OVPEntry, let contextData = contextDataResponse as? OVPEntryContextData, let flavorAssets = contextData.flavorAssets  ,let sources = contextData.sources else{
-                                callback(Result(data: nil, error: error.invalidResponse ))
-                                return
-                            }
-                            
-                            let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
-                            mediaEntry.duration = entry.duration
-                            
-                            var mediaSources: [MediaSource] = [MediaSource]()
-                            sources.forEach({ (source:OVPSource) in
-                                
-                                let mediaSource: MediaSource = MediaSource(id: String(source.deliveryProfileId))
-                                let sourceBuilder: SourceBuilder = SourceBuilder()
-                                let supportedFlavors = self.flavorsByFlavorsParamIds(flavorsIds: source.flavors, flavorAsset: flavorAssets)
-                                let flavorsId = self.flavorsId(flavors: supportedFlavors)
-                                
-                                sourceBuilder.set(baseURL: self.sessionProvider.serverURL)
-                                sourceBuilder.set(ks: ks)
-                                sourceBuilder.set(format: source.format)
-                                sourceBuilder.set(entryId: self.entryId)
-                                sourceBuilder.set(uiconfId: self.uiconfId)
-                                sourceBuilder.set(flavors: source.flavors)
-                                sourceBuilder.set(partnerId: self.sessionProvider.partnerId)
-                                sourceBuilder.set(playSessionId: UUID().uuidString) // insert - session
-                                sourceBuilder.set(sourceProtocol: source.protocols?.last)
-                                
-                                let url = sourceBuilder.build()
-                                mediaSource.contentUrl = url
-                                let drmData = DRMData()
-                                drmData.licenseURL = source.drm?.last?.licenseURL
-                                mediaSource.drmData = drmData
-                                mediaSources.append(mediaSource)
-                            })
-                            mediaEntry.sources = mediaSources
-                            callback(Result(data: mediaEntry, error: nil ))
-                        }else{
-                            callback(Result(data: nil, error: error.invalidResponse ))
-                        }
-                    })
+                    self.currentRequest = nil
+                    let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: r.data)
                     
-                    
-                    if let request = mrb?.build() {
-                        self.currentRequest = request
-                        self.executor.send(request: request)
-                        
-                    }else{
-                        callback(Result(data: nil, error: error.invalidParams))
+                    guard responses.count == 2,
+                        let mainResponse: OVPBaseObject = responses[0],
+                        let contextDataResponse: OVPBaseObject = responses[1],
+                        let mainResponseData = mainResponse as? OVPList,
+                        let entry = mainResponseData.objects?.last as? OVPEntry,
+                        let contextData = contextDataResponse as? OVPEntryContextData,
+                        let flavorAssets = contextData.flavorAssets  ,
+                        let sources = contextData.sources
+                        else{
+                            callback(Result(data: nil, error: Err.invalidResponse ))
+                            return
                     }
-                }else{
-                    callback(Result(data: nil, error: error.invalidParams))
-                }
+                    
+                    let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
+                    mediaEntry.duration = entry.duration
+                    
+                    var mediaSources: [MediaSource] = [MediaSource]()
+                    sources.forEach({ (source:OVPSource) in
+                        
+                        let mediaSource: MediaSource = MediaSource(id: String(source.deliveryProfileId))
+                        let sourceBuilder: SourceBuilder = SourceBuilder()
+                        let supportedFlavors = self.flavorsByFlavorsParamIds(flavorsIds: source.flavors, flavorAsset: flavorAssets)
+                        let flavorsId = self.flavorsId(flavors: supportedFlavors)
+                        
+                        sourceBuilder.set(baseURL: self.sessionProvider.serverURL)
+                        sourceBuilder.set(ks: ks)
+                        sourceBuilder.set(format: source.format)
+                        sourceBuilder.set(entryId: self.entryId)
+                        sourceBuilder.set(uiconfId: self.uiconfId)
+                        sourceBuilder.set(flavors: source.flavors)
+                        sourceBuilder.set(partnerId: self.sessionProvider.partnerId)
+                        sourceBuilder.set(playSessionId: UUID().uuidString) // insert - session
+                        sourceBuilder.set(sourceProtocol: source.protocols?.last)
+                        
+                        let url = sourceBuilder.build()
+                        mediaSource.contentUrl = url
+                        let drmData = DRMData()
+                        drmData.licenseURL = source.drm?.last?.licenseURL
+                        mediaSource.drmData = drmData
+                        mediaSources.append(mediaSource)
+                    })
+                    mediaEntry.sources = mediaSources
+                    callback(Result(data: mediaEntry, error: nil ))
+                    
+                })
+            
+            
+            if let request = mrb?.build() {
+                self.currentRequest = request
+                self.executor.send(request: request)
                 
             }else{
-                callback(Result(data: nil, error: error.invalidKS))
+                callback(Result(data: nil, error: Err.invalidParams))
             }
         }
+        
     }
     
     func flavorsByFlavorsParamIds(flavorsIds:[String]?,flavorAsset:[OVPFlavorAsset]) -> [OVPFlavorAsset] {
@@ -161,8 +160,6 @@ public class OVPMediaProvider: MediaEntryProvider {
             self.executor.cancel(request: currentRequest)
         }
     }
-    
-    
 }
 
 
