@@ -19,8 +19,6 @@
 		C24770AB1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C24770AA1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift */; };
 		C24770AD1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
 		C24770B01DEDF36900E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
-		BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */; };
-		C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,9 +50,7 @@
 		846088A81DD2619A009E0E7A /* MockMediaProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockMediaProviderTest.swift; sourceTree = "<group>"; };
 		C24770AA1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OVPMediaProviederTest.swift; sourceTree = "<group>"; };
 		C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ovp.multirequest._.1_1h1vsv3z.json; sourceTree = "<group>"; };
-		BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessegeBusTest.swift; sourceTree = "<group>"; };
 		C6039FAD64FBD55034BCB260 /* Pods-PlayKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlayKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PlayKit_Tests/Pods-PlayKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerControllerTest.swift; sourceTree = "<group>"; };
 		D1F7DD9C5361102A75AA1CAB /* Pods_PlayKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlayKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0608E8A07C05613B6F7157E /* Pods-PlayKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlayKit_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-PlayKit_Example/Pods-PlayKit_Example.release.xcconfig"; sourceTree = "<group>"; };
 		F22FBF5CD0C0446ED67E8399 /* Pods_PlayKit_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlayKit_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -127,11 +123,9 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */,
 				846088A81DD2619A009E0E7A /* MockMediaProviderTest.swift */,
 				C24770AA1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
-				C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -397,8 +391,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */,
-				BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */,
 				846088A91DD2619A009E0E7A /* MockMediaProviderTest.swift in Sources */,
 				C24770AB1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift in Sources */,
 			);
