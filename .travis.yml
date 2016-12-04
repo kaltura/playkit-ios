@@ -10,5 +10,6 @@ notifications:
   email:
     recipients:
       - noam.tamim@kaltura.com
+      - eliza.sapir@kaltura.com
     on_success: change
     on_failure: always
