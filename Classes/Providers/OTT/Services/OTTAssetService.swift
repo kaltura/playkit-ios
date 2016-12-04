@@ -19,9 +19,9 @@ public enum AssetType: String {
 
 internal class OTTAssetService {
 
-    internal static func get(baseURL: String, ks: String,assetId: String, type: AssetType) -> OTTRequestBuilder? {
+    internal static func get(baseURL: String, ks: String,assetId: String, type: AssetType) -> KalturaRequestBuilder? {
         
-        if let request: OTTRequestBuilder = OTTRequestBuilder(url: baseURL, service: "asset", action: "get") {
+        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "get") {
             request
             .setBody(key: "id", value: JSON(assetId))
             .setBody(key: "ks", value: JSON(ks))

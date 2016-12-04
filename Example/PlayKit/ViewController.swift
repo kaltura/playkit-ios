@@ -26,7 +26,6 @@ class ViewController: UIViewController, SessionProvider {
         completion(Result(data: "djJ8MjIwOTU5MXwyIZSCaXFEPW-YsddV0iXms3_oW1-8Y11RSakwymknSVvJ9SSQvQ5dndAeHCRFFFtQ6WqT6LtHRDgRtOYlNJYJ85Z28AX-cGKGczC6269Ym0dtLnOXua4pLa3i46qut9M=", error: nil))
     }
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -34,7 +33,6 @@ class ViewController: UIViewController, SessionProvider {
         provider.loadMedia { (r:Result<MediaEntry>) in
             print(r)
         }
-
     }
 
     override func didReceiveMemoryWarning() {
@@ -43,22 +41,6 @@ class ViewController: UIViewController, SessionProvider {
     }
 
 }
-
-
-//let sessionProvider = OTTSessionManager(serverURL: self.serverURL, partnerId: self.partnerId, executor: nil)
-//
-//sessionProvider.login(username: "rivka@p.com", password: "123456") { (e:Error?) in
-//    if ( e == nil){
-//        //login succeded
-//        sessionProvider.loadKS(completion: { (r:Result<String>) in
-//            print(r.data)
-//            }
-//        )
-//        
-//        
-//        
-//    }
-//}
 
 
 

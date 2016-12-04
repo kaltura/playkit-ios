@@ -75,7 +75,7 @@ public class OTTEntryProvider: MediaEntryProvider {
                         
                         let mediaEntry: MediaEntry = MediaEntry(id: asset.id)
                         
-                        let licensedLinkRequests: [OTTRequestBuilder] = [OTTRequestBuilder]()
+                        let licensedLinkRequests: [KalturaRequestBuilder] = [KalturaRequestBuilder]()
                         if let files = asset.files, let requestedFormats = self.formats {
                             
                             var sources = [MediaSource]()

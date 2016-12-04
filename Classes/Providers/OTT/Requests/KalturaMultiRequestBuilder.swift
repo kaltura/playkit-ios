@@ -9,20 +9,15 @@
 import UIKit
 import SwiftyJSON
 
-internal class OTTMultiRequestBuilder: OTTRequestBuilder {
+internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
     
-    internal var requests: [OTTRequestBuilder] = [OTTRequestBuilder]()
+    internal var requests: [KalturaRequestBuilder] = [KalturaRequestBuilder]()
 
     internal init?(url: String) {
-        //TODO:
-        //OTT:super.init(url: url, service: "multiRequest", action: nil)
         super.init(url: url, service: "multirequest", action: nil)
-        
-        
-        
     }
     
-    internal func add(request:OTTRequestBuilder) -> Self {
+    internal func add(request:KalturaRequestBuilder) -> Self {
         
         self.requests.append(request)
         return self
@@ -81,9 +76,6 @@ internal class OTTMultiRequestBuilder: OTTRequestBuilder {
                     }
                     
                 }
-                
-                
-                
             }
         }catch{
             print("unable to parse json")

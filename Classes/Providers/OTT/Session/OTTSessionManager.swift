@@ -51,7 +51,7 @@ public class OTTSessionManager: SessionProvider {
         
         if let r1 = loginRequestBuilder, let r2 = sessionGetRequest {
             
-            let mrb = OTTMultiRequestBuilder(url: self.serverURL)?.add(request: r1).add(request: r2)
+            let mrb = KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: r1).add(request: r2)
             mrb?.set(completion: { (r:Response) in
                 
                 if let data = r.data
@@ -108,7 +108,7 @@ public class OTTSessionManager: SessionProvider {
                 if let req1 = refreshSessionRequest, let req2 = getSessionRequest {
                     
                 }
-                    let mrb: OTTMultiRequestBuilder? = ((OTTMultiRequestBuilder(url: self.serverURL)?.add(request: refreshSessionRequest!).add(request: getSessionRequest!))?.set(completion: { (r:Response) in
+                    let mrb: KalturaMultiRequestBuilder? = ((KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: refreshSessionRequest!).add(request: getSessionRequest!))?.set(completion: { (r:Response) in
                         
                         if let data = r.data{
                             OTTMultiResponseParser.parse(data: data)
