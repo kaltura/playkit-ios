@@ -30,9 +30,10 @@ class MessegeBusTest: XCTestCase {
         entry["id"] = "test"
         entry["sources"] = sources
         
-        config.set(mediaEntry: MediaEntry(json: JSON(entry)))
-        
+        if let media = MediaEntry(json: JSON(entry)) {
+        config.set(mediaEntry: media)
         self.player = PlayKitManager.sharedInstance.loadPlayer(config:config)
+        }
         
     }
     
