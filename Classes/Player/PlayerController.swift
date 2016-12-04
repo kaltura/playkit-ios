@@ -10,20 +10,20 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: Player, PlayerEngineDelegate {
+class PlayerController: Player {
     
     public var duration: Double {
         get {
             return (self.currentPlayer?.duration)!
         }
     }
-    
-    var messageBus = MessageBus()
+
     var onEventBlock: ((PKEvent)->Void)?
     
     var delegate: PlayerDelegate?
     
-    private var currentPlayer: PlayerEngine?
+    private var currentPlayer: AVPlayerEngine?
+    private var assetBuilder: AssetBuilder?
     
     public var autoPlay: Bool? {
         get {
@@ -42,6 +42,7 @@ class PlayerController: Player, PlayerEngineDelegate {
         }
         set {
             //
+            self.currentPlayer?.currentPosition = currentTime!
         }
     }
     
@@ -53,29 +54,49 @@ class PlayerController: Player, PlayerEngineDelegate {
     
     public init(mediaEntry: PlayerConfig) {
         self.currentPlayer = AVPlayerEngine()
-        self.currentPlayer?.delegate = self
+        self.currentPlayer?.onEventBlock = { (event:PKEvent) in
+            PKLog.trace("postEvent:: \(event)")
+            
+            if let block = self.onEventBlock {
+                block(event)
+            }
+        }
+        
         self.onEventBlock = nil
     }
     
     func prepare(_ config: PlayerConfig) {
-        currentPlayer?.prepareNext(config)
+        if let mediaEntry: MediaEntry = config.mediaEntry  {
+            self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
+            self.assetBuilder?.build(readyCallback: { (asset: AVAsset?) in
+                if let avAsset: AVAsset = asset {
+                    self.currentPlayer?.asset = avAsset
+                }
+            })
+        } else {
+            PKLog.warning("mediaEntry is empty")
+        }
     }
     
     func play() {
-        PKLog.trace("Enter Play")
+        PKLog.trace("play::")
         self.currentPlayer?.play()
     }
     
     func pause() {
+        PKLog.trace("pause::")
         self.currentPlayer?.pause()
     }
     
     func resume() {
+        PKLog.trace("resume::")
         self.currentPlayer?.play()
     }
     
     func seek(to time: CMTime) {
-        self.currentPlayer?.seek(to: time)
+        PKLog.trace("seek::\(time)")
+        self.currentPlayer?.currentPosition = CMTimeGetSeconds(time)
+//        self.currentPlayer?.seek(to: time)
     }
     
     func prepareNext(_ config: PlayerConfig) -> Bool {
@@ -93,19 +114,6 @@ class PlayerController: Player, PlayerEngineDelegate {
     
     func destroy() {
         self.currentPlayer?.destroy()
-    }
-    
-    func playerDid(updateEvent: PKEvent) {
-        // TODO:: finilizing + object validation
-        PKLog.trace("changedState: \(updateEvent)")
-        if let block = onEventBlock {
-            block(updateEvent)
-        }
-    }
-    
-    func player(encounteredError: NSError) {
-        // TODO:: finilizing + object validation
-        NSLog("encounteredError")
     }
     
     func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {

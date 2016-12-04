@@ -111,7 +111,7 @@ public class AdEvents: PKEvent {
             self.totalTime = totalTime
         }
         
-        public required override init() {
+        public required init() {
             fatalError("init() has not been implemented")
         }
     }
@@ -123,7 +123,7 @@ public class AdEvents: PKEvent {
         public init(webOpener: NSObject!) {
             self.webOpener = webOpener
         }
-        public required override init() {
+        public required init() {
             fatalError("init() has not been implemented")
         }
     }
