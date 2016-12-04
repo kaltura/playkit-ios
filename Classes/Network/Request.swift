@@ -16,15 +16,15 @@ public typealias completionClosures =  (_ response:Response)->Void
 
 
 public protocol Request {
-
-     var requestId: String { get }
-     var method: String? { get }
-     var url: URL { get }
-     var dataBody: Data? { get }
-     var headers: [String:String]? { get }
-     var timeout: Double { get }
-     var conifiguration: RequestConfiguration? { get }
-     var completion: completionClosures? { get }
+    
+    var requestId: String { get }
+    var method: String? { get }
+    var url: URL { get }
+    var dataBody: Data? { get }
+    var headers: [String:String]? { get }
+    var timeout: Double { get }
+    var conifiguration: RequestConfiguration? { get }
+    var completion: completionClosures? { get }
 }
 
 
@@ -42,8 +42,8 @@ public struct RequestElement : Request {
 
 
 public class RequestBuilder {
-
-   public lazy var requestId: String =  {
+    
+    public lazy var requestId: String =  {
         return UUID().uuidString
     }()
     
@@ -54,8 +54,8 @@ public class RequestBuilder {
     public var timeout: Double = 3
     public var conifiguration: RequestConfiguration? = nil
     public var completion: completionClosures? = nil
-
-
+    
+    
     public init?(url:String){
         
         if let path = URL(string: url) {
@@ -120,19 +120,24 @@ public class RequestBuilder {
     
     public func build() -> Request {
         
-        do {
-         let data = try JSONSerialization.data(withJSONObject: self.jsonBody, options: JSONSerialization.WritingOptions())
-           return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: data, headers: self.headers, timeout: self.timeout, conifiguration: self.conifiguration, completion: self.completion)
-            
-        }catch{
-            return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: nil, headers: self.headers, timeout: self.timeout, conifiguration: self.conifiguration, completion: self.completion)
-            
+        
+        var bodyData: Data? = nil
+        if let body = self.jsonBody {
+            do {
+                bodyData = try body.rawData()
+            }catch{
+                
+            }
         }
+        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, conifiguration: self.conifiguration, completion: self.completion)
+        
+        
     }
-    
-    
-    
-
-    
-    
 }
+
+
+
+
+
+
+
