@@ -18,30 +18,21 @@ class OVPObjectMapper: NSObject {
     
     static func classByJsonObject(json:Any?) -> OVPBaseObject.Type? {
      
-        
         let jsonObject = JSON(json)
         let className = jsonObject[classNameKey].string
-        
-        
         if let name = className{
             switch name {
             case "KalturaMediaEntry":
                 return OVPEntry.self
             case "KalturaEntryContextDataResult":
                 return OVPEntryContextData.self
+            case "KalturaAPIException":
+                return OVPError.self
             default:
                 return nil
             }
         }
-//        else{
-//            if let jsonError = jsonObject[errorKey].dictionary {
-//                return OTTError.self
-//            }else{
-//                return nil
-//            }
-            
-//        }
-            return nil
+        return nil
         
     }
     

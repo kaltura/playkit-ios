@@ -10,25 +10,22 @@ import UIKit
 import SwiftyJSON
 
 class OTTResponseParser: ResponseParser {
-
     
-    enum error: Error {
-        case typeNotFound
-        case emptyResponse
-    }
-
-    static func parse(data:Any) -> Result<OTTBaseObject> {
-     
+    
+    static func parse(data:Any) -> OTTBaseObject {
         
-            let jsonResponse = JSON(data)
-            let resultObjectJSON = jsonResponse["result"].dictionaryObject
-            let objectType: OTTBaseObject.Type? = OTTObjectMapper.classByJsonObject(json: resultObjectJSON)
-            if let type = objectType{
-                    let object: OTTBaseObject? = type.init(json: resultObjectJSON)
-                return Result(data: object, error: nil)
+        let jsonResponse = JSON(data)
+        let resultObjectJSON = jsonResponse["result"].dictionaryObject
+        let objectType: OTTBaseObject.Type? = OTTObjectMapper.classByJsonObject(json: resultObjectJSON)
+        if let type = objectType{
+            if let object = type.init(json: resultObjectJSON) {
+                return object
             }else{
-                return Result(data: nil, error: error.typeNotFound)
+              return OTTError()
             }
+        }else{
+            return OTTError()
+        }
     }
 }
 

@@ -10,7 +10,7 @@ import UIKit
 
 protocol OTTBaseObject {
     
-    init?(json:Any)
+     init?(json:Any)
 }
 
 

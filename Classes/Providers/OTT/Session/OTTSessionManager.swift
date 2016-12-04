@@ -56,13 +56,13 @@ public class OTTSessionManager: SessionProvider {
                 
                 if let data = r.data
                 {
-                    let result: [Result<OTTBaseObject>] = OTTMultiResponseParser.parse(data:data)
+                    let result: [OTTBaseObject] = OTTMultiResponseParser.parse(data:data)
                     
                     if result.count == 2{
-                        let loginResult: Result<OTTBaseObject> = result[0]
-                        let sessionResult: Result<OTTBaseObject> = result[1]
+                        let loginResult: OTTBaseObject = result[0]
+                        let sessionResult: OTTBaseObject = result[1]
                         
-                        if  let obj1 = loginResult.data , let obj2 = sessionResult.data, let loginObj = obj1 as? OTTLogin, let sessionObj = obj2 as? OTTSession  {
+                        if  let loginObj = loginResult as? OTTLogin, let sessionObj = sessionResult as? OTTSession  {
                         
                             self.ks = loginObj.ks
                             self.refreshToken = loginObj.refreshToken

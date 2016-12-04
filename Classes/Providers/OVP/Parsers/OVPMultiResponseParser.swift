@@ -11,22 +11,14 @@ import SwiftyJSON
 
 class OVPMultiResponseParser: NSObject {
     
-    
-    enum error: Error {
-        case typeNotFound
-        case emptyResponse
-        case notMultiResponse
-    }
-    
-    static func parse(data:Any) -> [Result<OVPBaseObject>] {
+    static func parse(data:Any) -> [OVPBaseObject] {
         
         let jsonResponse = JSON(data)
         if let resultArrayJSON = jsonResponse.array{
             
-            var resultArray: [Result<OVPBaseObject>] = [Result<OVPBaseObject>]()
+            var resultArray: [OVPBaseObject] = [OVPBaseObject]()
             for jsonResult: JSON in resultArrayJSON{
-                // the result is list
-                var resultObject: Result<OVPBaseObject>? = nil
+                var object: OVPBaseObject? = nil
                 if let objects = jsonResult["objects"].array{
                     var parsedObjects: [OVPBaseObject] = [OVPBaseObject]()
                     for object in objects{
@@ -34,26 +26,18 @@ class OVPMultiResponseParser: NSObject {
                             parsedObjects.append(OVPObject)
                         }
                     }
-                    
-                  let list = OVPList(objects: parsedObjects)
-                  resultObject = Result(data: list, error: nil)
-                    
+                  object = OVPList(objects: parsedObjects)
                 }else{
-                    
-                    let object = OVPMultiResponseParser.parseSingleItem(json: jsonResult)
-                    resultObject = Result(data: object, error: nil)
-                // TODO:
-                //the result is single object
+                    object = OVPMultiResponseParser.parseSingleItem(json: jsonResult)
                 }
                 
-                if let result = resultObject{
-                        resultArray.append(result)
+                if let obj = object{
+                    resultArray.append(obj)
                 }
             }
-            
             return resultArray
         }else{
-            return [Result(data: nil, error: error.notMultiResponse)]
+            return [OVPBaseObject]()
         }
     }
     

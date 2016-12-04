@@ -16,7 +16,6 @@ class OVPList: OVPBaseObject {
     init(objects:[OVPBaseObject]?) {
         self.objects = objects
     }
-    
     required init?(json: Any) {
         
     }

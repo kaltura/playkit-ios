@@ -20,11 +20,16 @@ class OTTError: OTTBaseObject {
     let messageKey = "message"
     let codeKey = "code"
     
+    
     required init?(json: Any) {
         
         let jsonObj: JSON = JSON(json)
         self.message = jsonObj[errorKey][messageKey].string
         self.code = jsonObj[errorKey][codeKey].string
+    }
+    
+    init() {
+        
     }
     
 }

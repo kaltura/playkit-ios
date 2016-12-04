@@ -64,26 +64,14 @@ public class OVPMediaProvider: MediaEntryProvider {
                     let mrb = KalturaMultiRequestBuilder(url: self.apiServerURL)?.add(request: req1).add(request: req2).setOVPBasicParams().set(completion: { (r:Response) in
                         
                         self.currentRequest = nil
-                        let responses: [Result<OVPBaseObject>] = OVPMultiResponseParser.parse(data: r.data)
-                        print(responses)
-                        
+                        let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: r.data)
                         
                         if (responses.count == 2){
                             
-                            let mainResponse: Result<OVPBaseObject> = responses[0]
-                            let contextDataResponse: Result<OVPBaseObject> = responses[1]
+                            let mainResponse: OVPBaseObject = responses[0]
+                            let contextDataResponse: OVPBaseObject = responses[1]
                             
-                            guard mainResponse.error == nil else{
-                                callback(Result(data: nil, error: mainResponse.error ))
-                                return
-                            }
-                            
-                            guard contextDataResponse.error == nil else{
-                                callback(Result(data: nil, error: contextDataResponse.error ))
-                                return
-                            }
-                            
-                            guard let mainResponseData = mainResponse.data as? OVPList, let entry = mainResponseData.objects?.last as? OVPEntry, let contextData = contextDataResponse.data as? OVPEntryContextData, let flavorAssets = contextData.flavorAssets  ,let sources = contextData.sources else{
+                            guard let mainResponseData = mainResponse as? OVPList, let entry = mainResponseData.objects?.last as? OVPEntry, let contextData = contextDataResponse as? OVPEntryContextData, let flavorAssets = contextData.flavorAssets  ,let sources = contextData.sources else{
                                 callback(Result(data: nil, error: error.invalidResponse ))
                                 return
                             }

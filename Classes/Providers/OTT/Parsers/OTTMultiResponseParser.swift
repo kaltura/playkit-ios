@@ -18,26 +18,30 @@ class OTTMultiResponseParser: NSObject {
         case notMultiResponse
     }
     
-    static func parse(data:Any) -> [Result<OTTBaseObject>] {
+    static func parse(data:Any) -> [OTTBaseObject] {
         
         let jsonResponse = JSON(data)
         if let resultArrayJSON = jsonResponse["result"].array{
             
-            var resultArray: [Result<OTTBaseObject>] = [Result<OTTBaseObject>]()
+            var resultArray: [OTTBaseObject] = [OTTBaseObject]()
             for jsonObject: JSON in resultArrayJSON{
+                var object: OTTBaseObject? = nil
                 let objectType: OTTBaseObject.Type? = OTTObjectMapper.classByJsonObject(json: jsonObject.dictionaryObject)
                 if let type = objectType{
-                    let object: OTTBaseObject? = type.init(json: jsonObject.object)
-                    resultArray.append(Result(data: object, error: nil))
+                     object = type.init(json: jsonObject.object)
                 }else{
-                    resultArray.append(Result(data: nil, error: error.typeNotFound))
+                    // TO DO: add informatical error 
+                    object = OTTError()
                 }
                 
+                if let obj = object{
+                    resultArray.append(obj)
+                }
             }
             
             return resultArray
         }else{
-            return [Result(data: nil, error: error.notMultiResponse)]
+            return [OTTBaseObject]()
         }
     }
 }

@@ -29,8 +29,6 @@ class OTTObjectMapper: NSObject {
                 return OTTLogin.self
             case "KalturaSession":
                 return OTTSession.self
-                
-
             default:
                 return nil
             }

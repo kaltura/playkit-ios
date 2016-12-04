@@ -10,8 +10,8 @@ import UIKit
 import SwiftyJSON
 
 public class OTTEntryProvider: MediaEntryProvider {
-  
-
+    
+    
     
     
     let sessionProvider: SessionProvider
@@ -21,7 +21,7 @@ public class OTTEntryProvider: MediaEntryProvider {
     var executor: RequestExecutor
     
     private var currentRequest: Request? = nil
-
+    
     public enum ProviderError: Error {
         case invalidKS
         case fileIsEmptyOrNotFound
@@ -60,62 +60,56 @@ public class OTTEntryProvider: MediaEntryProvider {
             
             let request = OTTAssetService.get(baseURL: sessionProvider.serverURL, ks: ks, assetId: self.mediaId, type:self.type)?.setOTTBasicParams()
             request?.set(completion: { (r:Response) in
+                self.currentRequest = nil
                 
                 guard let data = r.data else {
                     callback(Result(data: nil, error: ProviderError.mediaNotFound))
                     return
                 }
                 
-                let jsonResponse =  JSON(data)
-                
-                if let assetResponse: OTTGetAssetResponse = OTTGetAssetResponse(json:jsonResponse.object){
-                    self.currentRequest = nil
+                let object = OTTResponseParser.parse(data: data)
+                if let asset = object as? OTTAsset {
                     
-                    if let asset = assetResponse.asset {
+                    let mediaEntry: MediaEntry = MediaEntry(id: asset.id)
+                    let licensedLinkRequests: [KalturaRequestBuilder] = [KalturaRequestBuilder]()
+                    if let files = asset.files, let requestedFormats = self.formats {
                         
-                        let mediaEntry: MediaEntry = MediaEntry(id: asset.id)
-                        
-                        let licensedLinkRequests: [KalturaRequestBuilder] = [KalturaRequestBuilder]()
-                        if let files = asset.files, let requestedFormats = self.formats {
-                            
-                            var sources = [MediaSource]()
-                            for  file in files {
-                                if let fileFormat = file.type{
-                                    if requestedFormats.contains(fileFormat) == true {
-                                        let source: MediaSource = MediaSource(id: file.id)
-                                        source.contentUrl = file.url
-                                        sources.append(source)
-                                        
-                                    }
+                        var sources = [MediaSource]()
+                        for  file in files {
+                            if let fileFormat = file.type{
+                                if requestedFormats.contains(fileFormat) == true {
+                                    let source: MediaSource = MediaSource(id: file.id)
+                                    source.contentUrl = file.url
+                                    sources.append(source)
+                                    
                                 }
-                            }
-                            
-                            if sources.count > 0 {
-                                mediaEntry.sources = sources
                             }
                         }
                         
-                        callback(Result(data: mediaEntry, error: nil))
-                    }else{
-                        callback(Result(data: nil, error: ProviderError.mediaNotFound))
+                        if sources.count > 0 {
+                            mediaEntry.sources = sources
+                        }
                     }
+                    
+                    callback(Result(data: mediaEntry, error: nil))
                 }else{
                     callback(Result(data: nil, error: ProviderError.mediaNotFound))
                 }
-            }).build()
             
-            if let assetRequest = request {
-                self.currentRequest = request
-                executor.send(request: assetRequest)
-            }
+        }).build()
+        
+        if let assetRequest = request {
+            self.currentRequest = request
+            executor.send(request: assetRequest)
         }
     }
-    
-    public func cancel() {
-        if let currentRequest = self.currentRequest {
-            self.executor.cancel(request: currentRequest)
-        }
+}
+
+public func cancel() {
+    if let currentRequest = self.currentRequest {
+        self.executor.cancel(request: currentRequest)
     }
+}
 }
 
 
