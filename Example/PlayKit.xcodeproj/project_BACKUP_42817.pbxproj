@@ -131,8 +131,11 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+<<<<<<< HEAD
 				C23A62C81DF412FD00635FA2 /* MediaEntryProvider */,
+=======
 				C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */,
+>>>>>>> develop
 				BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
