@@ -134,6 +134,34 @@ public class YouboraPlugin: PKPlugin {
             self.postEventLogWithMessage(message: "Youbora Event: \(info)")
         })
         
+        self.player.addObserver(self, events: [PlayerEvents.stateChanged.self]) { (data: Any) in
+            
+            if let stateChanged = data as? PlayerEvents.stateChanged {
+
+                switch stateChanged.newSate {
+                case .buffering:
+                    self.youboraManager.bufferingHandler()
+                    self.postEventLogWithMessage(message: "Youbora Event: Buffering")
+                    break
+                default:
+                    
+                    break
+                }
+                
+                switch stateChanged.oldSate {
+                case .buffering:
+                    self.youboraManager.bufferedHandler()
+                    self.postEventLogWithMessage(message: "Youbora Event: Buffered")
+                    break
+                default:
+                    
+                    break
+                }
+            }
+            
+            
+        }
+        
         self.messageBus?.addObserver(self, events: AdEvents.allEventTypes, block: { (info) in
             
             PKLog.trace("Ads event info: \(info)")
