@@ -17,7 +17,8 @@ class AVPlayerEngine : AVPlayer {
     
     // Attempt load and test these asset keys before playing.
     let assetKeysRequiredToPlay = [
-        "playable"
+        "playable",
+        "tracks"
     ]
     
     private var avPlayerLayer: AVPlayerLayer!
@@ -208,8 +209,8 @@ class AVPlayerEngine : AVPlayer {
         #keyPath(currentItem),
         #keyPath(currentItem.playbackLikelyToKeepUp),
         #keyPath(currentItem.playbackBufferEmpty),
-        #keyPath(currentItem.duration)
-        //        #keyPath(currentItem.tracks)
+        #keyPath(currentItem.duration),
+        #keyPath(currentItem.tracks)
     ]
     
     private var observerContext = 0
@@ -293,7 +294,7 @@ class AVPlayerEngine : AVPlayer {
         } else if keyPath == #keyPath(currentItem.status) {
             if currentItem?.status == .readyToPlay {
                 self.setupNonObservablePropertiesUpdateTimer()
-                
+                self.handleTracks()
                 let newState = PlayerState.ready
                 self.postEvent(event: PlayerEvents.loadedMetadata())
                 self.postStateChange(newState: newState, oldState: self.currentState)
@@ -312,7 +313,7 @@ class AVPlayerEngine : AVPlayer {
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
         }
-
+        
         if let currentEvent: PKEvent = event {
            self.postEvent(event: currentEvent)
         }
@@ -323,6 +324,12 @@ class AVPlayerEngine : AVPlayer {
         
         if let block = onEventBlock {
             block(event)
+        }
+    }
+    
+    private func handleTracks() {
+            self.currentItem?.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicLegible)?.options.forEach { (option) in
+                PKLog.trace(option)
         }
     }
     
