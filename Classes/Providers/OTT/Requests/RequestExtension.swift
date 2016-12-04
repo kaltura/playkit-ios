@@ -35,10 +35,11 @@ extension KalturaRequestBuilder {
         return self
     }
     
-    internal func setOVPBasicParams() -> Void{
+    internal func setOVPBasicParams() -> Self{
         self.setClientTag(clientTag: "playkit")
         self.setApiVersion(apiVersion: "3.3.0")
         self.setFormat(format: 1)
+        return self
 
     }
 }

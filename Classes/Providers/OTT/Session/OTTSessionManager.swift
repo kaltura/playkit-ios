@@ -51,7 +51,7 @@ public class OTTSessionManager: SessionProvider {
         
         if let r1 = loginRequestBuilder, let r2 = sessionGetRequest {
             
-            let mrb = KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: r1).add(request: r2)
+            let mrb = KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: r1).add(request: r2).setOTTBasicParams()
             mrb?.set(completion: { (r:Response) in
                 
                 if let data = r.data
@@ -116,8 +116,6 @@ public class OTTSessionManager: SessionProvider {
                         
                     }))
 
-                
-                
                 if let request = mrb {
                     
                     if self.executor != nil{

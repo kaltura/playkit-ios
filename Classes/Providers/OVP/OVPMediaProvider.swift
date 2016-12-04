@@ -61,7 +61,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                 
                 if let req1 = listRequest, let req2 = getContextDataRequest{
                     
-                    let mrb = KalturaMultiRequestBuilder(url: self.apiServerURL)?.add(request: req1).add(request: req2).set(completion: { (r:Response) in
+                    let mrb = KalturaMultiRequestBuilder(url: self.apiServerURL)?.add(request: req1).add(request: req2).setOVPBasicParams().set(completion: { (r:Response) in
                         
                         self.currentRequest = nil
                         let responses: [Result<OVPBaseObject>] = OVPMultiResponseParser.parse(data: r.data)
