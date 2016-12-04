@@ -15,13 +15,18 @@ public class OTTSessionManager: SessionProvider {
         
         case failedToGetKS
         case failedToGetLoginResponse
+        case failedToRefreshKS
+        case failedToBuildRefreshRequest
+        case invalidRefreshCallResponse
+        case noRefreshTokenOrTokenToRefresh
     }
     
     
+    let saftyMargin = 5*60.0
+    
     public var serverURL: String
     public var partnerId: Int64
-    
-    public var executor: RequestExecutor?
+    public var executor: RequestExecutor
     
     
     private var ks: String?
@@ -29,17 +34,22 @@ public class OTTSessionManager: SessionProvider {
     private var tokenExpiration: Date?
     
     
+    
     public init(serverURL:String, partnerId:Int64, executor: RequestExecutor?) {
         
         self.serverURL = serverURL
         self.partnerId = partnerId
-        self.executor = executor
+        if let exe = executor{
+            self.executor = exe
+        }else{
+            self.executor = USRExecutor.shared
+        }
     }
     
     
     
     
-    public func login(username:String, password:String, completion:@escaping (_ error:Error?)->Void) -> Void {
+    public func startSession(username:String, password:String, completion:@escaping (_ error:Error?)->Void) -> Void {
         
         let loginRequestBuilder = OTTUserService.login(baseURL: self.serverURL,
                                                        partnerId: partnerId,
@@ -62,10 +72,10 @@ public class OTTSessionManager: SessionProvider {
                         let loginResult: OTTBaseObject = result[0]
                         let sessionResult: OTTBaseObject = result[1]
                         
-                        if  let loginObj = loginResult as? OTTLogin, let sessionObj = sessionResult as? OTTSession  {
-                        
-                            self.ks = loginObj.ks
-                            self.refreshToken = loginObj.refreshToken
+                        if  let loginObj = loginResult as? OTTLoginResponse, let sessionObj = sessionResult as? OTTSession  {
+                            
+                            self.ks = loginObj.loginSession?.ks
+                            self.refreshToken = loginObj.loginSession?.refreshToken
                             self.tokenExpiration = sessionObj.tokenExpiration
                             
                         }
@@ -74,74 +84,128 @@ public class OTTSessionManager: SessionProvider {
                         completion(SessionManagerError.failedToGetLoginResponse)
                     }
                 }else{
-                  completion(SessionManagerError.failedToGetLoginResponse)
+                    completion(SessionManagerError.failedToGetLoginResponse)
                 }
             })
             
             
             if let request = mrb?.build() {
-                
-                if self.executor != nil{
-                    self.executor?.send(request: request)
-                }else{
-                    USRExecutor.shared.send(request: request)
-                }
-                
+                self.executor.send(request: request)
             }
         }
     }
     
+    public func startAnonymouseSession(completion:@escaping (_ error:Error?)->Void) {
+        
+        let loginRequestBuilder = OTTUserService.anonymousLogin(baseURL: self.serverURL,
+                                                                partnerId: self.partnerId)
+        let sessionGetRequest = OTTSessionService.get(baseURL: self.serverURL,
+                                                      ks:"1:result:ks")
+        
+        
+        if let r1 = loginRequestBuilder, let r2 = sessionGetRequest {
+            
+            let mrb = KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: r1)
+                .setOTTBasicParams()
+                .add(request: r2).setOTTBasicParams()
+                .set(completion: { (r:Response) in
+                
+                if let data = r.data
+                {
+                    let result: [OTTBaseObject] = OTTMultiResponseParser.parse(data:data)
+                    if result.count == 2, let loginSession = result[0] as? OTTLoginSession, let session = result[1] as? OTTSession{
+                        
+                        self.ks = loginSession.ks
+                        self.refreshToken = loginSession.refreshToken
+                        self.tokenExpiration = session.tokenExpiration
+                        completion(nil)
+                    }else{
+                        completion(SessionManagerError.failedToGetLoginResponse)
+                    }
+                    
+                }else{
+                    completion(SessionManagerError.failedToGetLoginResponse)
+                }
+
+            })
+            
+            
+            if let request = mrb?.build() {
+                self.executor.send(request: request)
+            }
+        }
+        
+        
+        
+        
+        
+        
+    }
     
-    public func loadKS(completion: (_ result :Result<String>) -> Void) {
-        
-        
+    
+    public func loadKS(completion: @escaping (_ result :Result<String>) -> Void) {
         let now = Date()
         
-        if let expiration = self.tokenExpiration, expiration.timeIntervalSince(now) < 5.0*60 {
+        if let expiration = self.tokenExpiration, expiration.timeIntervalSince(now) > saftyMargin {
             completion(Result(data:self.ks, error: nil))
         }else{
             
-            if let refreshToken = self.refreshToken, let ks = self.ks{
-                let refreshSessionRequest = OTTUserService.refreshSession(baseURL: self.serverURL, refreshToken: refreshToken, ks:ks )
-                let getSessionRequest = OTTSessionService.get(baseURL: self.serverURL, ks: "1:result:loginSession:ks")
+            self.refreshKS(completion: completion)
+        }
+    }
+    
+    public func refreshKS(completion: @escaping (_ result :Result<String>) -> Void){
+        
+        if let refreshToken = self.refreshToken, let ks = self.ks{
+            
+            let refreshSessionRequest = OTTUserService.refreshSession(baseURL: self.serverURL, refreshToken: refreshToken, ks:ks )
+            let getSessionRequest = OTTSessionService.get(baseURL: self.serverURL, ks: "1:result:ks")
+            
+            if let req1 = refreshSessionRequest, let req2 = getSessionRequest {
                 
-                if let req1 = refreshSessionRequest, let req2 = getSessionRequest {
+                let mrb: KalturaMultiRequestBuilder? = ((KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: req1).add(request: req2))?.setOTTBasicParams().set(completion: { (r:Response) in
                     
-                }
-                    let mrb: KalturaMultiRequestBuilder? = ((KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: refreshSessionRequest!).add(request: getSessionRequest!))?.set(completion: { (r:Response) in
+                    if let data = r.data{
+                        let response: [OTTBaseObject] = OTTMultiResponseParser.parse(data: data)
                         
-                        if let data = r.data{
-                            OTTMultiResponseParser.parse(data: data)
+                        if response.count == 2, let loginSession = response[0] as? OTTLoginSession, let session = response[1] as? OTTSession{
+                            
+                            self.ks = loginSession.ks
+                            self.refreshToken = loginSession.refreshToken
+                            self.tokenExpiration = session.tokenExpiration
+                            
+                            completion(Result(data: self.ks, error: nil))
+                            
+                        }else{
+                            completion(Result(data: nil, error: SessionManagerError.failedToRefreshKS))
                         }
                         
-                    }))
-
-                if let request = mrb?.build() {
-                    
-                    if self.executor != nil{
-                        self.executor?.send(request: request)
                     }else{
-                        USRExecutor.shared.send(request: request)
+                        completion(Result(data: nil, error: SessionManagerError.failedToRefreshKS))
                     }
                     
+                }))
+                
+                if let request = mrb?.build() {
+                    self.executor.send(request: request)
+                    
+                }else{
+                    completion(Result(data: nil, error: SessionManagerError.failedToBuildRefreshRequest))
                 }
-
+                
+            }else{
+               completion(Result(data: nil, error: SessionManagerError.invalidRefreshCallResponse))
             }
+        }else{
+            completion(Result(data: nil, error: SessionManagerError.noRefreshTokenOrTokenToRefresh))
         }
-            
+
     }
     
     
-//    if let data = r.data{
-//        let response: Result<OTTBaseObject> = OTTResponseParser.parse(data: r.data)
-//        if let data = response.data, let refreshedSession = data as? OTTRefreshedSession {
-//            self.ks = refreshedSession.ks
-//            self.refreshToken = refreshedSession.refreshToken
-//        }
-//    }
-
     
-
+    
+    
     
     
 }

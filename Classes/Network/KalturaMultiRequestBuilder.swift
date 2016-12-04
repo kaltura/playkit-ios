@@ -32,17 +32,18 @@ internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
     
     func kalturaMultiRequestData() -> Data? {
         
-        let json = JSON([String:Any]())
-        var requestCount = 0
-        for request in self.requests {
-            
+        
+        if self.jsonBody == nil {
+            self.jsonBody = JSON([String:Any]())
+        }
+        
+        for (index, request)  in self.requests.enumerated() {
             if let body = request.jsonBody{
                 var singleRequestBody: JSON = body
                 singleRequestBody["action"] = JSON(request.action)
                 singleRequestBody["service"] =  JSON(request.service)
-                self.jsonBody?[String(requestCount)] = singleRequestBody
+                self.jsonBody?[String(index+1)] = singleRequestBody
             }
-            requestCount += 1
         }
         
         
@@ -51,7 +52,7 @@ internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
         var data = prefix.data(using: String.Encoding.utf8)
         
         
-        for  index in 1...requestCount {
+        for  index in 1...self.requests.count {
             do{
                 let requestBody = try self.jsonBody?[String(index)].rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                 let requestBodyData = requestBody?.data(using: String.Encoding.utf8)

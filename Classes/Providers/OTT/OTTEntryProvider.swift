@@ -57,7 +57,7 @@ public class OTTEntryProvider: MediaEntryProvider {
                 return
             }
             
-            let requestBuilder = OTTAssetService.get(baseURL: sessionProvider.serverURL, ks: ks, assetId: self.mediaId, type:self.type)?.setOTTBasicParams()
+            let requestBuilder = OTTAssetService.get(baseURL: self.sessionProvider.serverURL, ks: ks, assetId: self.mediaId, type:self.type)?.setOTTBasicParams()
             requestBuilder?.set(completion: { (r:Response) in
                 
                 guard let data = r.data else {
@@ -97,7 +97,7 @@ public class OTTEntryProvider: MediaEntryProvider {
             })
             
             if let assetRequest = requestBuilder?.build() {
-                executor.send(request: assetRequest)
+                self.executor.send(request: assetRequest)
             }
         }
     }

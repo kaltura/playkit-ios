@@ -13,8 +13,7 @@ public protocol SessionProvider {
     var serverURL: String { get }
     var partnerId: Int64 { get }
     
-    func loadKS(completion: (_ result :Result<String>) -> Void)
-
+    func loadKS(completion: @escaping (_ result :Result<String>) -> Void)
     
     
     

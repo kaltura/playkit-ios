@@ -35,15 +35,10 @@ internal class KalturaRequestBuilder: RequestBuilder{
 
         super.init(url: path)
         
-    }
-   
-    public override func build() -> Request {
-        
         self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
         self.set(method: "POST")
-        let request = super.build()
-        return request
+        
     }
-    
+       
 
 }

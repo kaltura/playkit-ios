@@ -1,29 +1,27 @@
 //
-//  OTTUser.swift
+//  OTTLoginSession.swift
 //  Pods
 //
-//  Created by Admin on 17/11/2016.
+//  Created by Rivka Peleg on 04/12/2016.
 //
 //
 
 import UIKit
 import SwiftyJSON
 
-internal class OTTLogin: OTTBaseObject {
-    
+class OTTLoginSession: OTTBaseObject {
+
     internal var ks: String?
     internal var refreshToken: String?
     
-    private let sessionKey = "loginSession"
     private let ksKey = "ks"
     private let refreshTokenKey = "refreshToken"
     
     required init(json:Any) {
         
-        let loginJsonResponse = JSON(json)
-        let sessionJson = loginJsonResponse[sessionKey]
-        self.ks = sessionJson[ksKey].string
-        self.refreshToken = sessionJson[refreshTokenKey].string
+        let jsonObject = JSON(json)
+        self.ks = jsonObject[ksKey].string
+        self.refreshToken = jsonObject[refreshTokenKey].string
         
     }
 }

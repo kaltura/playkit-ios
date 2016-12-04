@@ -13,15 +13,15 @@ import PlayKit
 
 
 class OVPMediaProviederTest: XCTestCase, SessionProvider {
+    
+    public func loadKS(completion: @escaping (Result<String>) -> Void) {
+         completion(Result(data: "djJ8MjIwOTU5MXyDmkKuVhHfzNvca2oQWbhyKBVWMCvAGLcEH2QBS1VBmpqoszqPLwCFwl_V-Qdc2-nt9M21RaJIoea-VP0wpcxOHIHlzXADcdKUZ4rovtCRx-U5bnFIwSx17UUfBB80vzM=", error: nil))
+    }
 
     let entryID = "1_1h1vsv3z"
     var partnerId: Int64 = 2209591
     var serverURL: String  = "http://cdnapi.kaltura.com"
     
-    func loadKS(completion: (_ result :Result<String>) -> Void){
-        
-        completion(Result(data: "djJ8MjIwOTU5MXyDmkKuVhHfzNvca2oQWbhyKBVWMCvAGLcEH2QBS1VBmpqoszqPLwCFwl_V-Qdc2-nt9M21RaJIoea-VP0wpcxOHIHlzXADcdKUZ4rovtCRx-U5bnFIwSx17UUfBB80vzM=", error: nil))
-    }
 
     
     override func setUp() {

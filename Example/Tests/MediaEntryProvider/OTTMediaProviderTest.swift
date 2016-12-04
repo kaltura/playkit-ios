@@ -12,14 +12,18 @@ import PlayKit
 
 
 class OTTMediaProviderTest: XCTestCase, SessionProvider {
+    
+
 
     
     let mediaID = ""
     var partnerId: Int64 = 0
     var serverURL: String  = ""
-    func loadKS(completion: (_ result :Result<String>) -> Void){
-        completion(Result(data: "123", error: nil))
+    
+    public func loadKS(completion: @escaping (Result<String>) -> Void) {
+         completion(Result(data: "123", error: nil))
     }
+    
 
     
     override func setUp() {

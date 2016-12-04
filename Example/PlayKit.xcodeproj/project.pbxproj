@@ -20,6 +20,7 @@
 		C23A62D21DF4140B00635FA2 /* OTTMediaProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CA1DF412FD00635FA2 /* OTTMediaProviderTest.swift */; };
 		C23A62D31DF4140E00635FA2 /* OVPMediaProviederTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */; };
 		C23A62D41DF4141000635FA2 /* MediaEntryProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CF1DF4131700635FA2 /* MediaEntryProviderMock.swift */; };
+		C23A62DD1DF47D9C00635FA2 /* OTTSessionProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62DB1DF47D9800635FA2 /* OTTSessionProviderTest.swift */; };
 		C24770AD1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
 		C24770B01DEDF36900E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
 		C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */; };
@@ -56,6 +57,7 @@
 		C23A62CA1DF412FD00635FA2 /* OTTMediaProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTMediaProviderTest.swift; sourceTree = "<group>"; };
 		C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OVPMediaProviederTest.swift; sourceTree = "<group>"; };
 		C23A62CF1DF4131700635FA2 /* MediaEntryProviderMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntryProviderMock.swift; sourceTree = "<group>"; };
+		C23A62DB1DF47D9800635FA2 /* OTTSessionProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTSessionProviderTest.swift; sourceTree = "<group>"; };
 		C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ovp.multirequest._.1_1h1vsv3z.json; sourceTree = "<group>"; };
 		C6039FAD64FBD55034BCB260 /* Pods-PlayKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlayKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PlayKit_Tests/Pods-PlayKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerControllerTest.swift; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 		C23A62C81DF412FD00635FA2 /* MediaEntryProvider */ = {
 			isa = PBXGroup;
 			children = (
+				C23A62DB1DF47D9800635FA2 /* OTTSessionProviderTest.swift */,
 				C23A62C91DF412FD00635FA2 /* MockMediaProviderTest.swift */,
 				C23A62CA1DF412FD00635FA2 /* OTTMediaProviderTest.swift */,
 				C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */,
@@ -417,6 +420,7 @@
 				C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */,
 				BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */,
 				C23A62D21DF4140B00635FA2 /* OTTMediaProviderTest.swift in Sources */,
+				C23A62DD1DF47D9C00635FA2 /* OTTSessionProviderTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

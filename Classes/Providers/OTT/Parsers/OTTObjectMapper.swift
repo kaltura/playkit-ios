@@ -26,11 +26,13 @@ class OTTObjectMapper: NSObject {
         if let name = className{
             switch name {
             case "KalturaLoginResponse":
-                return OTTLogin.self
+                return OTTLoginResponse.self
             case "KalturaSession":
                 return OTTSession.self
             case "KalturaMediaAsset":
                 return OTTAsset.self
+            case "KalturaLoginSession":
+                return OTTLoginSession.self
             default:
                 return nil
             }
