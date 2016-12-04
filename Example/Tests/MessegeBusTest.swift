@@ -102,16 +102,21 @@ class MessegeBusTest: XCTestCase {
     func testPlayerSeekEventsFlow() {
         let theExeption = expectation(description: "test seek")
         let seekTime:TimeInterval = 3.0
-        
+        var isSeeking = false
         self.player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.seeking.self, PlayerEvents.seeked.self]) { (info: Any) in
             if info as! PKEvent is PlayerEvents.playing {
                 self.player.seek(to: CMTimeMakeWithSeconds(3, 1000000))
             } else if info as! PKEvent is PlayerEvents.seeking {
                 print(self.player.currentTime as Any)
                 if (self.player.currentTime == seekTime){
-                    theExeption.fulfill()
+                    isSeeking = true
+                } else {
+                    XCTFail("seeking issue")
                 }
-                else {
+            } else if info as! PKEvent is PlayerEvents.seeked {
+                if isSeeking {
+                    theExeption.fulfill()
+                } else {
                     XCTFail("seeking issue")
                 }
             } else {
