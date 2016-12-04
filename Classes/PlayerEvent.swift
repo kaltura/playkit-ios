@@ -139,13 +139,11 @@ public class AdEvents: PKEvent {
     public required override init() {}
 }
 
-public class AnalyticsLogEvents : PlayerEvents {
-    
-    public class analyticsLogEvent : AnalyticsLogEvents {
-        public var logDescription: String
-        init(log: String) {
-            self.logDescription = log
-        }
+public class PKLogEvent : PKEvent {
+    public let source: String       // Source of the log, for example PKPlugin.pluginName
+    public let message: String
+    public init(source: String, message: String) {
+        self.source = source
+        self.message = message
     }
-    
 }
