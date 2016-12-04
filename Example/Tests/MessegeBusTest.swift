@@ -42,7 +42,7 @@ class MessegeBusTest: XCTestCase {
     }
     
     func testPlayerMetadataLoaded() {
-        let theExeption = expectation(description: "test play")
+        let theExeption = expectation(description: "test loadedMetadata event")
         
         self.player.addObserver(self, events: [PlayerEvents.loadedMetadata.self]) { (info: Any) in
             if info as! PKEvent is PlayerEvents.loadedMetadata {
@@ -82,7 +82,7 @@ class MessegeBusTest: XCTestCase {
     }
     
     func testPlayerPauseEventsFlow() {
-        let theExeption = expectation(description: "test play")
+        let theExeption = expectation(description: "test pause")
         
         self.player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.pause.self]) { (info: Any) in
             if info as! PKEvent is PlayerEvents.playing {
@@ -100,7 +100,7 @@ class MessegeBusTest: XCTestCase {
     }
     
     func testPlayerSeekEventsFlow() {
-        let theExeption = expectation(description: "test play")
+        let theExeption = expectation(description: "test seek")
         let seekTime:TimeInterval = 3.0
         
         self.player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.seeking.self, PlayerEvents.seeked.self]) { (info: Any) in
