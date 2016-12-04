@@ -19,6 +19,7 @@ public class OTTSessionManager: SessionProvider {
         case failedToBuildRefreshRequest
         case invalidRefreshCallResponse
         case noRefreshTokenOrTokenToRefresh
+        case failedToParseResponse
     }
     
     
@@ -47,8 +48,6 @@ public class OTTSessionManager: SessionProvider {
     }
     
     
-    
-    
     public func startSession(username:String, password:String, completion:@escaping (_ error:Error?)->Void) -> Void {
         
         let loginRequestBuilder = OTTUserService.login(baseURL: self.serverURL,
@@ -66,9 +65,14 @@ public class OTTSessionManager: SessionProvider {
                 
                 if let data = r.data
                 {
-                    let result: [OTTBaseObject] = OTTMultiResponseParser.parse(data:data)
+                     let result: [OTTBaseObject]? = nil
+                    do{
+                        let result: [OTTBaseObject] = try OTTMultiResponseParser.parse(data:data)
+                    }catch{
+                        completion(error)
+                    }
                     
-                    if result.count == 2{
+                    if let result = result, result.count == 2{
                         let loginResult: OTTBaseObject = result[0]
                         let sessionResult: OTTBaseObject = result[1]
                         
@@ -112,8 +116,14 @@ public class OTTSessionManager: SessionProvider {
                 
                 if let data = r.data
                 {
-                    let result: [OTTBaseObject] = OTTMultiResponseParser.parse(data:data)
-                    if result.count == 2, let loginSession = result[0] as? OTTLoginSession, let session = result[1] as? OTTSession{
+                    var result: [OTTBaseObject]? = nil
+                    do{
+                      result = try OTTMultiResponseParser.parse(data:data)
+                    }catch{
+                        completion(error)
+                    }
+                    
+                    if let result = result, result.count == 2, let loginSession = result[0] as? OTTLoginSession, let session = result[1] as? OTTSession{
                         
                         self.ks = loginSession.ks
                         self.refreshToken = loginSession.refreshToken
@@ -166,9 +176,14 @@ public class OTTSessionManager: SessionProvider {
                 let mrb: KalturaMultiRequestBuilder? = ((KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: req1).add(request: req2))?.setOTTBasicParams().set(completion: { (r:Response) in
                     
                     if let data = r.data{
-                        let response: [OTTBaseObject] = OTTMultiResponseParser.parse(data: data)
+                        let response: [OTTBaseObject]? = nil
+                        do{
+                        let response: [OTTBaseObject] = try OTTMultiResponseParser.parse(data: data)
+                        }catch{
+                            completion(Result(data: nil, error: error))
+                        }
                         
-                        if response.count == 2, let loginSession = response[0] as? OTTLoginSession, let session = response[1] as? OTTSession{
+                        if let response = response, response.count == 2, let loginSession = response[0] as? OTTLoginSession, let session = response[1] as? OTTSession{
                             
                             self.ks = loginSession.ks
                             self.refreshToken = loginSession.refreshToken

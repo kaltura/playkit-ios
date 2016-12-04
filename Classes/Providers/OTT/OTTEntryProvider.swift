@@ -27,6 +27,7 @@ public class OTTEntryProvider: MediaEntryProvider {
         case invalidJSON
         case mediaNotFound
         case currentlyProcessingOtherRequest
+        case unableToParseObject
     }
     
     public init(sessionProvider:SessionProvider, mediaId: String, type:AssetType,formats: [String],executor:RequestExecutor?){
@@ -65,7 +66,13 @@ public class OTTEntryProvider: MediaEntryProvider {
                     return
                 }
                 
-                let object = OTTResponseParser.parse(data: data)
+                let object: OTTBaseObject? = nil
+                do {
+                    let object = try OTTResponseParser.parse(data: data)
+                }catch{
+                    callback(Result(data: nil, error: error))
+                }
+                
                 if let asset = object as? OTTAsset {
                     
                     let mediaEntry: MediaEntry = MediaEntry(id: asset.id)

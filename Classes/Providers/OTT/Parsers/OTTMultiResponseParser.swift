@@ -18,7 +18,7 @@ class OTTMultiResponseParser: NSObject {
         case notMultiResponse
     }
     
-    static func parse(data:Any) -> [OTTBaseObject] {
+    static func parse(data:Any) throws -> [OTTBaseObject] {
         
         let jsonResponse = JSON(data)
         if let resultArrayJSON = jsonResponse["result"].array{
@@ -30,8 +30,7 @@ class OTTMultiResponseParser: NSObject {
                 if let type = objectType{
                      object = type.init(json: jsonObject.object)
                 }else{
-                    // TO DO: add informatical error 
-                    object = OTTError()
+                    throw error.typeNotFound
                 }
                 
                 if let obj = object{
