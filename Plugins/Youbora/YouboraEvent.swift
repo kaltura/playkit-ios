@@ -9,11 +9,8 @@
 import UIKit
 
 public class YouboraReportSent : PKEvent {
-    public let source: String       // Source of the log, for example PKPlugin.pluginName
     public let message: String
-    public var params: [String: Any]?
-    public init(source: String, message: String) {
-        self.source = source
+    public init(message: String) {
         self.message = message
     }
 }

@@ -171,7 +171,7 @@ public class YouboraPlugin: PKPlugin {
     }
     
     private func postEventLogWithMessage(message: String) {
-        let eventLog = YouboraReportSent(source: YouboraPlugin.pluginName, message: message)
+        let eventLog = YouboraReportSent(message: message)
         self.messageBus?.post(eventLog)
     }
     
