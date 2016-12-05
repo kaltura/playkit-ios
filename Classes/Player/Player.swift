@@ -32,6 +32,11 @@ public protocol Player {
     /**
      Get the player's duration.
      */
+    var isPlaying: Bool { get }
+    
+    /**
+     Get the player's duration.
+     */
     var duration: Double { get }
     
     /**
