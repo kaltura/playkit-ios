@@ -327,10 +327,46 @@ class AVPlayerEngine : AVPlayer {
         }
     }
     
-    private func handleTracks() {
-            self.currentItem?.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicLegible)?.options.forEach { (option) in
+//    -(void)handleAudioTracks{
+//    NSMutableArray* audioTracks;
+//    //check for multi audio
+//    AVMediaSelectionGroup *audioSelectionGroup = [[[self currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
+//    
+//    if (audioSelectionGroup.options.count > 1){
+//    audioTracks = [NSMutableArray new];
+//    //we have more than one audio assest - lets send events and be ready for a switch
+//    for (AVMediaSelectionOption *option in audioSelectionGroup.options){
+//    NSString* language = [option.locale objectForKey:NSLocaleLanguageCode];
+//    [audioTracks addObject:@{@"language":language,
+//    @"label":language,
+//    @"title":option.displayName,
+//    @"index": @(audioTracks.count)
+//    }];
+//    }
+//    if ([audioTracks count] > 0){
+//    NSMutableDictionary *audioLanguages = @{@"languages": audioTracks}.mutableCopy;
+//    [self.delegate player:self
+//    eventName:@"audioTracksReceived"
+//    JSON:audioLanguages.toJSON];
+//    }
+//    }
+//    
+//    }
+
+    private var audioTracks = [BaseTrackInfo]()
+    
+    private func handleAudioTracks() {
+            self.currentItem?.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicAudible)?.options.forEach { (option) in
                 PKLog.trace(option)
+                var uniqueId = 0
+                if let tracks = audioTracks {
+                    uniqueId = tracks.count
+                }
+                let audioTrackInfo: AudioTrackInfo = AudioTrackInfo(uniqueId: uniqueId, title: option.displayName, isAdaptive: false, language: option.extendedLanguageTag)
+                audioTracks.append(audioTrackInfo)
         }
+        
+        
     }
     
     private func postStateChange(newState: PlayerState, oldState: PlayerState) {
