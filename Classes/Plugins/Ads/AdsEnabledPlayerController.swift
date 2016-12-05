@@ -31,15 +31,6 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         }
     }
     
-    override var isPlaying: Bool {
-        get {
-            if isAdPlayback {
-                return isPlayEnabled
-            }
-            return super.isPlaying
-        }
-    }
-
     override func play() {
         self.isPlayEnabled = true
         if !self.adsPlugin.start(showLoadingView: true) {
