@@ -37,6 +37,12 @@ class PlayerDecoratorBase: Player {
         }
     }
     
+    public var isPlaying: Bool {
+        get {
+            return self.player.isPlaying
+        }
+    }
+    
     public var view: UIView! {
         get {
             return self.player.view

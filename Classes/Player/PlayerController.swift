@@ -14,7 +14,23 @@ class PlayerController: Player {
     
     public var duration: Double {
         get {
-            return (self.currentPlayer?.duration)!
+            guard let currentPlayer = self.currentPlayer else {
+                PKLog.error("currentPlayer is empty")
+                return 0
+            }
+            
+            return (currentPlayer.duration)
+        }
+    }
+    
+    public var isPlaying: Bool {
+        get {
+            guard let currentPlayer = self.currentPlayer else {
+                PKLog.error("currentPlayer is empty")
+                return false
+            }
+            
+            return (currentPlayer.isPlaying)
         }
     }
 
