@@ -61,9 +61,9 @@ public class OTTEntryProvider: MediaEntryProvider {
                     return
                 }
                 
-                let object: OTTBaseObject? = nil
+                var object: OTTBaseObject? = nil
                 do {
-                    let object = try OTTResponseParser.parse(data: data)
+                    object = try OTTResponseParser.parse(data: data)
                 }catch{
                     callback(Result(data: nil, error: error))
                 }
