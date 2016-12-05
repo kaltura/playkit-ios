@@ -10,11 +10,13 @@ import Foundation
 import AVFoundation
 
 class WidevineClassicAssetHandler: AssetHandler {
-    required init() {
+    internal func buildAsset(mediaSource: MediaSource, readyCallback: (Error?, AVAsset?) -> Void) {
+        // TODO: start Widevine license acq, call play, build asset
         
     }
-    func buildAsset(mediaSource: MediaSource, readyCallback: (AVAsset?)->Void) {
-        // TODO: start Widevine license acq, call play, build asset
+
+    required init() {
+        
     }
 }
 
