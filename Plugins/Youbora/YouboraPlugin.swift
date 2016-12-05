@@ -81,18 +81,18 @@ public class YouboraPlugin: PKPlugin {
         self.messageBus?.addObserver(self, events: [PlayerEvents.canPlay.self], block: { (info) in
             PKLog.trace("canPlay info: \(info)")
             
-            self.postEventLogWithMessage(message: "Youbora Event: \(info)")
+            self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.play.self], block: { (info) in
             PKLog.trace("play info: \(info)")
             self.youboraManager.playHandler()
-            self.postEventLogWithMessage(message: "Youbora Event: \(info)")
+            self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.playing.self], block: { (info) in
             PKLog.trace("playing info: \(info)")
-            self.postEventLogWithMessage(message: "Youbora Event: \(info)")
+            self.postEventLogWithMessage(message: "Event info: \(info)")
 
             if self.isFirstPlay {
 
@@ -110,28 +110,28 @@ public class YouboraPlugin: PKPlugin {
         self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
             PKLog.trace("pause info: \(info)")
             self.youboraManager.pauseHandler()
-            self.postEventLogWithMessage(message: "Youbora Event: \(info)")
+            self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.seeking.self], block: { (info) in
             PKLog.trace("seeking info: \(info)")
             self.youboraManager.seekingHandler()
             
-            self.postEventLogWithMessage(message: "Youbora Event: \(info)")
+            self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.seeked.self], block: { (info) in
             PKLog.trace("seeked info: \(info)")
             self.youboraManager.seekedHandler()
             
-            self.postEventLogWithMessage(message: "Youbora Event: \(info)")
+            self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.ended.self], block: { (info) in
             PKLog.trace("ended info: \(info)")
             self.youboraManager.endedHandler()
             
-            self.postEventLogWithMessage(message: "Youbora Event: \(info)")
+            self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
         self.player.addObserver(self, events: [PlayerEvents.stateChanged.self]) { (data: Any) in
@@ -141,7 +141,7 @@ public class YouboraPlugin: PKPlugin {
                 switch stateChanged.newSate {
                 case .buffering:
                     self.youboraManager.bufferingHandler()
-                    self.postEventLogWithMessage(message: "Youbora Event: Buffering")
+                    self.postEventLogWithMessage(message: "Event info: Buffering")
                     break
                 default:
                     
@@ -151,7 +151,7 @@ public class YouboraPlugin: PKPlugin {
                 switch stateChanged.oldSate {
                 case .buffering:
                     self.youboraManager.bufferedHandler()
-                    self.postEventLogWithMessage(message: "Youbora Event: Buffered")
+                    self.postEventLogWithMessage(message: "Event info: Buffered")
                     break
                 default:
                     
