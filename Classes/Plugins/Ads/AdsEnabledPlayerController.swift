@@ -30,7 +30,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
             self.adsPlugin.requestAds()
         }
     }
-    
+
     override var isPlaying: Bool {
         get {
             if isAdPlayback {
@@ -96,6 +96,8 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         } else if event is AdEvents.adDidRequestResume {
             super.play()
             self.isAdPlayback = false
+        } else if event is AdEvents.adResumed {
+            self.isPlayEnabled = true
         }
     }
 }
