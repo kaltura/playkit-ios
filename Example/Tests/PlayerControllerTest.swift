@@ -46,7 +46,7 @@ class PlayerControllerTest: XCTestCase {
         let theExeption = expectation(description: "play command")
         self.player.play();
         self.player.addObserver(self, events: [PlayerEvents.playing.self]) { (info: Any) in
-            if info as! PKEvent is PlayerEvents.playing {
+            if info is PlayerEvents.playing {
                 theExeption.fulfill()
             } else {
                 XCTFail()
@@ -61,7 +61,7 @@ class PlayerControllerTest: XCTestCase {
         let theExeption = expectation(description: "pause command")
         self.player.play();
         self.player.addObserver(self, events: [PlayerEvents.pause.self]) { (info: Any) in
-            if info as! PKEvent is PlayerEvents.pause {
+            if info is PlayerEvents.pause {
                 theExeption.fulfill()
             } else {
                 XCTFail()
@@ -79,14 +79,14 @@ class PlayerControllerTest: XCTestCase {
         self.player.play();
         self.player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.pause.self]) { (info: Any) in
             
-            if info as! PKEvent is PlayerEvents.playing {
+            if info is PlayerEvents.playing {
                 if self.player.isPlaying {
                     self.player.pause()
                 } else {
                     XCTFail()
                 }
                 
-            } else if info as! PKEvent is PlayerEvents.pause {
+            } else if info is PlayerEvents.pause {
                 if !self.player.isPlaying {
                     theExeption.fulfill()
                 } else {

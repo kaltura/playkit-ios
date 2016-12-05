@@ -79,10 +79,10 @@ class AVPlayerEngine : AVPlayer {
             return false
         }
         
-        if self.rate == 1.0 {
+        if self.rate > 0 {
             if let timebase = currentItem.timebase {
                 if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
-                    if timebaseRate == 1.0 {
+                    if timebaseRate > 0 {
                         return true
                     }
                 }
@@ -125,7 +125,7 @@ class AVPlayerEngine : AVPlayer {
     
     public override func pause() {
 
-        if self.rate == 1.0 {
+        if self.rate > 0 {
             // Playing, so pause.
             PKLog.trace("pause player")
             super.pause()
@@ -134,7 +134,7 @@ class AVPlayerEngine : AVPlayer {
     
     public override func play() {
 
-        if self.rate != 1.0 {
+        if self.rate == 0 {
             PKLog.trace("play player")
             
             self.postEvent(event: PlayerEvents.play())
@@ -303,7 +303,7 @@ class AVPlayerEngine : AVPlayer {
         case #keyPath(currentItem.duration):
             event = PlayerEvents.durationChange(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
         case #keyPath(rate):
-            if rate == 1.0 {
+            if rate > 0 {
                 nonObservablePropertiesUpdateTimer.resume()
             } else {
                 event = PlayerEvents.pause()
@@ -389,7 +389,7 @@ class AVPlayerEngine : AVPlayer {
         if let currItem = self.currentItem {
             if let timebase = currItem.timebase {
                 if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
-                    if timebaseRate == 1.0 {
+                    if timebaseRate > 0 {
                         nonObservablePropertiesUpdateTimer.suspend()
                         
                         self.postEvent(event: PlayerEvents.playing())
