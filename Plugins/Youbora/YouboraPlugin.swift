@@ -166,12 +166,12 @@ public class YouboraPlugin: PKPlugin {
             
             PKLog.trace("Ads event info: \(info)")
 
-            self.postEventLogWithMessage(message: "Youbora Event: \(info)")
+            self.postEventLogWithMessage(message: "Event info: \(info)")
         })
     }
     
     private func postEventLogWithMessage(message: String) {
-        let eventLog = AnalyticsEvent(source: YouboraPlugin.pluginName, message: message)
+        let eventLog = YouboraReportSent(source: YouboraPlugin.pluginName, message: message)
         self.messageBus?.post(eventLog)
     }
     
