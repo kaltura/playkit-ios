@@ -23,7 +23,7 @@ public protocol Request {
     var dataBody: Data? { get }
     var headers: [String:String]? { get }
     var timeout: Double { get }
-    var conifiguration: RequestConfiguration? { get }
+    var configuration: RequestConfiguration? { get }
     var completion: completionClosures? { get }
 }
 
@@ -36,7 +36,7 @@ public struct RequestElement : Request {
     public var dataBody: Data?
     public var headers: [String:String]?
     public var timeout: Double
-    public var conifiguration: RequestConfiguration?
+    public var configuration: RequestConfiguration?
     public var completion: completionClosures?
 }
 
@@ -52,7 +52,7 @@ public class RequestBuilder {
     public var jsonBody: JSON? = nil
     public var headers: [String:String]? = nil
     public var timeout: Double = 3
-    public var conifiguration: RequestConfiguration? = nil
+    public var configuration: RequestConfiguration? = nil
     public var completion: completionClosures? = nil
     
     
@@ -86,8 +86,8 @@ public class RequestBuilder {
         return self
     }
     
-    public func set(conifiguration:RequestConfiguration?) -> Self{
-        self.conifiguration = conifiguration
+    public func set(configuration:RequestConfiguration?) -> Self{
+        self.configuration = configuration
         return self
     }
     
@@ -129,7 +129,7 @@ public class RequestBuilder {
                 
             }
         }
-        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, conifiguration: self.conifiguration, completion: self.completion)
+        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
         
         
     }

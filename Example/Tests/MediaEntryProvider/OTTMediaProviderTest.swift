@@ -16,15 +16,13 @@ class OTTMediaProviderTest: XCTestCase, SessionProvider {
 
 
     
-    let mediaID = ""
-    var partnerId: Int64 = 0
-    var serverURL: String  = ""
+    let mediaID = "258656"
+    var partnerId: Int64 = 198
+    var serverURL: String  = "http://52.210.223.65:8080/v4_0/api_v3"
     
     public func loadKS(completion: @escaping (Result<String>) -> Void) {
-         completion(Result(data: "123", error: nil))
+         completion(Result(data: "djJ8MTk4fLsl2jWZfTLBHh80n32POkgauZLWcLXhEEySDRL9yRtOLtr92sPWaKpnCaz4nJgsjjXIxD6PkOLXlOvpEHV3Wizc384sF3F4Kj1MfiqJRQd8", error: nil))
     }
-    
-
     
     override func setUp() {
         super.setUp()
@@ -36,12 +34,29 @@ class OTTMediaProviderTest: XCTestCase, SessionProvider {
         super.tearDown()
     }
     
-    func regularCaseTest() {
+    func testRegularCaseTest() {
         
-        let provider = OTTEntryProvider(sessionProvider: self, mediaId: mediaID, type: AssetType.media, formats: ["HD"], executor: MediaEntryProviderMockExecutor(entryID: mediaID, domain: "ott"))
+        let theExeption = expectation(description: "test")
+        
+        let provider = OTTMediaProvider()
+        .set(sessionProvider: self)
+        .set(mediaId: mediaID)
+        .set(type: AssetType.media)
+        .set(formats: ["Mobile_Devices_Main_HD"])
+        
         provider.loadMedia { (r:Result<MediaEntry>) in
             print(r)
+            if (r.error != nil){
+                theExeption.fulfill()
+            }else{
+                XCTFail()
+            }
         }
+        
+        self.waitForExpectations(timeout: 6.0) { (_) -> Void in
+            
+        }
+
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }

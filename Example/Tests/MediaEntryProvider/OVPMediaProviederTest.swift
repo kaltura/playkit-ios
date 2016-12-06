@@ -36,13 +36,30 @@ class OVPMediaProviederTest: XCTestCase, SessionProvider {
         super.tearDown()
     }
     
-    func regularCaseTest() {
+    func testRegularCaseTest() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+        let theExeption = expectation(description: "test")
         
-        let provider = OVPMediaProvider(sessionProvider: self, entryId: entryID, uiconfId:nil , executor: MediaEntryProviderMockExecutor(entryID: entryID, domain: "ovp"))
+        let provider = OVPMediaProvider()
+        .set(sessionProvider: self)
+        .set(entryId: self.entryID)
+        .set(executor: MediaEntryProviderMockExecutor(entryID: entryID, domain: "ovp"))
+        .set(apiServerURL: self.serverURL)
+        
+        
         provider.loadMedia { (r:Result<MediaEntry>) in
+            if (r.error != nil){
+                XCTFail()
+            }else{
+                theExeption.fulfill()
+            }
             print(r)
+        }
+        
+        
+        self.waitForExpectations(timeout: 6.0) { (_) -> Void in
+            
         }
     }
     
