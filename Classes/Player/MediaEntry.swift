@@ -59,6 +59,17 @@ public class MediaSource {
         if let mimeTypeString = json[mimeTypeKey].string {
             self.mimeType = mimeTypeString
         }
+        
+        if let drmData = json[drmDataKey].dictionaryObject {
+            guard let licenseURL = drmData["licenseUrl"] as? String else { return }
+            
+            if let fpsCertificate = drmData["fpsCertificate"] as? String {
+                var fpsData = FairPlayDRMData()
+                fpsData.fpsCertificate = Data(base64Encoded: fpsCertificate)
+                fpsData.licenseURL = URL(string: licenseURL)
+                self.drmData = fpsData
+            }
+        }
     }
 }
 
