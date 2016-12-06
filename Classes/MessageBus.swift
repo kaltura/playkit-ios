@@ -23,11 +23,11 @@ public class MessageBus: NSObject {
                 let typeId = NSStringFromClass(et)
                 var array: [Observation]? = observations[typeId]
                 
-                if (array != nil) {
-                    array!.append(Observation(observer: observer, block: block))
-                } else {
-                    observations[typeId] = [Observation(observer: observer, block: block)]
+                if array == nil {
+                    array = []
                 }
+                array!.append(Observation(observer: observer, block: block))
+                observations[typeId] = array
             }
         }
     }
@@ -36,8 +36,8 @@ public class MessageBus: NSObject {
         sync {
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
-                if var array: [Observation]? = observations[typeId] {
-                    array = array!.filter { $0.observer! !== observer }
+                if let array = observations[typeId] {
+                    observations[typeId] = array.filter { $0.observer! !== observer }
                 } else {
                     print("removeObserver:: array is empty")
                 }

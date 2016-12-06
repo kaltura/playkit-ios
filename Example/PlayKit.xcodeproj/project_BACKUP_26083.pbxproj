@@ -15,15 +15,15 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		6C1661639467768BB9BAA2D9 /* Pods_PlayKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F22FBF5CD0C0446ED67E8399 /* Pods_PlayKit_Example.framework */; };
 		8460889C1DD1AB1A009E0E7A /* Entries.json in Resources */ = {isa = PBXBuildFile; fileRef = 8460889B1DD1AB1A009E0E7A /* Entries.json */; };
-		BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */; };
-		C23A62D11DF413FF00635FA2 /* MockMediaProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62C91DF412FD00635FA2 /* MockMediaProviderTest.swift */; };
-		C23A62D21DF4140B00635FA2 /* OTTMediaProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CA1DF412FD00635FA2 /* OTTMediaProviderTest.swift */; };
-		C23A62D31DF4140E00635FA2 /* OVPMediaProviederTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */; };
-		C23A62D41DF4141000635FA2 /* MediaEntryProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CF1DF4131700635FA2 /* MediaEntryProviderMock.swift */; };
-		C23A62DD1DF47D9C00635FA2 /* OTTSessionProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62DB1DF47D9800635FA2 /* OTTSessionProviderTest.swift */; };
+		846088A91DD2619A009E0E7A /* MockMediaProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846088A81DD2619A009E0E7A /* MockMediaProviderTest.swift */; };
+<<<<<<< HEAD
+		C24770AB1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C24770AA1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift */; };
 		C24770AD1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
 		C24770B01DEDF36900E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
+=======
+		BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */; };
 		C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */; };
+>>>>>>> develop
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,13 +52,13 @@
 		607FACE51AFB9204008FA782 /* PlayKit_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlayKit_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8460889B1DD1AB1A009E0E7A /* Entries.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Entries.json; sourceTree = "<group>"; };
-		BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessegeBusTest.swift; sourceTree = "<group>"; };
-		C23A62C91DF412FD00635FA2 /* MockMediaProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockMediaProviderTest.swift; sourceTree = "<group>"; };
-		C23A62CA1DF412FD00635FA2 /* OTTMediaProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTMediaProviderTest.swift; sourceTree = "<group>"; };
-		C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OVPMediaProviederTest.swift; sourceTree = "<group>"; };
-		C23A62CF1DF4131700635FA2 /* MediaEntryProviderMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntryProviderMock.swift; sourceTree = "<group>"; };
-		C23A62DB1DF47D9800635FA2 /* OTTSessionProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTSessionProviderTest.swift; sourceTree = "<group>"; };
+		846088A81DD2619A009E0E7A /* MockMediaProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockMediaProviderTest.swift; sourceTree = "<group>"; };
+<<<<<<< HEAD
+		C24770AA1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OVPMediaProviederTest.swift; sourceTree = "<group>"; };
 		C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ovp.multirequest._.1_1h1vsv3z.json; sourceTree = "<group>"; };
+=======
+		BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessegeBusTest.swift; sourceTree = "<group>"; };
+>>>>>>> develop
 		C6039FAD64FBD55034BCB260 /* Pods-PlayKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlayKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PlayKit_Tests/Pods-PlayKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerControllerTest.swift; sourceTree = "<group>"; };
 		D1F7DD9C5361102A75AA1CAB /* Pods_PlayKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlayKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -133,10 +133,11 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				C23A62C81DF412FD00635FA2 /* MediaEntryProvider */,
-				C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */,
 				BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */,
+				846088A81DD2619A009E0E7A /* MockMediaProviderTest.swift */,
+				C24770AA1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
+				C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -177,18 +178,6 @@
 				C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		C23A62C81DF412FD00635FA2 /* MediaEntryProvider */ = {
-			isa = PBXGroup;
-			children = (
-				C23A62DB1DF47D9800635FA2 /* OTTSessionProviderTest.swift */,
-				C23A62C91DF412FD00635FA2 /* MockMediaProviderTest.swift */,
-				C23A62CA1DF412FD00635FA2 /* OTTMediaProviderTest.swift */,
-				C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */,
-				C23A62CF1DF4131700635FA2 /* MediaEntryProviderMock.swift */,
-			);
-			path = MediaEntryProvider;
 			sourceTree = "<group>";
 		};
 		E927D97FFF1E38C30E74E325 /* Frameworks */ = {
@@ -414,13 +403,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C23A62D41DF4141000635FA2 /* MediaEntryProviderMock.swift in Sources */,
-				C23A62D11DF413FF00635FA2 /* MockMediaProviderTest.swift in Sources */,
-				C23A62D31DF4140E00635FA2 /* OVPMediaProviederTest.swift in Sources */,
 				C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */,
 				BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */,
-				C23A62D21DF4140B00635FA2 /* OTTMediaProviderTest.swift in Sources */,
-				C23A62DD1DF47D9C00635FA2 /* OTTSessionProviderTest.swift in Sources */,
+				846088A91DD2619A009E0E7A /* MockMediaProviderTest.swift in Sources */,
+				C24770AB1DEDE5EE00E37C89 /* OVPMediaProviederTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

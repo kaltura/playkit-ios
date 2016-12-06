@@ -31,7 +31,11 @@ public protocol MediaEntryProvider {
      ```
      
      */
-    func loadMedia(callback:(_ response:Response<MediaEntry>)->Void)    
+    func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void)
+    
+    
+    func cancel()
+    
 }
 
 

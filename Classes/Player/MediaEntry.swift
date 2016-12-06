@@ -9,8 +9,8 @@
 import UIKit
 import SwiftyJSON
 
-public class MediaEntry: NSObject {
-    internal var id: String?
+public class MediaEntry: CustomStringConvertible{
+    internal var id: String
     internal var sources: [MediaSource]?
     internal var duration: Int64?
     
@@ -19,9 +19,13 @@ public class MediaEntry: NSObject {
     private let durationKey = "duration"
     
 
-    public init(json: JSON) {
+    internal init(id: String) {
+        self.id = id
+    }
+    
+    public init?(json: JSON) {
       
-        guard let id = json[idKey].string else { return}
+        guard let id = json[idKey].string else { return nil}
         self.id = id
         self.duration = json[durationKey].int64
         var sources : [MediaSource] = [MediaSource]()
@@ -33,21 +37,30 @@ public class MediaEntry: NSObject {
         
         self.sources = sources
     }
+    
+    public var description: String {
+        get{
+            return "id : \(self.id), sources: \(self.sources)"
+        }
+    }
 }
 
-public class MediaSource {
+public class MediaSource: CustomStringConvertible {
+    
     internal var id: String
     internal var contentUrl: URL?
     internal var mimeType: String?
     internal var drmData: DRMData?
-    
-    
     
     private let idKey: String = "id"
     private let contentUrlKey: String = "url"
     private let mimeTypeKey: String = "mimeType"
     private let drmDataKey: String = "drmData"
     
+    
+    public init (id: String){
+        self.id = id
+    }
     
     public init(json:JSON) {
         self.id = json[idKey].string!
@@ -71,6 +84,12 @@ public class MediaSource {
             }
         }
     }
+    
+    public var description: String {
+        get{
+            return "id : \(self.id), url: \(self.contentUrl)"
+        }
+    }
 }
 
 open class DRMData {
@@ -80,3 +99,8 @@ open class DRMData {
 public class FairPlayDRMData: DRMData {
     var fpsCertificate: Data?    
 }
+
+
+
+
+

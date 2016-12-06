@@ -1,0 +1,225 @@
+[
+  {
+    "objects": [
+      {
+        "flavorParamsIds": "0,487041,487051,487061,487071,487081,487091",
+        "duration": 102,
+        "msDuration": 102000,
+        "id": "1_1h1vsv3z",
+        "name": "Kaltura Video Solutions for Media Companies",
+        "type": 1,
+        "objectType": "KalturaMediaEntry"
+      }
+    ],
+    "totalCount": 1,
+    "objectType": "KalturaBaseEntryListResponse"
+  },
+  {
+    "isSiteRestricted": false,
+    "isCountryRestricted": false,
+    "isSessionRestricted": false,
+    "isIpAddressRestricted": false,
+    "isUserAgentRestricted": false,
+    "previewLength": -1,
+    "isScheduledNow": true,
+    "isAdmin": false,
+    "streamerType": "http",
+    "mediaProtocol": "http",
+    "accessControlMessages": [],
+    "accessControlActions": [],
+    "sources": [
+      {
+        "deliveryProfileId": 1234,
+        "format": "applehttp",
+        "protocols": ["http", "https"],
+        "flavors": ["1_ude4l5pb", "1_izgi81qa"],
+        "url": "http://cdnapi.kaltura.com/p/123/playManifest/entryId/0_11223344/flavorIds/1_ude4l5pb,1_izgi81qa,1_3l6wh2jz,1_fafwf2t7,1_k6gs4dju,1_nzen8kfl/format/url/protocol/http/a.mp4",
+        "drm": [{
+          "scheme": "FairPlay",
+          "certificate": "base64-encoded-certificate",
+          "licenseURL": "https://udrm.kaltura.com/..."
+        }]
+      },
+      {
+        "deliveryProfileId": 1235,
+        "format": "mpegdash",
+        "protocols": ["http", "https"],
+        "flavors": ["1_ude4l5pb", "1_izgi81qa"],
+        "url": "http://cdnapi.kaltura.com/p/123/playManifest/entryId/0_11223344/flavorIds/1_ude4l5pb,1_izgi81qa,1_3l6wh2jz,1_fafwf2t7,1_k6gs4dju,1_nzen8kfl/format/url/protocol/http/a.mp4",
+        "drm": [
+          {
+            "scheme": "WidevineModular",
+            "licenseURL": "https://udrm.kaltura.com/..."
+          },
+          {
+            "scheme": "PlayReady",
+            "licenseURL": "https://udrm.kaltura.com/..."
+          }
+        ]
+      },
+      {
+        "deliveryProfileId": 1236,
+        "format": "http",
+        "protocols": ["http", "https"],
+        "flavors": ["flavor3"],
+        "url": "http://cdnapi.kaltura.com/p/123/playManifest/entryId/0_11223344/flavorIds/1_ude4l5pb,1_izgi81qa,1_3l6wh2jz,1_fafwf2t7,1_k6gs4dju,1_nzen8kfl/format/url/protocol/http/a.mp4",
+        "drm": [{
+          "scheme": "WidevineClassic",
+          "licenseURL": "https://udrm.kaltura.com/..."
+        }]
+      },
+      {
+        "deliveryProfileId": 1235,
+        "format": "http",
+        "protocols": ["http", "https"],
+        "flavors": ["flavor3"],
+        "url": "http://cdnapi.kaltura.com/p/123/playManifest/entryId/0_11223344/flavorIds/1_ude4l5pb,1_izgi81qa,1_3l6wh2jz,1_fafwf2t7,1_k6gs4dju,1_nzen8kfl/format/url/protocol/http/a.mp4"
+      }
+    ],
+    "flavorAssets": [
+      {
+        "flavorParamsId": 487041,
+        "width": 480,
+        "height": 256,
+        "bitrate": 466,
+        "frameRate": 25,
+        "isOriginal": false,
+        "isWeb": true,
+        "containerFormat": "isom",
+        "videoCodecId": "avc1",
+        "status": 2,
+        "id": "1_ude4l5pb",
+        "entryId": "1_1h1vsv3z",
+        "partnerId": 2209591,
+        "version": "11",
+        "size": 5816,
+        "tags": "mobile,web,iphone,iphonenew,mbr",
+        "fileExt": "mp4",
+        "createdAt": 1477909427,
+        "updatedAt": 1477909427,
+        "description": "",
+        "objectType": "KalturaFlavorAsset"
+      },
+      {
+        "flavorParamsId": 487051,
+        "width": 640,
+        "height": 360,
+        "bitrate": 663,
+        "frameRate": 25,
+        "isOriginal": false,
+        "isWeb": true,
+        "containerFormat": "isom",
+        "videoCodecId": "avc1",
+        "status": 2,
+        "id": "1_izgi81qa",
+        "entryId": "1_1h1vsv3z",
+        "partnerId": 2209591,
+        "version": "11",
+        "size": 8273,
+        "tags": "mobile,web,iphone,iphonenew,mbr",
+        "fileExt": "mp4",
+        "createdAt": 1477909428,
+        "updatedAt": 1477909428,
+        "description": "",
+        "objectType": "KalturaFlavorAsset"
+      },
+      {
+        "flavorParamsId": 487061,
+        "width": 640,
+        "height": 360,
+        "bitrate": 924,
+        "frameRate": 25,
+        "isOriginal": false,
+        "isWeb": true,
+        "containerFormat": "isom",
+        "videoCodecId": "avc1",
+        "status": 2,
+        "id": "1_3l6wh2jz",
+        "entryId": "1_1h1vsv3z",
+        "partnerId": 2209591,
+        "version": "11",
+        "size": 11468,
+        "tags": "mobile,web,ipad,ipadnew,mbr",
+        "fileExt": "mp4",
+        "createdAt": 1477909428,
+        "updatedAt": 1477909428,
+        "description": "",
+        "objectType": "KalturaFlavorAsset"
+      },
+      {
+        "flavorParamsId": 487071,
+        "width": 1024,
+        "height": 576,
+        "bitrate": 1551,
+        "frameRate": 25,
+        "isOriginal": false,
+        "isWeb": true,
+        "containerFormat": "isom",
+        "videoCodecId": "avc1",
+        "status": 2,
+        "id": "1_fafwf2t7",
+        "entryId": "1_1h1vsv3z",
+        "partnerId": 2209591,
+        "version": "11",
+        "size": 19353,
+        "tags": "mobile,web,ipad,ipadnew,mbr",
+        "fileExt": "mp4",
+        "createdAt": 1477909428,
+        "updatedAt": 1477909428,
+        "description": "",
+        "objectType": "KalturaFlavorAsset"
+      },
+      {
+        "flavorParamsId": 487081,
+        "width": 1280,
+        "height": 720,
+        "bitrate": 2495,
+        "frameRate": 25,
+        "isOriginal": false,
+        "isWeb": true,
+        "containerFormat": "isom",
+        "videoCodecId": "avc1",
+        "status": 2,
+        "id": "1_k6gs4dju",
+        "entryId": "1_1h1vsv3z",
+        "partnerId": 2209591,
+        "version": "11",
+        "size": 31129,
+        "tags": "web,mbr",
+        "fileExt": "mp4",
+        "createdAt": 1477909428,
+        "updatedAt": 1477909428,
+        "description": "",
+        "objectType": "KalturaFlavorAsset"
+      },
+      {
+        "flavorParamsId": 487091,
+        "width": 1280,
+        "height": 720,
+        "bitrate": 3676,
+        "frameRate": 25,
+        "isOriginal": false,
+        "isWeb": true,
+        "containerFormat": "isom",
+        "videoCodecId": "avc1",
+        "status": 2,
+        "id": "1_nzen8kfl",
+        "entryId": "1_1h1vsv3z",
+        "partnerId": 2209591,
+        "version": "11",
+        "size": 45875,
+        "tags": "web,mbr",
+        "fileExt": "mp4",
+        "createdAt": 1477909429,
+        "updatedAt": 1477909429,
+        "description": "",
+        "objectType": "KalturaFlavorAsset"
+      }
+    ],
+    "msDuration": 102000,
+    "pluginData": [],
+    "messages": [],
+    "actions": [],
+    "objectType": "KalturaEntryContextDataResult"
+  }
+]
