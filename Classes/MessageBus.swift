@@ -37,7 +37,7 @@ public class MessageBus: NSObject {
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
                 if let array = observations[typeId] {
-                    observations[typeId] = array!.filter { $0.observer! !== observer }
+                    observations[typeId] = array.filter { $0.observer! !== observer }
                 } else {
                     print("removeObserver:: array is empty")
                 }
