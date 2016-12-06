@@ -2,7 +2,6 @@ use_frameworks!
 
 target 'PlayKit_Example' do
   pod 'PlayKit', :path => '../'
-  pod 'PlayKit/SamplePlugin', :path => '../'
 
   target 'PlayKit_Tests' do
     inherit! :search_paths

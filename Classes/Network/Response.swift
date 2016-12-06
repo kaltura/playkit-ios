@@ -2,16 +2,14 @@
 //  Response.swift
 //  Pods
 //
-//  Created by Admin on 08/11/2016.
+//  Created by Admin on 10/11/2016.
 //
 //
 
 import UIKit
 
+public class Response: Result<Any> {
 
-public struct Response<T> {
-    
-    public let data: T?
-    public let error : Error?
+    public let statusCode: Int = 0
     
 }
