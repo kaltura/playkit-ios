@@ -1,12 +1,15 @@
 use_frameworks!
 
 target 'PlayKit_Example' do
-    pod 'PlayKit', :path => ‘../../playkit-ios'
-    pod ‘PlayKit/IMAPlugin’, :path => ‘../../playkit-ios'
-    pod ‘PlayKit/YouboraPlugin’, :path => ‘../../playkit-ios'
+    pod 'PlayKit', :path => '../'
+    pod 'PlayKit/IMAPlugin', :path => '../'
+    pod 'PlayKit/YouboraPlugin', :path => '../'
 end  
 target 'PlayKit_Tests' do
-    inherit! :search_paths
+    #inherit! :search_paths
+    pod 'PlayKit', :path => '../'
+    pod 'PlayKit/IMAPlugin', :path => '../'
+    pod 'PlayKit/YouboraPlugin', :path => '../'
 end
 pre_install do |installer|
     def installer.verify_no_static_framework_transitive_dependencies; end
