@@ -14,7 +14,7 @@ import AVKit
 class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPluginDataSource {
     
     var isAdPlayback = false
-    var isPlaying = false
+    var isPlayEnabled = false
     var adsPlugin: AdsPlugin!
     weak var messageBus: MessageBus?
     
@@ -30,16 +30,25 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
             self.adsPlugin.requestAds()
         }
     }
-    
+
+    override var isPlaying: Bool {
+        get {
+            if isAdPlayback {
+                return isPlayEnabled
+            }
+            return super.isPlaying
+        }
+    }
+
     override func play() {
-        self.isPlaying = true
+        self.isPlayEnabled = true
         if !self.adsPlugin.start(showLoadingView: true) {
             super.play()
         }
     }
     
     override func pause() {
-        self.isPlaying = false
+        self.isPlayEnabled = false
         if isAdPlayback {
             self.adsPlugin.pause()
         } else {
@@ -48,7 +57,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     }
     
     override func resume() {
-        self.isPlaying = true
+        self.isPlayEnabled = true
         if isAdPlayback {
             self.adsPlugin.resume()
         } else {
@@ -68,7 +77,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String) {
-        if self.isPlaying {
+        if self.isPlayEnabled {
             super.play()
         }
         self.delegate?.player(self, failedWith: error)
@@ -87,6 +96,8 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         } else if event is AdEvents.adDidRequestResume {
             super.play()
             self.isAdPlayback = false
+        } else if event is AdEvents.adResumed {
+            self.isPlayEnabled = true
         }
     }
 }

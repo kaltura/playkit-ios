@@ -74,6 +74,25 @@ class AVPlayerEngine : AVPlayer {
         return CMTimeGetSeconds(self.currentItem!.duration)
     }
     
+    public var isPlaying: Bool {
+        guard let currentItem = self.currentItem else {
+            PKLog.error("current item is empty")
+            return false
+        }
+        
+        if self.rate > 0 {
+            if let timebase = currentItem.timebase {
+                if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
+                    if timebaseRate > 0 {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
+    
     // MARK: Player Methods
     
     public override init() {
@@ -107,7 +126,7 @@ class AVPlayerEngine : AVPlayer {
     
     public override func pause() {
 
-        if self.rate == 1.0 {
+        if self.rate > 0 {
             // Playing, so pause.
             PKLog.trace("pause player")
             super.pause()
@@ -116,7 +135,7 @@ class AVPlayerEngine : AVPlayer {
     
     public override func play() {
 
-        if self.rate != 1.0 {
+        if self.rate == 0 {
             PKLog.trace("play player")
             
             self.postEvent(event: PlayerEvents.play())
@@ -268,62 +287,95 @@ class AVPlayerEngine : AVPlayer {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
             return
         }
+        
+        guard let keyPath = keyPath else {
+            return
+        }
+        
+        PKLog.trace("keyPath:: \(keyPath)")
 
         var event: PKEvent? = nil
         
-        if keyPath == #keyPath(currentItem.isPlaybackLikelyToKeepUp) {
-            if let item = self.currentItem {
-                let newState = PlayerState.ready
-                self.postStateChange(newState: newState, oldState: self.currentState)
-                self.currentState = newState
-            }
-        } else if keyPath == #keyPath(currentItem.isPlaybackBufferEmpty) {
-            if let item = self.currentItem {
-                let newState = PlayerState.idle
-                self.postStateChange(newState: newState, oldState: self.currentState)
-                self.currentState = newState
-            }
-        } else if keyPath == #keyPath(currentItem.duration) {
+        switch keyPath {
+        case #keyPath(currentItem.playbackLikelyToKeepUp):
+            self.handleLikelyToKeepUp()
+        case #keyPath(currentItem.playbackBufferEmpty):
+            self.handleBufferEmptyChange()
+        case #keyPath(currentItem.duration):
             event = PlayerEvents.durationChange(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
-        } else if keyPath == #keyPath(rate) {
-            if rate == 1.0 {
+        case #keyPath(rate):
+            if rate > 0 {
                 nonObservablePropertiesUpdateTimer.resume()
             } else {
                 event = PlayerEvents.pause()
             }
-        } else if keyPath == #keyPath(currentItem.status) {
-            if currentItem?.status == .readyToPlay {
-                self.setupNonObservablePropertiesUpdateTimer()
-                self.handleTracks()
-                let newState = PlayerState.ready
-                self.postEvent(event: PlayerEvents.loadedMetadata())
-                self.postStateChange(newState: newState, oldState: self.currentState)
-                self.currentState = newState
-                
-                event = PlayerEvents.canPlay()
-            } else if currentItem?.status == .failed {
-                let newState = PlayerState.error
-                self.postStateChange(newState: newState, oldState: self.currentState)
-                self.currentState = newState
-                
-                event = PlayerEvents.error()
-            }
-        } else if keyPath == #keyPath(currentItem) {
+
+        case #keyPath(currentItem.status):
+            event = self.handleStatusChange()
+        case #keyPath(currentItem):
+            self.handleItemChange()
+            
+        default:
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        }
+
+        self.postEvent(event: event)
+    }
+    
+    private func handleLikelyToKeepUp() {
+        if let item = self.currentItem {
+            let newState = PlayerState.ready
+            self.postStateChange(newState: newState, oldState: self.currentState)
+            self.currentState = newState
+        }
+    }
+    
+    private func handleBufferEmptyChange() {
+        if let item = self.currentItem {
             let newState = PlayerState.idle
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
         }
-        
-        if let currentEvent: PKEvent = event {
-           self.postEvent(event: currentEvent)
-        }
     }
     
-    private func postEvent(event: PKEvent) {
-        PKLog.trace("onEvent:: \(event)")
+    private func handleStatusChange() -> PKEvent? {
+        var event: PKEvent? = nil
         
-        if let block = onEventBlock {
-            block(event)
+        if currentItem?.status == .readyToPlay {
+            self.setupNonObservablePropertiesUpdateTimer()
+            
+            let newState = PlayerState.ready
+            self.postEvent(event: PlayerEvents.loadedMetadata())
+            self.postStateChange(newState: newState, oldState: self.currentState)
+            self.currentState = newState
+            
+            event = PlayerEvents.canPlay()
+        } else if currentItem?.status == .failed {
+            let newState = PlayerState.error
+            self.postStateChange(newState: newState, oldState: self.currentState)
+            self.currentState = newState
+            
+            event = PlayerEvents.error()
+        }
+        
+        return event
+    }
+    
+    private func handleItemChange() {
+        let newState = PlayerState.idle
+        self.postStateChange(newState: newState, oldState: self.currentState)
+        self.currentState = newState
+    }
+    
+    private func postEvent(event: PKEvent?) {
+        if let currentEvent: PKEvent = event {
+            PKLog.trace("onEvent:: \(currentEvent)")
+            
+            if let block = onEventBlock {
+                block(currentEvent)
+            }
+        } else {
+            PKLog.error("event is empty:: \(event)")
         }
     }
     
@@ -381,7 +433,7 @@ class AVPlayerEngine : AVPlayer {
         if let currItem = self.currentItem {
             if let timebase = currItem.timebase {
                 if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
-                    if timebaseRate == 1.0 {
+                    if timebaseRate > 0 {
                         nonObservablePropertiesUpdateTimer.suspend()
                         
                         self.postEvent(event: PlayerEvents.playing())
