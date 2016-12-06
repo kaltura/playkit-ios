@@ -23,11 +23,11 @@ public class MessageBus: NSObject {
                 let typeId = NSStringFromClass(et)
                 var array: [Observation]? = observations[typeId]
                 
-                if (array != nil) {
-                    array!.append(Observation(observer: observer, block: block))
-                } else {
-                    observations[typeId] = [Observation(observer: observer, block: block)]
+                if array == nil {
+                    array = []
                 }
+                array!.append(Observation(observer: observer, block: block))
+                observations[typeId] = array
             }
         }
     }
