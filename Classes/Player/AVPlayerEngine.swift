@@ -26,6 +26,7 @@ class AVPlayerEngine : AVPlayer {
     private var _view: PlayerView!
     private var currentState: PlayerState = PlayerState.idle
     private var isObserved: Bool = false
+    private var tracksHandler = TracksHandler()
     
 //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
     private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
@@ -228,8 +229,7 @@ class AVPlayerEngine : AVPlayer {
         #keyPath(currentItem),
         #keyPath(currentItem.playbackLikelyToKeepUp),
         #keyPath(currentItem.playbackBufferEmpty),
-        #keyPath(currentItem.duration),
-        #keyPath(currentItem.tracks)
+        #keyPath(currentItem.duration)
     ]
     
     private var observerContext = 0
@@ -309,7 +309,6 @@ class AVPlayerEngine : AVPlayer {
             } else {
                 event = PlayerEvents.pause()
             }
-
         case #keyPath(currentItem.status):
             event = self.handleStatusChange()
         case #keyPath(currentItem):
@@ -346,6 +345,9 @@ class AVPlayerEngine : AVPlayer {
             
             let newState = PlayerState.ready
             self.postEvent(event: PlayerEvents.loadedMetadata())
+            
+//            self.postEvent(event: PlayerEvents.tracksAvailable(tracks:)
+                
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
@@ -379,46 +381,8 @@ class AVPlayerEngine : AVPlayer {
         }
     }
     
-//    -(void)handleAudioTracks{
-//    NSMutableArray* audioTracks;
-//    //check for multi audio
-//    AVMediaSelectionGroup *audioSelectionGroup = [[[self currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
-//    
-//    if (audioSelectionGroup.options.count > 1){
-//    audioTracks = [NSMutableArray new];
-//    //we have more than one audio assest - lets send events and be ready for a switch
-//    for (AVMediaSelectionOption *option in audioSelectionGroup.options){
-//    NSString* language = [option.locale objectForKey:NSLocaleLanguageCode];
-//    [audioTracks addObject:@{@"language":language,
-//    @"label":language,
-//    @"title":option.displayName,
-//    @"index": @(audioTracks.count)
-//    }];
-//    }
-//    if ([audioTracks count] > 0){
-//    NSMutableDictionary *audioLanguages = @{@"languages": audioTracks}.mutableCopy;
-//    [self.delegate player:self
-//    eventName:@"audioTracksReceived"
-//    JSON:audioLanguages.toJSON];
-//    }
-//    }
-//    
-//    }
-
-    private var audioTracks = [BaseTrackInfo]()
-    
-    private func handleAudioTracks() {
-            self.currentItem?.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicAudible)?.options.forEach { (option) in
-                PKLog.trace(option)
-                var uniqueId = 0
-                if let tracks = audioTracks {
-                    uniqueId = tracks.count
-                }
-                let audioTrackInfo: AudioTrackInfo = AudioTrackInfo(uniqueId: uniqueId, title: option.displayName, isAdaptive: false, language: option.extendedLanguageTag)
-                audioTracks.append(audioTrackInfo)
-        }
-        
-        
+    public func selectTrack(index: Int, type: String) {
+        self.tracksHandler.selectTrack(item: self.currentItem!, index: index, type: type)
     }
     
     private func postStateChange(newState: PlayerState, oldState: PlayerState) {

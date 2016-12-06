@@ -139,4 +139,8 @@ class PlayerController: Player {
     func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         //Assert.shouldNeverHappen();
     }
+    
+    public func selectTrack(index: Int, type: String) {
+        self.currentPlayer?.selectTrack(index: index, type: type)
+    }
 }
