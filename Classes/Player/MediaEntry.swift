@@ -66,23 +66,14 @@ public class MediaSource: CustomStringConvertible {
         self.id = json[idKey].string!
         
         if let pathString = json[contentUrlKey].string {
-                self.contentUrl = URL(string: pathString)
+            self.contentUrl = URL(string: pathString)
         }
         
         if let mimeTypeString = json[mimeTypeKey].string {
             self.mimeType = mimeTypeString
         }
         
-        if let drmData = json[drmDataKey].dictionaryObject {
-            guard let licenseURL = drmData["licenseUrl"] as? String else { return }
-            
-            if let fpsCertificate = drmData["fpsCertificate"] as? String {
-                var fpsData = FairPlayDRMData()
-                fpsData.fpsCertificate = Data(base64Encoded: fpsCertificate)
-                fpsData.licenseURL = URL(string: licenseURL)
-                self.drmData = fpsData
-            }
-        }
+        self.drmData = DRMData.fromJSON(json[drmDataKey])
     }
     
     public var description: String {
@@ -94,10 +85,25 @@ public class MediaSource: CustomStringConvertible {
 
 open class DRMData {
     var licenseURL: URL?
+    
+    static func fromJSON(_ json: JSON) -> DRMData? {
+        guard let licenseURL = json["licenseUrl"].string else { return nil }
+        
+        if let fpsCertificate = json["fpsCertificate"].string {
+            var fpsData = FairPlayDRMData()
+            fpsData.fpsCertificate = Data(base64Encoded: fpsCertificate)
+            fpsData.licenseURL = URL(string: licenseURL)
+            return fpsData
+        } else {
+            var drmData = DRMData()
+            drmData.licenseURL = URL(string: licenseURL)
+            return drmData
+        }
+    }
 }
 
 public class FairPlayDRMData: DRMData {
-    var fpsCertificate: Data?    
+    var fpsCertificate: Data?
 }
 
 
