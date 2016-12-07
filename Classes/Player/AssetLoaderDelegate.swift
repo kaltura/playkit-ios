@@ -4,11 +4,6 @@ import AVFoundation
 import SwiftyJSON
 
 
-public enum Result<T> {
-    case data(T)
-    case error(Error)
-}
-
 enum FairPlayError : Error {
     case emptyServerResponse
     case malformedServerResponse
@@ -99,9 +94,9 @@ public class AssetLoaderDelegate: NSObject {
         var dataTask = URLSession.shared.dataTask(with: request, completionHandler: {(data: Data?, response: URLResponse?, error: Error?) -> Void in
             do {
                 let ckc = try self.parseServerResponse(data: data, error: error)
-                callback(Result.data(ckc))
+                callback(Result(data: ckc))
             } catch let e as Error {
-                callback(Result.error(e))
+                callback(Result(error: e))
             }
         })
         dataTask.resume()
@@ -281,11 +276,10 @@ private extension AssetLoaderDelegate {
         
         
         performCKCRequest(spcData) {(result: Result<Data>) -> Void in
-            switch result {
-            case .data(let ckcData):
+            if let ckcData = result.data {
                 self.handleCKCData(resourceLoadingRequest, ckcData, shouldPersist)
-            case .error(let error):
-                PKLog.error("Error occured while loading FairPlay license:", error)
+            } else {
+                PKLog.error("Error occured while loading FairPlay license:", result.error)
             }
         }
         

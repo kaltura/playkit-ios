@@ -19,4 +19,11 @@ public class Result<T> {
         self.error = error
     }
     
+    public convenience init(data: T) {
+        self.init(data: data, error: nil)
+    }
+
+    public convenience init(error: Error) {
+        self.init(data: nil, error: error)
+    }
 }
