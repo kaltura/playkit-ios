@@ -48,7 +48,7 @@ public class AssetLoaderDelegate: NSObject {
         
         super.init()
         
-        self.asset.resourceLoader.setDelegate(self, queue: DispatchQueue(label: "\(assetName)-delegateQueue"))
+        self.asset.resourceLoader.setDelegate(self, queue: resourceLoadingRequestQueue)//DispatchQueue(label: "\(assetName)-delegateQueue"))
     }
     
     

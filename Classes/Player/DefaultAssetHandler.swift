@@ -12,6 +12,7 @@ import AVFoundation
 class DefaultAssetHandler: AssetHandler {
     
     var assetLoaderDelegate: AssetLoaderDelegate?
+    var avAsset: AVURLAsset?
     
     required init() {
         
@@ -43,11 +44,14 @@ class DefaultAssetHandler: AssetHandler {
         }
 
         let assetName = mediaSource.id
-        var avAsset = AVURLAsset(url: contentUrl)
         
-        self.assetLoaderDelegate = AssetLoaderDelegate(asset: avAsset, assetName: assetName, drmData: fpsData)
-        
-        readyCallback(nil, avAsset)
+        self.avAsset = AVURLAsset(url: contentUrl)    
+        if let asset = self.avAsset {
+            self.assetLoaderDelegate = AssetLoaderDelegate(asset: asset, assetName: assetName, drmData: fpsData)
+            readyCallback(nil, avAsset)
+        } else {
+            // TODO: error
+        }        
     }
 }
 
