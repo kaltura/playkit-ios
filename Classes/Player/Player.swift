@@ -80,7 +80,7 @@ public protocol Player {
     
     func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
     
-    func selectTrack(index: Int, type: String)
+    func selectTrack(trackId: String)
     
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?

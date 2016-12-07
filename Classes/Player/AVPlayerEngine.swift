@@ -346,7 +346,9 @@ class AVPlayerEngine : AVPlayer {
             let newState = PlayerState.ready
             self.postEvent(event: PlayerEvents.loadedMetadata())
             
-//            self.postEvent(event: PlayerEvents.tracksAvailable(tracks:)
+            self.tracksHandler.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+                self.postEvent(event: PlayerEvents.tracksAvailable(tracks: tracks))
+            })
                 
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
@@ -381,8 +383,12 @@ class AVPlayerEngine : AVPlayer {
         }
     }
     
-    public func selectTrack(index: Int, type: String) {
-        self.tracksHandler.selectTrack(item: self.currentItem!, index: index, type: type)
+    public func selectTrack(trackId: String) {
+        if let id: String = trackId {
+           self.tracksHandler.selectTrack(item: self.currentItem!, trackId: trackId)
+        } else {
+            PKLog.warning("trackId is nil")
+        }
     }
     
     private func postStateChange(newState: PlayerState, oldState: PlayerState) {

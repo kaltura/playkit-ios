@@ -102,7 +102,7 @@ class PlayerDecoratorBase: Player {
         //Assert.shouldNeverHappen();
     }
     
-    func selectTrack(index: Int, type: String) {
-        self.player.selectTrack(index: index, type: type)
+    public func selectTrack(trackId: String) {
+        self.player.selectTrack(trackId: trackId)
     }
 }

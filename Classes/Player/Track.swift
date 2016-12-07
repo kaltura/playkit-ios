@@ -9,16 +9,14 @@
 import Foundation
 
 public class Track {
-    public var index: Int?
-    public var type: String?
+    public var id: String?
     public var title: String?
     public var language: String?
     
-    init(index: Int?, type: String?, title: String?, language: String?) {
-        PKLog.debug("init:: index:\(index) type:\(type) title:\(title) language: \(language)")
-        // TODO:: replace index+type with id
-        self.index = index
-        self.type = type
+    init(id: String?, title: String?, language: String?) {
+        PKLog.debug("init:: id:\(id) title:\(title) language: \(language)")
+        
+        self.id = id
         self.title = title
         self.language = language
     }
