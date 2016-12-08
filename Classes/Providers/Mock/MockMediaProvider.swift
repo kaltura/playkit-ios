@@ -17,6 +17,7 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     
     
    public enum MockError: Error {
+        case invalidParam(paramName:String)
         case fileIsEmptyOrNotFound
         case unableToParseJSON
         case mediaNotFound
@@ -24,91 +25,73 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     }
     
     
-    public var id: String
+    public var id: String?
     public var url: URL?
-    public var content: Data?
+    public var content: Any?
     
-    private var objects: JSON?
-  
-    /**
-     Constructor
-     init mokc media proviedr with file url and media entry id,
-     
-     The file content should be as follow:
-     ```
-     "entryID": {
-        "duration": int,
-        "id": "entryID",
-        "name": string,
-        "sources": [
-        {
-            "id": "sourceid",
-            "mimeType": string,
-            "url": string
-        }
-        ]
-     }
-     ```
-     
-     - parameter fileURL full path of file
-     - parameter mediaEntryId the id of the media we want to load from the file
-     */
-    public init(fileURL:URL, mediaEntryId:String)
-    {
-        self.url = fileURL
-        self.id = mediaEntryId
+    public func set(id: String?) -> Self {
+        self.id = id
+        return self
+    }
+    
+    public func set(url: URL?) -> Self {
+        self.url = url
+        return self
+    }
+    
+    public func set(content: Any?) -> Self {
+        self.content = content
+        return self
+    }
+    
+    public init(){
         
     }
     
-    
-    /**
-     Constructor
-     init mokc media proviedr with file url and media entry id,
-     
-     The content should be json as follow:
-     ```
-     "entryID": {
-     "duration": int,
-     "id": "entryID",
-     "name": string,
-     "sources": [
-     {
-     "id": "sourceid",
-     "mimeType": string,
-     "url": string
-     }
-     ]
-     }
-     ```
-     
-     - parameter the data for loading the media
-     - parameter mediaEntryId the id of the media we want to load from the file
-     */
-    public init(data:Data, mediaEntryId:String)
-    {
-        self.content = data
-        self.id = mediaEntryId
+
+    struct LoaderInfo {
+         var id: String
+         var content: JSON
     }
-    
+
     
     public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void){
         
-        if self.content == nil {
-            guard let stringPath = self.url?.absoluteString else {return }
-            self.content = NSData(contentsOfFile: stringPath) as Data?
-        }
         
-        
-        guard let content = self.content  else {
-            
-            callback(Result(data: nil, error: MockError.fileIsEmptyOrNotFound))
+        guard let id = self.id else {
+            callback(Result(data: nil, error: MockError.invalidParam(paramName: "id")))
             return
         }
-        guard  let jsonObjects: JSON = JSON(data:self.content!), jsonObjects != .null  else {
+        
+        var json: JSON? = nil
+        if let inputContent = self.content {
+            json = JSON(self.content)
+        }else if let url = self.url{
+            guard let stringPath = self.url?.absoluteString else {
+                 callback(Result(data: nil, error: MockError.invalidParam(paramName: "url")))
+                return
+            }
+            guard  let data = NSData(contentsOfFile: stringPath)  else {
+                 callback(Result(data: nil, error: MockError.fileIsEmptyOrNotFound))
+                return
+            }
+            json = JSON(data: data as Data)
+        }
+        
+        
+        guard  let jsonContent = json else {
             callback(Result(data: nil, error: MockError.unableToParseJSON))
             return
         }
-        guard let jsonObject: JSON = jsonObjects[self.id] , jsonObject != .null else {
+        
+        let loderInfo = LoaderInfo(id: id, content: jsonContent)
+        
+        guard  loderInfo.content != .null  else {
+            callback(Result(data: nil, error: MockError.unableToParseJSON))
+            return
+        }
+        
+        guard let jsonObject: JSON = loderInfo.content[loderInfo.id] , jsonObject != .null else {
             callback(Result(data: nil, error:MockError.mediaNotFound))
             return
         }
