@@ -39,6 +39,16 @@ s.subspec 'YouboraPlugin' do |ssp|
     ssp.dependency 'Youbora-AVPlayer'
 end
 
+s.subspec 'GoogleCastAddon' do |ssp|
+    ssp.source_files = 'Addons/GoogleCast'
+    ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+                  'OTHER_LDFLAGS' => '$(inherited) -framework "GoogleCast"',
+                  'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+                  'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+    ssp.dependency 'google-cast-sdk'
+end
+
+
 s.default_subspec = 'Core'
 
 end
