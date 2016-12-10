@@ -91,7 +91,7 @@ class AssetLoaderDelegate: NSObject {
         
         var request = URLRequest(url: licenseURL)
         request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
-        request.httpBody = spcData
+        request.httpBody = spcData.base64EncodedData()
         request.httpMethod = "POST"
         
         var dataTask = URLSession.shared.dataTask(with: request, completionHandler: {(data: Data?, response: URLResponse?, error: Error?) -> Void in
