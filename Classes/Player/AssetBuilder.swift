@@ -29,6 +29,8 @@ class AssetBuilder {
         let handler = handlerClass.init()
 
         handler.buildAsset(mediaSource: selectedSource, readyCallback: readyCallback)
+        
+        self.assetHandler = handler 
     }
 }
 
