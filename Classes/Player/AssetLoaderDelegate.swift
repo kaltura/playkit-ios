@@ -12,7 +12,7 @@ enum FairPlayError : Error {
     
 }
 
-public class AssetLoaderDelegate: NSObject {
+class AssetLoaderDelegate: NSObject {
     
     /// The URL scheme for FPS content.
     static let customScheme = "skd"
@@ -47,10 +47,13 @@ public class AssetLoaderDelegate: NSObject {
         self.drmData = drmData
         
         super.init()
-        
-        self.asset.resourceLoader.setDelegate(self, queue: resourceLoadingRequestQueue)//DispatchQueue(label: "\(assetName)-delegateQueue"))
     }
     
+    static func configureAsset(asset: AVURLAsset, assetName: String, drmData: FairPlayDRMData) -> AssetLoaderDelegate {
+        let delegate = AssetLoaderDelegate.init(asset: asset, assetName: assetName, drmData: drmData)
+        asset.resourceLoader.setDelegate(delegate, queue: delegate.resourceLoadingRequestQueue)
+        return delegate
+    }
     
     func parseServerResponse(data: Data?, error: Error?) throws -> Data {
         if let error = error {

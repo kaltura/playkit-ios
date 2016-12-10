@@ -45,13 +45,10 @@ class DefaultAssetHandler: AssetHandler {
 
         let assetName = mediaSource.id
         
-        self.avAsset = AVURLAsset(url: contentUrl)    
-        if let asset = self.avAsset {
-            self.assetLoaderDelegate = AssetLoaderDelegate(asset: asset, assetName: assetName, drmData: fpsData)
-            readyCallback(nil, avAsset)
-        } else {
-            // TODO: error
-        }        
+        let asset = AVURLAsset(url: contentUrl)
+        self.assetLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, assetName: mediaSource.id, drmData: fpsData)
+        self.avAsset = asset  
+        readyCallback(nil, self.avAsset)
     }
 }
 

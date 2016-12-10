@@ -39,12 +39,6 @@ protocol AssetHandler {
     func buildAsset(mediaSource: MediaSource, readyCallback: (Error?, AVAsset?)->Void)
 }
 
-
-enum AssetHandlerResult {
-    case asset(AVAsset)
-    case error(Error)
-}
-
 enum AssetError : Error {
     case noFpsCertificate
     case invalidDrmScheme
