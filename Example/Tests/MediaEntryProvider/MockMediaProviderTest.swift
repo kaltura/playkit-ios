@@ -1,22 +1,39 @@
 import UIKit
 import XCTest
 import PlayKit
+import SwiftyJSON
 
 class MockMediaProviderTest: XCTestCase {
     
     
     
     var filePath : URL?
+    var fileContent: Any?
+    
     
     override func setUp() {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
         
-        
         let bundle = Bundle.main
         let path = bundle.path(forResource: "Entries", ofType: "json")
         guard let filePath = path else {return}
         self.filePath = URL(string:filePath)
+        
+        guard let stringPath = self.filePath?.absoluteString else {
+            return
+        }
+        guard  let data = NSData(contentsOfFile: stringPath)  else {
+            return
+        }
+        let json = JSON(data: data as Data)
+        self.fileContent = json.object
+
+        
+        
+        
+        
+        
         
         
     }
@@ -30,7 +47,10 @@ class MockMediaProviderTest: XCTestCase {
         
         let theExeption = expectation(description: "test")
         
-        let mediaProvider1 : MediaEntryProvider = MockMediaEntryProvider(fileURL: self.filePath! , mediaEntryId: "m001")
+        let mediaProvider1 : MediaEntryProvider = MockMediaEntryProvider()
+            .set(url: self.filePath!)
+            .set(id: "m001")
+        
         mediaProvider1.loadMedia { (r:Result<MediaEntry>) in
             print(r)
             if r.data != nil {
@@ -51,15 +71,11 @@ class MockMediaProviderTest: XCTestCase {
     func testMediaProviderMediaNotFoundFlow() {
         
         let theExeption = expectation(description: "test")
+        let mediaProvider2 : MediaEntryProvider = MockMediaEntryProvider().set(url: self.filePath!).set(id: "sdf")
         
-        let mediaProvider2 : MediaEntryProvider = MockMediaEntryProvider(fileURL: self.filePath! , mediaEntryId: "sdf")
         mediaProvider2.loadMedia { (r:Result<MediaEntry>) in
-            if let err = r.error as? MockMediaEntryProvider.MockError {
-                if( err == MockMediaEntryProvider.MockError.mediaNotFound){
-                    theExeption.fulfill()
-                }else{
-                    XCTFail()
-                }
+            if  r.error != nil {
+                theExeption.fulfill()
             }else{
                 XCTFail()
             }
@@ -75,25 +91,46 @@ class MockMediaProviderTest: XCTestCase {
     func testMediaProvideFileNotFoundFlow() {
         
         let theExeption = expectation(description: "test")
+        let mediaProvider2 : MediaEntryProvider = MockMediaEntryProvider().set(url: URL(string:"asdd")).set(id: "sdf")
         
-        let mediaProvider2 : MediaEntryProvider = MockMediaEntryProvider(fileURL: URL(string:"asdd")! , mediaEntryId: "sdf")
         mediaProvider2.loadMedia { (r:Result<MediaEntry>) in
-            if let err = r.error as? MockMediaEntryProvider.MockError {
-                if( err == MockMediaEntryProvider.MockError.fileIsEmptyOrNotFound){
-                    theExeption.fulfill()
-                }else{
-                    XCTFail()
-                }
+            if r.error != nil {
+                theExeption.fulfill()
             }else{
                 XCTFail()
             }
-            
             
             self.waitForExpectations(timeout: 6.0) { (_) -> Void in
                 
             }
             
         }
+    }
+    
+    func testMediaProviderByJson() -> Void {
+        
+        let theExeption = expectation(description: "test")
+        
+        let mediaProvider1 : MediaEntryProvider = MockMediaEntryProvider()
+            .set(content: self.fileContent)
+            .set(id: "m001")
+        
+        mediaProvider1.loadMedia { (r:Result<MediaEntry>) in
+            print(r)
+            if r.data != nil {
+                theExeption.fulfill()
+            }
+            else{
+                XCTFail()
+            }
+        }
+        
+        
+        self.waitForExpectations(timeout: 6.0) { (_) -> Void in
+            
+            
+        }
+
     }
     
     
