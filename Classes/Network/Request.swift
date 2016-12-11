@@ -54,7 +54,7 @@ public class RequestBuilder {
     public var timeout: Double = 3
     public var configuration: RequestConfiguration? = nil
     public var completion: completionClosures? = nil
-    
+    public var urlParams: [String: String]? = nil
     
     public init?(url:String){
         
@@ -118,6 +118,16 @@ public class RequestBuilder {
         return self
     }
     
+    public func setParam(key: String, value:String) -> Self {
+        
+        if var params = self.urlParams {
+            self.urlParams![key] = value
+        }else{
+            self.urlParams = [key:value]
+        }
+        return self
+    }
+    
     public func build() -> Request {
         
         
@@ -129,6 +139,23 @@ public class RequestBuilder {
                 
             }
         }
+        
+        if let params = self.urlParams, params.count > 0 {
+            
+            var newUrl = "\(self.url.absoluteString)?"
+            var isFirst = true
+            for (key, value) in params {
+                if isFirst {
+                    isFirst = false
+                } else {
+                    newUrl.append("&")
+                }
+                newUrl.append("\(key)=\(value)")
+            }
+            
+            self.url = URL(string: newUrl)!
+        }
+        
         return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
         
         

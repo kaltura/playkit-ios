@@ -16,29 +16,31 @@ internal class OTTStatsService {
         
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: nil, action: nil) {
             request
-                .setBody(key: "service", value: JSON("stats"))
-                .setBody(key: "apiVersion", value: JSON("3.1"))
-                .setBody(key: "expiry", value: JSON("86400"))
-                .setBody(key: "clientTag", value: JSON("kwidget:v\(clientVer)"))
-                .setBody(key: "format", value: JSON("1"))
-                .setBody(key: "ignoreNull", value: JSON("1"))
-                .setBody(key: "action", value: JSON("collect"))
-                .setBody(key: "event:eventType", value: JSON(eventType))
-                .setBody(key: "event:clientVer", value: JSON(clientVer))
-                .setBody(key: "event:currentPoint", value: JSON(position))
-                .setBody(key: "event:duration", value: JSON(duration))
-                .setBody(key: "event:eventTimeStamp", value: JSON(Date().timeIntervalSince1970)) //
-                .setBody(key: "event:isFirstInSession", value: JSON("false"))
-                .setBody(key: "event:objectType", value: JSON("KalturaStatsEvent"))
-                .setBody(key: "event:partnerId", value: JSON(partnerId))
-                .setBody(key: "event:sessionId", value: JSON(sessionId))
-                .setBody(key: "event:uiconfId", value: JSON(uiConfId))
-                .setBody(key: "event:seek", value: JSON(isSeek))
-                .setBody(key: "event:entryId", value: JSON(entryId))
-                .setBody(key: "event:widgetId", value: JSON(widgetId))
-                .setBody(key: "event:referrer", value: JSON(referrer))
+                .setParam(key: "service", value: "stats")
+                .setParam(key: "apiVersion", value: "3.1")
+                .setParam(key: "expiry", value: "86400")
+                .setParam(key: "clientTag", value: "kwidget:v\(clientVer)")
+                .setParam(key: "format", value: "1")
+                .setParam(key: "ignoreNull", value: "1")
+                .setParam(key: "action", value: "collect")
+                //.setParam(key: "event", value: JSON(eventType))
+                .setParam(key: "event:eventType", value: "\(eventType)")
+                .setParam(key: "event:clientVer", value: "\(clientVer)")
+                .setParam(key: "event:currentPoint", value: "\(position)")
+                .setParam(key: "event:duration", value: "\(duration)")
+                .setParam(key: "event:eventTimeStamp", value: "\(Date().timeIntervalSince1970)") //
+                .setParam(key: "event:isFirstInSession", value: "false")
+                .setParam(key: "event:objectType", value: "KalturaStatsEvent")
+                .setParam(key: "event:partnerId", value: partnerId)
+                .setParam(key: "event:sessionId", value: sessionId)
+                .setParam(key: "event:uiconfId", value: "\(uiConfId)")
+                .setParam(key: "event:seek", value: String(isSeek))
+                .setParam(key: "event:entryId", value: entryId)
+                .setParam(key: "event:widgetId", value: widgetId)
+                .setParam(key: "event:referrer", value: referrer)
             
-                //.setBody(key: "", value: JSON(""))
+                .set(method: "GET")
+                //.setParam(key: "", value: JSON(""))
 
             return request
         }else{
