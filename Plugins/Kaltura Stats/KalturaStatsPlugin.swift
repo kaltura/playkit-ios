@@ -102,7 +102,7 @@ public class KalturaStatsPlugin: PKPlugin {
     
     private func registerToAllEvents() {
         
-        PKLog.trace()
+        PKLog.trace("registerToAllEvents")
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.canPlay.self], block: { (info) in
             PKLog.trace("canPlay info: \(info)")
