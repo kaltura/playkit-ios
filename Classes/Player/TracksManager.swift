@@ -9,7 +9,7 @@
 import Foundation
 import AVFoundation
 
-public class TracksManager {
+class TracksManager {
     let audioTypeKey: String = "soun"
     private var audioTracks: [Track]?
     private var textTracks: [Track]?
