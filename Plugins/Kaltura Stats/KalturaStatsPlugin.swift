@@ -121,9 +121,6 @@ public class KalturaStatsPlugin: PKPlugin {
             PKLog.trace("playing info: \(info)")
             if self.isFirstPlay {
                 
-                //let timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(YouboraPlugin.didStartPlaying), userInfo: nil, repeats: false)
-                //timer.fire()
-                //Play
                 self.sendAnalyticsEvent(action: .PLAY)
                 self.isFirstPlay = false
             } else {
