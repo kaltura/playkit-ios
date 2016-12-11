@@ -24,14 +24,14 @@ class TracksManager {
         self.handleAudioTracks(item: playerItem)
         self.handleTextTracks(item: playerItem)
         
-        if block != nil {
-            if self.audioTracks != nil || self.textTracks != nil {
-                PKLog.debug("audio tracks:: \(self.audioTracks), text tracks:: \(self.textTracks)")
-                block(PKTracks(audioTracks: self.audioTracks, textTracks: self.textTracks))
-            } else {
-                PKLog.debug("no audio/ text tracks")
-            }
+        
+        if self.audioTracks != nil || self.textTracks != nil {
+            PKLog.debug("audio tracks:: \(self.audioTracks), text tracks:: \(self.textTracks)")
+            block(PKTracks(audioTracks: self.audioTracks, textTracks: self.textTracks))
+        } else {
+            PKLog.debug("no audio/ text tracks")
         }
+        
     }
     
     public func selectTrack(item: AVPlayerItem, trackId: String) {
@@ -57,13 +57,13 @@ class TracksManager {
             
             var index = 0
             
-            if var tracks = self.audioTracks {
+            if let tracks = self.audioTracks {
                 index = tracks.count
             } else {
                 self.audioTracks = [Track]()
             }
             
-            var trackId = "\(option.mediaType):\(String(index))"
+            let trackId = "\(option.mediaType):\(String(index))"
             let track = Track(id: trackId, title: option.displayName, language: option.extendedLanguageTag)
             
             self.audioTracks?.append(track)
@@ -81,7 +81,7 @@ class TracksManager {
                 PKLog.trace("option:: \(option)")
                 item.select(option, in: audioSelectionGroup!)
             }
-
+            
             trackIndex += 1
         }
     }
@@ -89,21 +89,19 @@ class TracksManager {
     private func handleTextTracks(item: AVPlayerItem) {
         PKLog.trace("handleTextTracks")
         
-        var captions = [Track]()
-        var subtitles = [Track]()
         item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicLegible)?.options.forEach { (option) in
             
             PKLog.trace("option:: \(option)")
-
+            
             var index = 0
             
-            if var tracks = self.textTracks {
+            if let tracks = self.textTracks {
                 index = tracks.count
             } else {
                 self.textTracks = [Track]()
             }
             
-            var trackId = "\(option.mediaType):\(String(index))"
+            let trackId = "\(option.mediaType):\(String(index))"
             let track = Track(id: trackId, title: option.displayName, language: option.extendedLanguageTag)
             
             self.textTracks?.append(track)

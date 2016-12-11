@@ -65,9 +65,9 @@ public class OTTSessionManager: SessionProvider {
                 
                 if let data = r.data
                 {
-                     let result: [OTTBaseObject]? = nil
+                     var result: [OTTBaseObject]? = nil
                     do{
-                        let result: [OTTBaseObject] = try OTTMultiResponseParser.parse(data:data)
+                        result = try OTTMultiResponseParser.parse(data:data)
                     }catch{
                         completion(error)
                     }
@@ -176,9 +176,9 @@ public class OTTSessionManager: SessionProvider {
                 let mrb: KalturaMultiRequestBuilder? = ((KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: req1).add(request: req2))?.setOTTBasicParams().set(completion: { (r:Response) in
                     
                     if let data = r.data{
-                        let response: [OTTBaseObject]? = nil
+                        var response: [OTTBaseObject]? = nil
                         do{
-                        let response: [OTTBaseObject] = try OTTMultiResponseParser.parse(data: data)
+                        response = try OTTMultiResponseParser.parse(data: data)
                         }catch{
                             completion(Result(data: nil, error: error))
                         }

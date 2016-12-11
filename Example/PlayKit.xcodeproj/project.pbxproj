@@ -618,6 +618,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PlayKit_Example.app/PlayKit_Example";
+				WARNING_CFLAGS = "-Weverything";
 			};
 			name = Debug;
 		};
@@ -634,6 +635,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PlayKit_Example.app/PlayKit_Example";
+				WARNING_CFLAGS = "-Weverything";
 			};
 			name = Release;
 		};
