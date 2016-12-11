@@ -101,4 +101,8 @@ class PlayerDecoratorBase: Player {
     func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         //Assert.shouldNeverHappen();
     }
+    
+    public func selectTrack(trackId: String) {
+        self.player.selectTrack(trackId: trackId)
+    }
 }
