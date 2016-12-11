@@ -78,7 +78,9 @@ public protocol Player {
     
     func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void)
     
-    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) 
+    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
+    
+    func selectTrack(trackId: String)
     
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?

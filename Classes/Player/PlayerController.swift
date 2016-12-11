@@ -112,7 +112,6 @@ class PlayerController: Player {
     func seek(to time: CMTime) {
         PKLog.trace("seek::\(time)")
         self.currentPlayer?.currentPosition = CMTimeGetSeconds(time)
-//        self.currentPlayer?.seek(to: time)
     }
     
     func prepareNext(_ config: PlayerConfig) -> Bool {
@@ -138,5 +137,9 @@ class PlayerController: Player {
     
     func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         //Assert.shouldNeverHappen();
+    }
+    
+    public func selectTrack(trackId: String) {
+        self.currentPlayer?.selectTrack(trackId: trackId)
     }
 }
