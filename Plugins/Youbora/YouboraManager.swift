@@ -36,8 +36,8 @@ class YouboraManager: YBPluginGeneric {
     override func getResource() -> String! {
         PKLog.trace("Resource")
 
-        if let title = self.mediaEntry.id {
-            return title
+        if self.mediaEntry.id != nil {
+            return self.mediaEntry.id
         }
         return ""
     }

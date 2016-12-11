@@ -32,10 +32,13 @@ class PlayerControllerTest: XCTestCase {
         entry["id"] = "test"
         entry["sources"] = sources
         
-        config.set(mediaEntry: MediaEntry(json: JSON(entry)))
+        if let media = MediaEntry(json: JSON(entry)) {
+         
+            config.set(mediaEntry: media)
+            self.player = PlayKitManager.sharedInstance.loadPlayer(config:config)
         
-        self.player = PlayKitManager.sharedInstance.loadPlayer(config:config)
-    }
+        }
+}
     
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
