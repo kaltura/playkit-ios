@@ -10,6 +10,7 @@ import Foundation
 import AVFoundation
 
 public class TracksHandler {
+    let textTypeKey: String = "sbtl"
     private var audioTracks: [Track]?
     private var textTracks: [Track]?
     
@@ -40,7 +41,7 @@ public class TracksHandler {
         let type: String = idArr[0]
         let index: Int = Int(idArr[1])!
         
-        if type == "sbtl" {
+        if type == textTypeKey {
             self.selectTextTrack(item: item, trackId: index)
         } else {
             self.selectAudioTrack(item: item, trackId: index)
@@ -80,7 +81,7 @@ public class TracksHandler {
                 PKLog.trace("option:: \(option)")
                 item.select(option, in: audioSelectionGroup!)
             }
-            //TODO:: change syntax
+
             index = index + 1
         }
     }
@@ -114,6 +115,7 @@ public class TracksHandler {
             }
         }
         
+        // Only one text track will be chosen
         if subtitles.count > 0 {
             self.textTracks = subtitles
         } else if captions.count > 0 {
@@ -141,7 +143,7 @@ public class TracksHandler {
                     item.select(option, in: textSelectionGroup!)
                 }
             }
-            //TODO:: change syntax
+            
             index = index + 1
         }
     }
