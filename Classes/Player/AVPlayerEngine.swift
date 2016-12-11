@@ -26,7 +26,7 @@ class AVPlayerEngine : AVPlayer {
     private var _view: PlayerView!
     private var currentState: PlayerState = PlayerState.idle
     private var isObserved: Bool = false
-    private var tracksHandler = TracksHandler()
+    private var tracksManager = TracksManager()
     
 //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
     private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
@@ -346,7 +346,7 @@ class AVPlayerEngine : AVPlayer {
             let newState = PlayerState.ready
             self.postEvent(event: PlayerEvents.loadedMetadata())
             
-            self.tracksHandler.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+            self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
                 self.postEvent(event: PlayerEvents.tracksAvailable(tracks: tracks))
             })
                 
@@ -385,7 +385,7 @@ class AVPlayerEngine : AVPlayer {
     
     public func selectTrack(trackId: String) {
         if let id: String = trackId {
-           self.tracksHandler.selectTrack(item: self.currentItem!, trackId: trackId)
+           self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
         } else {
             PKLog.warning("trackId is nil")
         }

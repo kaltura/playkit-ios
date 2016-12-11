@@ -9,7 +9,7 @@
 import Foundation
 import AVFoundation
 
-public class TracksHandler {
+public class TracksManager {
     let textTypeKey: String = "sbtl"
     private var audioTracks: [Track]?
     private var textTracks: [Track]?
