@@ -10,6 +10,11 @@ import UIKit
 
 public class PlayKitManager: NSObject {
 
+    public static let versionString: String = Bundle.init(for: PlayKitManager.self)
+        .object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    
+    public static let clientTag = "playkit/ios-\(versionString)"
+    
     public static let sharedInstance : PlayKitManager = PlayKitManager()
     
     var pluginRegistry = Dictionary<String, PKPlugin.Type>()
