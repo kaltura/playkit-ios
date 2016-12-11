@@ -71,6 +71,7 @@ public class MediaSource: NSObject {
     
     public init (id: String){
         self.id = id
+        super.init()
     }
     
     public init(json:JSON) {
@@ -83,6 +84,8 @@ public class MediaSource: NSObject {
         if let mimeTypeString = json[mimeTypeKey].string {
             self.mimeType = mimeTypeString
         }
+        
+        super.init()
     }
     
     override public var description: String {
