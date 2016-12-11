@@ -9,11 +9,11 @@
 import Foundation
 import AVKit
 
-protocol AdsPluginDataSource : class {
+protocol AdsPluginDataSource : class, NSObjectProtocol {
     func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool
 }
 
-protocol AdsPluginDelegate : class {
+protocol AdsPluginDelegate : class, NSObjectProtocol {
     func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String)
     func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String)
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent)

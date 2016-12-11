@@ -8,7 +8,7 @@
 
 import Foundation
 
-class LoadedPlugin {
+class LoadedPlugin: NSObject {
     var plugin: PKPlugin
     var decorator: PlayerDecoratorBase?
     init(plugin :PKPlugin, decorator: PlayerDecoratorBase?) {
@@ -19,7 +19,6 @@ class LoadedPlugin {
 
 class PlayerLoader: PlayerDecoratorBase {
     
-    // var loadedPlugins = [PKPlugin]()
     var loadedPlugins = Dictionary<String, LoadedPlugin>()
     var messageBus = MessageBus()
     

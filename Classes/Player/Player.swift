@@ -10,14 +10,14 @@ import UIKit
 import AVFoundation
 import AVKit
 
-public protocol PlayerDelegate: class {
+@objc public protocol PlayerDelegate: class, NSObjectProtocol {
     func playerShouldPlayAd(_ player: Player) -> Bool
     func player(_ player: Player, failedWith error: String)
 }
 
-public protocol Player {
+@objc public protocol Player: NSObjectProtocol {
     
-    var delegate: PlayerDelegate? { get set }
+    @objc var delegate: PlayerDelegate? { get set }
         
     /**
      Get the player's layer component.
@@ -27,7 +27,7 @@ public protocol Player {
     /**
      Get/set the current player position.
      */
-    var currentTime: TimeInterval? { get set }
+    var currentTime: TimeInterval { get set }
     
     /**
      Get the player's duration.
@@ -86,7 +86,7 @@ public protocol Player {
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
 }
 
-protocol PlayerDecoratorProvider {
+protocol PlayerDecoratorProvider: NSObjectProtocol {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
 

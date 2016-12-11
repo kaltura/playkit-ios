@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: Player {
+class PlayerController: NSObject, Player {
     
     public var duration: Double {
         get {
@@ -51,14 +51,14 @@ class PlayerController: Player {
         }
     }
     
-    public var currentTime: TimeInterval? {
+    public var currentTime: TimeInterval {
         get {
             //  return
-            return self.currentPlayer?.currentPosition
+            return (self.currentPlayer?.currentPosition)!
         }
         set {
             //
-            self.currentPlayer?.currentPosition = currentTime!
+            self.currentPlayer?.currentPosition = currentTime
         }
     }
     
@@ -69,8 +69,9 @@ class PlayerController: Player {
     }
     
     public init(mediaEntry: PlayerConfig) {
+        super.init()
         self.currentPlayer = AVPlayerEngine()
-        self.currentPlayer?.onEventBlock = { (event:PKEvent) in
+        self.currentPlayer?.onEventBlock = { [unowned self] (event:PKEvent) in
             PKLog.trace("postEvent:: \(event)")
             
             if let block = self.onEventBlock {

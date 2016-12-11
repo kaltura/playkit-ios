@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class PKTracks {
+public class PKTracks: NSObject {
     public var audioTracks: [Track]?
     public var textTracks: [Track]?
     

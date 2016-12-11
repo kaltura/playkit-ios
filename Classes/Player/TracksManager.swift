@@ -9,7 +9,7 @@
 import Foundation
 import AVFoundation
 
-class TracksManager {
+class TracksManager: NSObject {
     let audioTypeKey: String = "soun"
     private var audioTracks: [Track]?
     private var textTracks: [Track]?
@@ -128,6 +128,4 @@ class TracksManager {
             trackIndex += 1
         }
     }
-    
-    init() {}
 }
