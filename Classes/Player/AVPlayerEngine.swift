@@ -70,9 +70,9 @@ class AVPlayerEngine : AVPlayer {
     }
     
     public var duration: Double {
-        guard self.currentItem != nil else { return 0.0 }
-        PKLog.trace("get duration: \(self.currentItem?.duration)")
-        return CMTimeGetSeconds(self.currentItem!.duration)
+        guard let currentItem = self.currentItem else { return 0.0 }
+        PKLog.trace("get duration: \(currentItem.duration)")
+        return CMTimeGetSeconds(currentItem.duration)
     }
     
     public var isPlaying: Bool {
