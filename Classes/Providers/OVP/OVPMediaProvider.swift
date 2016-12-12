@@ -163,8 +163,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                         
                         let url = sourceBuilder.build()
                         mediaSource.contentUrl = url
-                        let drmData = DRMData()
-                        drmData.licenseURL = source.drm?.last?.licenseURL
+                        let drmData = DRMData(licenseUrl: (source.drm?.last?.licenseURL)!)
                         mediaSource.drmData = drmData
                         mediaSources.append(mediaSource)
                     })

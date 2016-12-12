@@ -87,9 +87,9 @@ class AssetLoaderDelegate: NSObject {
     
     func performCKCRequest(_ spcData: Data, _ callback: @escaping (Result<Data>)->Void) {
         
-        guard let licenseURL = drmData.licenseURL else { return }
+        guard let licenseUrl = drmData.licenseUrl else { return }
         
-        var request = URLRequest(url: licenseURL)
+        var request = URLRequest(url: licenseUrl)
         request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
         request.httpBody = spcData.base64EncodedData()
         request.httpMethod = "POST"
@@ -107,7 +107,7 @@ class AssetLoaderDelegate: NSObject {
     
     public func contentKeyFromKeyServerModuleWithSPCData(spcData: Data, assetIDString: String) -> Data? {
         
-        guard let licenseUrl = drmData.licenseURL else { return nil }
+        guard let licenseUrl = drmData.licenseUrl else { return nil }
         
         // TODO: send spcData to DRM server.
 
