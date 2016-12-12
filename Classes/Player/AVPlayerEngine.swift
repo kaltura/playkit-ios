@@ -18,7 +18,8 @@ class AVPlayerEngine : AVPlayer {
     // Attempt load and test these asset keys before playing.
     let assetKeysRequiredToPlay = [
         "playable", 
-        "hasProtectedContent"
+        "tracks",
+        "hasProtectedContent",
     ]
     
     private var avPlayerLayer: AVPlayerLayer!
@@ -26,6 +27,7 @@ class AVPlayerEngine : AVPlayer {
     private var _view: PlayerView!
     private var currentState: PlayerState = PlayerState.idle
     private var isObserved: Bool = false
+    private var tracksManager = TracksManager()
     
 //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
     private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
@@ -229,7 +231,6 @@ class AVPlayerEngine : AVPlayer {
         #keyPath(currentItem.playbackLikelyToKeepUp),
         #keyPath(currentItem.playbackBufferEmpty),
         #keyPath(currentItem.duration)
-        //        #keyPath(currentItem.tracks)
     ]
     
     private var observerContext = 0
@@ -345,6 +346,11 @@ class AVPlayerEngine : AVPlayer {
             
             let newState = PlayerState.ready
             self.postEvent(event: PlayerEvents.loadedMetadata())
+            
+            self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+                self.postEvent(event: PlayerEvents.tracksAvailable(tracks: tracks))
+            })
+                
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
@@ -375,6 +381,14 @@ class AVPlayerEngine : AVPlayer {
             }
         } else {
             PKLog.error("event is empty:: \(event)")
+        }
+    }
+    
+    public func selectTrack(trackId: String) {
+        if let id: String = trackId {
+           self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
+        } else {
+            PKLog.warning("trackId is nil")
         }
     }
     

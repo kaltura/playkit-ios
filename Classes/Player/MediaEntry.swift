@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-public class MediaEntry: CustomStringConvertible{
+public class MediaEntry: NSObject {
     internal var id: String
     internal var sources: [MediaSource]?
     internal var duration: Int64?
@@ -21,31 +21,41 @@ public class MediaEntry: CustomStringConvertible{
 
     internal init(id: String) {
         self.id = id
+        super.init()
     }
     
-    public init?(json: JSON) {
-      
-        guard let id = json[idKey].string else { return nil}
-        self.id = id
-        self.duration = json[durationKey].int64
+    public init(json: Any?) {
+        let jsonObject = JSON(json)
+
+        if let id = jsonObject[idKey].string {
+            self.id = id
+        } else {
+            self.id = ""
+        }
+        
+        self.duration = jsonObject[durationKey].int64
         var sources : [MediaSource] = [MediaSource]()
-        for jsonSource in json[sourcesKey].array! {
-            
-            let mediaSource : MediaSource = MediaSource(json: jsonSource)
-            sources.append(mediaSource)
+        
+        if let sourcesKeys = jsonObject[sourcesKey].array {
+            for jsonSource in sourcesKeys {
+                
+                let mediaSource : MediaSource = MediaSource(json: jsonSource)
+                sources.append(mediaSource)
+            }
         }
         
         self.sources = sources
+        super.init()
     }
     
-    public var description: String {
+    override public var description: String {
         get{
             return "id : \(self.id), sources: \(self.sources)"
         }
     }
 }
 
-public class MediaSource: CustomStringConvertible {
+public class MediaSource: NSObject {
     
     internal var id: String
     internal var contentUrl: URL?
@@ -60,6 +70,7 @@ public class MediaSource: CustomStringConvertible {
     
     public init (id: String){
         self.id = id
+        super.init()
     }
     
     public init(json:JSON) {
@@ -74,16 +85,18 @@ public class MediaSource: CustomStringConvertible {
         }
         
         self.drmData = DRMData.fromJSON(json[drmDataKey])
+
+        super.init()
     }
     
-    public var description: String {
+    override public var description: String {
         get{
             return "id : \(self.id), url: \(self.contentUrl)"
         }
     }
 }
 
-open class DRMData {
+open class DRMData: NSObject {
     var licenseURL: URL?
     
     static func fromJSON(_ json: JSON) -> DRMData? {

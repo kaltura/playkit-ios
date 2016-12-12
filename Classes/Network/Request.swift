@@ -41,7 +41,7 @@ public struct RequestElement : Request {
 }
 
 
-public class RequestBuilder {
+public class RequestBuilder: NSObject {
     
     public lazy var requestId: String =  {
         return UUID().uuidString
