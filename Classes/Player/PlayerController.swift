@@ -53,12 +53,18 @@ class PlayerController: NSObject, Player {
     
     public var currentTime: TimeInterval {
         get {
-            //  return
-            return (self.currentPlayer?.currentPosition)!
+            if let player = self.currentPlayer {
+                return player.currentPosition
+            }
+            
+            return 0
         }
         set {
-            //
-            self.currentPlayer?.currentPosition = currentTime
+            if let player = self.currentPlayer {
+                player.currentPosition = currentTime
+            } else {
+                PKLog.error("currentPlayer is empty")
+            }
         }
     }
     

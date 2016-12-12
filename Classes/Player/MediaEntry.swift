@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-@objc public class MediaEntry: NSObject {
+public class MediaEntry: NSObject {
     internal var id: String
     internal var sources: [MediaSource]?
     internal var duration: Int64?
@@ -24,10 +24,9 @@ import SwiftyJSON
         super.init()
     }
     
-    @objc public init(json: Any) {
+    public init(json: Any?) {
         let jsonObject = JSON(json)
-       // guard let id = json[idKey].string else { return nil}
-        
+
         if let id = jsonObject[idKey].string {
             self.id = id
         } else {

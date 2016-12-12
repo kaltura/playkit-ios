@@ -15,7 +15,7 @@ import AVKit
     func player(_ player: Player, failedWith error: String)
 }
 
-@objc public protocol Player {
+@objc public protocol Player: NSObjectProtocol {
     
     @objc var delegate: PlayerDelegate? { get set }
         
@@ -86,7 +86,7 @@ import AVKit
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
 }
 
-protocol PlayerDecoratorProvider {
+protocol PlayerDecoratorProvider: NSObjectProtocol {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
 
