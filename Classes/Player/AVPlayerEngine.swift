@@ -70,15 +70,23 @@ class AVPlayerEngine : AVPlayer {
         }
     }
     
+    public var startPosition: Double {
+        didSet {
+            PKLog.trace("set startPosition: \(startPosition)")
+        }
+    }
+    
     public var duration: Double {
         guard let currentItem = self.currentItem else { return 0.0 }
         PKLog.trace("get duration: \(currentItem.duration)")
+        
         return CMTimeGetSeconds(currentItem.duration)
     }
     
     public var isPlaying: Bool {
         guard let currentItem = self.currentItem else {
             PKLog.error("current item is empty")
+            
             return false
         }
         
@@ -99,10 +107,14 @@ class AVPlayerEngine : AVPlayer {
     
     public override init() {
         PKLog.trace("init AVPlayer")
+        
+        self.startPosition = 0
+        
         super.init()
         
         avPlayerLayer = AVPlayerLayer(player: self)
         _view = PlayerView(playerLayer: avPlayerLayer)
+    
         self.onEventBlock = nil
     }
     
@@ -346,6 +358,10 @@ class AVPlayerEngine : AVPlayer {
             
             let newState = PlayerState.ready
             self.postEvent(event: PlayerEvents.loadedMetadata())
+            
+            if self.startPosition > 0 {
+                self.currentPosition = self.startPosition
+            }
             
             self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
                 self.postEvent(event: PlayerEvents.tracksAvailable(tracks: tracks))
