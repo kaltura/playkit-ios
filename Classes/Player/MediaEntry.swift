@@ -10,9 +10,9 @@ import UIKit
 import SwiftyJSON
 
 public class MediaEntry: NSObject {
-    internal var id: String
-    internal var sources: [MediaSource]?
-    internal var duration: Int64?
+    public var id: String
+    public var sources: [MediaSource]?
+    public var duration: Int64?
     
     private let idKey = "id"
     private let sourcesKey = "sources"
@@ -75,10 +75,10 @@ public class MediaEntry: NSObject {
 
 public class MediaSource: NSObject {
     
-    internal var id: String
-    internal var contentUrl: URL?
-    internal var mimeType: String?
-    internal var drmData: DRMData?
+    public var id: String
+    public var contentUrl: URL?
+    public var mimeType: String?
+    public var drmData: DRMData?
     
     private let idKey: String = "id"
     private let contentUrlKey: String = "url"

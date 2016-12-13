@@ -49,7 +49,7 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
         let session: URLSession!
         
         if let conf = r.configuration, conf.ignoreLocalCache {
-            var configuration = URLSessionConfiguration.default
+            let configuration = URLSessionConfiguration.default
             configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
             session = URLSession(configuration: configuration)
         } else {

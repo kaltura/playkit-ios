@@ -35,11 +35,7 @@ class YouboraManager: YBPluginGeneric {
     
     override func getResource() -> String! {
         PKLog.trace("Resource")
-
-        if self.mediaEntry.id != nil {
-            return self.mediaEntry.id
-        }
-        return ""
+        return self.mediaEntry.id
     }
     
     override func getPlayhead() -> NSNumber! {

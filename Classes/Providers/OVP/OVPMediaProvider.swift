@@ -37,26 +37,31 @@ public class OVPMediaProvider: MediaEntryProvider {
     
     public init(){}
     
+    @discardableResult
     public func set(sessionProvider: SessionProvider?) -> Self{
         self.sessionProvider = sessionProvider
         return self
     }
     
+    @discardableResult
     public func set(entryId: String?) -> Self{
         self.entryId = entryId
         return self
     }
 
+    @discardableResult
     public func set( executor: RequestExecutor?) -> Self{
         self.executor = executor
         return self
     }
 
+    @discardableResult
     public func set(uiconfId: Int64?) -> Self{
         self.uiconfId = uiconfId
         return self
     }
 
+    @discardableResult
     public func set(apiServerURL: String?) -> Self{
         self.apiServerURL = apiServerURL
         return self
@@ -127,13 +132,20 @@ public class OVPMediaProvider: MediaEntryProvider {
                     
                     let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: r.data)
                     
-                    guard responses.count == 2,
-                        let mainResponse: OVPBaseObject = responses[0],
-                        let contextDataResponse: OVPBaseObject = responses[1],
+                    
+                    guard responses.count == 2
+                        else {
+                            callback(Result(data: nil, error: Err.invalidResponse ))
+                            return
+                    }
+                    
+                    let mainResponse: OVPBaseObject = responses[0]
+                    let contextDataResponse: OVPBaseObject = responses[1]
+                    
+                    guard
                         let mainResponseData = mainResponse as? OVPList,
                         let entry = mainResponseData.objects?.last as? OVPEntry,
                         let contextData = contextDataResponse as? OVPEntryContextData,
-                        let flavorAssets = contextData.flavorAssets  ,
                         let sources = contextData.sources
                         else{
                             callback(Result(data: nil, error: Err.invalidResponse ))
@@ -148,18 +160,16 @@ public class OVPMediaProvider: MediaEntryProvider {
                         
                         let mediaSource: MediaSource = MediaSource(id: String(source.deliveryProfileId))
                         let sourceBuilder: SourceBuilder = SourceBuilder()
-                        let supportedFlavors = self.flavorsByFlavorsParamIds(flavorsIds: source.flavors, flavorAsset: flavorAssets)
-                        let flavorsId = self.flavorsId(flavors: supportedFlavors)
                         
                         sourceBuilder.set(baseURL: loadInfo.sessionProvider.serverURL)
-                        sourceBuilder.set(ks: ks)
-                        sourceBuilder.set(format: source.format)
-                        sourceBuilder.set(entryId: loadInfo.entryId)
-                        sourceBuilder.set(uiconfId: loadInfo.uiconfId)
-                        sourceBuilder.set(flavors: source.flavors)
-                        sourceBuilder.set(partnerId: loadInfo.sessionProvider.partnerId)
-                        sourceBuilder.set(playSessionId: UUID().uuidString) // insert - session
-                        sourceBuilder.set(sourceProtocol: source.protocols?.last)
+                        .set(ks: ks)
+                        .set(format: source.format)
+                        .set(entryId: loadInfo.entryId)
+                        .set(uiconfId: loadInfo.uiconfId)
+                        .set(flavors: source.flavors)
+                        .set(partnerId: loadInfo.sessionProvider.partnerId)
+                        .set(playSessionId: UUID().uuidString) // insert - session
+                        .set(sourceProtocol: source.protocols?.last)
                         
                         let url = sourceBuilder.build()
                         mediaSource.contentUrl = url

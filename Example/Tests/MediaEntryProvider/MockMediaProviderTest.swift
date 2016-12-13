@@ -116,9 +116,18 @@ class MockMediaProviderTest: XCTestCase {
             .set(id: "m001")
         
         mediaProvider1.loadMedia { (r:Result<MediaEntry>) in
-            print(r)
-            if r.data != nil {
-                theExeption.fulfill()
+            if let mediaEntry = r.data {
+                if let sources = mediaEntry.sources, sources.count > 0{
+                    
+                    let source = sources[0]
+                    if let url = source.contentUrl , url.absoluteString.isEmpty == false {
+                        theExeption.fulfill()
+                    }else{
+                       XCTFail()
+                    }
+                }else{
+                    XCTFail()
+                }
             }
             else{
                 XCTFail()
