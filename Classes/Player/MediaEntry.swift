@@ -24,7 +24,27 @@ public class MediaEntry: NSObject {
         super.init()
     }
     
+    public init(dict: [String: Any]) {
+        
+        self.id = dict[idKey] as? String ?? ""
+        
+        self.duration = dict[durationKey] as? Int64
+        
+        var mediaSources = [MediaSource]()
+        
+        if let sources = dict[sourcesKey] as? [[String: Any]] {
+            for source in sources {
+                mediaSources.append(MediaSource(dict: source))
+            }
+        }
+        
+        self.sources = mediaSources
+        
+        super.init()
+    }
+        
     public init(json: Any?) {
+        
         let jsonObject = JSON(json)
 
         if let id = jsonObject[idKey].string {
@@ -34,13 +54,11 @@ public class MediaEntry: NSObject {
         }
         
         self.duration = jsonObject[durationKey].int64
-        var sources : [MediaSource] = [MediaSource]()
+        var sources = [MediaSource]()
         
         if let sourcesKeys = jsonObject[sourcesKey].array {
             for jsonSource in sourcesKeys {
-                
-                let mediaSource : MediaSource = MediaSource(json: jsonSource)
-                sources.append(mediaSource)
+                sources.append(MediaSource(json: jsonSource))
             }
         }
         
@@ -73,17 +91,37 @@ public class MediaSource: NSObject {
         super.init()
     }
     
+    public init(dict: [String:Any]) {
+        self.id = dict[idKey] as? String ?? ""
+        
+        if let contentUrl = dict[contentUrlKey] as? String {
+            self.contentUrl = URL(string: contentUrl)
+        }
+        
+        if let mimeType = dict[mimeTypeKey] as? String {
+            self.mimeType = mimeType
+        }
+        
+        if let drmData = dict[drmDataKey] as? [String:Any] {
+            self.drmData = DRMData.fromDictionary(drmData)
+        }
+        
+        super.init()
+    }
+    
     public init(json:JSON) {
         self.id = json[idKey].string!
         
         if let pathString = json[contentUrlKey].string {
-                self.contentUrl = URL(string: pathString)
+            self.contentUrl = URL(string: pathString)
         }
         
         if let mimeTypeString = json[mimeTypeKey].string {
             self.mimeType = mimeTypeString
         }
         
+        self.drmData = DRMData.fromJSON(json[drmDataKey])
+
         super.init()
     }
     
@@ -95,11 +133,43 @@ public class MediaSource: NSObject {
 }
 
 open class DRMData: NSObject {
-    public var licenseURL: URL?
+    var licenseUrl: URL?
+    
+    
+    init(licenseUrl: String) {
+        self.licenseUrl = URL(string: licenseUrl)
+    }
+    
+    static func fromDictionary(_ dict: [String:Any]) -> DRMData? {
+        
+        guard let licenseUrl = dict["licenseUrl"] as? String else { return nil }
+        
+        if let fpsCertificate = dict["fpsCertificate"] as? String {
+            return FairPlayDRMData(licenseUrl: licenseUrl, base64EncodedCertificate: fpsCertificate)
+        } else {
+            return DRMData(licenseUrl: licenseUrl)
+        }
+
+    }
+    
+    static func fromJSON(_ json: JSON) -> DRMData? {
+        guard let licenseUrl = json["licenseUrl"].string else { return nil }
+        
+        if let fpsCertificate = json["fpsCertificate"].string {
+            return FairPlayDRMData(licenseUrl: licenseUrl, base64EncodedCertificate: fpsCertificate)
+        } else {
+            return DRMData(licenseUrl: licenseUrl)
+        }
+    }
 }
 
 public class FairPlayDRMData: DRMData {
-    public var fpsCertificate: Data?    
+    var fpsCertificate: Data?
+    
+    init(licenseUrl: String, base64EncodedCertificate: String) {
+        fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
+        super.init(licenseUrl: licenseUrl)
+    }
 }
 
 

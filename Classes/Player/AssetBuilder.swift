@@ -17,11 +17,11 @@ class AssetBuilder {
     init(mediaEntry: MediaEntry) {
         self.mediaEntry = mediaEntry
     }
-    
-    func build(readyCallback: (AVAsset?)->Void) -> Void {
+
+    func build(readyCallback: (Error?, AVAsset?)->Void) -> Void {
         
         // Select source and handler
-        guard let sources = mediaEntry.sources else { return  }
+        guard let sources = mediaEntry.sources else { return }
         let selectedSource = sources[0]
 
         let handlerClass = DefaultAssetHandler.self
@@ -29,25 +29,18 @@ class AssetBuilder {
         let handler = handlerClass.init()
 
         handler.buildAsset(mediaSource: selectedSource, readyCallback: readyCallback)
+        
+        self.assetHandler = handler 
     }
 }
-
 
 protocol AssetHandler {
     init()
-    func buildAsset(mediaSource: MediaSource, readyCallback: (AVAsset?)->Void)
+    func buildAsset(mediaSource: MediaSource, readyCallback: (Error?, AVAsset?)->Void)
 }
 
-
-let defaultAssetHandler = { (mediaSource: MediaSource, ready: (AVAsset?)->Void) in
-    if let url = mediaSource.contentUrl {
-        ready(AVURLAsset(url: url))
-    } else {
-        ready(nil)
-    }
+enum AssetError : Error {
+    case noFpsCertificate
+    case invalidDrmScheme
+    case invalidContentUrl(URL?)
 }
-
-
-
-
-

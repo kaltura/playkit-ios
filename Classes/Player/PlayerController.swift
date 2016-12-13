@@ -91,7 +91,7 @@ class PlayerController: NSObject, Player {
     func prepare(_ config: PlayerConfig) {
         if let mediaEntry: MediaEntry = config.mediaEntry  {
             self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
-            self.assetBuilder?.build(readyCallback: { (asset: AVAsset?) in
+            self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
                 if let avAsset: AVAsset = asset {
                     self.currentPlayer?.asset = avAsset
                 }
