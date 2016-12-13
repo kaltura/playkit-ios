@@ -109,25 +109,14 @@ public class KalturaStatsPlugin: PKPlugin {
             self.sendMediaLoaded()
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.play.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvents.play.self, PlayerEvents.playing.self], block: { (info) in
             PKLog.trace("play info: \(info)")
             if self.isFirstPlay {
                 self.sendAnalyticsEvent(action: .PLAY)
                 self.isFirstPlay = false
             }
         })
-        
-        self.messageBus?.addObserver(self, events: [PlayerEvents.playing.self], block: { (info) in
-            PKLog.trace("playing info: \(info)")
-            if self.isFirstPlay {
                 
-                self.sendAnalyticsEvent(action: .PLAY)
-                self.isFirstPlay = false
-            } else {
-                //Resume
-            }
-        })
-        
         self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
             PKLog.trace("pause info: \(info)")
         })
@@ -297,13 +286,13 @@ public class KalturaStatsPlugin: PKPlugin {
             parterId = String(pId)
         }
         
-        let builder: KalturaRequestBuilder = OTTStatsService.get(baseURL: baseUrl,
+        let builder: KalturaRequestBuilder = OVPStatsService.get(baseURL: baseUrl,
                                                                  partnerId: parterId,
                                                                  eventType: action.rawValue,
-                                                                 clientVer: "playkit/ios-1.0",
+                                                                 clientVer: PlayKitManager.clientTag,
                                                                  duration: Float(self.player.duration),
                                                                  sessionId: sessionId,
-                                                                 position: Float(self.player.currentTime!),
+                                                                 position: Float(self.player.currentTime),
                                                                  uiConfId: confId,
                                                                  entryId: self.mediaEntry.id,
                                                                  widgetId: "_\(parterId)",

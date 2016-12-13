@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-internal class OTTStatsService {
+internal class OVPStatsService {
 
     internal static func get(baseURL: String, partnerId: String, eventType: Int, clientVer: String, duration: Float,
                              sessionId: String, position: Float, uiConfId: Int, entryId: String, widgetId: String, isSeek: Bool, referrer: String = "") -> KalturaRequestBuilder? {
@@ -23,7 +23,6 @@ internal class OTTStatsService {
                 .setParam(key: "format", value: "1")
                 .setParam(key: "ignoreNull", value: "1")
                 .setParam(key: "action", value: "collect")
-                //.setParam(key: "event", value: JSON(eventType))
                 .setParam(key: "event:eventType", value: "\(eventType)")
                 .setParam(key: "event:clientVer", value: "\(clientVer)")
                 .setParam(key: "event:currentPoint", value: "\(position)")
@@ -40,8 +39,6 @@ internal class OTTStatsService {
                 .setParam(key: "event:referrer", value: referrer)
             
                 .set(method: "GET")
-                //.setParam(key: "", value: JSON(""))
-
             return request
         }else{
             return nil
@@ -49,12 +46,3 @@ internal class OTTStatsService {
     }
 
 }
-
-/*
- .appendQueryParameter("event:sessionId", sessionId)
- .appendQueryParameter("event:uiconfId", Integer.toString(uiConfId))
- .appendQueryParameter("event:seek", Boolean.toString(isSeek))
- .appendQueryParameter("event:entryId", entryId)
- .appendQueryParameter("event:widgetId", widgetId)
-
- */
