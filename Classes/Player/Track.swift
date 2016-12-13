@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class Track {
+public class Track: NSObject {
     public var id: String?
     public var title: String?
     public var language: String?

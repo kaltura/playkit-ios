@@ -37,7 +37,7 @@ class OTTObjectMapper: NSObject {
                 return nil
             }
         }else{
-            if let jsonError = jsonObject[errorKey].dictionary {
+            if jsonObject[errorKey].dictionary != nil {
                 return OTTError.self
             }else{
                 return nil

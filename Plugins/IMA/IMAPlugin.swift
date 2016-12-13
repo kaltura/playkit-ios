@@ -91,7 +91,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
 
         var events: [PKEvent.Type] = []
-        events.append(PlayerEvents.ended)
+        events.append(PlayerEvents.ended.self)
         self.messageBus?.addObserver(self, events: events, block: { (data: Any) -> Void in
             self.contentComplete()
         })
@@ -128,6 +128,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
     }
     
+    @discardableResult
     func start(showLoadingView: Bool) -> Bool {
         if self.loaderFailed {
             return false
