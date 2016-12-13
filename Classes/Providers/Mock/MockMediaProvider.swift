@@ -100,7 +100,7 @@ public class MockMediaEntryProvider: MediaEntryProvider {
             return
         }
         
-        let mediaEntry : MediaEntry? = MediaEntry(json: jsonObject)
+        let mediaEntry : MediaEntry? = MediaEntry(json: jsonObject.object)
         callback(Result(data: mediaEntry, error: nil))
     }
     
