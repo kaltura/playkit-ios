@@ -17,10 +17,10 @@ class AVPlayerEngine : AVPlayer {
     
     // Attempt load and test these asset keys before playing.
     let assetKeysRequiredToPlay = [
-        "playable", 
+        "playable",
         "tracks",
         "hasProtectedContent",
-    ]
+        ]
     
     private var avPlayerLayer: AVPlayerLayer!
     
@@ -30,7 +30,7 @@ class AVPlayerEngine : AVPlayer {
     private var tracksManager = TracksManager()
     
     //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
-    private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
+    private var nonObservablePropertiesUpdateTimer: Timer?
     
     public var onEventBlock: ((PKEvent)->Void)?
     
@@ -104,19 +104,19 @@ class AVPlayerEngine : AVPlayer {
         avPlayerLayer = AVPlayerLayer(player: self)
         _view = PlayerView(playerLayer: avPlayerLayer)
         self.onEventBlock = nil
+        self.nonObservablePropertiesUpdateTimer = nil
     }
     
     deinit {
         self.destroy()
     }
     
-    private func setupNonObservablePropertiesUpdateTimer() {
+    private func startOrResumeNonObservablePropertiesUpdateTimer() {
         PKLog.trace("setupNonObservablePropertiesUpdateTimer")
         
-        nonObservablePropertiesUpdateTimer.setEventHandler { [weak self] in
-            self?.updateNonObservableProperties()
+        if self.nonObservablePropertiesUpdateTimer == nil {
+            self.nonObservablePropertiesUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateNonObservableProperties), userInfo: nil, repeats: true)
         }
-        nonObservablePropertiesUpdateTimer.scheduleRepeating(deadline: DispatchTime.now(), interval: DispatchTimeInterval.milliseconds(50))
     }
     
     /**
@@ -147,7 +147,7 @@ class AVPlayerEngine : AVPlayer {
     
     func destroy() {
         PKLog.trace("destory player")
-        self.nonObservablePropertiesUpdateTimer.suspend()
+        self.nonObservablePropertiesUpdateTimer?.invalidate()
         self.removeObservers()
         avPlayerLayer = nil
         _view = nil
@@ -306,8 +306,9 @@ class AVPlayerEngine : AVPlayer {
             event = PlayerEvents.durationChange(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
         case #keyPath(rate):
             if rate > 0 {
-                nonObservablePropertiesUpdateTimer.resume()
+                self.startOrResumeNonObservablePropertiesUpdateTimer()
             } else {
+                self.nonObservablePropertiesUpdateTimer?.invalidate()
                 event = PlayerEvents.pause()
             }
         case #keyPath(currentItem.status):
@@ -341,9 +342,7 @@ class AVPlayerEngine : AVPlayer {
     private func handleStatusChange() -> PKEvent? {
         var event: PKEvent? = nil
         
-        if currentItem?.status == .readyToPlay {
-            self.setupNonObservablePropertiesUpdateTimer()
-            
+        if currentItem?.status == .readyToPlay {           
             let newState = PlayerState.ready
             self.postEvent(event: PlayerEvents.loadedMetadata())
             
@@ -400,19 +399,19 @@ class AVPlayerEngine : AVPlayer {
     }
     
     // MARK: - Non Observable Properties
-    private func updateNonObservableProperties() {
+    @objc private func updateNonObservableProperties() {
         if let currItem = self.currentItem {
             if let timebase = currItem.timebase {
-                let timebaseRate: Float64 = CMTimebaseGetRate(timebase)
-                if timebaseRate > 0 {
-                    nonObservablePropertiesUpdateTimer.suspend()
+                if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
+                    if timebaseRate > 0 {
+                        nonObservablePropertiesUpdateTimer?.invalidate()
+                        
+                        self.postEvent(event: PlayerEvents.playing())
+                    }
                     
-                    self.postEvent(event: PlayerEvents.playing())
+                    PKLog.trace("timebaseRate:: \(timebaseRate)")
                 }
-                
-                PKLog.trace("timebaseRate:: \(timebaseRate)")
             }
-            
         }
     }
 }
