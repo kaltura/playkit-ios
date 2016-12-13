@@ -8,9 +8,5 @@
 
 import Foundation
 
-public class PKEvent {
-    init() {
-        
-    }
-//    var rawValue: String { get }
+public class PKEvent: NSObject {
 }

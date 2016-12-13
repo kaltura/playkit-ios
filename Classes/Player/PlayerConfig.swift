@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class PlayerConfig {
+public class PlayerConfig: NSObject {
     public var mediaEntry : MediaEntry?
     public var startTime : TimeInterval = 0
     public var autoPlay = false
@@ -16,11 +16,6 @@ public class PlayerConfig {
     public var subtitleLanguage: String?
     public var audioLanguage: String?
     public var plugins: [String : AnyObject?]?
-
-    public init() {}
-    public init(_ player: Player) {
-       // self.player = player
-    }
     
     // Builders
     @discardableResult
