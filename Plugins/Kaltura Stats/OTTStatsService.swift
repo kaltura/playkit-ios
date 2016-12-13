@@ -16,10 +16,10 @@ internal class OTTStatsService {
         
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: nil, action: nil) {
             request
+                .setClientTag(clientTag: "kwidget:v\(clientVer)")
                 .setParam(key: "service", value: "stats")
                 .setParam(key: "apiVersion", value: "3.1")
                 .setParam(key: "expiry", value: "86400")
-                .setParam(key: "clientTag", value: "kwidget:v\(clientVer)")
                 .setParam(key: "format", value: "1")
                 .setParam(key: "ignoreNull", value: "1")
                 .setParam(key: "action", value: "collect")
