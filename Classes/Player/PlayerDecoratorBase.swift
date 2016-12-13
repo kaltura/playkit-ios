@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerDecoratorBase: Player {
+public class PlayerDecoratorBase: NSObject, Player {
     private var player: Player!
     
     public var delegate: PlayerDelegate? {
@@ -22,7 +22,7 @@ class PlayerDecoratorBase: Player {
         }
     }
 
-    public var currentTime: TimeInterval? {
+     public var currentTime: TimeInterval {
         get {
             return self.player.currentTime
         }
@@ -90,15 +90,19 @@ class PlayerDecoratorBase: Player {
     }
     
     @available(iOS 9.0, *)
-    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+    public func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         return self.player.createPiPController(with: delegate)
     }
     
-    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {
+    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {
         //Assert.shouldNeverHappen();
     }
     
-    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
+    public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         //Assert.shouldNeverHappen();
+    }
+    
+    public func selectTrack(trackId: String) {
+        self.player.selectTrack(trackId: trackId)
     }
 }

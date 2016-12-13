@@ -64,6 +64,17 @@ public class PlayerEvents: PKEvent {
      Sent when a seek operation completes.
      */
     public class seeked : PlayerEvents {}
+    
+    /**
+     Sent when tracks available.
+     */
+    public class tracksAvailable : PlayerEvents {
+        public var tracks: PKTracks
+        
+        public init(tracks: PKTracks) {
+            self.tracks = tracks
+        }
+    }
 
     /**
      Sent when player state is changed.
