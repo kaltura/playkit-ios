@@ -19,7 +19,7 @@ class OVPDRM: OVPBaseObject {
 
     var scheme: String?
     var certificate: String?
-    var licenseURL: URL?
+    var licenseURL: String?
     
     let schemeKey = "scheme"
     let certificateKey = "certificate"
@@ -30,7 +30,7 @@ class OVPDRM: OVPBaseObject {
         let jsonObject = JSON(json)
         self.scheme = jsonObject[schemeKey].string
         self.certificate = jsonObject[certificateKey].string
-        self.licenseURL = jsonObject[licenseURLKey].URL
+        self.licenseURL = jsonObject[licenseURLKey].string
         
     }
 }

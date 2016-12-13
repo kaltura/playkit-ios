@@ -17,8 +17,9 @@ class AVPlayerEngine : AVPlayer {
     
     // Attempt load and test these asset keys before playing.
     let assetKeysRequiredToPlay = [
-        "playable",
-        "tracks"
+        "playable", 
+        "tracks",
+        "hasProtectedContent",
     ]
     
     private var avPlayerLayer: AVPlayerLayer!
