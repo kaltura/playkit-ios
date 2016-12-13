@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: Player {
+class PlayerController: NSObject, Player {
     
     public var duration: Double {
         get {
@@ -51,14 +51,20 @@ class PlayerController: Player {
         }
     }
     
-    public var currentTime: TimeInterval? {
+    public var currentTime: TimeInterval {
         get {
-            //  return
-            return self.currentPlayer?.currentPosition
+            if let player = self.currentPlayer {
+                return player.currentPosition
+            }
+            
+            return 0
         }
         set {
-            //
-            self.currentPlayer?.currentPosition = currentTime!
+            if let player = self.currentPlayer {
+                player.currentPosition = currentTime
+            } else {
+                PKLog.error("currentPlayer is empty")
+            }
         }
     }
     
@@ -69,8 +75,9 @@ class PlayerController: Player {
     }
     
     public init(mediaEntry: PlayerConfig) {
+        super.init()
         self.currentPlayer = AVPlayerEngine()
-        self.currentPlayer?.onEventBlock = { (event:PKEvent) in
+        self.currentPlayer?.onEventBlock = { [unowned self] (event:PKEvent) in
             PKLog.trace("postEvent:: \(event)")
             
             if let block = self.onEventBlock {
@@ -84,7 +91,7 @@ class PlayerController: Player {
     func prepare(_ config: PlayerConfig) {
         if let mediaEntry: MediaEntry = config.mediaEntry  {
             self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
-            self.assetBuilder?.build(readyCallback: { (asset: AVAsset?) in
+            self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
                 if let avAsset: AVAsset = asset {
                     self.currentPlayer?.asset = avAsset
                 }
@@ -112,7 +119,6 @@ class PlayerController: Player {
     func seek(to time: CMTime) {
         PKLog.trace("seek::\(time)")
         self.currentPlayer?.currentPosition = CMTimeGetSeconds(time)
-//        self.currentPlayer?.seek(to: time)
     }
     
     func prepareNext(_ config: PlayerConfig) -> Bool {
@@ -138,5 +144,9 @@ class PlayerController: Player {
     
     func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         //Assert.shouldNeverHappen();
+    }
+    
+    public func selectTrack(trackId: String) {
+        self.currentPlayer?.selectTrack(trackId: trackId)
     }
 }

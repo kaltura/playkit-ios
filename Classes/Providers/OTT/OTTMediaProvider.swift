@@ -33,25 +33,31 @@ public class OTTMediaProvider: MediaEntryProvider {
         
     }
     
+    @discardableResult
     public func set(sessionProvider:SessionProvider?) -> Self {
         self.sessionProvider = sessionProvider
         return self
     }
     
+    @discardableResult
     public func set(mediaId:String?) -> Self {
         self.mediaId = mediaId
         return self
     }
     
+    @discardableResult
     public func set(type:AssetType?) -> Self {
         self.type = type
         return self
     }
     
+    @discardableResult
     public func set(formats:[String]?) -> Self {
         self.formats = formats
         return self
     }
+    
+    @discardableResult
     public func set(executor:RequestExecutor?) -> Self {
         self.executor = executor
         return self
@@ -89,7 +95,7 @@ public class OTTMediaProvider: MediaEntryProvider {
             formats = fmts
         }
         
-        var loaderParams = LoaderInfo(sessionProvider: sessionProvider, mediaId: mediaId, type: type, formats: formats, executor: executor)
+        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, mediaId: mediaId, type: type, formats: formats, executor: executor)
         self.startLoad(loader: loaderParams, callback: callback)
     }
     
@@ -125,7 +131,6 @@ public class OTTMediaProvider: MediaEntryProvider {
                     if let asset = object as? OTTAsset {
                         
                         let mediaEntry: MediaEntry = MediaEntry(id: asset.id)
-                        let licensedLinkRequests: [KalturaRequestBuilder] = [KalturaRequestBuilder]()
                         if let files = asset.files {
                             
                             var sources = [MediaSource]()

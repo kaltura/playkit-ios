@@ -8,7 +8,7 @@
 
 import Foundation
 
-class LoadedPlugin {
+class LoadedPlugin: NSObject {
     var plugin: PKPlugin
     var decorator: PlayerDecoratorBase?
     init(plugin :PKPlugin, decorator: PlayerDecoratorBase?) {
@@ -19,14 +19,13 @@ class LoadedPlugin {
 
 class PlayerLoader: PlayerDecoratorBase {
     
-    // var loadedPlugins = [PKPlugin]()
     var loadedPlugins = Dictionary<String, LoadedPlugin>()
     var messageBus = MessageBus()
     
     func load(_ config: PlayerConfig) {
         var playerController: PlayerController
         
-        if let mediaEntry = config.mediaEntry {
+        if config.mediaEntry != nil {
             playerController = PlayerController(mediaEntry: config)
             playerController.onEventBlock = { (event:PKEvent) in
                 self.messageBus.post(event)

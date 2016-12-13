@@ -17,7 +17,9 @@ class AVPlayerEngine : AVPlayer {
     
     // Attempt load and test these asset keys before playing.
     let assetKeysRequiredToPlay = [
-        "playable"
+        "playable", 
+        "tracks",
+        "hasProtectedContent",
     ]
     
     private var avPlayerLayer: AVPlayerLayer!
@@ -25,8 +27,9 @@ class AVPlayerEngine : AVPlayer {
     private var _view: PlayerView!
     private var currentState: PlayerState = PlayerState.idle
     private var isObserved: Bool = false
+    private var tracksManager = TracksManager()
     
-//  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
+    //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
     private let nonObservablePropertiesUpdateTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
     
     public var onEventBlock: ((PKEvent)->Void)?
@@ -69,8 +72,8 @@ class AVPlayerEngine : AVPlayer {
     
     public var duration: Double {
         guard let currentItem = self.currentItem else { return 0.0 }
-        PKLog.trace("get duration: \(self.currentItem?.duration)")
-        return CMTimeGetSeconds(self.currentItem!.duration)
+        PKLog.trace("get duration: \(currentItem.duration)")
+        return CMTimeGetSeconds(currentItem.duration)
     }
     
     public var isPlaying: Bool {
@@ -81,11 +84,11 @@ class AVPlayerEngine : AVPlayer {
         
         if self.rate > 0 {
             if let timebase = currentItem.timebase {
-                if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
-                    if timebaseRate > 0 {
-                        return true
-                    }
+                let timebaseRate: Float64 = CMTimebaseGetRate(timebase)
+                if timebaseRate > 0 {
+                    return true
                 }
+                
             }
         }
         
@@ -124,7 +127,7 @@ class AVPlayerEngine : AVPlayer {
     }
     
     public override func pause() {
-
+        
         if self.rate > 0 {
             // Playing, so pause.
             PKLog.trace("pause player")
@@ -133,7 +136,7 @@ class AVPlayerEngine : AVPlayer {
     }
     
     public override func play() {
-
+        
         if self.rate == 0 {
             PKLog.trace("play player")
             
@@ -228,7 +231,6 @@ class AVPlayerEngine : AVPlayer {
         #keyPath(currentItem.playbackLikelyToKeepUp),
         #keyPath(currentItem.playbackBufferEmpty),
         #keyPath(currentItem.duration)
-        //        #keyPath(currentItem.tracks)
     ]
     
     private var observerContext = 0
@@ -292,7 +294,7 @@ class AVPlayerEngine : AVPlayer {
         }
         
         PKLog.trace("keyPath:: \(keyPath)")
-
+        
         var event: PKEvent? = nil
         
         switch keyPath {
@@ -316,12 +318,12 @@ class AVPlayerEngine : AVPlayer {
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
-
+        
         self.postEvent(event: event)
     }
     
     private func handleLikelyToKeepUp() {
-        if let item = self.currentItem {
+        if self.currentItem != nil {
             let newState = PlayerState.ready
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
@@ -329,7 +331,7 @@ class AVPlayerEngine : AVPlayer {
     }
     
     private func handleBufferEmptyChange() {
-        if let item = self.currentItem {
+        if self.currentItem != nil {
             let newState = PlayerState.idle
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
@@ -344,6 +346,11 @@ class AVPlayerEngine : AVPlayer {
             
             let newState = PlayerState.ready
             self.postEvent(event: PlayerEvents.loadedMetadata())
+            
+            self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+                self.postEvent(event: PlayerEvents.tracksAvailable(tracks: tracks))
+            })
+            
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
@@ -377,6 +384,14 @@ class AVPlayerEngine : AVPlayer {
         }
     }
     
+    public func selectTrack(trackId: String) {
+        if trackId.isEmpty == false {
+            self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
+        } else {
+            PKLog.warning("trackId is nil")
+        }
+    }
+    
     private func postStateChange(newState: PlayerState, oldState: PlayerState) {
         PKLog.trace("stateChanged:: new:\(newState) old:\(oldState)")
         let stateChangedEvent: PKEvent = PlayerEvents.stateChanged(newState: newState, oldState: oldState)
@@ -388,16 +403,16 @@ class AVPlayerEngine : AVPlayer {
     private func updateNonObservableProperties() {
         if let currItem = self.currentItem {
             if let timebase = currItem.timebase {
-                if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
-                    if timebaseRate > 0 {
-                        nonObservablePropertiesUpdateTimer.suspend()
-                        
-                        self.postEvent(event: PlayerEvents.playing())
-                    }
+                let timebaseRate: Float64 = CMTimebaseGetRate(timebase)
+                if timebaseRate > 0 {
+                    nonObservablePropertiesUpdateTimer.suspend()
                     
-                    PKLog.trace("timebaseRate:: \(timebaseRate)")
+                    self.postEvent(event: PlayerEvents.playing())
                 }
+                
+                PKLog.trace("timebaseRate:: \(timebaseRate)")
             }
+            
         }
     }
 }

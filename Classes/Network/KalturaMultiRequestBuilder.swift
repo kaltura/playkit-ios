@@ -18,8 +18,8 @@ internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
         super.init(url: url, service: "multirequest", action: nil)
     }
     
+    @discardableResult
     internal func add(request:KalturaRequestBuilder) -> Self {
-        
         self.requests.append(request)
         return self
     }
@@ -54,34 +54,26 @@ internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
         
         
         for  index in 1...self.requests.count {
-            do{
-                let requestBody = try self.jsonBody?[String(index)].rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            
+                let requestBody = self.jsonBody?[String(index)].rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                 let requestBodyData = requestBody?.data(using: String.Encoding.utf8)
                 data?.append("\"\(index)\":".data(using: String.Encoding.utf8)!)
                 data?.append(requestBodyData!)
                 data?.append(",".data(using: String.Encoding.utf8)!)
-                self.jsonBody?.dictionaryObject?.removeValue(forKey: String(index))
-            }catch{
-                
-            }
+                _ = self.jsonBody?.dictionaryObject?.removeValue(forKey: String(index))
         }
         
-        do{
-            
             if let jsonBody = self.jsonBody{
-                var remainingJsonAsString: String? = jsonBody.rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())
+                let remainingJsonAsString: String? = jsonBody.rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())
                 if let jsonString = remainingJsonAsString{
                     var jsonWithoutLastChar = String(jsonString.characters.dropLast())
-                    if  jsonWithoutLastChar != nil{
+                    
                         jsonWithoutLastChar = String(jsonWithoutLastChar.characters.dropFirst())
                         data?.append((jsonWithoutLastChar.data(using: String.Encoding.utf8))!)
-                    }
+                    
                     
                 }
             }
-        }catch{
-            print("unable to parse json")
-        }
         
         data?.append(suffix.data(using: String.Encoding.utf8)!)
         
