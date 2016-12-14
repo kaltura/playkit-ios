@@ -30,7 +30,7 @@ public class AdsConfig {
         return self
     }
     
-    @discardableResult
+    /*@discardableResult
     public func set(enableBackgroundPlayback: Bool) -> Self {
         self.enableBackgroundPlayback = enableBackgroundPlayback
         return self
@@ -40,7 +40,7 @@ public class AdsConfig {
     public func set(autoPlayAdBreaks: Bool) -> Self {
         self.autoPlayAdBreaks = autoPlayAdBreaks
         return self
-    }
+    }*/
     
     @discardableResult
     public func set(videoBitrate: Int32) -> Self {
