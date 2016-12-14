@@ -30,18 +30,6 @@ public class AdsConfig {
         return self
     }
     
-    /*@discardableResult
-    public func set(enableBackgroundPlayback: Bool) -> Self {
-        self.enableBackgroundPlayback = enableBackgroundPlayback
-        return self
-    }
-    
-    @discardableResult
-    public func set(autoPlayAdBreaks: Bool) -> Self {
-        self.autoPlayAdBreaks = autoPlayAdBreaks
-        return self
-    }*/
-    
     @discardableResult
     public func set(videoBitrate: Int32) -> Self {
         self.videoBitrate = videoBitrate
