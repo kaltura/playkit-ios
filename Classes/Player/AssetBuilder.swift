@@ -28,8 +28,10 @@ class AssetBuilder {
         // Iterate over all handlers
         let handlers: [AssetHandler.Type] = [DefaultAssetHandler.self, WidevineClassicAssetHandler.self]
         for handler in handlers {
+            // Select the first source that the handler can play.
             if let playableSource = sources.first(where: handler.sourceFilter) {
                 selection = (source: playableSource, handler: handler)
+                break   // don't ask the other handlers
             }
         }
         

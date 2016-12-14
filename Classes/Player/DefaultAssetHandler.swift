@@ -20,6 +20,7 @@ class DefaultAssetHandler: AssetHandler {
     
     static let sourceFilter = { (_ src: MediaSource) -> Bool in
         
+        // FIXME: extension is not the best criteria here, use format when that's available. 
         guard let ext = src.contentUrl?.pathExtension else {
             return false
         }
