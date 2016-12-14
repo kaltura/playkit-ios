@@ -43,10 +43,10 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
     internal func sendAnalyticsEvent(action: PhoenixAnalyticsType) {
         PKLog.trace("Action: \(action)")
         
-        var fileId = "464302"
+        var fileId = ""
         var baseUrl = ""
         var ks = ""
-        var parterId = 198
+        var parterId = 0
 
         if let url = self.config.params["baseUrl"] as? String {
             baseUrl = url
