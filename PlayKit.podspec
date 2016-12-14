@@ -39,6 +39,15 @@ s.subspec 'YouboraPlugin' do |ssp|
     ssp.dependency 'Youbora-AVPlayer'
 end
 
+s.subspec 'Widevine' do |ssp|
+    ssp.libraries = 'WViPhoneAPI'
+    ssp.vendored_library = 'libWViPhoneAPI.a'
+    ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO' }
+     ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+    'OTHER_LDFLAGS' => '$(inherited)',
+    'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+end
+
 s.default_subspec = 'Core'
 
 end
