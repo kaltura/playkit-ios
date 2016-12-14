@@ -360,6 +360,7 @@ class AVPlayerEngine : AVPlayer {
             
             if self.startPosition > 0 {
                 self.currentPosition = self.startPosition
+                self.startPosition = 0
             }
             
             self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
