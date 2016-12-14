@@ -12,7 +12,7 @@ public class AdsConfig {
     public var language: String = "en"
     public var enableBackgroundPlayback: Bool {
         get {
-            return false
+            return true
         }
     }
     public var autoPlayAdBreaks: Bool {
