@@ -89,15 +89,21 @@ class PlayerController: NSObject, Player {
     }
     
     func prepare(_ config: PlayerConfig) {
-        if let mediaEntry: MediaEntry = config.mediaEntry  {
-            self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
-            self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
-                if let avAsset: AVAsset = asset {
-                    self.currentPlayer?.asset = avAsset
-                }
-            })
+        if let player = self.currentPlayer {
+            player.startPosition = config.startTime
+            
+            if let mediaEntry: MediaEntry = config.mediaEntry  {
+                self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
+                self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
+                    if let avAsset: AVAsset = asset {
+                        self.currentPlayer?.asset = avAsset
+                    }
+                })
+            } else {
+                PKLog.warning("mediaEntry is empty")
+            }
         } else {
-            PKLog.warning("mediaEntry is empty")
+            PKLog.error("player is empty")
         }
     }
     
