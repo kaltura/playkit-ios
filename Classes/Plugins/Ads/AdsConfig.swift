@@ -10,8 +10,16 @@ import Foundation
 
 public class AdsConfig {
     public var language: String = "en"
-    public var enableBackgroundPlayback: Bool = true
-    public var autoPlayAdBreaks: Bool = false
+    public var enableBackgroundPlayback: Bool {
+        get {
+            return false
+        }
+    }
+    public var autoPlayAdBreaks: Bool {
+        get {
+            return false
+        }
+    }
     public var videoBitrate: Int32?
     public var videoMimeTypes: [AnyObject]?
     public var adTagUrl: String?
