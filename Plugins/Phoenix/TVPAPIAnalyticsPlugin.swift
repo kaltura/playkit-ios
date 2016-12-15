@@ -73,7 +73,16 @@ public class TVPAPIAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
             builder.set { (response: Response) in
                 
                 PKLog.trace("Response: \(response)")
-                
+                if response.statusCode == 0 {
+                    
+                    PKLog.trace("\(response.data)")
+                    if let data : [String: Any] = response.data as! [String : Any]? {
+                        if let result = data["concurrent"] as! [String: Any]? {
+                            self.kalturaPluginManager.reportConcurrencyEvent()
+                        }
+                    }
+ 
+                }
             }
             
             USRExecutor.shared.send(request: builder.build())

@@ -135,4 +135,7 @@ internal class KalturaPluginManager {
         }
     }
     
+    public func reportConcurrencyEvent() {
+        self.messageBus?.post(OttEvent.OttEventConcurrency())
+    }
 }

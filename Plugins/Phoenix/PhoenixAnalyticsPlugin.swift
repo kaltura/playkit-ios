@@ -74,6 +74,19 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
             builder.set { (response: Response) in
                 
                 PKLog.trace("Response: \(response)")
+                if response.statusCode == 0 {
+                    PKLog.trace("\(response.data)")
+                    if let data : [String: Any] = response.data as! [String : Any]? {
+                        if let result = data["result"] as! [String: Any]? {
+                            if let errorData = result["error"] as! [String: Any]? {
+                                if let errorCode = errorData["code"] as? Int, errorCode == 4001 {
+                                    
+                                    self.kalturaPluginManager.reportConcurrencyEvent()
+                                }
+                            }
+                        }
+                    }
+                }
                 
             }
             
@@ -85,7 +98,18 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
 }
 
 
-
+/*
+ {
+	"executionTime": 0.1772762,
+	"result": {
+ "error": {
+ "objectType": "KalturaAPIException",
+ "message": "Invalid action parameter [bookmark]",
+ "code": "500054"
+ }
+	}
+ }
+ */
 
 
 
