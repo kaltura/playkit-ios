@@ -6,7 +6,8 @@ abstract_target 'PlayKit' do
     pod 'PlayKit', :path => '../../playkit-ios'
     pod 'PlayKit/IMAPlugin', :path => '../../playkit-ios'
     pod 'PlayKit/YouboraPlugin', :path => '../../playkit-ios'
-    
+    pod 'PlayKit/KalturaStatsPlugin', :path => '../../playkit-ios'
+
     target 'PlayKit_Example' do
     end
     

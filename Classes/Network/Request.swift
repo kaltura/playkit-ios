@@ -147,23 +147,21 @@ public class RequestBuilder: NSObject {
             }
         }
         
+        let urlComponents = NSURLComponents()
+        urlComponents.path = self.url.absoluteString
+
+        
         if let params = self.urlParams, params.count > 0 {
             
-            var newUrl = "\(self.url.absoluteString)?"
-            var isFirst = true
+            var queryItems = [URLQueryItem]()
             for (key, value) in params {
-                if isFirst {
-                    isFirst = false
-                } else {
-                    newUrl.append("&")
-                }
-                newUrl.append("\(key)=\(value)")
+                queryItems.append(URLQueryItem(name: key, value: value))
             }
             
-            self.url = URL(string: newUrl)!
+            urlComponents.queryItems = queryItems
         }
         
-        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
+        return RequestElement(requestId: self.requestId, method:self.method , url: urlComponents.url!, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
         
         
     }

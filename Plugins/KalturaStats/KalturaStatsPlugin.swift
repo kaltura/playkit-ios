@@ -129,7 +129,7 @@ public class KalturaStatsPlugin: PKPlugin {
             PKLog.trace("seeked info: \(info)")
             
             self.hasSeeked = true
-            self.seekPercent = Float(self.player.currentTime!) / Float(self.player.duration)
+            self.seekPercent = Float(self.player.currentTime) / Float(self.player.duration)
             self.sendAnalyticsEvent(action: .SEEK);
         })
         
@@ -225,7 +225,7 @@ public class KalturaStatsPlugin: PKPlugin {
     }
     
     @objc private func timerHit() {
-        var progress = Float(self.player.currentTime!) / Float(self.player.duration)
+        var progress = Float(self.player.currentTime) / Float(self.player.duration)
         PKLog.trace("Progress is \(progress)")
         
         if progress >= 0.25 && !playReached25 && seekPercent <= 0.25 {
