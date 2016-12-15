@@ -66,37 +66,43 @@ public class RequestBuilder: NSObject {
         
     }
     
+    @discardableResult
     public func set(url: URL) -> Self{
         self.url = url
         return self
     }
     
+    @discardableResult
     public func set(method: String?) -> Self{
         self.method = method
         return self
     }
     
+    @discardableResult
     public func set(jsonBody:JSON?) -> Self{
         self.jsonBody = jsonBody
         return self
     }
     
+    @discardableResult
     public func set(headers: [String: String]?) -> Self{
         self.headers = headers
         return self
     }
     
+    @discardableResult
     public func set(configuration:RequestConfiguration?) -> Self{
         self.configuration = configuration
         return self
     }
     
+    @discardableResult
     public func set(completion:completionClosures?) -> Self{
         self.completion = completion
         return self
     }
     
-    
+    @discardableResult
     public func add(headerKey:String, headerValue:String) -> Self {
         
         if (self.headers == nil){
@@ -108,9 +114,10 @@ public class RequestBuilder: NSObject {
     }
     
     
+    @discardableResult
     public func setBody(key: String, value:JSON) -> Self {
         
-        if var body = self.jsonBody {
+        if self.jsonBody != nil {
             self.jsonBody![key] = value
         }else{
             self.jsonBody = [key:value]

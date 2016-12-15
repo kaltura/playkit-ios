@@ -25,7 +25,7 @@ class PlayerLoader: PlayerDecoratorBase {
     func load(_ config: PlayerConfig) {
         var playerController: PlayerController
         
-        if let mediaEntry = config.mediaEntry {
+        if config.mediaEntry != nil {
             playerController = PlayerController(mediaEntry: config)
             playerController.onEventBlock = { (event:PKEvent) in
                 self.messageBus.post(event)

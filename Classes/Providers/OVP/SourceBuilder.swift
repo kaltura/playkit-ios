@@ -22,47 +22,55 @@ class SourceBuilder {
     var playSessionId:String?
     
 
+    @discardableResult
     func set(baseURL:String?) -> SourceBuilder {
         self.baseURL = baseURL
         return self
     }
     
-    
+    @discardableResult
     func set(partnerId:Int64?) -> SourceBuilder {
         self.partnerId = partnerId
         return self
     }
     
+    @discardableResult
     func set(ks:String?) -> SourceBuilder {
         self.ks = ks
         return self
     }
 
+    @discardableResult
     func set(entryId:String?) -> SourceBuilder {
         self.entryId = entryId
         return self
     }
 
+    @discardableResult
     func set(flavors:[String]?) -> SourceBuilder {
         self.flavors = flavors
         return self
     }
 
+    @discardableResult
     func set(uiconfId:Int64?) -> SourceBuilder {
         self.uiconfId = uiconfId
         return self
     }
 
+    @discardableResult
     func set(format:String?) -> SourceBuilder {
         self.format = format
         return self
     }
     
+    @discardableResult
     func set(sourceProtocol:String?) -> SourceBuilder {
         self.sourceProtocol = sourceProtocol
         return self
     }
     
+    @discardableResult
     func set(playSessionId:String?) -> SourceBuilder {
         self.playSessionId = playSessionId
         return self
@@ -71,7 +79,7 @@ class SourceBuilder {
     
     func build() -> URL? {
         
-        guard let baseURL = self.baseURL, baseURL.isEmpty == false , let partnerId = self.partnerId, let entryId = self.entryId, let format = self.format, let sourceProtocol = self.sourceProtocol else {
+        guard let baseURL = self.baseURL, baseURL.isEmpty == false , let partnerId = self.partnerId, let format = self.format, let sourceProtocol = self.sourceProtocol else {
             return nil
         }
         

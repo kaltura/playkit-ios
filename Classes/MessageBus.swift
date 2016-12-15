@@ -51,7 +51,7 @@ public class MessageBus: NSObject {
             // TODO: remove nil observers
             if let array = observations[typeId] {
                 array.forEach {
-                    if let observer = $0.observer {
+                    if $0.observer != nil {
                         $0.block(event)
                     }
                 }

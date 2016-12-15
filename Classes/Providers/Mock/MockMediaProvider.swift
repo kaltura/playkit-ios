@@ -29,16 +29,19 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     public var url: URL?
     public var content: Any?
     
+    @discardableResult
     public func set(id: String?) -> Self {
         self.id = id
         return self
     }
     
+    @discardableResult
     public func set(url: URL?) -> Self {
         self.url = url
         return self
     }
     
+    @discardableResult
     public func set(content: Any?) -> Self {
         self.content = content
         return self
@@ -64,9 +67,9 @@ public class MockMediaEntryProvider: MediaEntryProvider {
         }
         
         var json: JSON? = nil
-        if let inputContent = self.content {
+        if self.content != nil {
             json = JSON(self.content)
-        }else if let url = self.url{
+        }else if self.url != nil{
             guard let stringPath = self.url?.absoluteString else {
                  callback(Result(data: nil, error: MockError.invalidParam(paramName: "url")))
                 return
@@ -91,12 +94,13 @@ public class MockMediaEntryProvider: MediaEntryProvider {
             return
         }
         
-        guard let jsonObject: JSON = loderInfo.content[loderInfo.id] , jsonObject != .null else {
+        let jsonObject: JSON = loderInfo.content[loderInfo.id]
+        guard jsonObject != .null else {
             callback(Result(data: nil, error:MockError.mediaNotFound))
             return
         }
         
-        let mediaEntry : MediaEntry? = MediaEntry(json: jsonObject)
+        let mediaEntry : MediaEntry? = MediaEntry(json: jsonObject.object)
         callback(Result(data: mediaEntry, error: nil))
     }
     

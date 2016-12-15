@@ -10,8 +10,16 @@ import Foundation
 
 public class AdsConfig {
     public var language: String = "en"
-    public var enableBackgroundPlayback: Bool = true
-    public var autoPlayAdBreaks: Bool = false
+    public var enableBackgroundPlayback: Bool {
+        get {
+            return true
+        }
+    }
+    public var autoPlayAdBreaks: Bool {
+        get {
+            return false
+        }
+    }
     public var videoBitrate: Int32?
     public var videoMimeTypes: [AnyObject]?
     public var adTagUrl: String?
@@ -27,18 +35,6 @@ public class AdsConfig {
     @discardableResult
     public func set(language: String) -> Self {
         self.language = language
-        return self
-    }
-    
-    @discardableResult
-    public func set(enableBackgroundPlayback: Bool) -> Self {
-        self.enableBackgroundPlayback = enableBackgroundPlayback
-        return self
-    }
-    
-    @discardableResult
-    public func set(autoPlayAdBreaks: Bool) -> Self {
-        self.autoPlayAdBreaks = autoPlayAdBreaks
         return self
     }
     

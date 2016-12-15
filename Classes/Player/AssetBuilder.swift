@@ -17,37 +17,47 @@ class AssetBuilder {
     init(mediaEntry: MediaEntry) {
         self.mediaEntry = mediaEntry
     }
-    
-    func build(readyCallback: (AVAsset?)->Void) -> Void {
+
+    func build(readyCallback: (Error?, AVAsset?)->Void) -> Void {
         
         // Select source and handler
-        guard let sources = mediaEntry.sources else { return  }
-        let selectedSource = sources[0]
+        guard let sources = mediaEntry.sources else { return }
+        
+        var selection: (source: MediaSource, handler: AssetHandler.Type)?
+        
+        // Iterate over all handlers
+        let handlers: [AssetHandler.Type] = [DefaultAssetHandler.self, WidevineClassicAssetHandler.self]
+        for handler in handlers {
+            // Select the first source that the handler can play.
+            if let playableSource = sources.first(where: handler.sourceFilter) {
+                selection = (source: playableSource, handler: handler)
+                break   // don't ask the other handlers
+            }
+        }
+        
+        // Check if something was selected
+        guard let selected = selection else { 
+            PKLog.error("No playable sources")
+            readyCallback(AssetError.noPlayableSources, nil)
+            return
+        }
 
-        let handlerClass = DefaultAssetHandler.self
-
-        let handler = handlerClass.init()
-
-        handler.buildAsset(mediaSource: selectedSource, readyCallback: readyCallback)
+        // Build the asset
+        let handler = selected.handler.init()
+        handler.buildAsset(mediaSource: selected.source, readyCallback: readyCallback)
+        self.assetHandler = handler
     }
 }
-
 
 protocol AssetHandler {
     init()
-    func buildAsset(mediaSource: MediaSource, readyCallback: (AVAsset?)->Void)
+    static var sourceFilter: (MediaSource)->Bool {get}
+    func buildAsset(mediaSource: MediaSource, readyCallback: (Error?, AVAsset?)->Void)
 }
 
-
-let defaultAssetHandler = { (mediaSource: MediaSource, ready: (AVAsset?)->Void) in
-    if let url = mediaSource.contentUrl {
-        ready(AVURLAsset(url: url))
-    } else {
-        ready(nil)
-    }
+enum AssetError : Error {
+    case noFpsCertificate
+    case invalidDrmScheme
+    case invalidContentUrl(URL?)
+    case noPlayableSources
 }
-
-
-
-
-
