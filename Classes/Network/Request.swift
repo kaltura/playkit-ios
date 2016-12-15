@@ -54,7 +54,7 @@ public class RequestBuilder: NSObject {
     public var timeout: Double = 3
     public var configuration: RequestConfiguration? = nil
     public var completion: completionClosures? = nil
-    
+    public var urlParams: [String: String]? = nil
     
     public init?(url:String){
         
@@ -125,6 +125,16 @@ public class RequestBuilder: NSObject {
         return self
     }
     
+    public func setParam(key: String, value:String) -> Self {
+        
+        if var params = self.urlParams {
+            self.urlParams![key] = value
+        }else{
+            self.urlParams = [key:value]
+        }
+        return self
+    }
+    
     public func build() -> Request {
         
         
@@ -136,7 +146,22 @@ public class RequestBuilder: NSObject {
                 
             }
         }
-        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
+        
+        let urlComponents = NSURLComponents()
+        urlComponents.path = self.url.absoluteString
+
+        
+        if let params = self.urlParams, params.count > 0 {
+            
+            var queryItems = [URLQueryItem]()
+            for (key, value) in params {
+                queryItems.append(URLQueryItem(name: key, value: value))
+            }
+            
+            urlComponents.queryItems = queryItems
+        }
+        
+        return RequestElement(requestId: self.requestId, method:self.method , url: urlComponents.url!, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
         
         
     }
