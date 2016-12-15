@@ -114,7 +114,7 @@ class AVPlayerEngine : AVPlayer {
         
         avPlayerLayer = AVPlayerLayer(player: self)
         _view = PlayerView(playerLayer: avPlayerLayer)
-    
+        
         self.onEventBlock = nil
         self.nonObservablePropertiesUpdateTimer = nil
     }
@@ -126,9 +126,7 @@ class AVPlayerEngine : AVPlayer {
     private func startOrResumeNonObservablePropertiesUpdateTimer() {
         PKLog.trace("setupNonObservablePropertiesUpdateTimer")
         
-        if self.nonObservablePropertiesUpdateTimer == nil {
-            self.nonObservablePropertiesUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateNonObservableProperties), userInfo: nil, repeats: true)
-        }
+        self.nonObservablePropertiesUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateNonObservableProperties), userInfo: nil, repeats: true)
     }
     
     /**
@@ -160,10 +158,11 @@ class AVPlayerEngine : AVPlayer {
     func destroy() {
         PKLog.trace("destory player")
         self.nonObservablePropertiesUpdateTimer?.invalidate()
+        self.nonObservablePropertiesUpdateTimer == nil
         self.removeObservers()
-        avPlayerLayer = nil
-        _view = nil
-        onEventBlock = nil
+        self.avPlayerLayer = nil
+        self._view = nil
+        self.onEventBlock = nil
     }
     
     @available(iOS 9.0, *)
@@ -354,7 +353,7 @@ class AVPlayerEngine : AVPlayer {
     private func handleStatusChange() -> PKEvent? {
         var event: PKEvent? = nil
         
-        if currentItem?.status == .readyToPlay {           
+        if currentItem?.status == .readyToPlay {
             let newState = PlayerState.ready
             self.postEvent(event: PlayerEvents.loadedMetadata())
             
@@ -421,7 +420,7 @@ class AVPlayerEngine : AVPlayer {
             if let timebase = currItem.timebase {
                 if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
                     if timebaseRate > 0 {
-                        nonObservablePropertiesUpdateTimer?.invalidate()
+                        self.nonObservablePropertiesUpdateTimer?.invalidate()
                         
                         self.postEvent(event: PlayerEvents.playing())
                     }
