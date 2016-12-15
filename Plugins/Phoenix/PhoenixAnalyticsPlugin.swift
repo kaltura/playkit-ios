@@ -98,18 +98,4 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
 }
 
 
-/*
- {
-	"executionTime": 0.1772762,
-	"result": {
- "error": {
- "objectType": "KalturaAPIException",
- "message": "Invalid action parameter [bookmark]",
- "code": "500054"
- }
-	}
- }
- */
-
-
 
