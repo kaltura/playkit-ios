@@ -63,22 +63,3 @@ internal class BookmarkService {
         return json
     }
 }
-
-
-
-/*
- JsonObject getParams = getPhoenixParams();
- getParams.addProperty("ks", ks);
- JsonObject bookmark = new JsonObject();
- bookmark.addProperty("objectType", "KalturaBookmark");
- bookmark.addProperty("id", assetId);
- bookmark.addProperty("type", type);
- bookmark.addProperty("position", position);
- JsonObject playerData = new JsonObject();
- playerData.addProperty("objectType", "KalturaBookmarkPlayerData");
- playerData.addProperty("action", actionType);
- playerData.addProperty("fileId", fileId);
- bookmark.add("playerData", playerData);
- getParams.add("bookmark", bookmark);
-
- */

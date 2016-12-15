@@ -54,6 +54,7 @@ internal class KalturaPluginManager {
     public func destroy() {
         self.delegate?.sendAnalyticsEvent(action: .stop)
         stopTimer()
+        self.delegate = nil
     }
     
     func registerToAllEvents() {
