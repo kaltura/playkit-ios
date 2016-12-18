@@ -41,7 +41,7 @@ public class TVPAPIAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
         self.kalturaPluginManager.destroy()
     }
     
-    internal func sendAnalyticsEvent(action: PhoenixAnalyticsType) {
+    internal func pluginManagerDidSendAnalyticsEvent(action: PhoenixAnalyticsType) {
         PKLog.trace("Action: \(action)")
         
         var fileId = ""
@@ -64,7 +64,7 @@ public class TVPAPIAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
         
         baseUrl = "\(baseUrl)m=\(method)"
         
-        if let builder: KalturaRequestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
+        if let builder: RequestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
                                                                                  initObj: initObj,
                                                                                  eventType: action.rawValue,
                                                                                  currentTime: Float(self.player.currentTime),

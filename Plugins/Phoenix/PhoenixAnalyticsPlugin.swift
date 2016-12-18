@@ -40,7 +40,7 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
         self.kalturaPluginManager.destroy()
     }
     
-    internal func sendAnalyticsEvent(action: PhoenixAnalyticsType) {
+    internal func pluginManagerDidSendAnalyticsEvent(action: PhoenixAnalyticsType) {
         PKLog.trace("Action: \(action)")
         
         var fileId = ""

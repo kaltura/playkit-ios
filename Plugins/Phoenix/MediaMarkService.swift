@@ -16,9 +16,9 @@ internal class MediaMarkService {
                                          eventType: String,
                                          currentTime: Float,
                                          assetId: String,
-                                         fileId: String) -> KalturaRequestBuilder? {
+                                         fileId: String) -> RequestBuilder? {
         
-        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: nil, action: nil) {
+        if let request: RequestBuilder = RequestBuilder(url: baseURL) {
             request
                 .set(method: "POST")
                 

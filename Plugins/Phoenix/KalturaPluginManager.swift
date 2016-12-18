@@ -22,14 +22,14 @@ internal enum PhoenixAnalyticsType: String {
 }
 
 protocol KalturaPluginManagerDelegate {
-    func sendAnalyticsEvent(action: PhoenixAnalyticsType)
+    func pluginManagerDidSendAnalyticsEvent(action: PhoenixAnalyticsType)
 }
 
 internal class KalturaPluginManager {
 
     public var delegate: KalturaPluginManagerDelegate?
     
-    private var player: Player!
+    private var player: Player?
     private var messageBus: MessageBus?
     private var config: AnalyticsConfig!
     
@@ -52,7 +52,7 @@ internal class KalturaPluginManager {
     }
     
     public func destroy() {
-        self.delegate?.sendAnalyticsEvent(action: .stop)
+        self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .stop)
         stopTimer()
         self.delegate = nil
     }
@@ -63,22 +63,22 @@ internal class KalturaPluginManager {
         self.messageBus?.addObserver(self, events: [PlayerEvents.ended.self], block: { (info) in
             PKLog.trace("ended info: \(info)")
             self.stopTimer()
-            self.delegate?.sendAnalyticsEvent(action: .finish)
+            self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.error.self], block: { (info) in
             PKLog.trace("error info: \(info)")
-            self.delegate?.sendAnalyticsEvent(action: .error)
+            self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .error)
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
             PKLog.trace("pause info: \(info)")
-            self.delegate?.sendAnalyticsEvent(action: .pause)
+            self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .pause)
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.loadedMetadata.self], block: { (info) in
             PKLog.trace("loadedMetadata info: \(info)")
-            self.delegate?.sendAnalyticsEvent(action: .load)
+            self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .load)
         })
         
         self.messageBus?.addObserver(self, events: [PlayerEvents.loadedMetadata.self], block: { (info) in
@@ -91,9 +91,9 @@ internal class KalturaPluginManager {
             
             if self.isFirstPlay {
                 self.isFirstPlay = false
-                self.delegate?.sendAnalyticsEvent(action: .first_play);
+                self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .first_play);
             } else {
-                self.delegate?.sendAnalyticsEvent(action: .play);
+                self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .play);
             }
             
             
@@ -119,13 +119,15 @@ internal class KalturaPluginManager {
         
         PKLog.trace("timerHit")
         
-        self.delegate?.sendAnalyticsEvent(action: .hit);
+        self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .hit);
         
-        var progress = Float(self.player.currentTime) / Float(self.player.duration)
-        PKLog.trace("Progress is \(progress)")
-        
-        if progress > 0.98 {
-            self.delegate?.sendAnalyticsEvent(action: .finish)
+        if let player = self.player {
+            var progress = Float(player.currentTime) / Float(player.duration)
+            PKLog.trace("Progress is \(progress)")
+            
+            if progress > 0.98 {
+                self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
+            }
         }
     }
     
