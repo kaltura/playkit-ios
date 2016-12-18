@@ -45,6 +45,13 @@ s.subspec 'PhoenixPlugin' do |ssp|
     'OTHER_LDFLAGS' => '$(inherited)',
     'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
     'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+
+s.subspec 'KalturaStatsPlugin' do |ssp|
+    ssp.source_files = 'Plugins/KalturaStats'
+    ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+    'OTHER_LDFLAGS' => '$(inherited)',
+    'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+'   LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
 end
 
 s.default_subspec = 'Core'
