@@ -64,9 +64,9 @@ class AssetLoaderDelegate: NSObject {
             throw FairPlayError.emptyServerResponse
         }
         
-        var pError: NSErrorPointer
-        let json = JSON(data: data, error: pError)
-        if let error = pError?.pointee {
+        var pError: NSError?
+        let json = JSON(data: data, options: [], error: &pError)
+        if let error = pError {
             throw error
         }
         
@@ -82,6 +82,8 @@ class AssetLoaderDelegate: NSObject {
             throw FairPlayError.malformedCKCInResponse
         }
 
+        PKLog.debug("Got valid CKC")
+
         return ckc
     }
     
@@ -94,8 +96,12 @@ class AssetLoaderDelegate: NSObject {
         request.httpBody = spcData.base64EncodedData()
         request.httpMethod = "POST"
         
+        PKLog.debug("Sending SPC to server");
+        let startTime: Double = Date.timeIntervalSinceReferenceDate
         var dataTask = URLSession.shared.dataTask(with: request, completionHandler: {(data: Data?, response: URLResponse?, error: Error?) -> Void in
             do {
+                let endTime: Double = Date.timeIntervalSinceReferenceDate
+                PKLog.debug("Got response in \(endTime-startTime) sec")
                 let ckc = try self.parseServerResponse(data: data, error: error)
                 callback(Result(data: ckc))
             } catch let e as Error {
@@ -103,23 +109,6 @@ class AssetLoaderDelegate: NSObject {
             }
         })
         dataTask.resume()
-    }
-    
-    public func contentKeyFromKeyServerModuleWithSPCData(spcData: Data, assetIDString: String) -> Data? {
-        
-        guard let licenseUrl = drmData.licenseUrl else { return nil }
-        
-        // TODO: send spcData to DRM server.
-
-        // MARK: ADAPT: YOU MUST IMPLEMENT THIS METHOD.
-        let ckcData: Data? = nil
-        
-        if ckcData == nil {
-            fatalError("No CKC being returned by \(#function)!")
-        }
-        
-        
-        return ckcData
     }
     
     public func deletePersistedConentKeyForAsset() {
@@ -159,7 +148,7 @@ private extension AssetLoaderDelegate {
     func prepareAndSendContentKeyRequest(resourceLoadingRequest: AVAssetResourceLoadingRequest) {
         
         guard let url = resourceLoadingRequest.request.url, let assetIDString = url.host else {
-            print("Failed to get url or assetIDString for the request object of the resource.")
+            PKLog.error("Failed to get url or assetIDString for the request object of the resource.")
             return
         }
         
@@ -180,7 +169,7 @@ private extension AssetLoaderDelegate {
                 resourceLoadingRequest.contentInformationRequest!.contentType = AVStreamingKeyDeliveryPersistentContentKeyType
             }
             else {
-                print("Unable to set contentType on contentInformationRequest.")
+                PKLog.error("Unable to set contentType on contentInformationRequest.")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -1, userInfo: nil)
                 resourceLoadingRequest.finishLoading(with: error)
                 return
@@ -219,14 +208,14 @@ private extension AssetLoaderDelegate {
         
         // Get the application certificate.
         guard let applicationCertificate = self.drmData.fpsCertificate else {
-            print("Error loading application certificate.")
+            PKLog.error("Error loading application certificate.")
             let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -3, userInfo: nil)
             resourceLoadingRequest.finishLoading(with: error)
             return
         }
         
         guard let assetIDData = assetIDString.data(using: String.Encoding.utf8) else {
-            print("Error retrieving Asset ID.")
+            PKLog.error("Error retrieving Asset ID.")
             let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -4, userInfo: nil)
             resourceLoadingRequest.finishLoading(with: error)
             return
@@ -253,8 +242,9 @@ private extension AssetLoaderDelegate {
              using the information we obtained earlier.
              */
             spcData = try resourceLoadingRequest.streamingContentKeyRequestData(forApp: applicationCertificate, contentIdentifier: assetIDData, options: resourceLoadingRequestOptions)
+            PKLog.debug("Got spcData with", spcData.count, "bytes")
         } catch let error as NSError {
-            print("Error obtaining key request data: \(error.domain) reason: \(error.localizedFailureReason)")
+            PKLog.error("Error obtaining key request data: \(error.domain) reason: \(error.localizedFailureReason)")
             resourceLoadingRequest.finishLoading(with: error)
             return
         }
@@ -271,7 +261,7 @@ private extension AssetLoaderDelegate {
          content key, it will honor the type of rental or lease specified when the key is used.
          
         guard let ckcData = contentKeyFromKeyServerModuleWithSPCData(spcData: spcData, assetIDString: assetIDString) else {
-            print("Error retrieving CKC from KSM.")
+            PKLog.error("Error retrieving CKC from KSM.")
             let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -5, userInfo: nil)
             resourceLoadingRequest.finishLoading(with: error)
             return
@@ -295,7 +285,7 @@ private extension AssetLoaderDelegate {
             guard #available(iOS 10.0, *) else {
                 assertionFailure()
                 return
-           }
+            }
                             
             // Since this request is the result of an AVAssetDownloadTask, we should get the secure persistent content key.
             var error: NSError?
@@ -311,7 +301,7 @@ private extension AssetLoaderDelegate {
             let persistentContentKeyData = resourceLoadingRequest.persistentContentKey(fromKeyVendorResponse: ckcData, options: nil, error: &error)
             
             if let error = error {
-                print("Error creating persistent content key: \(error)")
+                PKLog.error("Error creating persistent content key: \(error)")
                 resourceLoadingRequest.finishLoading(with: error)
                 return
             }
@@ -357,7 +347,7 @@ private extension AssetLoaderDelegate {
         }
         else {
             guard let dataRequest = resourceLoadingRequest.dataRequest else {
-                print("no data is being requested in loadingRequest")
+                PKLog.error("no data is being requested in loadingRequest")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
                 resourceLoadingRequest.finishLoading(with: error)
                 return
@@ -405,7 +395,7 @@ extension AssetLoaderDelegate: AVAssetResourceLoaderDelegate {
      */
     public func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         
-        print("\(#function) was called in AssetLoaderDelegate with loadingRequest: \(loadingRequest)")
+        PKLog.error("\(#function) was called in AssetLoaderDelegate with loadingRequest: \(loadingRequest)")
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: loadingRequest)
     }
@@ -435,7 +425,7 @@ extension AssetLoaderDelegate: AVAssetResourceLoaderDelegate {
      */
     public func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForRenewalOfRequestedResource renewalRequest: AVAssetResourceRenewalRequest) -> Bool {
         
-        print("\(#function) was called in AssetLoaderDelegate with renewalRequest: \(renewalRequest)")
+        PKLog.error("\(#function) was called in AssetLoaderDelegate with renewalRequest: \(renewalRequest)")
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: renewalRequest)
     }
