@@ -52,18 +52,10 @@ class AVPlayerEngine : AVPlayer {
     public var currentPosition: Double {
         get {
             PKLog.trace("get currentPosition: \(self.currentTime())")
-            return CMTimeGetSeconds(self.currentTime())
+            return CMTimeGetSeconds(self.currentTime() - rangeStart)
         }
         set {
             PKLog.trace("set currentPosition: \(currentPosition)")
-            
-            var rangeStart: CMTime = CMTimeMakeWithSeconds(0, 1)
-            if let currentItem = self.currentItem {
-                let seekableRanges = currentItem.seekableTimeRanges
-                if seekableRanges.count > 0 {
-                    rangeStart = seekableRanges.last!.timeRangeValue.start
-                }
-            }
 
             let newTime = rangeStart + CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { (isSeeked: Bool) in
@@ -120,6 +112,19 @@ class AVPlayerEngine : AVPlayer {
         }
         
         return false
+    }
+    
+    private var rangeStart: CMTime {
+        get {
+            var result: CMTime = CMTimeMakeWithSeconds(0, 1)
+            if let currentItem = self.currentItem {
+                let seekableRanges = currentItem.seekableTimeRanges
+                if seekableRanges.count > 0 {
+                    result = seekableRanges.last!.timeRangeValue.start
+                }
+            }
+            return result
+        }
     }
     
     // MARK: Player Methods
