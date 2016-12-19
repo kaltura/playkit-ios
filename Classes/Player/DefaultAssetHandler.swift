@@ -57,6 +57,23 @@ class DefaultAssetHandler: AssetHandler {
             readyCallback(AssetError.invalidContentUrl(nil), nil)
             return
         }
+        
+        if let localSource = mediaSource as? LocalMediaSource {
+            PKLog.debug("Creating local asset")
+            let asset = AVURLAsset(url: contentUrl)
+            
+            
+            if #available(iOS 10.0, *) {
+                self.assetLoaderDelegate = AssetLoaderDelegate.configureLocalAsset(asset: asset, storage: localSource.storage)
+            } else {
+                // On earlier versions, this will only work for non-FairPlay content.
+                PKLog.warning("Preparing local asset in iOS<10:", contentUrl)
+            }
+            
+            self.avAsset = asset  
+            readyCallback(nil, self.avAsset)
+            return
+        }
 
         
         guard let drmData = mediaSource.drmData?.first else {
@@ -82,16 +99,7 @@ class DefaultAssetHandler: AssetHandler {
         
         let asset = AVURLAsset(url: contentUrl)
         
-        let persisted = mediaSource is LocalMediaSource
-        
-        if persisted {
-            if #available(iOS 10.0, *) {
-                asset.resourceLoader.preloadsEligibleContentKeys = true
-            } else {
-                // Fallback on earlier versions
-            }
-        }
-        self.assetLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, assetName: assetName, drmData: fpsData, shouldPersist: persisted)
+        self.assetLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, drmData: fpsData, storage: nil)
         
         self.avAsset = asset  
         readyCallback(nil, self.avAsset)

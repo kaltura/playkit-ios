@@ -26,35 +26,43 @@ class AssetLoaderDelegate: NSObject {
     /// The AVURLAsset associated with the asset.
     fileprivate let asset: AVURLAsset
     
-    /// The name associated with the asset.
-    fileprivate let assetName: String
-    
     /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
     fileprivate let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
     
     var storage: LocalDrmStorage?
     
-    fileprivate let drmData: FairPlayDRMData
+    fileprivate let drmData: FairPlayDRMData?
     
-    private init(asset: AVURLAsset, assetName: String, drmData: FairPlayDRMData) {
+    private init(asset: AVURLAsset, drmData: FairPlayDRMData? = nil, storage: LocalDrmStorage? = nil) {
         // Determine the library URL.
         
         self.asset = asset
-        self.assetName = assetName
         self.drmData = drmData
+        self.storage = storage
         
         super.init()
     }
     
-    static func configureAsset(asset: AVURLAsset, assetName: String, drmData: FairPlayDRMData, shouldPersist: Bool) -> AssetLoaderDelegate {
-        let delegate = AssetLoaderDelegate.init(asset: asset, assetName: assetName, drmData: drmData)
+    static func configureAsset(asset: AVURLAsset, drmData: FairPlayDRMData, storage: LocalDrmStorage?) -> AssetLoaderDelegate {
+        let delegate = AssetLoaderDelegate.init(asset: asset, drmData: drmData, storage: storage)
         asset.resourceLoader.setDelegate(delegate, queue: delegate.resourceLoadingRequestQueue)
         
+        let persist = storage != nil
         if #available(iOS 10.0, *) {
-            asset.resourceLoader.preloadsEligibleContentKeys = shouldPersist
+            asset.resourceLoader.preloadsEligibleContentKeys = persist
         } else {
             PKLog.warning("Local FairPlay does not work before iOS 10")
         }
+        
+        return delegate
+    }
+    
+    @available(iOS 10.0, *)
+    static func configureLocalAsset(asset: AVURLAsset, storage: LocalDrmStorage) -> AssetLoaderDelegate {
+        let delegate = AssetLoaderDelegate.init(asset: asset, storage: storage)
+        asset.resourceLoader.setDelegate(delegate, queue: delegate.resourceLoadingRequestQueue)
+        
+        asset.resourceLoader.preloadsEligibleContentKeys = true
         
         return delegate
     }
@@ -93,7 +101,7 @@ class AssetLoaderDelegate: NSObject {
     
     func performCKCRequest(_ spcData: Data, _ callback: @escaping (Result<Data>)->Void) {
         
-        guard let licenseUrl = drmData.licenseUrl else { return }
+        guard let licenseUrl = drmData?.licenseUrl else { return }
         
         var request = URLRequest(url: licenseUrl)
         request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
@@ -115,8 +123,8 @@ class AssetLoaderDelegate: NSObject {
         dataTask.resume()
     }
     
-    func persistentKeyName() -> String {
-        return "\(self.assetName).fpskey"
+    func persistentKeyName(_ assetId: String) -> String {
+        return "\(assetId).fpskey"
     }
     
     func prepareAndSendContentKeyRequest(resourceLoadingRequest: AVAssetResourceLoadingRequest) {
@@ -151,7 +159,7 @@ class AssetLoaderDelegate: NSObject {
         }
         
         // Check if we have an existing key on disk for this asset.
-        if let persistedContentKeyData = self.storage?.load(key: persistentKeyName()) {
+        if let persistedContentKeyData = self.storage?.load(key: persistentKeyName(assetIDString)) {
             guard let dataRequest = resourceLoadingRequest.dataRequest else {
                 PKLog.error("Error loading contents of content key file.")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -2, userInfo: nil)
@@ -167,7 +175,7 @@ class AssetLoaderDelegate: NSObject {
         }
         
         // Get the application certificate.
-        guard let applicationCertificate = self.drmData.fpsCertificate else {
+        guard let applicationCertificate = self.drmData?.fpsCertificate else {
             PKLog.error("Error loading application certificate.")
             let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -3, userInfo: nil)
             resourceLoadingRequest.finishLoading(with: error)
@@ -230,7 +238,7 @@ class AssetLoaderDelegate: NSObject {
         
         performCKCRequest(spcData) {(result: Result<Data>) -> Void in
             if let ckcData = result.data {
-                self.handleCKCData(resourceLoadingRequest, ckcData, shouldPersist)
+                self.handleCKCData(resourceLoadingRequest, assetIDString, ckcData, shouldPersist)
             } else {
                 PKLog.error("Error occured while loading FairPlay license:", result.error)
             }
@@ -238,7 +246,7 @@ class AssetLoaderDelegate: NSObject {
         
     }
     
-    func handleCKCData(_ resourceLoadingRequest: AVAssetResourceLoadingRequest, _ ckcData: Data, _ shouldPersist: Bool) {
+    func handleCKCData(_ resourceLoadingRequest: AVAssetResourceLoadingRequest, _ assetId: String, _ ckcData: Data, _ shouldPersist: Bool) {
 
         // Check if this reuqest is the result of a potential AVAssetDownloadTask.
         if shouldPersist {
@@ -267,7 +275,8 @@ class AssetLoaderDelegate: NSObject {
             }
             
             // Save the persistentContentKeyData onto disk for use in the future.
-            self.storage?.save(key: persistentKeyName(), value: persistentContentKeyData)
+            PKLog.debug("Saving persistentContentKeyData")
+            self.storage?.save(key: persistentKeyName(assetId), value: persistentContentKeyData)
             guard let dataRequest = resourceLoadingRequest.dataRequest else {
                 PKLog.error("no data is being requested in loadingRequest")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)

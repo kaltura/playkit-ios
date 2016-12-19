@@ -19,7 +19,7 @@ public class DefaultLocalDrmStorage: LocalDrmStorage {
     
     let storageDirectory: URL
     
-    init() throws {
+    public init() throws {
         self.storageDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
     }
     
@@ -43,9 +43,9 @@ public class DefaultLocalDrmStorage: LocalDrmStorage {
 class LocalMediaSource: MediaSource {
     let storage: LocalDrmStorage
     
-    init(storage: LocalDrmStorage, dict: [String : Any]) {
+    init(storage: LocalDrmStorage, id: String, localContentUrl: URL) {
         self.storage = storage
-        super.init(json: dict)
+        super.init(id, contentUrl: localContentUrl)
     }
 }
 
@@ -72,9 +72,8 @@ public class LocalAssetsManager: NSObject {
         
         guard let drmData = mediaSource.drmData?.first as? FairPlayDRMData else {return}
 
-        let resourceLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, assetName: assetId, drmData: drmData, shouldPersist: true)
+        let resourceLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, drmData: drmData, storage: storage)
         
-        resourceLoaderDelegate.storage = self.storage
         self.resourceLoaderDelegate = resourceLoaderDelegate
         
     }
@@ -84,11 +83,7 @@ public class LocalAssetsManager: NSObject {
     public func createLocalMediaSource(for assetId: String, localURL: URL) -> MediaSource {
         // TODO
                 
-        var source = LocalMediaSource(storage: self.storage, dict: [
-            "id": assetId,
-            "url": localURL,
-            ])
-        
+        var source = LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
         return source
     }
 }
