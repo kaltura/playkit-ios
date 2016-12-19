@@ -56,7 +56,16 @@ class AVPlayerEngine : AVPlayer {
         }
         set {
             PKLog.trace("set currentPosition: \(currentPosition)")
-            let newTime = CMTimeMakeWithSeconds(newValue, 1)
+            
+            var rangeStart: CMTime = CMTimeMakeWithSeconds(0, 1)
+            if let currentItem = self.currentItem {
+                let seekableRanges = currentItem.seekableTimeRanges
+                if seekableRanges.count > 0 {
+                    rangeStart = seekableRanges.last!.timeRangeValue.start
+                }
+            }
+
+            let newTime = rangeStart + CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { (isSeeked: Bool) in
                 if isSeeked {
                     self.postEvent(event: PlayerEvents.seeked())
@@ -78,9 +87,19 @@ class AVPlayerEngine : AVPlayer {
     
     public var duration: Double {
         guard let currentItem = self.currentItem else { return 0.0 }
-        PKLog.trace("get duration: \(currentItem.duration)")
         
-        return CMTimeGetSeconds(currentItem.duration)
+        var result = CMTimeGetSeconds(currentItem.duration)
+    
+        if result.isNaN {
+            let seekableRanges = currentItem.seekableTimeRanges
+            if seekableRanges.count > 0 {
+                let range = seekableRanges.last!.timeRangeValue
+                result = CMTimeGetSeconds(range.duration)
+            }
+        }
+        
+        PKLog.trace("get duration: \(result)")
+        return result
     }
     
     public var isPlaying: Bool {
