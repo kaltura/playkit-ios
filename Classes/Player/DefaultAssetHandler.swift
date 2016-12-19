@@ -53,14 +53,16 @@ class DefaultAssetHandler: AssetHandler {
             return
         }
 
-        if mediaSource.drmData == nil {
+        
+        guard let drmData = mediaSource.drmData?.first else {
+            PKLog.debug("Creating clear AVURLAsset")
             readyCallback(nil, AVURLAsset(url: contentUrl))
             return
         }
 
-        // FairPlay
-        guard let fpsData = mediaSource.drmData as? FairPlayDRMData else {
-            PKLog.error("Unsupported DRM Data:", mediaSource.drmData)
+        // FairPlay: only looking at the first DRMData element.
+        guard let fpsData = drmData as? FairPlayDRMData else {
+            PKLog.error("Unsupported DRM Data:", drmData)
             readyCallback(AssetError.invalidDrmScheme, nil)
             return
         }
