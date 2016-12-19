@@ -30,6 +30,11 @@ class DefaultAssetHandler: AssetHandler {
             return true
         }
         
+        // 'movpkg' was downloaded here.
+        if ext == "movpkg" {
+            return true
+        }
+        
         // The only other option is HLS
         if ext != "m3u8" {
             return false
@@ -76,7 +81,18 @@ class DefaultAssetHandler: AssetHandler {
         let assetName = mediaSource.id
         
         let asset = AVURLAsset(url: contentUrl)
-        self.assetLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, assetName: mediaSource.id, drmData: fpsData)
+        
+        let persisted = mediaSource is LocalMediaSource
+        
+        if persisted {
+            if #available(iOS 10.0, *) {
+                asset.resourceLoader.preloadsEligibleContentKeys = true
+            } else {
+                // Fallback on earlier versions
+            }
+        }
+        self.assetLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, assetName: assetName, drmData: fpsData, shouldPersist: persisted)
+        
         self.avAsset = asset  
         readyCallback(nil, self.avAsset)
     }

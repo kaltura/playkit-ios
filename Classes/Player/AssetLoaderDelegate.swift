@@ -32,15 +32,12 @@ class AssetLoaderDelegate: NSObject {
     /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
     fileprivate let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
     
-    /// The document URL to use for saving persistent content key.
-    fileprivate let documentURL: URL
+    var storage: LocalDrmStorage?
     
     fileprivate let drmData: FairPlayDRMData
     
-    init(asset: AVURLAsset, assetName: String, drmData: FairPlayDRMData) {
+    private init(asset: AVURLAsset, assetName: String, drmData: FairPlayDRMData) {
         // Determine the library URL.
-        guard let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first else { fatalError("Unable to determine library URL") }
-        documentURL = URL(fileURLWithPath: documentPath)
         
         self.asset = asset
         self.assetName = assetName
@@ -49,9 +46,16 @@ class AssetLoaderDelegate: NSObject {
         super.init()
     }
     
-    static func configureAsset(asset: AVURLAsset, assetName: String, drmData: FairPlayDRMData) -> AssetLoaderDelegate {
+    static func configureAsset(asset: AVURLAsset, assetName: String, drmData: FairPlayDRMData, shouldPersist: Bool) -> AssetLoaderDelegate {
         let delegate = AssetLoaderDelegate.init(asset: asset, assetName: assetName, drmData: drmData)
         asset.resourceLoader.setDelegate(delegate, queue: delegate.resourceLoadingRequestQueue)
+        
+        if #available(iOS 10.0, *) {
+            asset.resourceLoader.preloadsEligibleContentKeys = shouldPersist
+        } else {
+            PKLog.warning("Local FairPlay does not work before iOS 10")
+        }
+        
         return delegate
     }
     
@@ -111,38 +115,8 @@ class AssetLoaderDelegate: NSObject {
         dataTask.resume()
     }
     
-    public func deletePersistedConentKeyForAsset() {
-        guard let filePathURLForPersistedContentKey = filePathURLForPersistedContentKey() else {
-            return
-        }
-        
-        do {
-            try FileManager.default.removeItem(at: filePathURLForPersistedContentKey)
-            
-            UserDefaults.standard.removeObject(forKey: "\(assetName)-Key")
-        } catch {
-            print("An error occured removing the persisted content key: \(error)")
-        }
-    }
-    
-}
-
-//MARK:- Internal methods extension.
-private extension AssetLoaderDelegate {
-    func filePathURLForPersistedContentKey() -> URL? {
-        var filePathURL: URL?
-        
-        guard let fileName = UserDefaults.standard.value(forKey: "\(assetName)-Key") as? String else {
-            return filePathURL
-        }
-        
-        let url = documentURL.appendingPathComponent(fileName)
-        
-        if url != documentURL {
-            filePathURL = url
-        }
-        
-        return filePathURL
+    func persistentKeyName() -> String {
+        return "\(self.assetName).fpskey"
     }
     
     func prepareAndSendContentKeyRequest(resourceLoadingRequest: AVAssetResourceLoadingRequest) {
@@ -177,33 +151,19 @@ private extension AssetLoaderDelegate {
         }
         
         // Check if we have an existing key on disk for this asset.
-        if let filePathURLForPersistedContentKey = filePathURLForPersistedContentKey() {
-            
-            // Verify the file does actually exist on disk.
-            if FileManager.default.fileExists(atPath: filePathURLForPersistedContentKey.path) {
-                
-                do {
-                    // Load the contents of the persistedContentKey file.
-                    let persistedContentKeyData = try Data(contentsOf: filePathURLForPersistedContentKey)
-                    
-                    guard let dataRequest = resourceLoadingRequest.dataRequest else {
-                        print("Error loading contents of content key file.")
-                        let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -2, userInfo: nil)
-                        resourceLoadingRequest.finishLoading(with: error)
-                        return
-                    }
-                    
-                    // Pass the persistedContentKeyData into the dataRequest so complete the content key request.
-                    dataRequest.respond(with: persistedContentKeyData)
-                    resourceLoadingRequest.finishLoading()
-                    return
-                    
-                } catch let error as Error {
-                    print("Error initializing Data from contents of URL: \(error.localizedDescription)")
-                    resourceLoadingRequest.finishLoading(with: error)
-                    return
-                }
+        if let persistedContentKeyData = self.storage?.load(key: persistentKeyName()) {
+            guard let dataRequest = resourceLoadingRequest.dataRequest else {
+                PKLog.error("Error loading contents of content key file.")
+                let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -2, userInfo: nil)
+                resourceLoadingRequest.finishLoading(with: error)
+                return
             }
+            
+            // Pass the persistedContentKeyData into the dataRequest so complete the content key request.
+            dataRequest.respond(with: persistedContentKeyData)
+            resourceLoadingRequest.finishLoading()
+            
+            return
         }
         
         // Get the application certificate.
@@ -307,45 +267,19 @@ private extension AssetLoaderDelegate {
             }
             
             // Save the persistentContentKeyData onto disk for use in the future.
-            do {
-                let persistentContentKeyURL = documentURL.appendingPathComponent("\(asset.url.hashValue).key")
-                
-                if persistentContentKeyURL == documentURL {
-                    print("failed to create the URL for writing the persistent content key")
-                    resourceLoadingRequest.finishLoading(with: error)
-                    return
-                }
-                
-                do {
-                    try persistentContentKeyData.write(to: persistentContentKeyURL, options: Data.WritingOptions.atomicWrite)
-                    
-                    // Since the save was successful, store the location of the key somewhere to reuse it for future calls.
-                    UserDefaults.standard.set("\(asset.url.hashValue).key", forKey: "\(assetName)-Key")
-                    
-                    guard let dataRequest = resourceLoadingRequest.dataRequest else {
-                        print("no data is being requested in loadingRequest")
-                        let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
-                        resourceLoadingRequest.finishLoading(with: error)
-                        return
-                    }
-                    
-                    // Provide data to the loading request.
-                    dataRequest.respond(with: persistentContentKeyData)
-                    resourceLoadingRequest.finishLoading()  // Treat the processing of the request as complete.
-                    
-                    // Since the request has complete, notify the rest of the app that the content key has been persisted for this asset.
-                    
-                    //NotificationCenter.default.post(name: AssetLoaderDelegate.didPersistContentKeyNotification, object: asset, userInfo: [Asset.Keys.name : assetName])
-                    
-                } catch let error as Error {
-                    print("failed writing persisting key to path: \(persistentContentKeyURL) with error: \(error)")
-                    resourceLoadingRequest.finishLoading(with: error)
-                    return
-                }
-                
+            self.storage?.save(key: persistentKeyName(), value: persistentContentKeyData)
+            guard let dataRequest = resourceLoadingRequest.dataRequest else {
+                PKLog.error("no data is being requested in loadingRequest")
+                let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
+                resourceLoadingRequest.finishLoading(with: error)
+                return
             }
-        }
-        else {
+            // Provide data to the loading request.
+            dataRequest.respond(with: persistentContentKeyData)
+            resourceLoadingRequest.finishLoading()  // Treat the processing of the request as complete.
+        
+        } else {
+            
             guard let dataRequest = resourceLoadingRequest.dataRequest else {
                 PKLog.error("no data is being requested in loadingRequest")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
@@ -395,7 +329,7 @@ extension AssetLoaderDelegate: AVAssetResourceLoaderDelegate {
      */
     public func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         
-        PKLog.error("\(#function) was called in AssetLoaderDelegate with loadingRequest: \(loadingRequest)")
+        PKLog.trace("\(#function) was called in AssetLoaderDelegate with loadingRequest: \(loadingRequest)")
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: loadingRequest)
     }
@@ -425,7 +359,7 @@ extension AssetLoaderDelegate: AVAssetResourceLoaderDelegate {
      */
     public func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForRenewalOfRequestedResource renewalRequest: AVAssetResourceRenewalRequest) -> Bool {
         
-        PKLog.error("\(#function) was called in AssetLoaderDelegate with renewalRequest: \(renewalRequest)")
+        PKLog.trace("\(#function) was called in AssetLoaderDelegate with renewalRequest: \(renewalRequest)")
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: renewalRequest)
     }
