@@ -21,12 +21,10 @@ internal class BookmarkService {
         
         if ks == "" {
             
-            if let request = KalturaRequestBuilder(url: baseURL, service: nil, action: nil) {
+            if let request = KalturaRequestBuilder(url: baseURL, service: "bookmark", action: "add") {
                 request
                     .setBody(key: "ks", value: JSON("{1:result:ks}"))
                     .setBody(key: "bookmark", value: createBookmark(eventType: eventType, position: currentTime, assetId: assetId, fileId: fileId))
-                    .setBody(key: "service", value: JSON("bookmark"))
-                    .setBody(key: "action", value: JSON("add"))
                     .set(method: "POST")
 
             }

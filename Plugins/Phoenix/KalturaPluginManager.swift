@@ -31,7 +31,7 @@ internal class KalturaPluginManager {
     
     private var player: Player?
     private var messageBus: MessageBus?
-    private var config: AnalyticsConfig!
+    private var config: AnalyticsConfig?
     
     private var isFirstPlay = true
     private var intervalOn = false
@@ -103,7 +103,7 @@ internal class KalturaPluginManager {
     
     private func createTimer() {
         
-        if let intr = self.config.params["timerInterval"] as? Int {
+        if let conf = self.config, let intr = conf.params["timerInterval"] as? Int {
             self.interval = intr
         }
         
