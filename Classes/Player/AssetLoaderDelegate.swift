@@ -23,9 +23,6 @@ class AssetLoaderDelegate: NSObject {
     /// Notification for when the persistent content key has been saved to disk.
     static let didPersistContentKeyNotification = NSNotification.Name(rawValue: "handleAssetLoaderDelegateDidPersistContentKeyNotification")
     
-    /// The AVURLAsset associated with the asset.
-    fileprivate let asset: AVURLAsset
-    
     /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
     fileprivate let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
     
@@ -33,10 +30,9 @@ class AssetLoaderDelegate: NSObject {
     
     fileprivate let drmData: FairPlayDRMData?
     
-    private init(asset: AVURLAsset, drmData: FairPlayDRMData? = nil, storage: LocalDrmStorage? = nil) {
+    private init(drmData: FairPlayDRMData? = nil, storage: LocalDrmStorage? = nil) {
         // Determine the library URL.
         
-        self.asset = asset
         self.drmData = drmData
         self.storage = storage
         
@@ -44,12 +40,11 @@ class AssetLoaderDelegate: NSObject {
     }
     
     static func configureAsset(asset: AVURLAsset, drmData: FairPlayDRMData, storage: LocalDrmStorage?) -> AssetLoaderDelegate {
-        let delegate = AssetLoaderDelegate.init(asset: asset, drmData: drmData, storage: storage)
+        let delegate = AssetLoaderDelegate.init(drmData: drmData, storage: storage)
         asset.resourceLoader.setDelegate(delegate, queue: delegate.resourceLoadingRequestQueue)
         
-        let persist = storage != nil
         if #available(iOS 10.0, *) {
-            asset.resourceLoader.preloadsEligibleContentKeys = persist
+            asset.resourceLoader.preloadsEligibleContentKeys = storage != nil
         } else {
             PKLog.warning("Local FairPlay does not work before iOS 10")
         }
@@ -59,7 +54,7 @@ class AssetLoaderDelegate: NSObject {
     
     @available(iOS 10.0, *)
     static func configureLocalAsset(asset: AVURLAsset, storage: LocalDrmStorage) -> AssetLoaderDelegate {
-        let delegate = AssetLoaderDelegate.init(asset: asset, storage: storage)
+        let delegate = AssetLoaderDelegate.init(storage: storage)
         asset.resourceLoader.setDelegate(delegate, queue: delegate.resourceLoadingRequestQueue)
         
         asset.resourceLoader.preloadsEligibleContentKeys = true
@@ -151,12 +146,7 @@ class AssetLoaderDelegate: NSObject {
             return
         }
         
-        let shouldPersist: Bool
-        if #available(iOS 10.0, *) {
-            shouldPersist = asset.resourceLoader.preloadsEligibleContentKeys
-        } else {
-            shouldPersist = false
-        }
+        let shouldPersist = self.storage != nil
         
         // Check if this reuqest is the result of a potential AVAssetDownloadTask.
         if shouldPersist {
