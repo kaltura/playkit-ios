@@ -10,9 +10,9 @@ import Foundation
 import AVFoundation
 
 public protocol LocalDrmStorage {
-    func save(key: String, value: Data)
-    func load(key: String) -> Data?
-    func remove(key: String)
+    func save(key: String, value: Data) throws
+    func load(key: String) throws -> Data?
+    func remove(key: String) throws
 }
 
 public class DefaultLocalDrmStorage: LocalDrmStorage {
@@ -27,16 +27,16 @@ public class DefaultLocalDrmStorage: LocalDrmStorage {
         return self.storageDirectory.appendingPathComponent(key)
     }
     
-    public func save(key: String, value: Data) {
-        try? value.write(to: file(key), options: .atomic)
+    public func save(key: String, value: Data) throws {
+        try value.write(to: file(key), options: .atomic)
     }
     
-    public func load(key: String) -> Data? {
-        return try? Data.init(contentsOf: file(key), options: [])
+    public func load(key: String) throws -> Data? {
+        return try Data.init(contentsOf: file(key), options: [])
     }
     
-    public func remove(key: String) {
-        try? FileManager.default.removeItem(at: file(key))
+    public func remove(key: String) throws {
+        try FileManager.default.removeItem(at: file(key))
     }
 }
 
@@ -81,9 +81,6 @@ public class LocalAssetsManager: NSObject {
     
     
     public func createLocalMediaSource(for assetId: String, localURL: URL) -> MediaSource {
-        // TODO
-                
-        var source = LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
-        return source
+        return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
     }
 }

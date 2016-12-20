@@ -127,6 +127,23 @@ class AssetLoaderDelegate: NSObject {
         return "\(assetId).fpskey"
     }
     
+    func loadPersistedContentKeyData(_ assetId: String) -> Data? {
+        do {
+            return try self.storage?.load(key: persistentKeyName(assetId))
+        } catch {
+            // TODO: real error handling
+            return nil
+        }
+    }
+    
+    func savePersistentContentKeyData(_ assetId: String, _ data: Data) {
+        do {
+            try self.storage?.save(key: persistentKeyName(assetId), value: data)
+        } catch {
+            // TODO: real error handling
+        }
+    }
+    
     func prepareAndSendContentKeyRequest(resourceLoadingRequest: AVAssetResourceLoadingRequest) {
         
         guard let url = resourceLoadingRequest.request.url, let assetIDString = url.host else {
@@ -159,7 +176,8 @@ class AssetLoaderDelegate: NSObject {
         }
         
         // Check if we have an existing key on disk for this asset.
-        if let persistedContentKeyData = self.storage?.load(key: persistentKeyName(assetIDString)) {
+        
+        if let persistedContentKeyData = loadPersistedContentKeyData(assetIDString) {
             guard let dataRequest = resourceLoadingRequest.dataRequest else {
                 PKLog.error("Error loading contents of content key file.")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -2, userInfo: nil)
@@ -276,7 +294,8 @@ class AssetLoaderDelegate: NSObject {
             
             // Save the persistentContentKeyData onto disk for use in the future.
             PKLog.debug("Saving persistentContentKeyData")
-            self.storage?.save(key: persistentKeyName(assetId), value: persistentContentKeyData)
+            self.savePersistentContentKeyData(assetId, persistentContentKeyData)
+            
             guard let dataRequest = resourceLoadingRequest.dataRequest else {
                 PKLog.error("no data is being requested in loadingRequest")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
