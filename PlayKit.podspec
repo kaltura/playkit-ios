@@ -39,6 +39,14 @@ s.subspec 'YouboraPlugin' do |ssp|
     ssp.dependency 'Youbora-AVPlayer'
 end
 
+s.subspec 'PhoenixPlugin' do |ssp|
+    ssp.source_files = 'Plugins/Phoenix'
+    ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+    'OTHER_LDFLAGS' => '$(inherited)',
+    'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+    'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+end
+
 s.subspec 'KalturaStatsPlugin' do |ssp|
     ssp.source_files = 'Plugins/KalturaStats'
     ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
