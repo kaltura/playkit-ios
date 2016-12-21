@@ -45,6 +45,7 @@ s.subspec 'PhoenixPlugin' do |ssp|
     'OTHER_LDFLAGS' => '$(inherited)',
     'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
     'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+end
 
 s.subspec 'KalturaStatsPlugin' do |ssp|
     ssp.source_files = 'Plugins/KalturaStats'
