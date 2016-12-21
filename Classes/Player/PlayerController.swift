@@ -68,6 +68,18 @@ class PlayerController: NSObject, Player {
         }
     }
     
+    public var currentAudioTrack: String? {
+        get {
+            return self.currentPlayer?.currentAudioTrack
+        }
+    }
+    
+    public var currentTextTrack: String? {
+        get {
+            return self.currentPlayer?.currentTextTrack
+        }
+    }
+    
     public var view: UIView! {
         get {
             return self.currentPlayer?.view

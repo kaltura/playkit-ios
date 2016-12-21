@@ -103,6 +103,20 @@ class AVPlayerEngine : AVPlayer {
         return false
     }
     
+    public var currentAudioTrack: String? {
+        if let currentItem = self.currentItem {
+            return self.tracksManager.currentAudioTrack(item: currentItem)
+        }
+        return nil
+    }
+    
+    public var currentTextTrack: String? {
+        if let currentItem = self.currentItem {
+            return self.tracksManager.currentTextTrack(item: currentItem)
+        }
+        return nil
+    }
+
     // MARK: Player Methods
     
     public override init() {
