@@ -10,64 +10,42 @@ import UIKit
 import GoogleCast
 
 
-internal class BasicBuilderData {
-    
-    enum BasicBuilderDataError: Error {
-        case missingContentId
-        case missingwebPlayerURL
-        case missingpartnerID
-        case missingUIConfId
-    }
-    
-    internal var contentId: String
-    internal var webPlayerURL: String
-    internal var partnerID: String
-    internal var uiconfID: String
-    internal var adTagURL: String?
-    internal var metaData: GCKMediaMetadata?
-    
-    internal init (contentId: String?,
-                 webPlayerURL: String?,
-                 partnerID: String?,
-                 uiconf:String?) throws {
-        
-        
-        guard let ci = contentId else {
-            throw BasicBuilderData.BasicBuilderDataError.missingContentId
-        }
-        
-        guard let pURL = webPlayerURL else {
-            throw BasicBuilderData.BasicBuilderDataError.missingwebPlayerURL
-        }
-        
-        guard let pi = partnerID else {
-            throw BasicBuilderData.BasicBuilderDataError.missingpartnerID
-        }
-        
-        guard let ui = uiconf else {
-            throw BasicBuilderData.BasicBuilderDataError.missingUIConfId
-        }
-        
-        
-        self.contentId = ci
-        self.webPlayerURL = pURL
-        self.partnerID = pi
-        self.uiconfID = ui
-    }
-    
-}
-
-
-
 public class BasicCastBuilder: NSObject {
     
     
-    internal var contentId: String?
-    internal var webPlayerURL: String?
-    internal var partnerID: String?
-    internal var uiconfID: String?
+    enum BasicBuilderDataError: Error {
+        case missingContentId
+        case missingWebPlayerURL
+        case missingPartnerID
+        case missingUIConfId
+    }
+    
+    internal var contentId: String!
+    internal var webPlayerURL: String!
+    internal var partnerID: String!
+    internal var uiconfID: String!
     internal var adTagURL: String?
     internal var metaData: GCKMediaMetadata?
+    
+    
+    func validate() throws {
+        guard self.contentId != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingContentId
+        }
+        
+        guard self.webPlayerURL != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingWebPlayerURL
+        }
+        
+        guard self.partnerID != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingPartnerID
+        }
+        
+        guard self.uiconfID != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingUIConfId
+        }
+
+    }
     
     @discardableResult
     public func set(contentId: String?) -> Self{
@@ -109,22 +87,15 @@ public class BasicCastBuilder: NSObject {
     }
     
     
-    internal func validateInput() throws -> BasicBuilderData {
-        
-        let data = try BasicBuilderData(contentId: self.contentId,
-                                    webPlayerURL: self.webPlayerURL,
-                                    partnerID: self.partnerID,
-                                    uiconf: self.uiconfID)
-        return data
-    }
+    
 
     
 
     public func build() throws -> GCKMediaInformation {
         
-        let data = try self.validateInput()
-        let customData = self.customData(data: data)
-        let mediaInfo: GCKMediaInformation = GCKMediaInformation(contentID:data.contentId,
+        let data = try self.validate()
+        let customData = self.customData()
+        let mediaInfo: GCKMediaInformation = GCKMediaInformation(contentID:self.contentId,
                                                                  streamType: GCKMediaStreamType.unknown,
                                                                  contentType: "",
                                                                  metadata: self.metaData,
@@ -137,15 +108,15 @@ public class BasicCastBuilder: NSObject {
     
     // MARK - Setup Data
     
-    internal func customData(data: BasicBuilderData) -> [String:Any]? {
+    internal func customData() -> [String:Any]? {
 
         var embedConfig: [String:Any] = [:]
-        embedConfig["lib"] = data.webPlayerURL
-        embedConfig["publisherID"] = data.partnerID
-        embedConfig["entryID"] = data.contentId
-        embedConfig["uiconfID"] = data.uiconfID
+        embedConfig["lib"] = self.webPlayerURL
+        embedConfig["publisherID"] = self.partnerID
+        embedConfig["entryID"] = self.contentId
+        embedConfig["uiconfID"] = self.uiconfID
         
-        let flashVars = self.flashVars(data: data)
+        let flashVars = self.flashVars()
         embedConfig["flashVars"] = flashVars
         let customData: [String:Any] = ["embedConfig":embedConfig]
         return customData
@@ -153,15 +124,15 @@ public class BasicCastBuilder: NSObject {
     
     
     // MARK - Build flash vars json:
-    internal func flashVars(data: BasicBuilderData) -> [String: Any]{
+    internal func flashVars() -> [String: Any]{
         
         var flashVars = [String:Any]()
-        if let proxyData =  self.proxyData(data: data) {
+        if let proxyData =  self.proxyData() {
             PKLog.warning("proxyData is empty")
             flashVars["proxyData"] = proxyData
         }
         
-        if let doubleClickPlugin = self.doubleClickPlugin(data: data) {
+        if let doubleClickPlugin = self.doubleClickPlugin() {
             PKLog.warning("doubleClickPlugin is empty")
             flashVars["doubleClick"] = doubleClickPlugin
         }
@@ -169,15 +140,15 @@ public class BasicCastBuilder: NSObject {
         return flashVars
     }
     
-    internal func proxyData(data: BasicBuilderData) ->  [String:Any]? {
+    internal func proxyData() ->  [String:Any]? {
         // implement in sub classes
         return nil
     }
     
     
-    internal func doubleClickPlugin(data: BasicBuilderData) -> [String:Any]? {
+    internal func doubleClickPlugin() -> [String:Any]? {
         
-        guard let adTagURL = data.adTagURL else {
+        guard let adTagURL = self.adTagURL else {
             return nil
         }
         

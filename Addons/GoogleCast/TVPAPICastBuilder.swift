@@ -8,44 +8,18 @@
 
 import UIKit
 
-internal class TVPAPICastBuilderData: BasicBuilderData {
+
+
+public class TVPAPICastBuilder: BasicCastBuilder {
+    
     
     enum BasicBuilderDataError: Error {
         case missingInitObject
         case missingFormat
     }
-    
-    internal var initObject: [String:Any]
-    internal var format: String
-    
-    internal init(contentId: String?,
-         webPlayerURL: String?,
-         partnerID: String?,
-         initObject: [String:Any]?,
-         format: String?,
-         uiconf: String?) throws {
-        
-        guard let io = initObject else {
-            throw TVPAPICastBuilderData.BasicBuilderDataError.missingInitObject
-        }
-        
-        guard let f = format else {
-            throw TVPAPICastBuilderData.BasicBuilderDataError.missingFormat
-        }
 
-        
-        self.format = f
-        self.initObject = io
-        try super.init(contentId: contentId, webPlayerURL: webPlayerURL, partnerID: partnerID, uiconf: uiconf )
-    }
-    
-}
-
-
-public class TVPAPICastBuilder: BasicCastBuilder {
-    
-    internal var initObject: [String:Any]?
-    internal var format: String?
+    internal var initObject: [String:Any]!
+    internal var format: String!
     
     
     @discardableResult
@@ -61,30 +35,33 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     }
     
     
-    internal override func validateInput() throws -> BasicBuilderData {
     
-        return try TVPAPICastBuilderData(contentId: self.contentId,
-                                     webPlayerURL: self.webPlayerURL,
-                                     partnerID: self.partnerID,
-                                     initObject: self.initObject,
-                                     format: self.format,
-                                     uiconf: self.uiconfID)
-    }
-    
-    internal override func proxyData(data: BasicBuilderData) -> [String:Any]? {
+    override func validate() throws {
         
-        guard let TVPAPIData = data as? TVPAPICastBuilderData else {
-            return nil
+        guard self.initObject != nil else {
+            throw TVPAPICastBuilder.BasicBuilderDataError.missingInitObject
         }
         
-        let flavorAssets = ["filters":["include":["Format":[TVPAPIData.format]]]]
+        guard self.format != nil else {
+            throw TVPAPICastBuilder.BasicBuilderDataError.missingFormat
+        }
+        
+    }
+    
+    
+    internal override func proxyData() -> [String:Any]? {
+        
+
+        let flavorAssets = ["filters":["include":["Format":[self.format!]]]]
+        
+        JSONSerialization.isValidJSONObject(flavorAssets)
         let baseEntry  = ["vars":["isTrailer":" false"]]
         var proxyData : [String : Any] = ["flavorassets":flavorAssets,
                                           "baseentry":baseEntry,
-                                          "MediaID":TVPAPIData.contentId,
-                                          "iMediaID":TVPAPIData.contentId]
+                                          "MediaID":self.contentId!,
+                                          "iMediaID":self.contentId!]
         
-        proxyData["initObj"] = TVPAPIData.initObject
+        proxyData["initObj"] = self.initObject!
         return proxyData
     }
 }

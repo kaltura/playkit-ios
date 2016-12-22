@@ -8,10 +8,6 @@
 
 import UIKit
 
-internal class OVPCastBuilderData: BasicBuilderData {
-    
-    internal var ks: String?
-}
 
 
 public class OVPCastBuilder: BasicCastBuilder{
@@ -24,20 +20,9 @@ public class OVPCastBuilder: BasicCastBuilder{
         return self
     }
     
-    override internal func validateInput() throws -> BasicBuilderData {
-        
-        let data = try OVPCastBuilderData(contentId: self.contentId, webPlayerURL: self.webPlayerURL, partnerID: self.partnerID,uiconf:self.uiconfID)
-        data.ks = self.ks
-        return data
-    }
+    override internal func  proxyData() -> [String:Any]? {
     
-    
-    override internal func  proxyData(data: BasicBuilderData) -> [String:Any]? {
-        guard let OVPData = data as? OVPCastBuilderData else {
-            return nil
-        }
-        
-        if let ks = OVPData.ks, ks.isEmpty == false {
+        if let ks = self.ks, ks.isEmpty == false {
             
             var proxyData =  [String : Any]()
             proxyData["ks"] = ks
