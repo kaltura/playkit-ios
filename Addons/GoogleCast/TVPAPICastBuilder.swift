@@ -9,7 +9,11 @@
 import UIKit
 
 
+/**
+ 
+ TVPAPICastBuilder this component will help you to comunicate with Kaltura-custom-receiver with TVPAPI Server.
 
+ */
 public class TVPAPICastBuilder: BasicCastBuilder {
     
     
@@ -18,16 +22,26 @@ public class TVPAPICastBuilder: BasicCastBuilder {
         case missingFormat
     }
 
-    internal var initObject: [String:Any]!
+        internal var initObject: [String:Any]!
+    
+
     internal var format: String!
     
     
+    /**
+     Set - initObject
+     - Parameter initObject: that the receiver will use to represent the user
+     */
     @discardableResult
     public func set(initObject: [String:Any]?) -> Self {
         self.initObject = initObject
         return self
     }
     
+    /**
+     Set - format
+     - Parameter format: the file format that the receiver will play
+     */
     @discardableResult
     public func set(format: String?) -> Self {
         self.format = format
@@ -35,7 +49,10 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     }
     
     
-    
+    /**
+     
+      In order to comunicate with Kaltura receiver you should have init object and format this will throw if the input is not valid
+     */
     override func validate() throws {
         
         guard self.initObject != nil else {

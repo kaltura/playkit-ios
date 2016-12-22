@@ -10,6 +10,12 @@ import UIKit
 import GoogleCast
 
 
+
+/**
+ 
+ TVPAPICastBuilder this component will help you to comunicate with Kaltura-custom-receiver.
+ 
+ */
 public class BasicCastBuilder: NSObject {
     
     
@@ -27,18 +33,31 @@ public class BasicCastBuilder: NSObject {
     internal var adTagURL: String?
     internal var metaData: GCKMediaMetadata?
     
+    
+    /**
+     Set - contentId
+     - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
+     */
     @discardableResult
     public func set(contentId: String?) -> Self{
         self.contentId = contentId
         return self
     }
     
+    /**
+     Set - adTagURL
+     - Parameter adTagURL: that advertisments url to play
+     */
     @discardableResult
     public func set(adTagURL: String?) -> Self {
         self.adTagURL = adTagURL
         return self
     }
     
+    /**
+     Set - webPlayerURL
+     - Parameter webPlayerURL: the location of the web player the receiver will use to play content
+     */
     @discardableResult
     public func set(webPlayerURL: String?) -> Self {
         self.webPlayerURL = webPlayerURL
@@ -46,12 +65,21 @@ public class BasicCastBuilder: NSObject {
     }
     
    
+    
+    /**
+     Set - partnerID
+     - Parameter partnerID: the client partner id
+     */
     @discardableResult
     public func set(partnerID: String?) -> Self {
         self.partnerID = partnerID
         return self
     }
     
+    /**
+     Set - uiconfID
+     - Parameter uiconfID: the receiver uiconf id thet has the configuration for the layout and plugins
+     */
     @discardableResult
     public func set(uiconfID: String?) -> Self {
         self.uiconfID = uiconfID
@@ -59,7 +87,10 @@ public class BasicCastBuilder: NSObject {
     }
     
     
-    
+    /**
+     Set - metaData
+     - Parameter metaData: the receiver google meta data
+     */
     @discardableResult
     public func set(metaData: GCKMediaMetadata?) -> Self{
         self.metaData = metaData
@@ -88,6 +119,10 @@ public class BasicCastBuilder: NSObject {
         
     }
 
+    
+    /**
+     Build GCKMediaInformation a google-cast-sdk object to send through the load google API to play content
+     */
     public func build() throws -> GCKMediaInformation {
         
         let data = try self.validate()
@@ -104,7 +139,6 @@ public class BasicCastBuilder: NSObject {
     
     
     // MARK - Setup Data
-    
     internal func customData() -> [String:Any]? {
 
         var embedConfig: [String:Any] = [:]
