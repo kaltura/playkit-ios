@@ -27,26 +27,6 @@ public class BasicCastBuilder: NSObject {
     internal var adTagURL: String?
     internal var metaData: GCKMediaMetadata?
     
-    
-    func validate() throws {
-        guard self.contentId != nil else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingContentId
-        }
-        
-        guard self.webPlayerURL != nil else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingWebPlayerURL
-        }
-        
-        guard self.partnerID != nil else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingPartnerID
-        }
-        
-        guard self.uiconfID != nil else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingUIConfId
-        }
-
-    }
-    
     @discardableResult
     public func set(contentId: String?) -> Self{
         self.contentId = contentId
@@ -89,7 +69,24 @@ public class BasicCastBuilder: NSObject {
     
     
 
-    
+    func validate() throws {
+        guard self.contentId != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingContentId
+        }
+        
+        guard self.webPlayerURL != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingWebPlayerURL
+        }
+        
+        guard self.partnerID != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingPartnerID
+        }
+        
+        guard self.uiconfID != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingUIConfId
+        }
+        
+    }
 
     public func build() throws -> GCKMediaInformation {
         
@@ -141,7 +138,7 @@ public class BasicCastBuilder: NSObject {
     }
     
     internal func proxyData() ->  [String:Any]? {
-        // implement in sub classes
+        // Can be implemented on sub classes
         return nil
     }
     
