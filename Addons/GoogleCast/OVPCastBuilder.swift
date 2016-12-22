@@ -24,16 +24,15 @@ public class OVPCastBuilder: BasicCastBuilder{
         return self
     }
     
-    override internal func  proxyData() -> [String:Any]? {
-    
-        if let ks = self.ks, ks.isEmpty == false {
-            
-            var proxyData =  [String : Any]()
-            proxyData["ks"] = ks
-            return proxyData
-        }else{
-            return nil
+  
+    override func embedConfig() -> [String : Any]? {
+     
+        if var customData = super.embedConfig(), let ks = self.ks , ks.isEmpty == false {
+            customData["ks"] = self.ks
+            return customData
         }
+        
+        return super.embedConfig()
     }
     
 }

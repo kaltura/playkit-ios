@@ -139,8 +139,9 @@ public class BasicCastBuilder: NSObject {
     
     
     // MARK - Setup Data
-    internal func customData() -> [String:Any]? {
-
+    
+    internal func embedConfig() -> [String:Any]? {
+        
         var embedConfig: [String:Any] = [:]
         embedConfig["lib"] = self.webPlayerURL
         embedConfig["publisherID"] = self.partnerID
@@ -149,8 +150,17 @@ public class BasicCastBuilder: NSObject {
         
         let flashVars = self.flashVars()
         embedConfig["flashVars"] = flashVars
-        let customData: [String:Any] = ["embedConfig":embedConfig]
-        return customData
+        
+        return embedConfig
+    }
+    
+    internal func customData() -> [String:Any]? {
+
+        if let embedConfig = self.embedConfig() {
+            let customData: [String:Any] = ["embedConfig":embedConfig]
+            return customData
+        }
+        return nil
     }
     
     
