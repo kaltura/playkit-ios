@@ -24,7 +24,7 @@ class AssetLoaderDelegate: NSObject {
     static let didPersistContentKeyNotification = NSNotification.Name(rawValue: "handleAssetLoaderDelegateDidPersistContentKeyNotification")
     
     /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
-    fileprivate let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
+    fileprivate static let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
     
     var storage: LocalDrmStorage?
     
@@ -41,7 +41,7 @@ class AssetLoaderDelegate: NSObject {
     
     static func configureAsset(asset: AVURLAsset, drmData: FairPlayDRMData, storage: LocalDrmStorage?) -> AssetLoaderDelegate {
         let delegate = AssetLoaderDelegate.init(drmData: drmData, storage: storage)
-        asset.resourceLoader.setDelegate(delegate, queue: delegate.resourceLoadingRequestQueue)
+        asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
         
         if #available(iOS 10.0, *) {
             asset.resourceLoader.preloadsEligibleContentKeys = storage != nil
@@ -55,7 +55,7 @@ class AssetLoaderDelegate: NSObject {
     @available(iOS 10.0, *)
     static func configureLocalAsset(asset: AVURLAsset, storage: LocalDrmStorage) -> AssetLoaderDelegate {
         let delegate = AssetLoaderDelegate.init(storage: storage)
-        asset.resourceLoader.setDelegate(delegate, queue: delegate.resourceLoadingRequestQueue)
+        asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
         
         asset.resourceLoader.preloadsEligibleContentKeys = true
         
@@ -124,8 +124,15 @@ class AssetLoaderDelegate: NSObject {
     
     func loadPersistedContentKeyData(_ assetId: String) -> Data? {
         do {
-            return try self.storage?.load(key: persistentKeyName(assetId))
+            let data = try self.storage?.load(key: persistentKeyName(assetId))
+            if data != nil {
+                PKLog.debug("Loaded PCKD with \(data?.count) bytes")
+            } else {
+                PKLog.error("Load PCKD failed (1)")
+            }
+            return data
         } catch {
+            PKLog.error("Load PCKD failed (2)")
             // TODO: real error handling
             return nil
         }
@@ -134,7 +141,9 @@ class AssetLoaderDelegate: NSObject {
     func savePersistentContentKeyData(_ assetId: String, _ data: Data) {
         do {
             try self.storage?.save(key: persistentKeyName(assetId), value: data)
+            PKLog.debug("Saved PCKD")
         } catch {
+            PKLog.error("Failed saving PCKD")
             // TODO: real error handling
         }
     }
@@ -323,7 +332,7 @@ class AssetLoaderDelegate: NSObject {
             return false
         }
         
-        resourceLoadingRequestQueue.async {
+        AssetLoaderDelegate.resourceLoadingRequestQueue.async {
             self.prepareAndSendContentKeyRequest(resourceLoadingRequest: resourceLoadingRequest)
         }
         
