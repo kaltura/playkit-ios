@@ -152,8 +152,10 @@ public class RequestBuilder: NSObject {
         if let params = self.urlParams, params.count > 0 {
             
             let urlComponents = NSURLComponents()
-            urlComponents.path = self.url.absoluteString
-
+            urlComponents.host = self.url.host
+            urlComponents.scheme = self.url.scheme
+            urlComponents.path = self.url.path
+            
             var queryItems = [URLQueryItem]()
             for (key, value) in params {
                 queryItems.append(URLQueryItem(name: key, value: value))
