@@ -300,7 +300,7 @@ public class KalturaStatsPlugin: PKPlugin {
         
         builder.set { (response: Response) in
             
-            PKLog.trace("Response code: \(response.statusCode)")
+            PKLog.trace("Response: \(response)")
             
         }
         

@@ -16,7 +16,7 @@ internal class OVPStatsService {
         
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: nil, action: nil) {
             request
-                .setClientTag(clientTag: "kwidget:v\(clientVer)")
+                .setParam(key: "clientTag", value: "kwidget:v\(clientVer)")
                 .setParam(key: "service", value: "stats")
                 .setParam(key: "apiVersion", value: "3.1")
                 .setParam(key: "expiry", value: "86400")
