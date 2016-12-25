@@ -68,7 +68,7 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
                                                                        partnerId: parterId,
                                                                        ks: ks,
                                                                        eventType: action.rawValue.uppercased(),
-                                                                       currentTime: Int32(self.player.currentTime),
+                                                                       currentTime: self.player.currentTime.toInt32(),
                                                                        assetId: self.mediaEntry.id,
                                                                        fileId: fileId) {
             builder.set { (response: Response) in

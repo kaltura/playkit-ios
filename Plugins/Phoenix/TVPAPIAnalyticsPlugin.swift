@@ -67,7 +67,7 @@ public class TVPAPIAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
         if let builder: RequestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
                                                                                  initObj: initObj,
                                                                                  eventType: action.rawValue,
-                                                                                 currentTime: Int32(self.player.currentTime),
+                                                                                 currentTime: self.player.currentTime.toInt32(),
                                                                                  assetId: self.mediaEntry.id,
                                                                                  fileId: fileId) {
             builder.set { (response: Response) in
