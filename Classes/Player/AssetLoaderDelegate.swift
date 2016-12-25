@@ -12,6 +12,7 @@ enum FairPlayError : Error {
     
 }
 
+
 class AssetLoaderDelegate: NSObject {
     
     /// The URL scheme for FPS content.
@@ -26,9 +27,12 @@ class AssetLoaderDelegate: NSObject {
     /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
     fileprivate static let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
     
+        
     var storage: LocalDrmStorage?
     
-    fileprivate let drmData: FairPlayDRMData?
+    private let drmData: FairPlayDRMData?
+    
+    var done: ((Error?)->Void)?
     
     private init(drmData: FairPlayDRMData? = nil, storage: LocalDrmStorage? = nil) {
         // Determine the library URL.
@@ -131,8 +135,8 @@ class AssetLoaderDelegate: NSObject {
                 PKLog.error("Load PCKD failed (1)")
             }
             return data
-        } catch {
-            PKLog.error("Load PCKD failed (2)")
+        } catch let error {
+            PKLog.error("Load PCKD failed (2)", error)
             // TODO: real error handling
             return nil
         }
@@ -170,6 +174,7 @@ class AssetLoaderDelegate: NSObject {
                 PKLog.error("Unable to set contentType on contentInformationRequest.")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -1, userInfo: nil)
                 resourceLoadingRequest.finishLoading(with: error)
+                self.done?(error)
                 return
             }
         }
@@ -181,12 +186,14 @@ class AssetLoaderDelegate: NSObject {
                 PKLog.error("Error loading contents of content key file.")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -2, userInfo: nil)
                 resourceLoadingRequest.finishLoading(with: error)
+                self.done?(error)
                 return
             }
             
             // Pass the persistedContentKeyData into the dataRequest so complete the content key request.
             dataRequest.respond(with: persistedContentKeyData)
             resourceLoadingRequest.finishLoading()
+            self.done?(nil)            
             
             return
         }
@@ -196,6 +203,7 @@ class AssetLoaderDelegate: NSObject {
             PKLog.error("Error loading application certificate.")
             let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -3, userInfo: nil)
             resourceLoadingRequest.finishLoading(with: error)
+            self.done?(error)
             return
         }
         
@@ -203,6 +211,7 @@ class AssetLoaderDelegate: NSObject {
             PKLog.error("Error retrieving Asset ID.")
             let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -4, userInfo: nil)
             resourceLoadingRequest.finishLoading(with: error)
+            self.done?(error)
             return
         }
         
@@ -212,6 +221,7 @@ class AssetLoaderDelegate: NSObject {
         if shouldPersist {
             guard #available(iOS 10.0, *) else {
                 assertionFailure()  // can't happen -- shouldPersist would be false
+                self.done?(nil)
                 return
             }
             // Since this request is the result of an AVAssetDownloadTask, we configure the options to request a persistent content key from the KSM.
@@ -231,6 +241,7 @@ class AssetLoaderDelegate: NSObject {
         } catch let error as NSError {
             PKLog.error("Error obtaining key request data: \(error.domain) reason: \(error.localizedFailureReason)")
             resourceLoadingRequest.finishLoading(with: error)
+            self.done?(error)
             return
         }
         
@@ -244,13 +255,7 @@ class AssetLoaderDelegate: NSObject {
          When a KSM receives an SPC with a media playback state TLLV, the SPC may include a content key duration TLLV
          in the CKC message that it returns. If the Apple device finds this type of TLLV in a CKC that delivers an FPS
          content key, it will honor the type of rental or lease specified when the key is used.
-         
-        guard let ckcData = contentKeyFromKeyServerModuleWithSPCData(spcData: spcData, assetIDString: assetIDString) else {
-            PKLog.error("Error retrieving CKC from KSM.")
-            let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -5, userInfo: nil)
-            resourceLoadingRequest.finishLoading(with: error)
-            return
-        }*/
+         */
         
         
         performCKCRequest(spcData) {(result: Result<Data>) -> Void in
@@ -288,6 +293,7 @@ class AssetLoaderDelegate: NSObject {
             if let error = error {
                 PKLog.error("Error creating persistent content key: \(error)")
                 resourceLoadingRequest.finishLoading(with: error)
+                self.done?(error)
                 return
             }
             
@@ -299,11 +305,13 @@ class AssetLoaderDelegate: NSObject {
                 PKLog.error("no data is being requested in loadingRequest")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
                 resourceLoadingRequest.finishLoading(with: error)
+                self.done?(error)
                 return
             }
             // Provide data to the loading request.
             dataRequest.respond(with: persistentContentKeyData)
             resourceLoadingRequest.finishLoading()  // Treat the processing of the request as complete.
+            self.done?(nil)
         
         } else {
             
@@ -311,12 +319,14 @@ class AssetLoaderDelegate: NSObject {
                 PKLog.error("no data is being requested in loadingRequest")
                 let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
                 resourceLoadingRequest.finishLoading(with: error)
+                self.done?(error)
                 return
             }
             
             // Provide data to the loading request.
             dataRequest.respond(with: ckcData)
             resourceLoadingRequest.finishLoading()  // Treat the processing of the request as complete.
+            self.done?(nil)
         }
     }
     

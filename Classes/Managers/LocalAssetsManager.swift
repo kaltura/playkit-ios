@@ -51,19 +51,15 @@ class LocalMediaSource: MediaSource {
 
 public class LocalAssetsManager: NSObject {
     let storage: LocalDrmStorage
-    var resourceLoaderDelegate: AssetLoaderDelegate?
+    var delegates = Set<AssetLoaderDelegate>()
     
-    public init(storage: LocalDrmStorage? = nil) {
-        if let storage = storage {
-            self.storage = storage
-        } else {
-            
-            self.storage = try! DefaultLocalDrmStorage()
-        }
+    public init(storage: LocalDrmStorage) {
+        self.storage = storage
     }
     
-    public func prepareForDownload(asset: AVURLAsset, assetId: String, mediaSource: MediaSource) {
+    public func prepareForDownload(asset: AVURLAsset, mediaSource: MediaSource) {
 
+        PKLog.debug("Preparing asset for download; asset.url:", asset.url)
         guard #available(iOS 10.0, *) else {
             PKLog.error("Offline is only supported on iOS 10+")
             return
@@ -74,8 +70,12 @@ public class LocalAssetsManager: NSObject {
 
         let resourceLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, drmData: drmData, storage: storage)
         
-        self.resourceLoaderDelegate = resourceLoaderDelegate
+        self.delegates.update(with: resourceLoaderDelegate)
         
+        resourceLoaderDelegate.done =  { (_ error: Error?)->Void in
+            self.delegates.remove(resourceLoaderDelegate);
+        }
+
     }
     
     
