@@ -37,6 +37,18 @@ public class PlayerDecoratorBase: NSObject, Player {
         }
     }
     
+    public var currentAudioTrack: String? {
+        get {
+            return self.player.currentAudioTrack
+        }
+    }
+
+    public var currentTextTrack: String? {
+        get {
+            return self.player.currentTextTrack
+        }
+    }
+    
     public var isPlaying: Bool {
         get {
             return self.player.isPlaying
