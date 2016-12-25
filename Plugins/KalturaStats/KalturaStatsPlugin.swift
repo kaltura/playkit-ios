@@ -292,7 +292,7 @@ public class KalturaStatsPlugin: PKPlugin {
                                                                  clientVer: PlayKitManager.clientTag,
                                                                  duration: Float(self.player.duration),
                                                                  sessionId: sessionId,
-                                                                 position: Float(self.player.currentTime),
+                                                                 position: Int32(self.player.currentTime),
                                                                  uiConfId: confId,
                                                                  entryId: self.mediaEntry.id,
                                                                  widgetId: "_\(parterId)",

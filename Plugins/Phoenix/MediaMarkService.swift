@@ -14,7 +14,7 @@ internal class MediaMarkService {
     internal static func sendTVPAPIEVent(baseURL: String,
                                          initObj: JSON?,
                                          eventType: String,
-                                         currentTime: Float,
+                                         currentTime: Int32,
                                          assetId: String,
                                          fileId: String) -> RequestBuilder? {
         
@@ -40,7 +40,7 @@ internal class MediaMarkService {
 
     }
 
-    private static func createBookmark(eventType: String, position: Float, assetId: String, fileId: String) -> JSON {
+    private static func createBookmark(eventType: String, position: Int32, assetId: String, fileId: String) -> JSON {
         var json: JSON = JSON.init(["objectType": "KalturaBookmark"])
         json["type"] = JSON("media")
         json["id"] = JSON(assetId)
