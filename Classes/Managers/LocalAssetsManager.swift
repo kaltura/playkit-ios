@@ -43,6 +43,11 @@ public class LocalAssetsManager: NSObject {
     public func createLocalMediaSource(for assetId: String, localURL: URL) -> MediaSource {
         return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
     }
+    
+    public func createLocalMediaEntry(for assetId: String, localURL: URL) -> MediaEntry {
+        let mediaSource = createLocalMediaSource(for: assetId, localURL: localURL)
+        return MediaEntry.init(assetId, sources: [mediaSource])
+    }
 }
 
 public protocol LocalDrmStorage {
