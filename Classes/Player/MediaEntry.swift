@@ -93,11 +93,11 @@ public class MediaSource: NSObject {
 }
 
 open class DRMData: NSObject {
-    var licenseUrl: URL?
+    var licenseUri: URL?
     
-    init(licenseUrl: String?) {
-        if let url = licenseUrl {
-            self.licenseUrl = URL(string: url)
+    init(licenseUri: String?) {
+        if let url = licenseUri {
+            self.licenseUri = URL(string: url)
         }
     }
     
@@ -105,12 +105,12 @@ open class DRMData: NSObject {
         
         let jsonObj = getJson(json)
         
-        guard let licenseUrl = jsonObj["licenseUrl"].string else { return nil }
+        guard let licenseUri = jsonObj["licenseUri"].string else { return nil }
         
         if let fpsCertificate = jsonObj["fpsCertificate"].string {
-            return FairPlayDRMData(licenseUrl: licenseUrl, base64EncodedCertificate: fpsCertificate)
+            return FairPlayDRMData(licenseUri: licenseUri, base64EncodedCertificate: fpsCertificate)
         } else {
-            return DRMData(licenseUrl: licenseUrl)
+            return DRMData(licenseUri: licenseUri)
         }
     }
 }
@@ -118,9 +118,9 @@ open class DRMData: NSObject {
 public class FairPlayDRMData: DRMData {
     var fpsCertificate: Data?
     
-    init(licenseUrl: String, base64EncodedCertificate: String) {
+    init(licenseUri: String, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
-        super.init(licenseUrl: licenseUrl)
+        super.init(licenseUri: licenseUri)
     }
 }
 
