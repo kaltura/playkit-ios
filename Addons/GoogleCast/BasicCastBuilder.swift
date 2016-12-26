@@ -27,7 +27,7 @@ public class BasicCastBuilder: NSObject {
     }
     
     internal var contentId: String!
-    internal var webPlayerURL: String!
+    internal var webPlayerURL: String?
     internal var partnerID: String!
     internal var uiconfID: String!
     internal var adTagURL: String?
@@ -105,10 +105,6 @@ public class BasicCastBuilder: NSObject {
             throw BasicCastBuilder.BasicBuilderDataError.missingContentId
         }
         
-        guard self.webPlayerURL != nil else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingWebPlayerURL
-        }
-        
         guard self.partnerID != nil else {
             throw BasicCastBuilder.BasicBuilderDataError.missingPartnerID
         }
@@ -143,7 +139,11 @@ public class BasicCastBuilder: NSObject {
     internal func embedConfig() -> [String:Any]? {
         
         var embedConfig: [String:Any] = [:]
-        embedConfig["lib"] = self.webPlayerURL
+        
+        if let lib = self.webPlayerURL {
+          embedConfig["lib"] = lib
+        }
+        
         embedConfig["publisherID"] = self.partnerID
         embedConfig["entryID"] = self.contentId
         embedConfig["uiconfID"] = self.uiconfID
