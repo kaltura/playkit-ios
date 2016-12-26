@@ -292,7 +292,7 @@ public class KalturaStatsPlugin: PKPlugin {
                                                                  clientVer: PlayKitManager.clientTag,
                                                                  duration: Float(self.player.duration),
                                                                  sessionId: sessionId,
-                                                                 position: Float(self.player.currentTime),
+                                                                 position: self.player.currentTime.toInt32(),
                                                                  uiConfId: confId,
                                                                  entryId: self.mediaEntry.id,
                                                                  widgetId: "_\(parterId)",
@@ -300,7 +300,7 @@ public class KalturaStatsPlugin: PKPlugin {
         
         builder.set { (response: Response) in
             
-            PKLog.trace("Response code: \(response.statusCode)")
+            PKLog.trace("Response: \(response)")
             
         }
         

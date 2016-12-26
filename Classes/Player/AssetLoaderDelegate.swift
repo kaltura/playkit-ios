@@ -100,9 +100,9 @@ class AssetLoaderDelegate: NSObject {
     
     func performCKCRequest(_ spcData: Data, _ callback: @escaping (Result<Data>)->Void) {
         
-        guard let licenseUrl = drmData?.licenseUrl else { return }
+        guard let licenseUri = drmData?.licenseUri else { return }
         
-        var request = URLRequest(url: licenseUrl)
+        var request = URLRequest(url: licenseUri)
         request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
         request.httpBody = spcData.base64EncodedData()
         request.httpMethod = "POST"
