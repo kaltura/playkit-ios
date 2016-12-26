@@ -52,11 +52,12 @@ class AVPlayerEngine : AVPlayer {
     public var currentPosition: Double {
         get {
             PKLog.trace("get currentPosition: \(self.currentTime())")
-            return CMTimeGetSeconds(self.currentTime())
+            return CMTimeGetSeconds(self.currentTime() - rangeStart)
         }
         set {
             PKLog.trace("set currentPosition: \(currentPosition)")
-            let newTime = CMTimeMakeWithSeconds(newValue, 1)
+
+            let newTime = rangeStart + CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { (isSeeked: Bool) in
                 if isSeeked {
                     self.postEvent(event: PlayerEvents.seeked())
@@ -78,9 +79,19 @@ class AVPlayerEngine : AVPlayer {
     
     public var duration: Double {
         guard let currentItem = self.currentItem else { return 0.0 }
-        PKLog.trace("get duration: \(currentItem.duration)")
         
-        return CMTimeGetSeconds(currentItem.duration)
+        var result = CMTimeGetSeconds(currentItem.duration)
+    
+        if result.isNaN {
+            let seekableRanges = currentItem.seekableTimeRanges
+            if seekableRanges.count > 0 {
+                let range = seekableRanges.last!.timeRangeValue
+                result = CMTimeGetSeconds(range.duration)
+            }
+        }
+        
+        PKLog.trace("get duration: \(result)")
+        return result
     }
     
     public var isPlaying: Bool {
@@ -103,6 +114,33 @@ class AVPlayerEngine : AVPlayer {
         return false
     }
     
+    public var currentAudioTrack: String? {
+        if let currentItem = self.currentItem {
+            return self.tracksManager.currentAudioTrack(item: currentItem)
+        }
+        return nil
+    }
+    
+    public var currentTextTrack: String? {
+        if let currentItem = self.currentItem {
+            return self.tracksManager.currentTextTrack(item: currentItem)
+        }
+        return nil
+    }
+  
+    private var rangeStart: CMTime {
+        get {
+            var result: CMTime = CMTimeMakeWithSeconds(0, 1)
+            if let currentItem = self.currentItem {
+                let seekableRanges = currentItem.seekableTimeRanges
+                if seekableRanges.count > 0 {
+                    result = seekableRanges.last!.timeRangeValue.start
+                }
+            }
+            return result
+        }
+    }
+    
     // MARK: Player Methods
     
     public override init() {
@@ -114,7 +152,7 @@ class AVPlayerEngine : AVPlayer {
         
         avPlayerLayer = AVPlayerLayer(player: self)
         _view = PlayerView(playerLayer: avPlayerLayer)
-    
+        
         self.onEventBlock = nil
         self.nonObservablePropertiesUpdateTimer = nil
     }
@@ -126,9 +164,7 @@ class AVPlayerEngine : AVPlayer {
     private func startOrResumeNonObservablePropertiesUpdateTimer() {
         PKLog.trace("setupNonObservablePropertiesUpdateTimer")
         
-        if self.nonObservablePropertiesUpdateTimer == nil {
-            self.nonObservablePropertiesUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateNonObservableProperties), userInfo: nil, repeats: true)
-        }
+        self.nonObservablePropertiesUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateNonObservableProperties), userInfo: nil, repeats: true)
     }
     
     /**
@@ -160,10 +196,11 @@ class AVPlayerEngine : AVPlayer {
     func destroy() {
         PKLog.trace("destory player")
         self.nonObservablePropertiesUpdateTimer?.invalidate()
+        self.nonObservablePropertiesUpdateTimer == nil
         self.removeObservers()
-        avPlayerLayer = nil
-        _view = nil
-        onEventBlock = nil
+        self.avPlayerLayer = nil
+        self._view = nil
+        self.onEventBlock = nil
     }
     
     @available(iOS 9.0, *)
@@ -354,7 +391,7 @@ class AVPlayerEngine : AVPlayer {
     private func handleStatusChange() -> PKEvent? {
         var event: PKEvent? = nil
         
-        if currentItem?.status == .readyToPlay {           
+        if currentItem?.status == .readyToPlay {
             let newState = PlayerState.ready
             self.postEvent(event: PlayerEvents.loadedMetadata())
             
@@ -421,7 +458,7 @@ class AVPlayerEngine : AVPlayer {
             if let timebase = currItem.timebase {
                 if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
                     if timebaseRate > 0 {
-                        nonObservablePropertiesUpdateTimer?.invalidate()
+                        self.nonObservablePropertiesUpdateTimer?.invalidate()
                         
                         self.postEvent(event: PlayerEvents.playing())
                     }

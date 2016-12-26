@@ -1,21 +1,22 @@
 //
-//  PhoenixAnalyticsPlugin.swift
+//  TVPAPIAnalyticsPlugin.swift
 //  Pods
 //
-//  Created by Oded Klein on 27/11/2016.
+//  Created by Oded Klein on 11/12/2016.
 //
 //
 
 import UIKit
+import SwiftyJSON
 
-public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
+public class TVPAPIAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
 
-    public static var pluginName: String = "PhoenixAnalytics"
-
+    public static var pluginName: String = "TVPAPIAnalytics"
+    
     private var player: Player!
     private var config: AnalyticsConfig!
     private var mediaEntry: MediaEntry!
-
+    
     private var kalturaPluginManager: KalturaPluginManager!
     
     required public init() {
@@ -30,10 +31,10 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
             self.player = player
             self.config = aConfig
         }
-
+        
         self.kalturaPluginManager.delegate = self
         self.kalturaPluginManager.load(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-
+        
     }
     
     public func destroy() {
@@ -45,57 +46,48 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
         
         var fileId = ""
         var baseUrl = ""
-        var ks = ""
-        var parterId = 0
+        var initObj : JSON? = nil
+        
+        let method = action == .hit ? "MediaHit" : "MediaMark"
 
         if let url = self.config.params["baseUrl"] as? String {
             baseUrl = url
         }
-
+        
         if let fId = self.config.params["fileId"] as? String {
             fileId = fId
         }
 
-        if let theKs = self.config.params["ks"] as? String {
-            ks = theKs
+        if let obj = self.config.params["initObj"] as? JSON {
+            initObj = obj
         }
-
-        if let pId = self.config.params["partnerId"] as? Int {
-            parterId = pId
-        }
-
-        if let builder: KalturaRequestBuilder = BookmarkService.actionAdd(baseURL: baseUrl,
-                                                                       partnerId: parterId,
-                                                                       ks: ks,
-                                                                       eventType: action.rawValue.uppercased(),
-                                                                       currentTime: self.player.currentTime.toInt32(),
-                                                                       assetId: self.mediaEntry.id,
-                                                                       fileId: fileId) {
+        
+        baseUrl = "\(baseUrl)m=\(method)"
+        
+        if let builder: RequestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
+                                                                                 initObj: initObj,
+                                                                                 eventType: action.rawValue,
+                                                                                 currentTime: self.player.currentTime.toInt32(),
+                                                                                 assetId: self.mediaEntry.id,
+                                                                                 fileId: fileId) {
             builder.set { (response: Response) in
                 
                 PKLog.trace("Response: \(response)")
                 if response.statusCode == 0 {
+                    
                     PKLog.trace("\(response.data)")
                     if let data : [String: Any] = response.data as! [String : Any]? {
-                        if let result = data["result"] as! [String: Any]? {
-                            if let errorData = result["error"] as! [String: Any]? {
-                                if let errorCode = errorData["code"] as? Int, errorCode == 4001 {
-                                    
-                                    self.kalturaPluginManager.reportConcurrencyEvent()
-                                }
-                            }
+                        if let result = data["concurrent"] as! [String: Any]? {
+                            self.kalturaPluginManager.reportConcurrencyEvent()
                         }
                     }
+ 
                 }
-                
             }
             
             USRExecutor.shared.send(request: builder.build())
+
         }
         
     }
-    
 }
-
-
-
