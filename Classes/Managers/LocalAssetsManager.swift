@@ -9,6 +9,42 @@
 import Foundation
 import AVFoundation
 
+public class LocalAssetsManager: NSObject {
+    let storage: LocalDrmStorage
+    var delegates = Set<AssetLoaderDelegate>()
+    
+    public init(storage: LocalDrmStorage) {
+        self.storage = storage
+    }
+    
+    public func prepareForDownload(asset: AVURLAsset, mediaSource: MediaSource) {
+        
+        PKLog.debug("Preparing asset for download; asset.url:", asset.url)
+        guard #available(iOS 10.0, *) else {
+            PKLog.error("Offline is only supported on iOS 10+")
+            return
+            // TODO: this error has to be reported.
+        }
+        
+        guard let drmData = mediaSource.drmData?.first as? FairPlayDRMData else {return}
+        
+        let resourceLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, drmData: drmData, storage: storage)
+        
+        self.delegates.update(with: resourceLoaderDelegate)
+        
+        resourceLoaderDelegate.done =  { (_ error: Error?)->Void in
+            self.delegates.remove(resourceLoaderDelegate);
+        }
+        
+    }
+    
+    
+    
+    public func createLocalMediaSource(for assetId: String, localURL: URL) -> MediaSource {
+        return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
+    }
+}
+
 public protocol LocalDrmStorage {
     func save(key: String, value: Data) throws
     func load(key: String) throws -> Data?
@@ -49,38 +85,3 @@ class LocalMediaSource: MediaSource {
     }
 }
 
-public class LocalAssetsManager: NSObject {
-    let storage: LocalDrmStorage
-    var delegates = Set<AssetLoaderDelegate>()
-    
-    public init(storage: LocalDrmStorage) {
-        self.storage = storage
-    }
-    
-    public func prepareForDownload(asset: AVURLAsset, mediaSource: MediaSource) {
-
-        PKLog.debug("Preparing asset for download; asset.url:", asset.url)
-        guard #available(iOS 10.0, *) else {
-            PKLog.error("Offline is only supported on iOS 10+")
-            return
-            // TODO: this error has to be reported.
-        }
-        
-        guard let drmData = mediaSource.drmData?.first as? FairPlayDRMData else {return}
-
-        let resourceLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, drmData: drmData, storage: storage)
-        
-        self.delegates.update(with: resourceLoaderDelegate)
-        
-        resourceLoaderDelegate.done =  { (_ error: Error?)->Void in
-            self.delegates.remove(resourceLoaderDelegate);
-        }
-
-    }
-    
-    
-    
-    public func createLocalMediaSource(for assetId: String, localURL: URL) -> MediaSource {
-        return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
-    }
-}
