@@ -24,12 +24,11 @@ class WidevineClassicAssetHandler: AssetHandler {
             return false
         }
         
-        // The only other option is HLS
+        // Only support wvm files
         if ext == "wvm" {
             return true
         }
         
-        PKLog.error("pathExtension is not wvm")
         return false
     }
 
