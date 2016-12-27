@@ -26,6 +26,8 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     private var currentBitrate = -1
     private var bufferTime: Int32 = 0
     private var bufferStartTime: Int32 = 0
+    private var lastReportedBitrate: Int32 = -1
+    
     private var isBuffering = false
     
     private var timer: Timer?
@@ -79,14 +81,14 @@ public class KalturaLiveStatsPlugin: PKPlugin {
                     self.startTimer()
                     if self.isBuffering {
                         self.isBuffering = false
-                        self.sendLiveEvent(bufferTime: self.calculateBuffer(isBuffering: false))
+                        self.sendLiveEvent(theBufferTime: self.calculateBuffer(isBuffering: false))
                     }
                     break
                 case .buffering:
                     self.isBuffering = true
                     self.bufferStartTime = Date().timeIntervalSince1970.toInt32()
                     break
-                case .error:
+                default:
                     
                     break
                 }
@@ -100,7 +102,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
             startTimer()
             isLive = true
             if isFirstPlay {
-                sendLiveEvent(bufferTime: bufferTime);
+                sendLiveEvent(theBufferTime: bufferTime);
                 isFirstPlay = false
             }
         }
@@ -125,23 +127,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     }
     
     @objc private func timerHit() {
-        var progress = Float(self.player.currentTime) / Float(self.player.duration)
-        PKLog.trace("Progress is \(progress)")
-        
-        if progress >= 0.25 && !playReached25 && seekPercent <= 0.25 {
-            playReached25 = true
-            sendAnalyticsEvent(action: .PLAY_REACHED_25);
-        } else if progress >= 0.5 && !playReached50 && seekPercent < 0.5 {
-            playReached50 = true
-            sendAnalyticsEvent(action: .PLAY_REACHED_50);
-        } else if progress >= 0.75 && !playReached75 && seekPercent <= 0.75 {
-            playReached75 = true
-            sendAnalyticsEvent(action: .PLAY_REACHED_75);
-        } else if progress >= 0.98 && !playReached100 && seekPercent < 1 {
-            playReached100 = true
-            sendAnalyticsEvent(action: .PLAY_REACHED_100)
-        }
-
+        self.sendLiveEvent(theBufferTime: bufferTime);
     }
     
     private func startTimer() {
@@ -176,7 +162,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
         return bufferTime
     }
     
-    private func sendLiveEvent(bufferTime: Int32) {
+    private func sendLiveEvent(theBufferTime: Int32) {
         
         PKLog.trace("Buffer Time: \(bufferTime)")
         
@@ -201,8 +187,31 @@ public class KalturaLiveStatsPlugin: PKPlugin {
             parterId = String(pId)
         }
         
+        if let builder: RequestBuilder = LiveStatsService.sendLiveStatsEvent(baseURL: baseUrl,
+                                                                           partnerId: parterId,
+                                                                           eventType: self.isLive ? 1 : 0,
+                                                                           eventIndex: self.eventIdx,
+                                                                           bufferTime: theBufferTime,
+                                                                           bitrate: self.lastReportedBitrate,
+                                                                           sessionId: sessionId,
+                                                                           startTime: 0,
+                                                                           entryId: self.mediaEntry.id,
+                                                                           isLive: isLive,
+                                                                           clientVer: PlayKitManager.clientTag,
+                                                                           deliveryType: "hls") {
+            
+            builder.set { (response: Response) in
+                
+                PKLog.trace("Response: \(response)")
+                
+            }
+            
+            USRExecutor.shared.send(request: builder.build())
+            
+        }
+        
         /*
-        let builder: KalturaRequestBuilder = OVPStatsService.get(baseURL: baseUrl,
+        let builder: RequestBuilder = LiveStatsService.(baseURL: baseUrl,
                                                                  partnerId: parterId,
                                                                  eventType: action.rawValue,
                                                                  clientVer: PlayKitManager.clientTag,
