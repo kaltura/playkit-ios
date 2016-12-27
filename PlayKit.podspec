@@ -49,10 +49,11 @@ s.subspec 'YouboraPlugin' do |ssp|
 end
 
 s.subspec 'Widevine' do |ssp|
-    #ssp.libraries = 'WViPhoneAPI'
-    #ssp.vendored_library = 'libWViPhoneAPI.a'
-    ssp.source_files = 'Classes/WV'
-    ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO' }
+    ssp.libraries = 'WViPhoneAPI'
+    ssp.vendored_library = 'libWViPhoneAPI.a'
+    #ssp.source_files = 'Classes/WV'
+    ssp.libraries      = 'stdc++', 'z', 'System', 'stdc++.6', 'xml2.2', 'c++', 'stdc++.6.0.9', 'xml2'
+    ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1' }
      ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
     'OTHER_LDFLAGS' => '$(inherited)',
     'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }

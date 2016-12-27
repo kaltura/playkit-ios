@@ -34,11 +34,15 @@ class WidevineClassicAssetHandler: AssetHandler {
     }
 
 
-    internal func buildAsset(mediaSource: MediaSource, readyCallback: (Error?, AVAsset?) -> Void) {
+    internal func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?) -> Void) {
         // TODO: start Widevine license acq, call play, build asset
         let drmData = mediaSource.drmData?.first
-        WidevineClassicCDM.playAsset(mediaSource.contentUrl?.absoluteString, withLicenseUri: drmData?.licenseUri?.absoluteString) {  (_ playbackURL:String?)->Void  in
-            
+        WidevineClassicCDM.playAsset(mediaSource.contentUrl?.absoluteString, withLicenseUri: drmData!.licenseUri!.absoluteString) {  (_ playbackURL:String?)->Void  in
+        
+            DispatchQueue.main.async {
+                readyCallback(nil, AVURLAsset(url: URL(string: playbackURL!)!))
+            }
+           
         }
     }
 

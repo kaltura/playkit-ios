@@ -18,7 +18,7 @@ class AssetBuilder {
         self.mediaEntry = mediaEntry
     }
 
-    func build(readyCallback: (Error?, AVAsset?)->Void) -> Void {
+    func build(readyCallback: @escaping (Error?, AVAsset?)->Void) -> Void {
         
         // Select source and handler
         guard let sources = mediaEntry.sources else { return }
@@ -52,7 +52,7 @@ class AssetBuilder {
 protocol AssetHandler {
     init()
     static var sourceFilter: (MediaSource)->Bool {get}
-    func buildAsset(mediaSource: MediaSource, readyCallback: (Error?, AVAsset?)->Void)
+    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?)->Void)
 }
 
 enum AssetError : Error {
