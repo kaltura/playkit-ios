@@ -124,7 +124,7 @@ public class BasicCastBuilder: NSObject {
         let data = try self.validate()
         let customData = self.customData()
         let mediaInfo: GCKMediaInformation = GCKMediaInformation(contentID:self.contentId,
-                                                                 streamType: GCKMediaStreamType.unknown,
+                                                                 streamType: GCKMediaStreamType.buffered,
                                                                  contentType: "",
                                                                  metadata: self.metaData,
                                                                  streamDuration: 0,
