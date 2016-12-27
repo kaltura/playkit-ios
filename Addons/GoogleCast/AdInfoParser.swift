@@ -28,6 +28,7 @@ public class AdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
             let adsInfo = customData["adsInfo"] as? [String:Any],
             let metaData : AdsMetadata = AdsMetadata(dict: adsInfo)
             else{
+                PKLog.warning("No Ads info from receiver")
                 return false
         }
         
@@ -45,6 +46,7 @@ public class AdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
             let adsData : AdsMetadata = AdsMetadata(dict: adsInfo),
             let adsBreakInfo = adsData.adsBreakInfo
             else {
+               PKLog.warning("No Ads info from receiver")
              return nil
         }
         
