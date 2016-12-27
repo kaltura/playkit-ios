@@ -28,7 +28,7 @@ public class LocalAssetsManager: NSObject {
         
         guard let drmData = mediaSource.drmData?.first as? FairPlayDRMData else {return}
         
-        let resourceLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, drmData: drmData, storage: storage)
+        let resourceLoaderDelegate = AssetLoaderDelegate.configureDownload(asset: asset, drmData: drmData, storage: storage)
         
         self.delegates.update(with: resourceLoaderDelegate)
         
@@ -89,4 +89,3 @@ class LocalMediaSource: MediaSource {
         super.init(id, contentUrl: localContentUrl)
     }
 }
-
