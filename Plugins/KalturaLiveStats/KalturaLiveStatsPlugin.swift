@@ -164,19 +164,14 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     
     private func sendLiveEvent(theBufferTime: Int32) {
         
-        PKLog.trace("Buffer Time: \(bufferTime)")
+        PKLog.trace("sendLiveEvent - Buffer Time: \(bufferTime)")
         
         var sessionId = ""
-        var baseUrl = ""
-        var confId = 0
+        var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
         var parterId = ""
         
         if let sId = self.config.params["sessionId"] as? String {
             sessionId = sId
-        }
-        
-        if let cId = self.config.params["uiconfId"] as? Int {
-            confId = cId
         }
         
         if let url = self.config.params["baseUrl"] as? String {
@@ -209,28 +204,6 @@ public class KalturaLiveStatsPlugin: PKPlugin {
             USRExecutor.shared.send(request: builder.build())
             
         }
-        
-        /*
-        let builder: RequestBuilder = LiveStatsService.(baseURL: baseUrl,
-                                                                 partnerId: parterId,
-                                                                 eventType: action.rawValue,
-                                                                 clientVer: PlayKitManager.clientTag,
-                                                                 duration: Float(self.player.duration),
-                                                                 sessionId: sessionId,
-                                                                 position: self.player.currentTime.toInt32(),
-                                                                 uiConfId: confId,
-                                                                 entryId: self.mediaEntry.id,
-                                                                 widgetId: "_\(parterId)",
-                                                                 isSeek: hasSeeked)!
-        
-        builder.set { (response: Response) in
-            
-            PKLog.trace("Response: \(response)")
-            
-        }
-        
-        USRExecutor.shared.send(request: builder.build())
-         */
     }
 
 }
