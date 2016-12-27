@@ -55,8 +55,10 @@ public class AdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
 
 
 
-
-public class AdsMetadata: NSObject {
+/**
+  An object which represent the Ads info
+ */
+private class AdsMetadata: NSObject {
     
     public let adsBreakInfo: [Int]?
     public let isPlayingAd: Bool
