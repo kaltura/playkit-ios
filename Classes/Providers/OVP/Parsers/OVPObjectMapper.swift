@@ -24,8 +24,8 @@ class OVPObjectMapper: NSObject {
             switch name {
             case "KalturaMediaEntry":
                 return OVPEntry.self
-            case "KalturaEntryContextDataResult":
-                return OVPEntryContextData.self
+            case "KalturaPlaybackContext":
+                return OVPPlaybackContext.self
             case "KalturaAPIException":
                 return OVPError.self
             default:

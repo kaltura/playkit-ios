@@ -18,18 +18,15 @@ import SwiftyJSON
 class OVPDRM: OVPBaseObject {
 
     var scheme: String?
-    var certificate: String?
     var licenseURL: String?
     
     let schemeKey = "scheme"
-    let certificateKey = "certificate"
     let licenseURLKey = "licenseURL"
     
     required init?(json: Any) {
         
         let jsonObject = JSON(json)
         self.scheme = jsonObject[schemeKey].string
-        self.certificate = jsonObject[certificateKey].string
         self.licenseURL = jsonObject[licenseURLKey].string
         
     }

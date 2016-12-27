@@ -96,7 +96,7 @@ public class OVPMediaProvider: MediaEntryProvider {
         }
         
         
-        let loaderInfo = LoaderInfo(sessionProvider: sessionProvider, entryId: entryId, uiconfId: self.uiconfId, executor: executor, apiServerURL: apiServerURL)
+        let loaderInfo = LoaderInfo(sessionProvider: sessionProvider, entryId: entryId, uiconfId: self.uiconfId, executor: executor, apiServerURL: apiServerURL + "/api_v3")
         
         self.startLoading(loadInfo: loaderInfo, callback: callback)
         
@@ -115,12 +115,17 @@ public class OVPMediaProvider: MediaEntryProvider {
             let listRequest = OVPBaseEntryService.list(baseURL: loadInfo.apiServerURL,
                                                        ks: ks,
                                                        entryID: loadInfo.entryId)
-            let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: loadInfo.apiServerURL,
-                                                                           ks: ks,
-                                                                           entryID: loadInfo.entryId)
+            
+//            let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: loadInfo.apiServerURL,
+//                                                                           ks: ks,
+//                                                                           entryID: loadInfo.entryId)
+            
+            let getPlaybackContext =  OVPBaseEntryService.getPlaybackContext(baseURL: loadInfo.apiServerURL,
+                                                   ks: ks,
+                                                   entryID: loadInfo.entryId)
             
             guard let req1 = listRequest,
-                let req2 = getContextDataRequest else {
+                let req2 = getPlaybackContext else {
                     callback(Result(data: nil, error: Err.invalidParams))
                     return
             }
@@ -145,7 +150,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                     guard
                         let mainResponseData = mainResponse as? OVPList,
                         let entry = mainResponseData.objects?.last as? OVPEntry,
-                        let contextData = contextDataResponse as? OVPEntryContextData,
+                        let contextData = contextDataResponse as? OVPPlaybackContext,
                         let sources = contextData.sources
                         else{
                             callback(Result(data: nil, error: Err.invalidResponse ))
@@ -160,8 +165,8 @@ public class OVPMediaProvider: MediaEntryProvider {
                         
                         let mediaSource: MediaSource = MediaSource(id: String(source.deliveryProfileId))
                         let sourceBuilder: SourceBuilder = SourceBuilder()
-                        
-                        sourceBuilder.set(baseURL: loadInfo.sessionProvider.serverURL)
+                
+                        .set(baseURL: loadInfo.sessionProvider.serverURL)
                         .set(ks: ks)
                         .set(format: source.format)
                         .set(entryId: loadInfo.entryId)
@@ -173,8 +178,13 @@ public class OVPMediaProvider: MediaEntryProvider {
                         
                         let url = sourceBuilder.build()
                         mediaSource.contentUrl = url
-                        let drmData = DRMData(licenseUri: (source.drm?.last?.licenseURL)!)
-                        mediaSource.drmData = [drmData] // TODO: this should be a list
+                        
+                        let drmData =
+                            source.drm?.map({ (drm:OVPDRM) -> DRMData in
+                            return DRMData(licenseUri: drm.licenseURL)
+                        })
+                        
+                        mediaSource.drmData = drmData // TODO: this should be a list
                         mediaSources.append(mediaSource)
                     })
                     mediaEntry.sources = mediaSources

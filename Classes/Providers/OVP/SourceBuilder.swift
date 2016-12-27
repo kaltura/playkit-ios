@@ -79,7 +79,12 @@ class SourceBuilder {
     
     func build() -> URL? {
         
-        guard let baseURL = self.baseURL, baseURL.isEmpty == false , let partnerId = self.partnerId, let format = self.format, let sourceProtocol = self.sourceProtocol else {
+        guard
+            let baseURL = self.baseURL,
+            baseURL.isEmpty == false,
+            let partnerId = self.partnerId,
+            let format = self.format,
+            let sourceProtocol = self.sourceProtocol else {
             return nil
         }
         
