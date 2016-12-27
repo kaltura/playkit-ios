@@ -1,6 +1,6 @@
 # PlayKit
 
-# *Note: PlayKit is under active development, in alpha stage*
+# *Note: PlayKit is under active development*
 
 [![CI Status](http://img.shields.io/travis/kaltura/playkit-ios.svg?style=flat)](https://travis-ci.org/kaltura/playkit-ios)
 
