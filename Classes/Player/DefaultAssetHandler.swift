@@ -30,6 +30,11 @@ class DefaultAssetHandler: AssetHandler {
             return true
         }
         
+        // 'movpkg' was downloaded here.
+        if ext == "movpkg" {
+            return true
+        }
+        
         // The only other option is HLS
         if ext != "m3u8" {
             return false
@@ -50,6 +55,23 @@ class DefaultAssetHandler: AssetHandler {
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
             readyCallback(AssetError.invalidContentUrl(nil), nil)
+            return
+        }
+        
+        if let localSource = mediaSource as? LocalMediaSource {
+            PKLog.debug("Creating local asset")
+            let asset = AVURLAsset(url: contentUrl)
+            
+            
+            if #available(iOS 10.0, *) {
+                self.assetLoaderDelegate = AssetLoaderDelegate.configureLocalPlay(asset: asset, storage: localSource.storage)
+            } else {
+                // On earlier versions, this will only work for non-FairPlay content.
+                PKLog.warning("Preparing local asset in iOS<10:", contentUrl)
+            }
+            
+            self.avAsset = asset  
+            readyCallback(nil, self.avAsset)
             return
         }
 
@@ -76,7 +98,9 @@ class DefaultAssetHandler: AssetHandler {
         let assetName = mediaSource.id
         
         let asset = AVURLAsset(url: contentUrl)
-        self.assetLoaderDelegate = AssetLoaderDelegate.configureAsset(asset: asset, assetName: mediaSource.id, drmData: fpsData)
+        
+        self.assetLoaderDelegate = AssetLoaderDelegate.configureRemotePlay(asset: asset, drmData: fpsData)
+        
         self.avAsset = asset  
         readyCallback(nil, self.avAsset)
     }
