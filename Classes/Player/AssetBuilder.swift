@@ -57,6 +57,7 @@ protocol AssetHandler {
 
 enum AssetError : Error {
     case noFpsCertificate
+    case noLicenseUri
     case invalidDrmScheme
     case invalidContentUrl(URL?)
     case noPlayableSources

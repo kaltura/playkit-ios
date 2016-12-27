@@ -35,20 +35,43 @@ class WidevineClassicAssetHandler: AssetHandler {
 
 
     internal func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?) -> Void) {
-        // TODO: start Widevine license acq, call play, build asset
-        let drmData = mediaSource.drmData?.first
-        WidevineClassicCDM.playAsset(mediaSource.contentUrl?.absoluteString, withLicenseUri: drmData!.licenseUri!.absoluteString) {  (_ playbackURL:String?)->Void  in
         
-            DispatchQueue.main.async {
-                readyCallback(nil, AVURLAsset(url: URL(string: playbackURL!)!))
+        guard let contentUrl = mediaSource.contentUrl else {
+            PKLog.error("Invalid media: no url")
+            readyCallback(AssetError.invalidContentUrl(nil), nil)
+            return
+        }
+        
+        guard let drmData = mediaSource.drmData?.first else {
+            PKLog.error("Invalid drm data")
+            readyCallback(AssetError.noPlayableSources, nil)
+            return
+        }
+        
+        guard let licenseUri = drmData.licenseUri else {
+            PKLog.error("Missing licenseUri")
+            readyCallback(AssetError.noLicenseUri, nil)
+            return
+        }
+        
+        PKLog.trace("playAsset:: url: \(contentUrl.absoluteString), uri: \(licenseUri.absoluteString)")
+        
+        WidevineClassicCDM.playAsset(contentUrl.absoluteString, withLicenseUri: licenseUri.absoluteString) {  (_ playbackURL:String?)->Void  in
+            
+            guard let playbackURL = playbackURL else {
+                PKLog.error("Invalid media: no url")
+                readyCallback(AssetError.invalidContentUrl(nil), nil)
+                return
             }
-           
+            
+            DispatchQueue.main.async {
+                PKLog.debug("widevine classic:: callback url:\(playbackURL)")
+                readyCallback(nil, AVURLAsset(url: URL(string: playbackURL)!))
+            }
         }
     }
 
-    required init() {
-    
-    }
+    required init() {}
 }
 
 
