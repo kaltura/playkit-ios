@@ -39,6 +39,10 @@ import AVKit
      */
     var duration: Double { get }
     
+    var currentAudioTrack: String? { get }
+    
+    var currentTextTrack: String? { get }
+    
     /**
      Prepare for playing an entry. If `config.autoPlay` is true, the entry will automatically
      play when it's ready.

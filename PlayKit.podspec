@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.0.5'
+s.version          = '0.0.8'
 s.summary          = 'A short description of PlayKit.'
 
 
@@ -30,6 +30,15 @@ s.subspec 'IMAPlugin' do |ssp|
     ssp.dependency 'GoogleAds-IMA-iOS-SDK', '~> 3.3'
 end
 
+s.subspec 'GoogleCastAddon' do |ssp|
+    ssp.source_files = 'Addons/GoogleCast'
+    ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+                  'OTHER_LDFLAGS' => '$(inherited) -framework "GoogleCast"',
+                  'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+                  'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+    ssp.dependency 'google-cast-sdk'
+end
+
 s.subspec 'YouboraPlugin' do |ssp|
     ssp.source_files = 'Plugins/Youbora'
     ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
@@ -37,6 +46,14 @@ s.subspec 'YouboraPlugin' do |ssp|
     'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
     'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
     ssp.dependency 'Youbora-AVPlayer'
+end
+
+s.subspec 'PhoenixPlugin' do |ssp|
+    ssp.source_files = 'Plugins/Phoenix'
+    ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+    'OTHER_LDFLAGS' => '$(inherited)',
+    'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+    'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
 end
 
 s.subspec 'KalturaStatsPlugin' do |ssp|

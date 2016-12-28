@@ -147,11 +147,12 @@ public class RequestBuilder: NSObject {
             }
         }
         
-        let urlComponents = NSURLComponents()
-        urlComponents.path = self.url.absoluteString
-
-        
         if let params = self.urlParams, params.count > 0 {
+            
+            let urlComponents = NSURLComponents()
+            urlComponents.host = self.url.host
+            urlComponents.scheme = self.url.scheme
+            urlComponents.path = self.url.path
             
             var queryItems = [URLQueryItem]()
             for (key, value) in params {
@@ -159,10 +160,14 @@ public class RequestBuilder: NSObject {
             }
             
             urlComponents.queryItems = queryItems
+            
+            if let url = urlComponents.url{
+                self.url = url
+            }
+            
         }
         
-        return RequestElement(requestId: self.requestId, method:self.method , url: urlComponents.url!, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
-        
+        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)        
         
     }
 }
