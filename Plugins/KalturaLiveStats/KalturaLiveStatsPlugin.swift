@@ -27,6 +27,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     private var bufferTime: Int32 = 0
     private var bufferStartTime: Int32 = 0
     private var lastReportedBitrate: Int32 = -1
+    private var lastReportedStartTime: Int32 = 0
     
     private var isBuffering = false
     
@@ -62,8 +63,9 @@ public class KalturaLiveStatsPlugin: PKPlugin {
         
         PKLog.trace("registerToAllEvents")
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.play.self, PlayerEvents.playing.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvents.play.self], block: { (info) in
             PKLog.trace("play info: \(info)")
+            self.lastReportedStartTime = self.player.currentTime.toInt32()
             self.startLiveEvents()
         })
                 
@@ -189,7 +191,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
                                                                            bufferTime: theBufferTime,
                                                                            bitrate: self.lastReportedBitrate,
                                                                            sessionId: sessionId,
-                                                                           startTime: 0,
+                                                                           startTime: self.lastReportedStartTime,
                                                                            entryId: self.mediaEntry.id,
                                                                            isLive: isLive,
                                                                            clientVer: PlayKitManager.clientTag,
