@@ -26,7 +26,12 @@ class AssetBuilder {
         var selection: (source: MediaSource, handler: AssetHandler.Type)?
         
         // Iterate over all handlers
-        let handlers: [AssetHandler.Type] = [DefaultAssetHandler.self, WidevineClassicAssetHandler.self]
+        var handlers: [AssetHandler.Type] = [DefaultAssetHandler.self]
+        
+        if let type = NSClassFromString("PlayKit.WidevineClassicAssetHandler") {
+            handlers.append(type as! AssetHandler.Type)
+        }
+        
         for handler in handlers {
             // Select the first source that the handler can play.
             if let playableSource = sources.first(where: handler.sourceFilter) {
