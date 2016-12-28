@@ -10,14 +10,14 @@ import UIKit
 import GoogleCast
 
 /**
- AdInfoParser
+ CastAdInfoParser
  
  Parser
  */
-public class AdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
+public class CastAdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
     
     
-    public static let shared = AdInfoParser()
+    public static let shared = CastAdInfoParser()
     
     /**
      return A boolean flag indicating whether your receiver is currently playing an ad ot not
