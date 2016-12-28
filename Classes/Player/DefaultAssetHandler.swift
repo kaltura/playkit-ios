@@ -50,7 +50,7 @@ class DefaultAssetHandler: AssetHandler {
     }
 
     
-    func buildAsset(mediaSource: MediaSource, readyCallback: (Error?, AVAsset?)->Void) {
+    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?)->Void) {
 
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
