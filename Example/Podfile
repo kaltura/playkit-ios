@@ -1,15 +1,13 @@
 use_frameworks!
 
 
-abstract_target 'PlayKit' do
+
+target 'PlayKit_Example' do
+
     
     pod 'PlayKit', :path => '../../playkit-ios'
     pod 'PlayKit/IMAPlugin', :path => '../../playkit-ios'
-    #pod 'PlayKit/YouboraPlugin', :path => '../../playkit-ios'
     pod 'PlayKit/KalturaStatsPlugin', :path => '../../playkit-ios'
-
-    target 'PlayKit_Example' do
-    end
     
     target 'PlayKit_Tests' do
     end
