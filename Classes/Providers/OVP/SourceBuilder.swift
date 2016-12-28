@@ -84,17 +84,13 @@ class SourceBuilder {
             baseURL.isEmpty == false,
             let partnerId = self.partnerId,
             let format = self.format,
+            let entryId = self.entryId,
             let sourceProtocol = self.sourceProtocol else {
             return nil
         }
         
         let fileExt = self.fileExtentionByFormat(format: format) 
-        var urlAsString: String = baseURL + "/p/" + String(partnerId) + "/sp/" + String(partnerId) + "00/playManifest"
-        
-        if let ks = self.ks{
-            urlAsString = urlAsString + "/ks/" + ks
-        }
-        
+        var urlAsString: String = baseURL + "/p/" + String(partnerId) + "/sp/" + String(partnerId) + "00/playManifest" + "/entryId/" + entryId + "/protocol/" + sourceProtocol + "/format/" + format
         
         var flavorsExist = false
         if let flavors = self.flavors {
@@ -116,8 +112,13 @@ class SourceBuilder {
             urlAsString.append("/uiConfId/" + String(uiconfId))
         }
         
-        urlAsString = urlAsString + "/format/" + format + "/protocol/" + sourceProtocol + "/a." + fileExt
         
+        if let ks = self.ks{
+            urlAsString = urlAsString + "/ks/" + ks
+        }
+        
+
+        urlAsString = urlAsString + "/a." + self.fileExtentionByFormat(format: format)
         
         var params: [String] = [String]()
         

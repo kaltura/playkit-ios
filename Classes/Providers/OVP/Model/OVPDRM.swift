@@ -19,15 +19,18 @@ class OVPDRM: OVPBaseObject {
 
     var scheme: String?
     var licenseURL: String?
+    var certificate: String?
     
-    let schemeKey = "scheme"
-    let licenseURLKey = "licenseURL"
+    private let schemeKey = "scheme"
+    private let licenseURLKey = "licenseURL"
+    private let certificateKey = "certificate"
     
     required init?(json: Any) {
         
         let jsonObject = JSON(json)
         self.scheme = jsonObject[schemeKey].string
         self.licenseURL = jsonObject[licenseURLKey].string
-        
+        self.certificate = jsonObject[certificateKey].string
+    
     }
 }

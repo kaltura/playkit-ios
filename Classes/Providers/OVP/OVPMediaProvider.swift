@@ -32,7 +32,6 @@ public class OVPMediaProvider: MediaEntryProvider {
     var entryId: String?
     var executor: RequestExecutor?
     var uiconfId: Int64?
-    var apiServerURL: String?
     
     
     public init(){}
@@ -61,11 +60,7 @@ public class OVPMediaProvider: MediaEntryProvider {
         return self
     }
 
-    @discardableResult
-    public func set(apiServerURL: String?) -> Self{
-        self.apiServerURL = apiServerURL
-        return self
-    }
+
 
     
     
@@ -83,7 +78,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                 return
         }
         
-        guard let apiServerURL = self.apiServerURL
+        guard let apiServerURL = self.sessionProvider?.serverURL
             else {
                 callback(Result(data: nil, error: Err.invalidParam(paramName: "apiServerURL")))
                 return
@@ -115,10 +110,6 @@ public class OVPMediaProvider: MediaEntryProvider {
             let listRequest = OVPBaseEntryService.list(baseURL: loadInfo.apiServerURL,
                                                        ks: ks,
                                                        entryID: loadInfo.entryId)
-            
-//            let getContextDataRequest = OVPBaseEntryService.getContextData(baseURL: loadInfo.apiServerURL,
-//                                                                           ks: ks,
-//                                                                           entryID: loadInfo.entryId)
             
             let getPlaybackContext =  OVPBaseEntryService.getPlaybackContext(baseURL: loadInfo.apiServerURL,
                                                    ks: ks,
@@ -157,36 +148,70 @@ public class OVPMediaProvider: MediaEntryProvider {
                             return
                     }
                     
-                    let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
-                    mediaEntry.duration = entry.duration
+                    
                     
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach({ (source:OVPSource) in
                         
-                        let mediaSource: MediaSource = MediaSource(id: String(source.deliveryProfileId))
-                        let sourceBuilder: SourceBuilder = SourceBuilder()
-                
-                        .set(baseURL: loadInfo.sessionProvider.serverURL)
-                        .set(ks: ks)
-                        .set(format: source.format)
-                        .set(entryId: loadInfo.entryId)
-                        .set(uiconfId: loadInfo.uiconfId)
-                        .set(flavors: source.flavors)
-                        .set(partnerId: loadInfo.sessionProvider.partnerId)
-                        .set(playSessionId: UUID().uuidString) // insert - session
-                        .set(sourceProtocol: source.protocols?.last)
+                        guard self.isSourceValid(source: source) else { return }
                         
-                        let url = sourceBuilder.build()
-                        mediaSource.contentUrl = url
+                        var playURL: URL? = nil
+                        if let flavors =  source.flavors,
+                            flavors.count > 0 {
+                            
+                            let sourceBuilder: SourceBuilder = SourceBuilder()
+                                .set(baseURL: loadInfo.sessionProvider.serverURL)
+                                .set(ks: ks)
+                                .set(format: source.format)
+                                .set(entryId: loadInfo.entryId)
+                                .set(uiconfId: loadInfo.uiconfId)
+                                .set(flavors: source.flavors)
+                                .set(partnerId: loadInfo.sessionProvider.partnerId)
+                                .set(playSessionId: UUID().uuidString) // insert - session
+                                .set(sourceProtocol: source.protocols?.last)
+                            
+                            playURL = sourceBuilder.build()
+                        }
+                        else{
+                            playURL = source.url
+                        }
+                        
+                        guard let url = playURL else {
+                            PKLog.warning("failed to create play url from source, discarding source:\(entry.id),\(source.deliveryProfileId), \(source.format)")
+                            return
+                        }
+                        
                         
                         let drmData =
-                            source.drm?.map({ (drm:OVPDRM) -> DRMData in
-                            return DRMData(licenseUri: drm.licenseURL)
-                        })
+                            source.drm?.flatMap({ (drm:OVPDRM) -> DRMData? in
+                                guard let scheme = drm.scheme else {
+                                    return nil
+                                }
+                                
+                                var drmData: DRMData? = nil
+                                switch scheme {
+                                case "fps":
+                                    guard let certifictae = drm.certificate,
+                                        let licenseURL = drm.licenseURL
+                                        else { return nil }
+                                    drmData = FairPlayDRMData(licenseUri: licenseURL, base64EncodedCertificate: certifictae)
+                                default:
+                                    drmData = DRMData(licenseUri: drm.licenseURL)
+                                    
+                                }
+                                
+                            return drmData
+                            
+                            })
                         
-                        mediaSource.drmData = drmData // TODO: this should be a list
+                        let mediaSource: MediaSource = MediaSource(id: entry.id + "_" + String(source.deliveryProfileId))
+                        mediaSource.drmData = drmData
+                        mediaSource.contentUrl = url
                         mediaSources.append(mediaSource)
                     })
+                    
+                    let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
+                    mediaEntry.duration = entry.duration
                     mediaEntry.sources = mediaSources
                     callback(Result(data: mediaEntry, error: nil ))
                     
@@ -229,9 +254,27 @@ public class OVPMediaProvider: MediaEntryProvider {
         return flavorsId
     }
     
+    func isSourceValid(source:OVPSource) -> Bool {
+        let supportedFormats = FormatsHelper.extentionByformat.keys
+        guard  let format = source.format,
+        format.isEmpty == false,
+        supportedFormats.contains(format)
+            else {
+            return false
+        }
+        
+        return true
+    }
     
     public func cancel() {
     }
+    
+}
+
+class FormatsHelper {
+    static let extentionByformat = ["applehttp":"m3u8",
+                                    "url":"mp4"]
+    
 }
 
 
