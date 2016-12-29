@@ -325,7 +325,7 @@ class AVPlayerEngine : AVPlayer {
             if lastEvent.indicatedBitrate != self.lastBitrate {
                 self.lastBitrate = lastEvent.indicatedBitrate
                 PKLog.trace("currentBitrate:: \(self.lastBitrate)")
-                // TODO:: post event
+                self.postEvent(event: PlayerEvents.playbackParamsUpdated(currentBitrate: self.lastBitrate))
             }
         }
     }
