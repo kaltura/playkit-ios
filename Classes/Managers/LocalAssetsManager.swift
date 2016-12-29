@@ -23,12 +23,13 @@ fileprivate let canDownloadWidevineClassic: Bool = TARGET_OS_SIMULATOR==0
     && NSClassFromString("WidevineClassicAssetHandler") != nil
 
 
+
 public class LocalAssetsManager: NSObject {
-    let storage: LocalDrmStorage
+    let storage: LocalDataStore
     var delegates = Set<AssetLoaderDelegate>()
     
 
-    public init(storage: LocalDrmStorage) {
+    public init(storage: LocalDataStore) {
         self.storage = storage
     }
 
@@ -105,13 +106,13 @@ public class LocalAssetsManager: NSObject {
     }
 }
 
-public protocol LocalDrmStorage {
+public protocol LocalDataStore {
     func save(key: String, value: Data) throws
     func load(key: String) throws -> Data?
     func remove(key: String) throws
 }
 
-public class DefaultLocalDrmStorage: LocalDrmStorage {
+public class DefaultLocalDataStore: LocalDataStore {
 
     let storageDirectory: URL
 
@@ -137,9 +138,9 @@ public class DefaultLocalDrmStorage: LocalDrmStorage {
 }
 
 class LocalMediaSource: MediaSource {
-    let storage: LocalDrmStorage
+    let storage: LocalDataStore
 
-    init(storage: LocalDrmStorage, id: String, localContentUrl: URL) {
+    init(storage: LocalDataStore, id: String, localContentUrl: URL) {
         self.storage = storage
         super.init(id, contentUrl: localContentUrl)
     }

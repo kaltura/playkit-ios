@@ -28,7 +28,7 @@ class AssetLoaderDelegate: NSObject {
     fileprivate static let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
     
     
-    private let storage: LocalDrmStorage?
+    private let storage: LocalDataStore?
     
     private let drmData: FairPlayDRMData?
     
@@ -38,7 +38,7 @@ class AssetLoaderDelegate: NSObject {
         return storage != nil
     }
     
-    private init(drmData: FairPlayDRMData? = nil, storage: LocalDrmStorage? = nil) {
+    private init(drmData: FairPlayDRMData? = nil, storage: LocalDataStore? = nil) {
         
         self.drmData = drmData
         self.storage = storage
@@ -55,7 +55,7 @@ class AssetLoaderDelegate: NSObject {
     }
     
     @available(iOS 10.0, *)
-    static func configureDownload(asset: AVURLAsset, drmData: FairPlayDRMData, storage: LocalDrmStorage) -> AssetLoaderDelegate {
+    static func configureDownload(asset: AVURLAsset, drmData: FairPlayDRMData, storage: LocalDataStore) -> AssetLoaderDelegate {
         let delegate = AssetLoaderDelegate.init(drmData: drmData, storage: storage)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
@@ -65,7 +65,7 @@ class AssetLoaderDelegate: NSObject {
     }
     
     @available(iOS 10.0, *)
-    static func configureLocalPlay(asset: AVURLAsset, storage: LocalDrmStorage) -> AssetLoaderDelegate {
+    static func configureLocalPlay(asset: AVURLAsset, storage: LocalDataStore) -> AssetLoaderDelegate {
         let delegate = AssetLoaderDelegate.init(storage: storage)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
