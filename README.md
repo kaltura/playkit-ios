@@ -1,29 +1,11 @@
 # PlayKit
 
-[![CI Status](http://img.shields.io/travis/Rivka Schwartz/PlayKit.svg?style=flat)](https://travis-ci.org/Rivka Schwartz/PlayKit)
-[![Version](https://img.shields.io/cocoapods/v/PlayKit.svg?style=flat)](http://cocoapods.org/pods/PlayKit)
-[![License](https://img.shields.io/cocoapods/l/PlayKit.svg?style=flat)](http://cocoapods.org/pods/PlayKit)
-[![Platform](https://img.shields.io/cocoapods/p/PlayKit.svg?style=flat)](http://cocoapods.org/pods/PlayKit)
+# *Note: PlayKit is under active development*
 
-## Example
+[![CI Status](http://img.shields.io/travis/kaltura/playkit-ios.svg?style=flat)](https://travis-ci.org/kaltura/playkit-ios)
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+# License and Copyright Information
+All code in this project is released under the [AGPLv3 license](http://www.gnu.org/licenses/agpl-3.0.html) unless a different license for a particular library is specified in the applicable library path.   
 
-## Requirements
-
-## Installation
-
-PlayKit is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-```ruby
-pod "PlayKit"
-```
-
-## Author
-
-Rivka Schwartz, Rivka.Peleg@kaltura.com
-
-## License
-
-PlayKit is available under the AGPLv3 license. See the LICENSE file for more info.
+Copyright © Kaltura Inc. All rights reserved.   
+Authors and contributors: See [GitHub contributors list](https://github.com/kaltura/playkit-ios/graphs/contributors).  

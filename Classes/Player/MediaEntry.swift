@@ -13,18 +13,31 @@ func getJson(_ json: Any) -> JSON {
     return json as? JSON ?? JSON(json)
 }
 
+public enum MediaType {
+    case Live
+}
+
 public class MediaEntry: NSObject {
     public var id: String
     public var sources: [MediaSource]?
     public var duration: Int64?
+    public var mediaType: MediaType?
     
     private let idKey = "id"
     private let sourcesKey = "sources"
+    private let mediaTypeKey = "mediaType"
     private let durationKey = "duration"
     
 
     internal init(id: String) {
         self.id = id
+        super.init()
+    }
+    
+    public init(_ id: String, sources: [MediaSource], duration: Int64 = 0) {
+        self.id = id
+        self.sources = sources
+        self.duration = duration
         super.init()
     }
     
@@ -38,6 +51,12 @@ public class MediaEntry: NSObject {
         
         if let sources = jsonObject[sourcesKey].array {
             self.sources = sources.map { MediaSource(json: $0) }
+        }
+        
+        if let mediaTypeStr = jsonObject[mediaTypeKey].string {
+            if mediaTypeStr == "Live" {
+                self.mediaType = MediaType.Live
+            }
         }
         
         super.init()
@@ -63,22 +82,28 @@ public class MediaSource: NSObject {
     private let drmDataKey: String = "drmData"
     
     
-    public init (id: String){
+    public convenience init (id: String){
+        self.init(id, contentUrl: nil)
+    }
+    
+    public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil) {
         self.id = id
-        super.init()
+        self.contentUrl = contentUrl
+        self.mimeType = mimeType
+        self.drmData = drmData
     }
     
     public init(json: Any) {
         
-        let jsonObj = getJson(json)
+        let sj = getJson(json)
         
-        self.id = jsonObj[idKey].string ?? UUID().uuidString
+        self.id = sj[idKey].string ?? UUID().uuidString
         
-        self.contentUrl = jsonObj[contentUrlKey].URL
+        self.contentUrl = sj[contentUrlKey].URL
         
-        self.mimeType = jsonObj[mimeTypeKey].string
+        self.mimeType = sj[mimeTypeKey].string
         
-        if let drmData = jsonObj[drmDataKey].array {
+        if let drmData = sj[drmDataKey].array {
             self.drmData = drmData.flatMap { DRMData.fromJSON($0) }
         }
 
@@ -101,13 +126,13 @@ open class DRMData: NSObject {
         }
     }
     
-    static func fromJSON(_ json: Any) -> DRMData? {
+    public static func fromJSON(_ json: Any) -> DRMData? {
         
-        let jsonObj = getJson(json)
+        let sj = getJson(json)
         
-        guard let licenseUri = jsonObj["licenseUri"].string else { return nil }
+        guard let licenseUri = sj["licenseUri"].string else { return nil }
         
-        if let fpsCertificate = jsonObj["fpsCertificate"].string {
+        if let fpsCertificate = sj["fpsCertificate"].string {
             return FairPlayDRMData(licenseUri: licenseUri, base64EncodedCertificate: fpsCertificate)
         } else {
             return DRMData(licenseUri: licenseUri)
