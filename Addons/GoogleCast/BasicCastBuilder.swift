@@ -19,13 +19,20 @@ import GoogleCast
 public class BasicCastBuilder: NSObject {
     
     
+    public enum StreamType {
+        case live
+        case vod
+    }
+    
     enum BasicBuilderDataError: Error {
         case missingContentId
         case missingWebPlayerURL
         case missingPartnerID
         case missingUIConfId
+        case missingStreamType
     }
     
+    internal var streamType: GCKMediaStreamType!
     internal var contentId: String!
     internal var webPlayerURL: String?
     internal var partnerID: String!
@@ -33,6 +40,27 @@ public class BasicCastBuilder: NSObject {
     internal var adTagURL: String?
     internal var metaData: GCKMediaMetadata?
     
+    
+
+    
+    
+    
+    /**
+     Set - stream type
+     - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
+     */
+    @discardableResult
+    public func set(streamType: StreamType?) -> Self{
+        
+        switch streamType {
+        case .live? :
+            self.streamType = .live
+        default:
+            self.streamType = .buffered
+            
+        }
+        return self
+    }
     
     /**
      Set - contentId
@@ -113,6 +141,10 @@ public class BasicCastBuilder: NSObject {
             throw BasicCastBuilder.BasicBuilderDataError.missingUIConfId
         }
         
+        guard self.streamType != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
+        }
+        
     }
 
     
@@ -124,7 +156,7 @@ public class BasicCastBuilder: NSObject {
         let data = try self.validate()
         let customData = self.customData()
         let mediaInfo: GCKMediaInformation = GCKMediaInformation(contentID:self.contentId,
-                                                                 streamType: GCKMediaStreamType.buffered,
+                                                                 streamType: self.streamType,
                                                                  contentType: "",
                                                                  metadata: self.metaData,
                                                                  streamDuration: 0,
