@@ -17,6 +17,7 @@ class YouboraManager: YBPluginGeneric {
 
     private var pkPlayer: Player!
     private var mediaEntry: MediaEntry!
+    public var currentBitrate: Double?
     
     init!(options: NSObject!, player: Player, media: MediaEntry) {
         super.init(options: options)
@@ -45,5 +46,12 @@ class YouboraManager: YBPluginGeneric {
     
     override func getPlayerVersion() -> String! {
         return "PlayKit-0.1.0"
+    }
+    
+    override func getBitrate() -> NSNumber! {
+        if let bitrate = currentBitrate {
+            return NSNumber(value: bitrate)
+        }
+        return NSNumber(value: 0.0)
     }
 }

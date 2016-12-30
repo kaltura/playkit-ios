@@ -134,6 +134,14 @@ public class YouboraPlugin: PKPlugin {
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
+        self.messageBus?.addObserver(self, events: [PlayerEvents.playbackParamsUpdated.self], block: { (info) in
+            PKLog.trace("playbackParamsUpdated info: \(info)")
+            if let paramsEvent = info as? PlayerEvents.playbackParamsUpdated {
+                self.youboraManager.currentBitrate = paramsEvent.currentBitrate
+            }
+            self.postEventLogWithMessage(message: "Event info: \(info)")
+        })
+
         self.player.addObserver(self, events: [PlayerEvents.stateChanged.self]) { (data: Any) in
             
             if let stateChanged = data as? PlayerEvents.stateChanged {
