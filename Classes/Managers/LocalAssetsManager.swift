@@ -89,4 +89,3 @@ class LocalMediaSource: MediaSource {
         super.init(id, contentUrl: localContentUrl)
     }
 }
-

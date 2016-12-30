@@ -13,13 +13,19 @@ func getJson(_ json: Any) -> JSON {
     return json as? JSON ?? JSON(json)
 }
 
+public enum MediaType {
+    case Live
+}
+
 public class MediaEntry: NSObject {
     public var id: String
     public var sources: [MediaSource]?
     public var duration: Int64?
+    public var mediaType: MediaType?
     
     private let idKey = "id"
     private let sourcesKey = "sources"
+    private let mediaTypeKey = "mediaType"
     private let durationKey = "duration"
     
 
@@ -45,6 +51,12 @@ public class MediaEntry: NSObject {
         
         if let sources = jsonObject[sourcesKey].array {
             self.sources = sources.map { MediaSource(json: $0) }
+        }
+        
+        if let mediaTypeStr = jsonObject[mediaTypeKey].string {
+            if mediaTypeStr == "Live" {
+                self.mediaType = MediaType.Live
+            }
         }
         
         super.init()

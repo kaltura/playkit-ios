@@ -48,6 +48,12 @@ s.subspec 'YouboraPlugin' do |ssp|
     ssp.dependency 'Youbora-AVPlayer'
 end
 
+s.subspec 'WidevineClassic' do |ssp|
+  ssp.source_files = 'Widevine'
+  ssp.dependency 'PlayKitWV'
+  ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1' }
+end
+
 s.subspec 'PhoenixPlugin' do |ssp|
     ssp.source_files = 'Plugins/Phoenix'
     ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
