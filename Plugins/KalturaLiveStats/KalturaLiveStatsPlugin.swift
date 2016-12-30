@@ -74,6 +74,13 @@ public class KalturaLiveStatsPlugin: PKPlugin {
             self.stopLiveEvents()
         })
         
+        self.messageBus?.addObserver(self, events: [PlayerEvents.playbackParamsUpdated.self], block: { (info) in
+            PKLog.trace("playbackParamsUpdated info: \(info)")
+            if let paramsEvent = info as? PlayerEvents.playbackParamsUpdated {
+                self.lastReportedBitrate = Int32(paramsEvent.currentBitrate)
+            }
+        })
+        
         self.player.addObserver(self, events: [PlayerEvents.stateChanged.self]) { (data: Any) in
             
             if let stateChanged = data as? PlayerEvents.stateChanged {
