@@ -10,14 +10,13 @@ import UIKit
 import SwiftyJSON
 
 
-
 class OVPObjectMapper: NSObject {
-
+    
     static let classNameKey = "objectType"
     static let errorKey = "objectType"
     
     static func classByJsonObject(json:Any?) -> OVPBaseObject.Type? {
-     
+        
         let jsonObject = JSON(json)
         let className = jsonObject[classNameKey].string
         if let name = className{
@@ -28,6 +27,8 @@ class OVPObjectMapper: NSObject {
                 return OVPPlaybackContext.self
             case "KalturaAPIException":
                 return OVPError.self
+            case "KalturaStartWidgetSessionResponse":
+                return OVPStartWidgetSessionResponse.self
             default:
                 return nil
             }
@@ -41,5 +42,11 @@ class OVPObjectMapper: NSObject {
     
     
     
-  
+    
 }
+    
+    
+    
+    
+  
+
