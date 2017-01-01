@@ -10,7 +10,7 @@ import UIKit
 
 class SourceBuilder {
 
-
+        
     var baseURL: String?
     var partnerId: Int64?
     var ks: String?
@@ -20,6 +20,8 @@ class SourceBuilder {
     var format:String? = "url"
     var sourceProtocol:String? = "https"
     var playSessionId:String?
+    var drmSchemes:[String]?
+    var fileExtension: String?
     
 
     @discardableResult
@@ -77,6 +79,21 @@ class SourceBuilder {
     }
     
     
+    @discardableResult
+    func set(drmSchemes:[String]?) -> SourceBuilder {
+        self.drmSchemes = drmSchemes
+        return self
+    }
+    
+    @discardableResult
+    func set(fileExtension:String) -> SourceBuilder {
+        self.fileExtension = fileExtension
+        return self
+    }
+    
+    
+    
+    
     func build() -> URL? {
         
         guard
@@ -85,11 +102,12 @@ class SourceBuilder {
             let partnerId = self.partnerId,
             let format = self.format,
             let entryId = self.entryId,
-            let sourceProtocol = self.sourceProtocol else {
+            let sourceProtocol = self.sourceProtocol,
+            let fileExt = self.fileExtension
+        else {
             return nil
         }
         
-        let fileExt = self.fileExtentionByFormat(format: format) 
         var urlAsString: String = baseURL + "/p/" + String(partnerId) + "/sp/" + String(partnerId) + "00/playManifest" + "/entryId/" + entryId + "/protocol/" + sourceProtocol + "/format/" + format
         
         var flavorsExist = false
@@ -118,7 +136,7 @@ class SourceBuilder {
         }
         
 
-        urlAsString = urlAsString + "/a." + self.fileExtentionByFormat(format: format)
+        urlAsString = urlAsString + "/a." + fileExt
         
         var params: [String] = [String]()
         
@@ -147,18 +165,18 @@ class SourceBuilder {
     }
 
     //
-    func fileExtentionByFormat(format:String) -> String{
-        
-        switch format {
-        case "applehttp":
-            return "m3u8"
-        case "mpegdash":
-            return "mpd"
-        case "url":
-            return "mp4"
-        default:
-            return "mp4"
-        }
-    }
+//    func fileExtentionByFormat(format:String) -> String{
+//        
+//        switch format {
+//        case "applehttp":
+//            return "m3u8"
+//        case "mpegdash":
+//            return "mpd"
+//        case "url":
+//            return "mp4"
+//        default:
+//            return "mp4"
+//        }
+//    }
 
 }

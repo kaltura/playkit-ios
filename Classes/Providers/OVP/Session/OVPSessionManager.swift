@@ -57,7 +57,7 @@ public class OVPSessionManager: SessionProvider {
     }
     
     public func loadKS(completion: @escaping (_ result :Result<String>) -> Void){
-        if let ks = self.ks, self.tokenExpiration?.compare(Date()) == ComparisonResult.orderedAscending {
+        if let ks = self.ks, self.tokenExpiration?.compare(Date()) == ComparisonResult.orderedDescending {
                 completion(Result(data: ks))
         }else{
             

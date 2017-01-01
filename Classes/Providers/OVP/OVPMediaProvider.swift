@@ -153,13 +153,15 @@ public class OVPMediaProvider: MediaEntryProvider {
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach({ (source:OVPSource) in
                         
-                        guard self.isSourceValid(source: source) else { return }
+                        let sourceType = self.getSourceType(source: source)
+                        guard sourceType != .unknown else { return }
+    
                         
                         var playURL: URL? = nil
                         if let flavors =  source.flavors,
                             flavors.count > 0 {
                             
-                            let sourceBuilder: SourceBuilder = SourceBuilder()
+                                let sourceBuilder: SourceBuilder = SourceBuilder()
                                 .set(baseURL: loadInfo.sessionProvider.serverURL)
                                 .set(ks: ks)
                                 .set(format: source.format)
@@ -169,8 +171,9 @@ public class OVPMediaProvider: MediaEntryProvider {
                                 .set(partnerId: loadInfo.sessionProvider.partnerId)
                                 .set(playSessionId: UUID().uuidString) // insert - session
                                 .set(sourceProtocol: source.protocols?.last)
+                                .set(fileExtension: sourceType.fileExtension)
                             
-                            playURL = sourceBuilder.build()
+                                playURL = sourceBuilder.build()
                         }
                         else{
                             playURL = source.url
@@ -254,28 +257,38 @@ public class OVPMediaProvider: MediaEntryProvider {
         return flavorsId
     }
     
-    func isSourceValid(source:OVPSource) -> Bool {
-        let supportedFormats = FormatsHelper.extentionByformat.keys
-        guard  let format = source.format,
-        format.isEmpty == false,
-        supportedFormats.contains(format)
-            else {
-            return false
-        }
-        
-        return true
-    }
-    
     public func cancel() {
+        
     }
     
+    
+    private func getSourceType(source:OVPSource) -> MediaSource.SourceType {
+    
+        if let format = source.format {
+        switch format {
+        case "applehttp":
+            if source.drm == nil {
+                return MediaSource.SourceType.hls_clear
+            }else{
+                return MediaSource.SourceType.hls_fair_play
+            }
+        case "url":
+            if source.drm == nil {
+                return MediaSource.SourceType.mp4_clear
+            }else{
+                return MediaSource.SourceType.wvm_wideVine
+            }
+        default:
+            return MediaSource.SourceType.unknown
+            }
+        }
+    
+        return MediaSource.SourceType.unknown
+        
+    }
 }
 
-class FormatsHelper {
-    static let extentionByformat = ["applehttp":"m3u8",
-                                    "url":"mp4"]
-    
-}
+
 
 
 
