@@ -41,16 +41,6 @@ class PlayerController: NSObject, Player {
     private var currentPlayer: AVPlayerEngine?
     private var assetBuilder: AssetBuilder?
     
-    public var autoPlay: Bool? {
-        get {
-            return false
-            //  return
-        }
-        set {
-            //
-        }
-    }
-    
     public var currentTime: TimeInterval {
         get {
             if let player = self.currentPlayer {

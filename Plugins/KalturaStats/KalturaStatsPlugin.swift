@@ -266,7 +266,7 @@ public class KalturaStatsPlugin: PKPlugin {
         PKLog.trace("Action: \(action)")
         
         var sessionId = ""
-        var baseUrl = ""
+        var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
         var confId = 0
         var parterId = ""
         
