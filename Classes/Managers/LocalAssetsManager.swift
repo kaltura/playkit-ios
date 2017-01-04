@@ -23,21 +23,32 @@ fileprivate let canDownloadWidevineClassic: Bool = TARGET_OS_SIMULATOR==0
     && NSClassFromString("WidevineClassicAssetHandler") != nil
 
 
-
+/// Manage local (downloaded) assets.
 public class LocalAssetsManager: NSObject {
     let storage: LocalDataStore
     var delegates = Set<AssetLoaderDelegate>()
     
-
-    public init(storage: LocalDataStore) {
-        self.storage = storage
+    /**
+     Create a new LocalAssetsManager.
+     
+     - Parameter storage: data store. Used for DRM data, and may only be nil if DRM is not used.
+    */
+    public init(storage: LocalDataStore?) {
+        self.storage = storage ?? NullStore.instance
     }
 
+    /**
+     Prepare an AVURLAsset for download via AVAssetDownloadTask.
+     Note that this is only relevant for FairPlay assets, and does not do anything otherwise.
+     
+     - Parameters:
+        - asset: an AVURLAsset, ready to be downloaded
+        - mediaSource: the original source for the asset. mediaSource.contentUrl and asset.url should point at the same file.
+    */
     public func prepareForDownload(asset: AVURLAsset, mediaSource: MediaSource) {
         
-        // This function is a noop (not an error) if no DRM data or DRM is not FairPlay.
+        // This function is a noop if no DRM data or DRM is not FairPlay.
         guard let drmData = mediaSource.drmData?.first as? FairPlayDRMData else {return}
-
 
         PKLog.debug("Preparing asset for download; asset.url:", asset.url)
         
@@ -56,10 +67,11 @@ public class LocalAssetsManager: NSObject {
 
     }
 
-    public func createLocalMediaSource(for assetId: String, localURL: URL) -> MediaSource {
+    private func createLocalMediaSource(for assetId: String, localURL: URL) -> MediaSource {
         return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
     }
 
+    
     public func createLocalMediaEntry(for assetId: String, localURL: URL) -> MediaEntry {
         let mediaSource = createLocalMediaSource(for: assetId, localURL: localURL)
         return MediaEntry.init(assetId, sources: [mediaSource])
@@ -88,7 +100,7 @@ public class LocalAssetsManager: NSObject {
         if canDownloadWidevineClassic, let source = sources.first(where: {$0.fileExt=="wvm"}) {
             return source
         }
-            
+        
         return nil
     }
 
@@ -103,6 +115,24 @@ public class LocalAssetsManager: NSObject {
     public func registerDownloadedAsset(location: URL, mediaSource: MediaSource) {
         // FairPlay -- nothing to do
         
+        // Widevine: TODO
+    }
+    
+    private class NullStore: LocalDataStore {
+        public func remove(key: String) throws {
+            PKLog.error("LocalDataStore not set")
+        }
+
+        public func load(key: String) throws -> Data? {
+            PKLog.error("LocalDataStore not set")
+            return nil
+        }
+
+        public func save(key: String, value: Data) throws {
+            PKLog.error("LocalDataStore not set")
+        }
+        
+        static let instance = NullStore()
     }
 }
 
