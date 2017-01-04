@@ -11,8 +11,7 @@ import SwiftyJSON
 
 internal class OVPStatsService {
 
-    internal static func get(baseURL: String, partnerId: String, eventType: Int, clientVer: String, duration: Float,
-                             sessionId: String, position: Int32, uiConfId: Int, entryId: String, widgetId: String, isSeek: Bool, referrer: String = "") -> KalturaRequestBuilder? {
+    internal static func get(baseURL: String, partnerId: String, eventType: Int, clientVer: String, duration: Float,sessionId: String, position: Int32, uiConfId: Int, entryId: String, widgetId: String, isSeek: Bool, referrer: String = "") -> KalturaRequestBuilder? {
         
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: nil, action: nil) {
             request

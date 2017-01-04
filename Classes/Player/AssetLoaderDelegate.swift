@@ -27,8 +27,8 @@ class AssetLoaderDelegate: NSObject {
     /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
     fileprivate static let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
     
-        
-    private let storage: LocalDrmStorage?
+    
+    private let storage: LocalDataStore?
     
     private let drmData: FairPlayDRMData?
     
@@ -38,8 +38,8 @@ class AssetLoaderDelegate: NSObject {
         return storage != nil
     }
     
-    private init(drmData: FairPlayDRMData? = nil, storage: LocalDrmStorage? = nil) {
-
+    private init(drmData: FairPlayDRMData? = nil, storage: LocalDataStore? = nil) {
+        
         self.drmData = drmData
         self.storage = storage
         
@@ -55,7 +55,7 @@ class AssetLoaderDelegate: NSObject {
     }
     
     @available(iOS 10.0, *)
-    static func configureDownload(asset: AVURLAsset, drmData: FairPlayDRMData, storage: LocalDrmStorage) -> AssetLoaderDelegate {
+    static func configureDownload(asset: AVURLAsset, drmData: FairPlayDRMData, storage: LocalDataStore) -> AssetLoaderDelegate {
         let delegate = AssetLoaderDelegate.init(drmData: drmData, storage: storage)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
@@ -65,7 +65,7 @@ class AssetLoaderDelegate: NSObject {
     }
     
     @available(iOS 10.0, *)
-    static func configureLocalPlay(asset: AVURLAsset, storage: LocalDrmStorage) -> AssetLoaderDelegate {
+    static func configureLocalPlay(asset: AVURLAsset, storage: LocalDataStore) -> AssetLoaderDelegate {
         let delegate = AssetLoaderDelegate.init(storage: storage)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
@@ -100,9 +100,9 @@ class AssetLoaderDelegate: NSObject {
         if ckc.count == 0 {
             throw FairPlayError.malformedCKCInResponse
         }
-
+        
         PKLog.debug("Got valid CKC")
-
+        
         return ckc
     }
     
@@ -194,7 +194,7 @@ class AssetLoaderDelegate: NSObject {
             // Pass the persistedContentKeyData into the dataRequest so complete the content key request.
             dataRequest.respond(with: persistedContentKeyData)
             resourceLoadingRequest.finishLoading()
-            self.done?(nil)            
+            self.done?(nil)
             
             return
         }
@@ -222,12 +222,12 @@ class AssetLoaderDelegate: NSObject {
             resourceLoadingRequestOptions = [AVAssetResourceLoadingRequestStreamingContentKeyRequestRequiresPersistentKey: true as AnyObject]
         }
         
-                
+        
         let spcData: Data!
         
         do {
-            /* 
-             To obtain the Server Playback Context (SPC), we call 
+            /*
+             To obtain the Server Playback Context (SPC), we call
              AVAssetResourceLoadingRequest.streamingContentKeyRequestData(forApp:contentIdentifier:options:)
              using the information we obtained earlier.
              */
@@ -264,7 +264,7 @@ class AssetLoaderDelegate: NSObject {
     }
     
     func handleCKCData(_ resourceLoadingRequest: AVAssetResourceLoadingRequest, _ assetId: String, _ ckcData: Data) {
-
+        
         // Check if this reuqest is the result of a potential AVAssetDownloadTask.
         if #available(iOS 10.0, *), shouldPersist {
             // Since this request is the result of an AVAssetDownloadTask, we should get the secure persistent content key.
@@ -302,7 +302,7 @@ class AssetLoaderDelegate: NSObject {
             dataRequest.respond(with: persistentContentKeyData)
             resourceLoadingRequest.finishLoading()  // Treat the processing of the request as complete.
             self.done?(nil)
-        
+            
         } else {
             
             guard let dataRequest = resourceLoadingRequest.dataRequest else {
@@ -392,4 +392,3 @@ extension AssetLoaderDelegate: AVAssetResourceLoaderDelegate {
     }
     
 }
-
