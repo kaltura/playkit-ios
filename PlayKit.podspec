@@ -1,13 +1,13 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = 'v0.1.2'
+s.version          = '0.1.3'
 s.summary          = 'A short description of PlayKit.'
 
 
 s.homepage         = 'https://github.com/kaltura/playkit-ios'
 s.license          = { :type => 'MIT', :file => 'LICENSE' }
 s.author           = { 'Rivka Schwartz' => 'Rivka.Peleg@kaltura.com', 'Vadim Kononov' => 'vadim.kononov@kaltura.com', 'Eliza Sapir' => 'eliza.sapir@kaltura.com', 'Noam Tamim' => 'noam.tamim@kaltura.com' }
-s.source           = { :git => 'https://github.com/kaltura/playkit-ios.git', :tag => s.version.to_s }
+s.source           = { :git => 'https://github.com/kaltura/playkit-ios.git', :tag => 'v' + s.version.to_s }
 
 s.ios.deployment_target = '8.0'
 
