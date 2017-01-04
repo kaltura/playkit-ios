@@ -21,9 +21,7 @@ class DefaultAssetHandler: AssetHandler {
     static let sourceFilter = { (_ src: MediaSource) -> Bool in
         
         // FIXME: extension is not the best criteria here, use format when that's available. 
-        guard let ext = src.contentUrl?.pathExtension else {
-            return false
-        }
+        let ext = src.fileExt
         
         // mp4 is always supported
         if ext == "mp4" {
@@ -36,7 +34,7 @@ class DefaultAssetHandler: AssetHandler {
         }
         
         // The only other option is HLS
-        if ext != "m3u8" {
+        guard ext == "m3u8" else {
             return false
         }
         
