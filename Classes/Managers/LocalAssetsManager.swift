@@ -20,7 +20,7 @@ fileprivate let canDownloadFairPlay: Bool = {
 
 // Widevine is optional (and not available in simulators)
 fileprivate let canDownloadWidevineClassic: Bool = TARGET_OS_SIMULATOR==0 
-    && NSClassFromString("WidevineClassicAssetHandler") != nil
+    && NSClassFromString("PlayKit.WidevineClassicAssetHandler") != nil
 
 
 /// Manage local (downloaded) assets.
