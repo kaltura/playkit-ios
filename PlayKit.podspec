@@ -70,6 +70,14 @@ s.subspec 'KalturaStatsPlugin' do |ssp|
 '   LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
 end
 
+s.subspec 'KalturaLiveStatsPlugin' do |ssp|
+ssp.source_files = 'Plugins/KalturaLiveStats'
+ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+'OTHER_LDFLAGS' => '$(inherited)',
+'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
+'   LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+end
+
 s.default_subspec = 'Core'
 
 end
