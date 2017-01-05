@@ -1,7 +1,7 @@
 # Kaltura Player SDK
 ## Note: The Kaltura SDK v3 is in beta
 
-*If you are a Kaltura customer, please contact your **Kaltura Customer Success Manager** to help facilitate use of this component.*
+*If you are a Kaltura customer, please contact your Kaltura Customer Success Manager to help facilitate use of this component.*
 
 The **Kaltura Player SDK** is fully native and introduces significant performance improvements. The SDK is intended to be integrated in any iOS application and includes the following features:
 
