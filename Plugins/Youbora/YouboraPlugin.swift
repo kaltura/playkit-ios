@@ -38,8 +38,7 @@ public class YouboraPlugin: PKPlugin {
             PKLog.warning("There is no Analytics Config.")
         }
         
-        let options = [String : Any]()
-        youboraManager = YouboraManager(options: options as NSObject!, player: player, media: mediaConfig)
+        setupOptions()
         
         registerToAllEvents()
         
@@ -50,21 +49,23 @@ public class YouboraPlugin: PKPlugin {
         stopMonitoring()
     }
     
-    private func startMonitoring(player: Player) {
-        
-        var yConfig = YouboraConfig.defaultYouboraConfig
-        var media : [String: Any] = yConfig["media"] as! [String : Any]
-        
-        if let entry = self.mediaEntry {
-            media["resource"] = entry.id
-            media["title"] = entry.id
-            media["duration"] = self.player.duration
-            
-        } else {
-            PKLog.warning("There is no MediaEntry")
+    private func setupOptions() {
+        let options = self.config.params
+        if var media = options?["media"] as? [String: Any] {
+            if let entry = self.mediaEntry {
+                media["resource"] = entry.id
+                media["title"] = entry.id
+                media["duration"] = self.player.duration
+                
+            } else {
+                PKLog.warning("There is no MediaEntry")
+            }
         }
-        
-        youboraManager.setOptions(yConfig as NSObject!)
+        youboraManager = YouboraManager(options: options as NSObject!, player: player, media: self.mediaEntry)
+	
+    }
+    
+    private func startMonitoring(player: Player) {
         PKLog.trace("Start monitoring using Youbora")
         youboraManager.startMonitoring(withPlayer: youboraManager)
     }
@@ -134,6 +135,14 @@ public class YouboraPlugin: PKPlugin {
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
+        self.messageBus?.addObserver(self, events: [PlayerEvents.playbackParamsUpdated.self], block: { (info) in
+            PKLog.trace("playbackParamsUpdated info: \(info)")
+            if let paramsEvent = info as? PlayerEvents.playbackParamsUpdated {
+                self.youboraManager.currentBitrate = paramsEvent.currentBitrate
+            }
+            self.postEventLogWithMessage(message: "Event info: \(info)")
+        })
+
         self.player.addObserver(self, events: [PlayerEvents.stateChanged.self]) { (data: Any) in
             
             if let stateChanged = data as? PlayerEvents.stateChanged {

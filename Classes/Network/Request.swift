@@ -147,8 +147,6 @@ public class RequestBuilder: NSObject {
             }
         }
         
-        
-        
         if let params = self.urlParams, params.count > 0 {
             
             let urlComponents = NSURLComponents()
@@ -169,8 +167,7 @@ public class RequestBuilder: NSObject {
             
         }
         
-        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
-        
+        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)        
         
     }
 }
