@@ -163,20 +163,4 @@ class SourceBuilder {
         
         return URL(string: urlAsString)
     }
-
-    //
-//    func fileExtentionByFormat(format:String) -> String{
-//        
-//        switch format {
-//        case "applehttp":
-//            return "m3u8"
-//        case "mpegdash":
-//            return "mpd"
-//        case "url":
-//            return "mp4"
-//        default:
-//            return "mp4"
-//        }
-//    }
-
 }
