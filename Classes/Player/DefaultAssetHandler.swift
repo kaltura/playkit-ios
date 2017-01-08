@@ -39,7 +39,7 @@ class DefaultAssetHandler: AssetHandler {
         }
         
         // DRM is not supported on simulators
-        if src.drmData != nil && TARGET_OS_SIMULATOR != 0 {
+        if  let drmData = src.drmData, drmData.count > 0 && TARGET_OS_SIMULATOR != 0 {
             return false
         }
         
