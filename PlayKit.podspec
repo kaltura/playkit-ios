@@ -15,6 +15,7 @@ s.subspec 'Core' do |sp|
     sp.source_files = 'Classes/**/*'
     sp.dependency 'SwiftyJSON'
     sp.dependency 'Log'
+    sp.dependency 'SwiftyXMLParser'
 end
 
 s.subspec 'SamplePlugin' do |ssp|

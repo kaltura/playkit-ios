@@ -7,8 +7,11 @@
 //
 
 import UIKit
+import SwiftyXMLParser
 
 public class OVPMediaProvider: MediaEntryProvider {
+   
+
     
     //This object is initiate at the begning of loadMedia methos and contain all neccessery info to load.
     struct LoaderInfo {
@@ -144,6 +147,7 @@ public class OVPMediaProvider: MediaEntryProvider {
             let getPlaybackContext =  OVPBaseEntryService.getPlaybackContext(baseURL: loadInfo.apiServerURL,
                                                                              ks: token,
                                                                              entryID: loadInfo.entryId)
+            let metadataRequest = OVPBaseEntryService.metadata(baseURL: loadInfo.apiServerURL, ks: token, entryID: loadInfo.entryId)
             
             guard let req1 = listRequest,
                 let req2 = getPlaybackContext else {
@@ -154,6 +158,7 @@ public class OVPMediaProvider: MediaEntryProvider {
             //Building the multi request
             mrb?.add(request: req1)
                 .add(request: req2)
+                .add(request:metadataRequest!)
                 .set(completion: { (dataResponse:Response) in
                     
                     let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: dataResponse.data)
@@ -166,14 +171,17 @@ public class OVPMediaProvider: MediaEntryProvider {
                             return
                     }
                     
-                    let mainResponse: OVPBaseObject = responses[responses.count-2]
-                    let contextDataResponse: OVPBaseObject = responses[responses.count-1]
+                    let metaData:OVPBaseObject = responses[responses.count-1]
+                    let mainResponse: OVPBaseObject = responses[responses.count-3]
+                    let contextDataResponse: OVPBaseObject = responses[responses.count-2]
                     
                     guard
                         let mainResponseData = mainResponse as? OVPList,
                         let entry = mainResponseData.objects?.last as? OVPEntry,
                         let contextData = contextDataResponse as? OVPPlaybackContext,
-                        let sources = contextData.sources
+                        let sources = contextData.sources,
+                        let metadataListObject = metaData as? OVPList,
+                        let metadataList = metadataListObject.objects as? [OVPMetadata]
                         else{
                             callback(Result(data: nil, error: Err.invalidResponse ))
                             PKLog.debug("Response is not containing Entry info or playback data")
@@ -213,12 +221,23 @@ public class OVPMediaProvider: MediaEntryProvider {
                         mediaSources.append(mediaSource)
                     })
                     
+                    var metaDataItems: [(name: String, value: String)] = [(name: String, value: String)]()
+
+                    metadataList.forEach({ (meta:OVPMetadata) in
+                        let xml = try! XML.parse(meta.xml!)
+                        xml["metadata"].all?.forEach({ (element) in
+                            element.childElements.forEach({(dataElement) in
+                            metaDataItems.append((name:dataElement.name,value:dataElement.text!))
+                            })
+                        })
+                    })
+                    
                     //creating media entry with the above sources
                     let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
                     mediaEntry.duration = entry.duration
                     mediaEntry.sources = mediaSources
+                    mediaEntry.metadata = metaDataItems
                     callback(Result(data: mediaEntry, error: nil ))
-                    
                 })
             
             

@@ -22,6 +22,7 @@ public class MediaEntry: NSObject {
     public var sources: [MediaSource]?
     public var duration: Int64?
     public var mediaType: MediaType?
+    public var metadata:[(name:String,value:String)]?
     
     private let idKey = "id"
     private let sourcesKey = "sources"
