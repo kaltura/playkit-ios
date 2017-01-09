@@ -271,7 +271,7 @@ public class OVPMediaProvider: MediaEntryProvider {
             
             var drmData: DRMData? = nil
             switch scheme {
-            case "fps":
+            case "fairplay.FAIRPLAY":
                 guard let certifictae = drm.certificate,
                     let licenseURL = drm.licenseURL
                     // if the scheme is type fair play and there is no certificate or license URL
