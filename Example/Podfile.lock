@@ -1,0 +1,26 @@
+PODS:
+  - Log (1.0)
+  - PlayKit (0.1.3):
+    - Log
+    - PlayKit/Lite (= 0.1.3)
+    - SwiftyJSON
+  - PlayKit/Lite (0.1.3):
+    - Log
+    - SwiftyJSON
+  - SwiftyJSON (3.1.3)
+
+DEPENDENCIES:
+  - PlayKit (from `../../playkit-ios`)
+
+EXTERNAL SOURCES:
+  PlayKit:
+    :path: ../../playkit-ios
+
+SPEC CHECKSUMS:
+  Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
+  PlayKit: 1ea0a73f3d2642d7f03cb42424da54cc3c2dc8a8
+  SwiftyJSON: 38a8ea2006779c0fc4c310cb2ee8195327740faf
+
+PODFILE CHECKSUM: 97489b4955a7453cf805ff425f4931620ad73250
+
+COCOAPODS: 1.1.1
