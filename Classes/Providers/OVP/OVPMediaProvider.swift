@@ -150,7 +150,7 @@ public class OVPMediaProvider: MediaEntryProvider {
             let metadataRequest = OVPBaseEntryService.metadata(baseURL: loadInfo.apiServerURL, ks: token, entryID: loadInfo.entryId)
             
             guard let req1 = listRequest,
-                let req2 = getPlaybackContext else {
+                let req2 = getPlaybackContext, let req3 = metadataRequest else {
                     callback(Result(data: nil, error: Err.invalidParams))
                     return
             }
@@ -158,7 +158,7 @@ public class OVPMediaProvider: MediaEntryProvider {
             //Building the multi request
             mrb?.add(request: req1)
                 .add(request: req2)
-                .add(request:metadataRequest!)
+                .add(request: req3)
                 .set(completion: { (dataResponse:Response) in
                     
                     let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: dataResponse.data)
@@ -172,8 +172,8 @@ public class OVPMediaProvider: MediaEntryProvider {
                     }
                     
                     let metaData:OVPBaseObject = responses[responses.count-1]
-                    let mainResponse: OVPBaseObject = responses[responses.count-3]
                     let contextDataResponse: OVPBaseObject = responses[responses.count-2]
+                    let mainResponse: OVPBaseObject = responses[responses.count-3]
                     
                     guard
                         let mainResponseData = mainResponse as? OVPList,
