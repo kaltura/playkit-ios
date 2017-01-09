@@ -44,7 +44,7 @@ import AVKit
     var currentTextTrack: String? { get }
     
     /**
-     Prepare for playing an entry. If `config.autoPlay` is true, the entry will automatically
+     Prepare for playing an entry.
      play when it's ready.
      */
     func prepare(_ config: PlayerConfig)
@@ -64,9 +64,7 @@ import AVKit
     func seek(to time: CMTime)
     
     /**
-     Prepare for playing the next entry. If `config.shouldAutoPlay` is true, the entry will automatically
-     play when it's ready and the current entry is ended.
-     
+     Prepare for playing the next entry.      
     */
     func prepareNext(_ config: PlayerConfig) -> Bool
 

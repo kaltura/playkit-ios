@@ -75,6 +75,17 @@ public class PlayerEvents: PKEvent {
             self.tracks = tracks
         }
     }
+    
+    /**
+     Sent when Playback Params Updated.
+     */
+    public class playbackParamsUpdated : PlayerEvents {
+        public var currentBitrate: Double
+        
+        init(currentBitrate: Double) {
+            self.currentBitrate = currentBitrate
+        }
+    }
 
     /**
      Sent when player state is changed.

@@ -28,6 +28,7 @@ class AVPlayerEngine : AVPlayer {
     private var currentState: PlayerState = PlayerState.idle
     private var isObserved: Bool = false
     private var tracksManager = TracksManager()
+    private var lastBitrate: Double = 0
     
     //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
     private var nonObservablePropertiesUpdateTimer: Timer?
@@ -296,6 +297,7 @@ class AVPlayerEngine : AVPlayer {
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.playerFailed(notification:)), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.playerPlayedToEnd(notification:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: NSNotification.Name.AVPlayerItemNewAccessLogEntry, object: nil)
     }
     
     func removeObservers() {
@@ -310,7 +312,22 @@ class AVPlayerEngine : AVPlayer {
             removeObserver(self, forKeyPath: keyPath, context: &observerContext)
         }
         
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    func onAccessLogEntryNotification(notification: Notification) {
+        if let item = notification.object as? AVPlayerItem, let accessLog = item.accessLog(), let lastEvent = accessLog.events.last {
+            if #available(iOS 10.0, *) {
+                PKLog.debug("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
+            }
+            
+            if lastEvent.indicatedBitrate != self.lastBitrate {
+                self.lastBitrate = lastEvent.indicatedBitrate
+                PKLog.trace("currentBitrate:: \(self.lastBitrate)")
+                self.postEvent(event: PlayerEvents.playbackParamsUpdated(currentBitrate: self.lastBitrate))
+            }
+        }
     }
     
     public func playerFailed(notification: NSNotification) {

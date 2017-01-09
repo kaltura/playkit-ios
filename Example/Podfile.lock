@@ -1,14 +1,14 @@
 PODS:
   - GoogleAds-IMA-iOS-SDK (3.3.1)
   - Log (1.0)
-  - PlayKit (0.0.5):
-    - PlayKit/Core (= 0.0.5)
-  - PlayKit/Core (0.0.5):
+  - PlayKit (0.0.8):
+    - PlayKit/Core (= 0.0.8)
+  - PlayKit/Core (0.0.8):
     - Log
     - SwiftyJSON
-  - PlayKit/IMAPlugin (0.0.5):
+  - PlayKit/IMAPlugin (0.0.8):
     - GoogleAds-IMA-iOS-SDK (~> 3.3)
-  - PlayKit/KalturaStatsPlugin (0.0.5)
+  - PlayKit/KalturaStatsPlugin (0.0.8)
   - SwiftyJSON (3.1.1)
 
 DEPENDENCIES:
@@ -23,9 +23,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   GoogleAds-IMA-iOS-SDK: 5643300870bd3289c47c0d0b5a2dbf595b05c336
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
-  PlayKit: 75c6075e3f776f2722e80d377cc4eb0cb079c4db
+  PlayKit: 9b502b4b640a50af7dc14b1ee736d0d2039b38a5
   SwiftyJSON: f0be2e604f83e8405a624e9f891898bf6ed4e019
 
-PODFILE CHECKSUM: 90a4b70e772c6da533348e6ec217959a9bc7ee02
+PODFILE CHECKSUM: 96338e35726ea000055afe7c776718b53dfef70d
 
-COCOAPODS: 1.1.1
+COCOAPODS: 1.2.0.beta.1
