@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.1.4.rc1'
+s.version          = '0.1.4.rc2'
 s.summary          = 'A short description of PlayKit.'
 
 
@@ -25,7 +25,7 @@ s.subspec 'IMAPlugin' do |ssp|
                   'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
     #ssp.dependency 'GoogleAds-IMA-iOS-SDK', '~> 3.3'
     ssp.dependency 'PlayKit/Core'
-    ssp.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS'=>'NOT_IMA=1' }
+    ssp.pod_target_xcconfig = { 'OTHER_SWIFT_FLAGS[config=Debug]' => '-DNOT_IMA' }
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
