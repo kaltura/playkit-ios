@@ -132,7 +132,7 @@ public class MediaSource: NSObject {
         
         self.id = sj[idKey].string ?? UUID().uuidString
         
-        self.contentUrl = sj[contentUrlKey].URL
+        self.contentUrl = sj[contentUrlKey].url
         
         self.mimeType = sj[mimeTypeKey].string
         
