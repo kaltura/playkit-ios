@@ -247,11 +247,13 @@ public class OVPMediaProvider: MediaEntryProvider {
 
         for meta in metadataList {
             do{
-                let xml = try XML.parse(meta.xml!)
-                if let allNodes = xml["metadata"].all{
-                    for element in allNodes {
-                        for dataElement in element.childElements {
-                            metaDataItems[dataElement.name] = dataElement.text
+                if let metaXML = meta.xml {
+                    let xml = try XML.parse(metaXML)
+                    if let allNodes = xml["metadata"].all{
+                        for element in allNodes {
+                            for dataElement in element.childElements {
+                                metaDataItems[dataElement.name] = dataElement.text
+                            }
                         }
                     }
                 }
