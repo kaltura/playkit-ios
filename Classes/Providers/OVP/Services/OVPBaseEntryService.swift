@@ -29,7 +29,6 @@ class OVPBaseEntryService {
     internal static func metadata(baseURL: String, ks: String,entryID: String) -> KalturaRequestBuilder? {
         
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "metadata_metadata", action: "list") {
-            let filter = ["redirectFromEntryId":entryID]
             request.setBody(key: "ks", value: JSON(ks))
                 .setBody(key: "filter:objectType", value: JSON("KalturaMetadataFilter"))
                 .setBody(key: "filter:objectIdEqual", value: JSON(entryID))

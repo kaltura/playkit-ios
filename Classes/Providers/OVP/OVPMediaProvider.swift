@@ -221,16 +221,16 @@ public class OVPMediaProvider: MediaEntryProvider {
                         mediaSources.append(mediaSource)
                     })
                     
-                    var metaDataItems: [(name: String, value: String)] = [(name: String, value: String)]()
-
-                    metadataList.forEach({ (meta:OVPMetadata) in
+                    var metaDataItems = [String: String]()
+                    
+                    for meta in metadataList {
                         let xml = try! XML.parse(meta.xml!)
-                        xml["metadata"].all?.forEach({ (element) in
-                            element.childElements.forEach({(dataElement) in
-                            metaDataItems.append((name:dataElement.name,value:dataElement.text!))
-                            })
-                        })
-                    })
+                            for element in xml["metadata"].all! {
+                                for dataElement in element.childElements {
+                                    metaDataItems[dataElement.name] = dataElement.text
+                                }
+                        }
+                    }
                     
                     //creating media entry with the above sources
                     let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
