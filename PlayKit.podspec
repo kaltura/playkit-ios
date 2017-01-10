@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.1.5'
+s.version          = '0.1.6.rc2'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 
 
