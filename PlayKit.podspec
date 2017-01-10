@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.1.5'
+s.version          = '0.1.7'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 
 
@@ -47,9 +47,8 @@ end
 
 s.subspec 'WidevineClassic' do |ssp|
   ssp.source_files = 'Widevine'
-  ssp.dependency 'PlayKitWV'
   ssp.dependency 'PlayKit/Core'
-  ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1' }
+  #ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1' }
 end
 
 s.subspec 'PhoenixPlugin' do |ssp|
