@@ -1,12 +1,12 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.1.3'
-s.summary          = 'A short description of PlayKit.'
+s.version          = '0.1.5'
+s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 
 
 s.homepage         = 'https://github.com/kaltura/playkit-ios'
-s.license          = { :type => 'MIT', :file => 'LICENSE' }
-s.author           = { 'Rivka Schwartz' => 'Rivka.Peleg@kaltura.com', 'Vadim Kononov' => 'vadim.kononov@kaltura.com', 'Eliza Sapir' => 'eliza.sapir@kaltura.com', 'Noam Tamim' => 'noam.tamim@kaltura.com' }
+s.license          = { :type => 'AGPLv3', :text => 'AGPLv3' }
+s.author           = { 'Noam Tamim' => 'noam.tamim@kaltura.com', 'Eliza Sapir' => 'eliza.sapir@kaltura.com' }
 s.source           = { :git => 'https://github.com/kaltura/playkit-ios.git', :tag => 'v' + s.version.to_s }
 
 s.ios.deployment_target = '8.0'
@@ -17,17 +17,12 @@ s.subspec 'Core' do |sp|
     sp.dependency 'Log'
 end
 
-s.subspec 'SamplePlugin' do |ssp|
-    ssp.source_files = 'Plugins/Sample'
-end
-
 s.subspec 'IMAPlugin' do |ssp|
     ssp.source_files = 'Plugins/IMA'
     ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
-                  'OTHER_LDFLAGS' => '$(inherited) -framework "GoogleInteractiveMediaAds"',
                   'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
                   'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
-    ssp.dependency 'GoogleAds-IMA-iOS-SDK', '~> 3.3'
+    ssp.dependency 'PlayKit/Core'
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
@@ -37,6 +32,7 @@ s.subspec 'GoogleCastAddon' do |ssp|
                   'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
                   'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
     ssp.dependency 'google-cast-sdk'
+    ssp.dependency 'PlayKit/Core'
 end
 
 s.subspec 'YouboraPlugin' do |ssp|
@@ -45,12 +41,14 @@ s.subspec 'YouboraPlugin' do |ssp|
     'OTHER_LDFLAGS' => '$(inherited) -framework "YouboraLib" -framework "YouboraPluginAVPlayer"',
     'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
     'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
-    ssp.dependency 'Youbora-AVPlayer'
+    ssp.dependency 'Youbora-AVPlayer/dynamic'
+    ssp.dependency 'PlayKit/Core'
 end
 
 s.subspec 'WidevineClassic' do |ssp|
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKitWV'
+  ssp.dependency 'PlayKit/Core'
   ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1' }
 end
 
@@ -60,6 +58,7 @@ s.subspec 'PhoenixPlugin' do |ssp|
     'OTHER_LDFLAGS' => '$(inherited)',
     'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
     'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+    ssp.dependency 'PlayKit/Core'
 end
 
 s.subspec 'KalturaStatsPlugin' do |ssp|
@@ -68,6 +67,7 @@ s.subspec 'KalturaStatsPlugin' do |ssp|
     'OTHER_LDFLAGS' => '$(inherited)',
     'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
 '   LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+    ssp.dependency 'PlayKit/Core'
 end
 
 s.subspec 'KalturaLiveStatsPlugin' do |ssp|
@@ -76,6 +76,7 @@ ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES
 'OTHER_LDFLAGS' => '$(inherited)',
 'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
 '   LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
+ssp.dependency 'PlayKit/Core'
 end
 
 s.default_subspec = 'Core'
