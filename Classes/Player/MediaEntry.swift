@@ -28,7 +28,7 @@ public class MediaEntry: NSObject {
     private let mediaTypeKey = "mediaType"
     private let durationKey = "duration"
     
-
+    
     internal init(id: String) {
         self.id = id
         super.init()
@@ -71,10 +71,39 @@ public class MediaEntry: NSObject {
 
 public class MediaSource: NSObject {
     
+    
+    public enum SourceType: Int {
+        case hls_clear
+        case hls_fair_play
+        case wvm_wideVine
+        case mp4_clear
+        case unknown
+        
+        var fileExtension: String {
+            get {
+                switch self {
+                case .hls_clear,
+                     .hls_fair_play:
+                    return "m3u8"
+                case .wvm_wideVine:
+                    return "wvm"
+                case .mp4_clear:
+                    return "mp4"
+                case .unknown:
+                    return "mp4"
+                }
+                
+            }
+        }
+        
+    }
+    
+    
     public var id: String
     public var contentUrl: URL?
     public var mimeType: String?
     public var drmData: [DRMData]?
+    public var sourceType: SourceType?
     public var fileExt: String {
         return contentUrl?.pathExtension ?? ""
     }
@@ -83,6 +112,7 @@ public class MediaSource: NSObject {
     private let contentUrlKey: String = "url"
     private let mimeTypeKey: String = "mimeType"
     private let drmDataKey: String = "drmData"
+    private let sourceTypeKey: String = "sourceType"
     
     
     public convenience init (id: String){
@@ -109,7 +139,11 @@ public class MediaSource: NSObject {
         if let drmData = sj[drmDataKey].array {
             self.drmData = drmData.flatMap { DRMData.fromJSON($0) }
         }
-
+        
+        if let sourceType = sj[sourceTypeKey].int {
+            self.sourceType = SourceType(rawValue: sourceType)
+        }
+        
         super.init()
     }
     

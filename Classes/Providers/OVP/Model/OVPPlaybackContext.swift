@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-class OVPEntryContextData: OVPBaseObject {
+class OVPPlaybackContext: OVPBaseObject {
     
     var flavorAssets: [OVPFlavorAsset]? = nil
     var sources: [OVPSource]?
