@@ -1,0 +1,38 @@
+auther: Kaltura
+auther_url: "http://corp.kaltura.com"
+github_url: "https://github.com/kaltura/playkit-ios/tree/develop/Classes"
+copyright: "Copyright © 2016 Kaltura Inc. All Rights Reserved."
+clean: true
+
+exclude: [Example/]
+xcodebuild_arguments: [-workspace, "PlayKitFramework/PlayKitFramework.xcworkspace", -scheme, PlayKitFramework]
+
+theme: fullwidth
+
+custom_categories:
+  - name: Player
+    children:
+    - Player
+    - PlayerDelegate
+    - PlayerConfig
+    - PlayerDecoratorBase
+    - PlayerState
+    - MediaEntry
+    - Track
+    - PKTracks
+
+  - name: Network
+    children:
+    - Request
+    - RequestElement
+    - RequestBuilder
+    - RequestConfiguration
+    - RequestExecutor
+
+  - name: Events
+    children:
+    - MessageBus
+    - PlayerEvents 
+    - AdEvents
+    - PKEvent
+    

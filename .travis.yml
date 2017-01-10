@@ -2,10 +2,13 @@ language: objective-c
 osx_image: xcode8.1
 before_install:
   - gem install cocoapods # Since Travis is not always on latest version
+  - gem install jazzy
 script:
   - cd PlayKitFramework
   - pod install
-  - xcodebuild -scheme PlayKitFramework -workspace PlayKitFramework.xcworkspace
+  # build command is being run inside .jazzy.script
+  # - xcodebuild -scheme PlayKitFramework -workspace PlayKitFramework.xcworkspace
+  - jazzy
 notifications:
   email:
     recipients:
