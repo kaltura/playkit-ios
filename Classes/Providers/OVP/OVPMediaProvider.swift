@@ -221,24 +221,8 @@ public class OVPMediaProvider: MediaEntryProvider {
                         mediaSources.append(mediaSource)
                     })
                     
-                    var metaDataItems = [String: String]()
-                    
-                    for meta in metadataList {
-                        do{
-                            let xml = try! XML.parse(meta.xml!)
-                            if let allNodes = xml["metadata"].all{
-                                for element in allNodes {
-                                    for dataElement in element.childElements {
-                                        metaDataItems[dataElement.name] = dataElement.text
-                                    }
-                                }
-                            }
-                        }catch{
-                          PKLog.warning("Error occur while trying to parse metadata XML")
-                        }
-                    }
-                    
-                    
+                    let metaDataItems = self.getMetadata(metadataList: metadataList)
+                 
                     //creating media entry with the above sources
                     let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
                     mediaEntry.duration = entry.duration
@@ -256,6 +240,27 @@ public class OVPMediaProvider: MediaEntryProvider {
             }
         }
         
+    }
+    
+    private func getMetadata(metadataList:[OVPMetadata])->[String:String] {
+        var metaDataItems = [String: String]()
+
+        for meta in metadataList {
+            do{
+                let xml = try XML.parse(meta.xml!)
+                if let allNodes = xml["metadata"].all{
+                    for element in allNodes {
+                        for dataElement in element.childElements {
+                            metaDataItems[dataElement.name] = dataElement.text
+                        }
+                    }
+                }
+            }catch{
+                PKLog.warning("Error occur while trying to parse metadata XML")
+            }
+        }
+        
+        return metaDataItems
     }
     
     
