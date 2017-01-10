@@ -6,9 +6,8 @@ before_install:
 script:
   - cd PlayKitFramework
   - pod install
-  # build command is being run inside .jazzy.script
-  # - xcodebuild -scheme PlayKitFramework -workspace PlayKitFramework.xcworkspace
-  - jazzy
+  - cd .. # go up one folder to root in order to use jazzy script
+  - jazzy # xcodebuild command is being run inside .jazzy.yaml script
 notifications:
   email:
     recipients:
