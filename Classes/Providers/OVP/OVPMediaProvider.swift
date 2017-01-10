@@ -224,13 +224,20 @@ public class OVPMediaProvider: MediaEntryProvider {
                     var metaDataItems = [String: String]()
                     
                     for meta in metadataList {
-                        let xml = try! XML.parse(meta.xml!)
-                            for element in xml["metadata"].all! {
-                                for dataElement in element.childElements {
-                                    metaDataItems[dataElement.name] = dataElement.text
+                        do{
+                            let xml = try! XML.parse(meta.xml!)
+                            if let allNodes = xml["metadata"].all{
+                                for element in allNodes {
+                                    for dataElement in element.childElements {
+                                        metaDataItems[dataElement.name] = dataElement.text
+                                    }
                                 }
+                            }
+                        }catch{
+                          PKLog.warning("Error occur while trying to parse metadata XML")
                         }
                     }
+                    
                     
                     //creating media entry with the above sources
                     let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
