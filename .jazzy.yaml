@@ -6,6 +6,7 @@ clean: true
 
 exclude: [Example/]
 xcodebuild_arguments: [-workspace, "PlayKitFramework/PlayKitFramework.xcworkspace", -scheme, PlayKitFramework]
+output: jazzy/docs/
 
 theme: fullwidth
 

@@ -8,10 +8,12 @@ script:
   - pod install
   - cd .. # go up one folder to root in order to use jazzy script
   - jazzy # xcodebuild command is being run inside .jazzy.yaml script
+  - ./scripts/gh-pages-deploy-ios.sh
 notifications:
   email:
     recipients:
       - noam.tamim@kaltura.com
       - eliza.sapir@kaltura.com
+      - gal.orlanczyk@kaltura.com
     on_success: change
     on_failure: always
