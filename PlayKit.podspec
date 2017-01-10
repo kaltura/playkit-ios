@@ -1,12 +1,12 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.1.4'
+s.version          = '0.1.5'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 
 
 s.homepage         = 'https://github.com/kaltura/playkit-ios'
 s.license          = { :type => 'AGPLv3', :text => 'AGPLv3' }
-s.author           = { 'Rivka Schwartz' => 'Noam Tamim' => 'noam.tamim@kaltura.com', 'Eliza Sapir' => 'eliza.sapir@kaltura.com' }
+s.author           = { 'Noam Tamim' => 'noam.tamim@kaltura.com', 'Eliza Sapir' => 'eliza.sapir@kaltura.com' }
 s.source           = { :git => 'https://github.com/kaltura/playkit-ios.git', :tag => 'v' + s.version.to_s }
 
 s.ios.deployment_target = '8.0'
