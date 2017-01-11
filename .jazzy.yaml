@@ -1,6 +1,6 @@
-auther: Kaltura
-auther_url: "http://corp.kaltura.com"
-github_url: "https://github.com/kaltura/playkit-ios/tree/develop/Classes"
+author: Kaltura
+author_url: "http://corp.kaltura.com"
+github_url: "https://github.com/kaltura/playkit-ios"
 copyright: "Copyright © 2016 Kaltura Inc. All Rights Reserved."
 clean: true
 
