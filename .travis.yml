@@ -3,13 +3,10 @@ osx_image: xcode8.1
 before_install:
   - gem install cocoapods # Since Travis is not always on latest version
   - gem install jazzy
-before_script:
-  - chmod +x /scripts/gh-pages-deploy-ios.sh
 script:
   - cd PlayKitFramework
   - pod install
-  - cd .. # go up one folder to root in order to use jazzy script
-  - jazzy # xcodebuild command is being run inside .jazzy.yaml script
+  - cd .. # go up one folder back to root
   - ./scripts/gh-pages-deploy-ios.sh
 notifications:
   email:
