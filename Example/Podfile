@@ -9,7 +9,7 @@ abstract_target 'PlayKit' do
     pod'GoogleAds-IMA-iOS-SDK', '~> 3.3'
     pod 'PlayKit/IMAPlugin', :path => '../../playkit-ios'
     pod 'PlayKit/YouboraPlugin', :path => '../../playkit-ios'
-    pod 'PlayKit/WidevineClassic', :path => '../../playkit-ios'
+    #pod 'PlayKit/WidevineClassic', :path => '../../playkit-ios'
 
     target 'PlayKit_Example' do
     end
