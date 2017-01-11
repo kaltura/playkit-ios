@@ -6,7 +6,7 @@ if [ "$TRAVIS_REPO_SLUG" == "kaltura/playkit-ios" ] && [ "$TRAVIS_PULL_REQUEST" 
   
     jazzy # xcodebuild command is being run inside .jazzy.yaml script
 
-    echo -e "Starting apple docs deploy...\n"
+    echo "Starting apple docs deploy..."
 
     # Get to the Travis build directory, configure git and clone the repo
     cd $TRAVIS_BUILD_DIR
@@ -19,12 +19,14 @@ if [ "$TRAVIS_REPO_SLUG" == "kaltura/playkit-ios" ] && [ "$TRAVIS_PULL_REQUEST" 
     git rm -rf ios
     mv $TRAVIS_BUILD_DIR/jazzy/docs ios
     git add -f .
-    git commit -m "Latest appledoc on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to playkit-docs"
+    git commit -m "Latest apple doc was created on successful travis build #$TRAVIS_BUILD_NUMBER, auto-pushed to playkit docs"
     #git push -fq origin master
-    ls -l
+    
+    echo -e "\nfiles added in the commit:\n"
+    ls -l ios
 
-    echo -e "deployed apple docs to playkit documentation\n"
+    echo "deployed apple docs to playkit documentation"
 else 
-    echo -e "came from pull request or a fork, doing a regular build\n"
+    echo "came from pull request or a fork, doing a regular build"
     xcodebuild -scheme PlayKitFramework -workspace PlayKitFramework.xcworkspace
 fi
