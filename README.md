@@ -3,6 +3,7 @@
 
 *If you are a Kaltura customer, please contact your Kaltura Customer Success Manager to help facilitate use of this component.*
 
+## Overview
 The **Kaltura Player SDK** is fully native and introduces significant performance improvements. The SDK is intended to be integrated in any iOS application and includes the following features:
 
 * Online and Offline Playback
@@ -15,12 +16,13 @@ The **Kaltura Player SDK** is fully native and introduces significant performanc
 * Youbora
 * Chromecast and AirPlay support
 
-Overview and guides are available on our [VPaaS Documentation site](https://vpaas.kaltura.com/documentation/Mobile-Video-Player-SDKs/iOS_Introduction.html).
-
-[![CI Status](http://img.shields.io/travis/kaltura/playkit-ios.svg?style=flat)](https://travis-ci.org/kaltura/playkit-ios)
+## Usage Guides
+Please see our [VPaaS Documentation site](https://vpaas.kaltura.com/documentation/Mobile-Video-Player-SDKs/iOS_Introduction.html).
 
 ## License and Copyright Information
 All code in this project is released under the [AGPLv3 license](http://www.gnu.org/licenses/agpl-3.0.html) unless a different license for a particular library is specified in the applicable library path.   
 
 Copyright © Kaltura Inc. All rights reserved.   
 Authors and contributors: See [GitHub contributors list](https://github.com/kaltura/playkit-ios/graphs/contributors).  
+
+[![CI Status](http://img.shields.io/travis/kaltura/playkit-ios.svg?style=flat)](https://travis-ci.org/kaltura/playkit-ios)
