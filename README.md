@@ -15,7 +15,7 @@ The **Kaltura Player SDK** is fully native and introduces significant performanc
 * Youbora
 * Chromecast and AirPlay support
 
-Further documentation is coming soon.
+Overview and guides are available on our [VPaaS Documentation site](https://vpaas.kaltura.com/documentation/Mobile-Video-Player-SDKs/iOS_Introduction.html).
 
 [![CI Status](http://img.shields.io/travis/kaltura/playkit-ios.svg?style=flat)](https://travis-ci.org/kaltura/playkit-ios)
 
