@@ -1,6 +1,8 @@
 author: Kaltura
 author_url: "http://corp.kaltura.com"
 github_url: "https://github.com/kaltura/playkit-ios"
+# github_file_prefix used for showing "Show in Github" links, must be same repo used for the docs generation.
+github_file_prefix: "https://github.com/kaltura/playkit-ios/tree/master" 
 copyright: "Copyright © 2016 Kaltura Inc. All Rights Reserved."
 clean: true
 
