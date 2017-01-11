@@ -7,8 +7,11 @@
 //
 
 import UIKit
+import SwiftyXMLParser
 
 public class OVPMediaProvider: MediaEntryProvider {
+   
+
     
     //This object is initiate at the begning of loadMedia methos and contain all neccessery info to load.
     struct LoaderInfo {
@@ -144,9 +147,10 @@ public class OVPMediaProvider: MediaEntryProvider {
             let getPlaybackContext =  OVPBaseEntryService.getPlaybackContext(baseURL: loadInfo.apiServerURL,
                                                                              ks: token,
                                                                              entryID: loadInfo.entryId)
+            let metadataRequest = OVPBaseEntryService.metadata(baseURL: loadInfo.apiServerURL, ks: token, entryID: loadInfo.entryId)
             
             guard let req1 = listRequest,
-                let req2 = getPlaybackContext else {
+                let req2 = getPlaybackContext, let req3 = metadataRequest else {
                     callback(Result(data: nil, error: Err.invalidParams))
                     return
             }
@@ -154,6 +158,7 @@ public class OVPMediaProvider: MediaEntryProvider {
             //Building the multi request
             mrb?.add(request: req1)
                 .add(request: req2)
+                .add(request: req3)
                 .set(completion: { (dataResponse:Response) in
                     
                     let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: dataResponse.data)
@@ -166,14 +171,17 @@ public class OVPMediaProvider: MediaEntryProvider {
                             return
                     }
                     
-                    let mainResponse: OVPBaseObject = responses[responses.count-2]
-                    let contextDataResponse: OVPBaseObject = responses[responses.count-1]
+                    let metaData:OVPBaseObject = responses[responses.count-1]
+                    let contextDataResponse: OVPBaseObject = responses[responses.count-2]
+                    let mainResponse: OVPBaseObject = responses[responses.count-3]
                     
                     guard
                         let mainResponseData = mainResponse as? OVPList,
                         let entry = mainResponseData.objects?.last as? OVPEntry,
                         let contextData = contextDataResponse as? OVPPlaybackContext,
-                        let sources = contextData.sources
+                        let sources = contextData.sources,
+                        let metadataListObject = metaData as? OVPList,
+                        let metadataList = metadataListObject.objects as? [OVPMetadata]
                         else{
                             callback(Result(data: nil, error: Err.invalidResponse ))
                             PKLog.debug("Response is not containing Entry info or playback data")
@@ -213,12 +221,14 @@ public class OVPMediaProvider: MediaEntryProvider {
                         mediaSources.append(mediaSource)
                     })
                     
+                    let metaDataItems = self.getMetadata(metadataList: metadataList)
+                 
                     //creating media entry with the above sources
                     let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
                     mediaEntry.duration = entry.duration
                     mediaEntry.sources = mediaSources
+                    mediaEntry.metadata = metaDataItems
                     callback(Result(data: mediaEntry, error: nil ))
-                    
                 })
             
             
@@ -230,6 +240,29 @@ public class OVPMediaProvider: MediaEntryProvider {
             }
         }
         
+    }
+    
+    private func getMetadata(metadataList:[OVPMetadata])->[String:String] {
+        var metaDataItems = [String: String]()
+
+        for meta in metadataList {
+            do{
+                if let metaXML = meta.xml {
+                    let xml = try XML.parse(metaXML)
+                    if let allNodes = xml["metadata"].all{
+                        for element in allNodes {
+                            for dataElement in element.childElements {
+                                metaDataItems[dataElement.name] = dataElement.text
+                            }
+                        }
+                    }
+                }
+            }catch{
+                PKLog.warning("Error occur while trying to parse metadata XML")
+            }
+        }
+        
+        return metaDataItems
     }
     
     
