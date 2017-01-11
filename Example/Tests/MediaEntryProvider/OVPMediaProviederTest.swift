@@ -45,8 +45,6 @@ class OVPMediaProviederTest: XCTestCase, SessionProvider {
         .set(sessionProvider: self)
         .set(entryId: self.entryID)
         .set(executor: MediaEntryProviderMockExecutor(entryID: entryID, domain: "ovp"))
-        .set(apiServerURL: self.serverURL)
-        
         
         provider.loadMedia { (r:Result<MediaEntry>) in
             if (r.error != nil){
@@ -73,7 +71,7 @@ class OVPMediaProviederTest: XCTestCase, SessionProvider {
             .set(sessionProvider: self)
             .set(entryId: self.entryID)
             .set(executor: USRExecutor.shared )
-            .set(apiServerURL: self.serverURL)
+        
         
         provider.loadMedia { (r:Result<MediaEntry>) in
             if (r.error != nil){
