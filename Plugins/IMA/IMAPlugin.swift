@@ -247,7 +247,11 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     
     @objc private func update() {
         if !self.isAdPlayback {
-            self.currentPlaybackTime = self.player.currentTime
+            let currentTime = self.player.currentTime
+            if currentTime.isNaN {
+                return
+            }
+            self.currentPlaybackTime = currentTime
             self.loadAdsIfNeeded()
         }
     }
