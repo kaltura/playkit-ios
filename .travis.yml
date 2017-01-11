@@ -6,9 +6,9 @@ before_install:
 script:
   - cd PlayKitFramework
   - pod install
-  - cd .. # go up one folder back to root
   - echo Starting build...
   - xcodebuild -scheme PlayKitFramework -workspace PlayKitFramework.xcworkspace
+  - cd .. # go up one folder back to root
   - echo Starting jazzy, soulful docs for Swift & Objective-C...
   - jazzy # apple docs generator tool
   - ./scripts/gh-pages-deploy-ios.sh # apple docs deploy script
