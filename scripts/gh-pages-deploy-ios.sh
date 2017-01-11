@@ -14,7 +14,7 @@ if [ "$TRAVIS_REPO_SLUG" == "kaltura/playkit-ios" ] && [ "$TRAVIS_PULL_REQUEST" 
     cd $TRAVIS_BUILD_DIR
     git config --global user.email "travis@travis-ci.org"
     git config --global user.name "travis-ci"
-    git clone --quiet https://${GITHUB_TOKEN}@github.com/kaltura/playkit 
+    git clone --quiet https://${GITHUB_TOKEN}@github.com/kaltura/playkit.git 
 
     # Commit and Push the Changes
     cd master/docs/ios
