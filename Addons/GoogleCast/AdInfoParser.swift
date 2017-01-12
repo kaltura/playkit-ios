@@ -12,7 +12,10 @@ import GoogleCast
 /**
  CastAdInfoParser
  
- Parser
+ This class can be used to handle advertisement UI while casting while using google components.
+ There is 2 options to use this class :
+ 1. set 
+ 
  */
 public class CastAdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
     
@@ -58,7 +61,8 @@ public class CastAdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegat
 
 
 /**
-  An object which represent the Ads info
+  An object which represent the Ads info 
+  The receiver is sending this data by the mediaStatus's customData
  */
 private class AdsMetadata: NSObject {
     

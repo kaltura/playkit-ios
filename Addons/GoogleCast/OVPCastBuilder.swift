@@ -18,6 +18,10 @@ public class OVPCastBuilder: BasicCastBuilder{
     
     internal var ks: String?
     
+    /**
+     Set - ks
+     The ks which represent the user key, used by the Kaltura Web Player
+     */
     @discardableResult
     public func set(ks:String?) -> Self {
         self.ks = ks

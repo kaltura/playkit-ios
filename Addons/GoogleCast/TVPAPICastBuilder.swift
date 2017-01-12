@@ -22,12 +22,17 @@ public class TVPAPICastBuilder: BasicCastBuilder {
         case missingFormat
     }
 
-        internal var initObject: [String:Any]!
-    
-
+    internal var initObject: [String:Any]!
     internal var format: String!
+    internal var isTrailer: Bool!
     
-    
+    public override func set(streamType: StreamType?) -> Self{
+        super.set(streamType: streamType)
+        self.isTrailer = streamType == StreamType.trailer
+        
+        return self
+    }
+ 
     /**
      Set - initObject
      - Parameter initObject: that the receiver will use to represent the user
@@ -51,9 +56,11 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     
     /**
      
-      In order to comunicate with Kaltura receiver you should have init object and format this will throw if the input is not valid
+      In order to comunicate with Kaltura receiver you should have init object and format this will throw exception if the input is not valid
      */
     override func validate() throws {
+        
+        try super.validate()
         
         guard self.initObject != nil else {
             throw TVPAPICastBuilder.BasicBuilderDataError.missingInitObject
@@ -66,13 +73,15 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     }
     
     
+    /**
+        Adding the data relevent for the OTT
+     */
     internal override func proxyData() -> [String:Any]? {
         
-
         let flavorAssets = ["filters":["include":["Format":[self.format!]]]]
         
         JSONSerialization.isValidJSONObject(flavorAssets)
-        let baseEntry  = ["vars":["isTrailer":" false"]]
+        let baseEntry  = ["vars":["isTrailer":" " + String(self.isTrailer)]]
         var proxyData : [String : Any] = ["flavorassets":flavorAssets,
                                           "baseentry":baseEntry,
                                           "MediaID":self.contentId!,

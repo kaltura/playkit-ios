@@ -22,6 +22,7 @@ public class BasicCastBuilder: NSObject {
     public enum StreamType {
         case live
         case vod
+        case trailer
     }
     
     enum BasicBuilderDataError: Error {
@@ -149,11 +150,11 @@ public class BasicCastBuilder: NSObject {
 
     
     /**
-     Build GCKMediaInformation a google-cast-sdk object to send through the load google API to play content
+     Build GCKMediaInformation a google-cast-sdk object to send through the load google-API 
      */
     public func build() throws -> GCKMediaInformation {
         
-        let data = try self.validate()
+        try self.validate()
         let customData = self.customData()
         let mediaInfo: GCKMediaInformation = GCKMediaInformation(contentID:self.contentId,
                                                                  streamType: self.streamType,
@@ -166,7 +167,22 @@ public class BasicCastBuilder: NSObject {
     
     
     
-    // MARK - Setup Data
+    
+    // MARK - Setup custom data
+    
+    
+    /**
+     customData - Which used by Kaltura receiver to play the content through the Kaltura Web Player
+     */
+    internal func customData() -> [String:Any]? {
+        
+        if let embedConfig = self.embedConfig() {
+            let customData: [String:Any] = ["embedConfig":embedConfig]
+            return customData
+        }
+        return nil
+    }
+    
     
     internal func embedConfig() -> [String:Any]? {
         
@@ -186,17 +202,7 @@ public class BasicCastBuilder: NSObject {
         return embedConfig
     }
     
-    internal func customData() -> [String:Any]? {
 
-        if let embedConfig = self.embedConfig() {
-            let customData: [String:Any] = ["embedConfig":embedConfig]
-            return customData
-        }
-        return nil
-    }
-    
-    
-    // MARK - Build flash vars json:
     internal func flashVars() -> [String: Any]{
         
         var flashVars = [String:Any]()

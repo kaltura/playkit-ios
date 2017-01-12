@@ -1,4 +1,7 @@
 PODS:
+  - google-cast-sdk (3.3.0):
+    - google-cast-sdk/Core (= 3.3.0)
+  - google-cast-sdk/Core (3.3.0)
   - GoogleAds-IMA-iOS-SDK (3.3.1)
   - Log (1.0)
   - PlayKit (0.0.8):
@@ -6,26 +9,40 @@ PODS:
   - PlayKit/Core (0.0.8):
     - Log
     - SwiftyJSON
+  - PlayKit/GoogleCastAddon (0.0.8):
+    - google-cast-sdk
   - PlayKit/IMAPlugin (0.0.8):
     - GoogleAds-IMA-iOS-SDK (~> 3.3)
-  - PlayKit/KalturaStatsPlugin (0.0.8)
-  - SwiftyJSON (3.1.1)
+  - PlayKit/YouboraPlugin (0.0.8):
+    - Youbora-AVPlayer
+  - SwiftyJSON (3.1.3)
+  - Youbora-AVPlayer (5.3.5):
+    - Youbora-AVPlayer/default (= 5.3.5)
+  - Youbora-AVPlayer/default (5.3.5):
+    - Youbora-YouboraLib (= 5.3.8)
+  - Youbora-YouboraLib (5.3.8):
+    - Youbora-YouboraLib/default (= 5.3.8)
+  - Youbora-YouboraLib/default (5.3.8)
 
 DEPENDENCIES:
   - PlayKit (from `../../playkit-ios`)
+  - PlayKit/GoogleCastAddon (from `../../playkit-ios`)
   - PlayKit/IMAPlugin (from `../../playkit-ios`)
-  - PlayKit/KalturaStatsPlugin (from `../../playkit-ios`)
+  - PlayKit/YouboraPlugin (from `../../playkit-ios`)
 
 EXTERNAL SOURCES:
   PlayKit:
     :path: ../../playkit-ios
 
 SPEC CHECKSUMS:
+  google-cast-sdk: da1989cbc1b9ff7b50ddb9dae5b1969d95a65a0f
   GoogleAds-IMA-iOS-SDK: 5643300870bd3289c47c0d0b5a2dbf595b05c336
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
-  PlayKit: 9b502b4b640a50af7dc14b1ee736d0d2039b38a5
-  SwiftyJSON: f0be2e604f83e8405a624e9f891898bf6ed4e019
+  PlayKit: 39cab83d21c70ec8f07241b2585a90c43df4d03b
+  SwiftyJSON: 38a8ea2006779c0fc4c310cb2ee8195327740faf
+  Youbora-AVPlayer: 02aea2a12a4f7e6a61d8a1747e5dfc177bf2354b
+  Youbora-YouboraLib: 523adf7cd09c4a213e3485e6ec7c48d498986246
 
-PODFILE CHECKSUM: 96338e35726ea000055afe7c776718b53dfef70d
+PODFILE CHECKSUM: a08b1d38cbc8e2181c5b19bebf0378f098e2f1ac
 
 COCOAPODS: 1.2.0.beta.1
