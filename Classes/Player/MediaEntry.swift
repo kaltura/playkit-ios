@@ -22,6 +22,7 @@ public class MediaEntry: NSObject {
     public var sources: [MediaSource]?
     public var duration: Int64?
     public var mediaType: MediaType?
+    public var metadata:[String:String]?
     
     private let idKey = "id"
     private let sourcesKey = "sources"
@@ -132,7 +133,7 @@ public class MediaSource: NSObject {
         
         self.id = sj[idKey].string ?? UUID().uuidString
         
-        self.contentUrl = sj[contentUrlKey].URL
+        self.contentUrl = sj[contentUrlKey].url
         
         self.mimeType = sj[mimeTypeKey].string
         

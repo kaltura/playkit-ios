@@ -45,7 +45,7 @@ class OVPSource: OVPBaseObject {
             self.flavors = flavors.components(separatedBy: ",")
         }
         
-        if let url = jsonObject[urlKey].URL{
+        if let url = jsonObject[urlKey].url{
             self.url = url
         }
         
