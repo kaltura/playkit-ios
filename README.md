@@ -1,7 +1,7 @@
-[![CI Status](http://img.shields.io/travis/kaltura/playkit-ios.svg?style=flat)](https://travis-ci.org/kaltura/playkit-ios)
-[![Version](https://img.shields.io/cocoapods/v/PlayKit.svg?style=flat)](http://cocoadocs.org/docsets/PlayKit)
-[![License](https://img.shields.io/cocoapods/l/PlayKit.svg?style=flat)](http://cocoadocs.org/docsets/PlayKit)
-[![Platform](https://img.shields.io/cocoapods/p/PlayKit.svg?style=flat)](http://cocoadocs.org/docsets/PlayKit)
+[![CI Status](https://img.shields.io/travis/kaltura/playkit-ios.svg?style=flat)](https://travis-ci.org/kaltura/playkit-ios)
+[![Version](https://img.shields.io/cocoapods/v/PlayKit.svg?style=flat)](https://cocoadocs.org/docsets/PlayKit)
+[![License](https://img.shields.io/cocoapods/l/PlayKit.svg?style=flat)](https://cocoadocs.org/docsets/PlayKit)
+[![Platform](https://img.shields.io/cocoapods/p/PlayKit.svg?style=flat)](https://cocoadocs.org/docsets/PlayKit)
 
 # Kaltura Player SDK
 ## Note: The Kaltura SDK v3 is in beta
