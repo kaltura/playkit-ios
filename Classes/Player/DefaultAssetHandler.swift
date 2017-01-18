@@ -18,36 +18,6 @@ class DefaultAssetHandler: AssetHandler {
         
     }
     
-    static let sourceFilter = { (_ src: MediaSource) -> Bool in
-        
-        // FIXME: extension is not the best criteria here, use format when that's available. 
-        let ext = src.fileExt
-        
-        // mp4 is always supported
-        if ext == "mp4" {
-            return true
-        }
-        
-        // 'movpkg' was downloaded here.
-        if ext == "movpkg" {
-            return true
-        }
-        
-        // The only other option is HLS
-        guard ext == "m3u8" else {
-            return false
-        }
-        
-        // DRM is not supported on simulators
-        if  let drmData = src.drmData, drmData.count > 0 && TARGET_OS_SIMULATOR != 0 {
-            return false
-        }
-        
-        // Source is HLS, with or without DRM.
-        return true
-    }
-
-    
     func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?)->Void) {
 
         guard let contentUrl = mediaSource.contentUrl else {
@@ -87,14 +57,12 @@ class DefaultAssetHandler: AssetHandler {
             return
         }
 
-        guard let fpsCertificate = fpsData.fpsCertificate else {
+        guard fpsData.fpsCertificate != nil else {
             PKLog.error("Missing FPS Certificate")
             readyCallback(AssetError.noFpsCertificate, nil)
             return
         }
 
-        let assetName = mediaSource.id
-        
         let asset = AVURLAsset(url: contentUrl)
         
         self.assetLoaderDelegate = AssetLoaderDelegate.configureRemotePlay(asset: asset, drmData: fpsData)
