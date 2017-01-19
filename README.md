@@ -5,7 +5,7 @@
 
 # Kaltura Player SDK
 ## Note: The Kaltura SDK v3 is in beta
-## Demo: [Samples repo](https://github.com/kaltura/playkit-ios-samples).
+### Demo: [Demo repo](https://github.com/kaltura/playkit-ios-samples).
 
 *If you are a Kaltura customer, please contact your Kaltura Customer Success Manager to help facilitate use of this component.*
 
