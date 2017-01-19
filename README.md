@@ -1,4 +1,4 @@
-[![CI Status](https://img.shields.io/travis/kaltura/playkit-ios.svg?style=flat&branch=develop)](https://travis-ci.org/kaltura/playkit-ios)
+[![CI Status](https://api.travis-ci.org/kaltura/playkit-ios.svg?branch=develop)](https://travis-ci.org/kaltura/playkit-ios)
 [![Version](https://img.shields.io/cocoapods/v/PlayKit.svg?style=flat)](https://cocoadocs.org/docsets/PlayKit)
 [![License](https://img.shields.io/cocoapods/l/PlayKit.svg?style=flat)](https://cocoadocs.org/docsets/PlayKit)
 [![Platform](https://img.shields.io/cocoapods/p/PlayKit.svg?style=flat)](https://cocoadocs.org/docsets/PlayKit)
