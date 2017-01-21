@@ -27,7 +27,6 @@ class AssetLoaderDelegate: NSObject {
     /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
     fileprivate static let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
     
-    
     private let storage: LocalDataStore?
     
     private let drmData: FairPlayDRMData?
