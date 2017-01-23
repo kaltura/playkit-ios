@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal enum PhoenixAnalyticsType: String {
+enum PhoenixAnalyticsType: String {
     case hit
     case play
     case stop
@@ -25,7 +25,7 @@ protocol KalturaPluginManagerDelegate {
     func pluginManagerDidSendAnalyticsEvent(action: PhoenixAnalyticsType)
 }
 
-internal class KalturaPluginManager {
+final class KalturaPluginManager {
 
     public var delegate: KalturaPluginManagerDelegate?
     
@@ -48,7 +48,6 @@ internal class KalturaPluginManager {
         }
         
         registerToAllEvents()
-
     }
     
     public func destroy() {
@@ -58,30 +57,34 @@ internal class KalturaPluginManager {
     }
     
     func registerToAllEvents() {
-        
-        
-        self.messageBus?.addObserver(self, events: [PlayerEvents.ended.self], block: { (info) in
+        PKLog.trace("Register to all events")
+        guard let messageBus = self.messageBus else {
+            PKLog.error("messageBus is nil !")
+            return
+        }
+
+        messageBus.addObserver(self, events: [PlayerEvents.ended.self], block: { (info) in
             PKLog.trace("ended info: \(info)")
             self.stopTimer()
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.error.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvents.error.self], block: { (info) in
             PKLog.trace("error info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .error)
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
             PKLog.trace("pause info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .pause)
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.loadedMetadata.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvents.loadedMetadata.self], block: { (info) in
             PKLog.trace("loadedMetadata info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .load)
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.loadedMetadata.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvents.playing.self], block: { (info) in
             PKLog.trace("play info: \(info)")
             
             if !self.intervalOn {
@@ -95,10 +98,7 @@ internal class KalturaPluginManager {
             } else {
                 self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .play);
             }
-            
-            
         })
-        
     }
     
     private func createTimer() {
