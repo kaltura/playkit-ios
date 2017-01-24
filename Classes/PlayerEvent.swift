@@ -7,8 +7,6 @@
 //
 import Foundation
 
-public class PlayerEventsPlaying : PlayerEvents {}
-
 public class PlayerEvents: PKEvent {
     
     // All events EXCLUDING error. Assuming error events are treated differently.
@@ -17,7 +15,9 @@ public class PlayerEvents: PKEvent {
         play.self, pause.self, playing.self, seeking.self, seeked.self, stateChanged.self
     ]
     
-    public static let playing : PlayerEvents.Type = PlayerEventsPlaying.self
+    @objc public static let canPlayEvent = canPlay.self
+    @objc public static let playingEvent = playing.self
+    @objc public static let durationChangeEvent = durationChange.self
     
     /**
      Sent when enough data is available that the media can be played, at least for a couple of frames.
@@ -31,6 +31,10 @@ public class PlayerEvents: PKEvent {
         
         init(duration: TimeInterval) {
             self.duration = duration
+        }
+        
+        override public func data() -> [String : AnyObject]? {
+            return ["duration": NSNumber(value: duration)]
         }
     }
     /**
@@ -57,7 +61,7 @@ public class PlayerEvents: PKEvent {
     /**
      Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).
      */
-//    public class playing : PlayerEvents {}
+    public class playing : PlayerEvents {}
     
     /**
      Sent when a seek operation begins.

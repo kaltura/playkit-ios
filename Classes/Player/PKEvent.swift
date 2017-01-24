@@ -9,4 +9,6 @@
 import Foundation
 
 public class PKEvent: NSObject {
+    // Events that have payload must provide it as a dictionary for objective-c compat.
+    public func data() -> [String: AnyObject]? {return nil}
 }
