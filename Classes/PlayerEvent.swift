@@ -91,12 +91,12 @@ public class PlayerEvents: PKEvent {
      Sent when player state is changed.
      */
     public class stateChanged : PlayerEvents {
-        public var newSate: PlayerState
-        public var oldSate: PlayerState
+        public var newState: PlayerState
+        public var oldState: PlayerState
         
         public init(newState: PlayerState, oldState: PlayerState) {
-            self.newSate = newState
-            self.oldSate = oldState
+            self.newState = newState
+            self.oldState = oldState
         }
     }
 }
