@@ -11,6 +11,7 @@ import Foundation
 private struct Observation {
     weak var observer: AnyObject?
     let block: (PKEvent)->Void
+    let bridgedEventType: PKBridgedEvent.Type?
 }
 
 public class MessageBus: NSObject {
@@ -20,13 +21,25 @@ public class MessageBus: NSObject {
     public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void) {
         sync {
             events.forEach { (et) in
-                let typeId = NSStringFromClass(et)
+                
+                let typeId: String
+                let bet: PKBridgedEvent.Type?
+                
+                if et is PKBridgedEvent.Type {
+                    bet = et as! PlayKit.PKBridgedEvent.Type
+                    typeId = NSStringFromClass(bet!.realType)
+                } else {
+                    bet = nil
+                    typeId = NSStringFromClass(et)
+                }
+                
                 var array: [Observation]? = observations[typeId]
                 
                 if array == nil {
                     array = []
                 }
-                array!.append(Observation(observer: observer, block: block))
+                
+                array!.append(Observation(observer: observer, block: block, bridgedEventType: bet))
                 observations[typeId] = array
             }
         }
@@ -52,7 +65,11 @@ public class MessageBus: NSObject {
             if let array = observations[typeId] {
                 array.forEach {
                     if $0.observer != nil {
-                        $0.block(event)
+                        if let bet = $0.bridgedEventType {
+                            $0.block(bet.init(event) as! PKEvent)
+                        } else {
+                            $0.block(event)
+                        }
                     }
                 }
             }
@@ -65,3 +82,11 @@ public class MessageBus: NSObject {
         objc_sync_exit(lock)
     }
 }
+
+// Objective-C compatibility
+protocol PKBridgedEvent: class {
+    static var realType: PKEvent.Type {get}
+    init(_ event: PKEvent)
+}
+
+
