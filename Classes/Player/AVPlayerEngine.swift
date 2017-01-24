@@ -502,7 +502,7 @@ class AVPlayerEngine : AVPlayer {
                     if timebaseRate > 0 {
                         self.nonObservablePropertiesUpdateTimer?.invalidate()
                         
-                        self.postEvent(event: PlayerEvents.playing())
+                        self.postEvent(event: PlayerEventsPlaying())
                     }
                     
                     PKLog.trace("timebaseRate:: \(timebaseRate)")
