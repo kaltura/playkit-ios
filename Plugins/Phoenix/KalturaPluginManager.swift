@@ -157,7 +157,7 @@ extension KalturaPluginManager: AppStateObservable {
             NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
                 guard let delegate = self.delegate else { return }
                 PKLog.trace("plugin: \(delegate) will terminate event received, sending analytics stop event")
-                delegate.pluginManagerDidSendAnalyticsEvent(action: .stop)
+                self.destroy()
                 AppStateSubject.sharedInstance.remove(observer: self)
             }
         ]
