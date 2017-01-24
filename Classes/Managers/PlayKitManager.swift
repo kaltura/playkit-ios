@@ -28,7 +28,7 @@ public class PlayKitManager: NSObject {
     
     /// Loads and returns a player object using a provided configuration.
     ///
-    /// - Important: In order to start buffering the video after loading the player 
+    /// - Important: In order to start buffering the video after loading the player
     /// you must call prepare on the player with the same configuration.
     /// ````
     ///     player = PlayKitManager.sharedInstance.loadPlayer(config: config)
