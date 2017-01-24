@@ -147,7 +147,7 @@ public class YouboraPlugin: PKPlugin {
             
             if let stateChanged = data as? PlayerEvents.stateChanged {
 
-                switch stateChanged.newSate {
+                switch stateChanged.newState {
                 case .buffering:
                     self.youboraManager.bufferingHandler()
                     self.postEventLogWithMessage(message: "Event info: Buffering")
@@ -157,7 +157,7 @@ public class YouboraPlugin: PKPlugin {
                     break
                 }
                 
-                switch stateChanged.oldSate {
+                switch stateChanged.oldState {
                 case .buffering:
                     self.youboraManager.bufferedHandler()
                     self.postEventLogWithMessage(message: "Event info: Buffered")

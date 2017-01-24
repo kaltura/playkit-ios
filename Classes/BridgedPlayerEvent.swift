@@ -121,11 +121,11 @@ public class PlayerEvent_stateChanged: PKEvent, PKBridgedEvent {
     
     
     public var newState: PlayerState {
-        return realEvent.newSate
+        return realEvent.newState
     }
     
     public var oldState: PlayerState {
-        return realEvent.oldSate
+        return realEvent.oldState
     }
     
     public required init(_ event: PKEvent) {
