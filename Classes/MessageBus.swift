@@ -48,7 +48,19 @@ public class MessageBus: NSObject {
     public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         sync {
             events.forEach { (et) in
-                let typeId = NSStringFromClass(et)
+                
+                let typeId: String
+                let bet: PKBridgedEvent.Type?
+                
+                if et is PKBridgedEvent.Type {
+                    bet = et as! PlayKit.PKBridgedEvent.Type
+                    typeId = NSStringFromClass(bet!.realType)
+                } else {
+                    bet = nil
+                    typeId = NSStringFromClass(et)
+                }
+                
+               // let typeId = NSStringFromClass(et)
                 if let array = observations[typeId] {
                     observations[typeId] = array.filter { $0.observer! !== observer }
                 } else {
@@ -83,7 +95,8 @@ public class MessageBus: NSObject {
     }
 }
 
-// Objective-C compatibility
+// MARK: - Objective-C Compatibility
+
 protocol PKBridgedEvent: class {
     static var realType: PKEvent.Type {get}
     init(_ event: PKEvent)
