@@ -78,7 +78,7 @@ import AVKit
     */
     func destroy()
     
-    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void)
+    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void)
     
     func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
     

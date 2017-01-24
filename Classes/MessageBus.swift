@@ -10,14 +10,14 @@ import Foundation
 
 private struct Observation {
     weak var observer: AnyObject?
-    let block: (_ info: Any)->Void
+    let block: (PKEvent)->Void
 }
 
 public class MessageBus: NSObject {
     private var observations = [String: [Observation]]()
     private let lock: AnyObject = UUID().uuidString as AnyObject
     
-    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
+    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void) {
         sync {
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
