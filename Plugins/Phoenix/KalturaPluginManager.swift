@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal enum PhoenixAnalyticsType: String {
+enum PhoenixAnalyticsType: String {
     case hit
     case play
     case stop
@@ -25,7 +25,7 @@ protocol KalturaPluginManagerDelegate {
     func pluginManagerDidSendAnalyticsEvent(action: PhoenixAnalyticsType)
 }
 
-class KalturaPluginManager {
+final class KalturaPluginManager {
 
     public var delegate: KalturaPluginManagerDelegate?
     
@@ -58,6 +58,7 @@ class KalturaPluginManager {
     }
     
     func registerToAllEvents() {
+        PKLog.trace("Register to all events")
         guard let messageBus = self.messageBus else {
             PKLog.error("message bus is nil! shouldn't happen")
             return
@@ -84,7 +85,7 @@ class KalturaPluginManager {
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .load)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvents.loadedMetadata.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvents.playing.self], block: { (info) in
             PKLog.trace("play info: \(info)")
             
             if !self.intervalOn {
