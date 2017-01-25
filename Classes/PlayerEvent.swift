@@ -14,12 +14,12 @@ let kCurrentBitrate = "currentBitrate"
 let kOldState = "oldState"
 let kNewState = "newState"
 
-/// An PlayerEvents is a class used to reflect player events.
+/// An PlayerEvent is a class used to reflect player events.
 
-public class PlayerEvents: PKEvent {
+public class PlayerEvent: PKEvent {
     
     // All events EXCLUDING error. Assuming error events are treated differently.
-    public static let allEventTypes: [PlayerEvents.Type] = [
+    public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay.self, durationChanged.self, ended.self, loadedMetadata.self,
         play.self, paused.self, playing.self, seeking.self, seeked.self, stateChanged.self
     ]
@@ -55,8 +55,8 @@ public class PlayerEvents: PKEvent {
     
     // MARK: - Player Basic Events
 
-    public class canPlay : PlayerEvents {}
-    public class durationChanged : PlayerEvents {
+    public class canPlay : PlayerEvent {}
+    public class durationChanged : PlayerEvent {
         public var duration: TimeInterval
         
         init(duration: TimeInterval) {
@@ -68,18 +68,18 @@ public class PlayerEvents: PKEvent {
         }
     }
     
-    public class ended : PlayerEvents {}
-    public class loadedMetadata : PlayerEvents {}
-    public class error : PlayerEvents {}
-    public class play : PlayerEvents {}
-    public class paused : PlayerEvents {}
-    public class playing : PlayerEvents {}
-    public class seeking : PlayerEvents {}
-    public class seeked : PlayerEvents {}
+    public class ended : PlayerEvent {}
+    public class loadedMetadata : PlayerEvent {}
+    public class error : PlayerEvent {}
+    public class play : PlayerEvent {}
+    public class paused : PlayerEvent {}
+    public class playing : PlayerEvent {}
+    public class seeking : PlayerEvent {}
+    public class seeked : PlayerEvent {}
     
     // MARK: - Player Tracks Events
     
-    public class tracksAvailable : PlayerEvents {
+    public class tracksAvailable : PlayerEvent {
         public var tracks: PKTracks
         
         public init(tracks: PKTracks) {
@@ -91,7 +91,7 @@ public class PlayerEvents: PKEvent {
         }
     }
     
-    public class playbackParamsUpdated : PlayerEvents {
+    public class playbackParamsUpdated : PlayerEvent {
         public var currentBitrate: Double
         
         init(currentBitrate: Double) {
@@ -105,7 +105,7 @@ public class PlayerEvents: PKEvent {
     
     // MARK: - Player State Events
 
-    public class stateChanged : PlayerEvents {
+    public class stateChanged : PlayerEvent {
         public var newState: PlayerState
         public var oldState: PlayerState
         

@@ -92,7 +92,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
 
         var events: [PKEvent.Type] = []
-        events.append(PlayerEvents.ended.self)
+        events.append(PlayerEvent.ended.self)
         self.messageBus?.addObserver(self, events: events, block: { (data: Any) -> Void in
             self.contentComplete()
         })
