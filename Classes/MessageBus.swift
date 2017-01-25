@@ -50,13 +50,11 @@ public class MessageBus: NSObject {
     public func post(_ event: PKEvent) {
         DispatchQueue.main.async { [unowned self] in
             let typeId = NSStringFromClass(type(of:event))
-            self.sync {
-                // TODO: remove nil observers
-                if let array = self.observations[typeId] {
-                    array.forEach {
-                        if $0.self.observer != nil {
-                            $0.block(event)
-                        }
+            // TODO: remove nil observers
+            if let array = self.observations[typeId] {
+                array.forEach {
+                    if $0.self.observer != nil {
+                        $0.block(event)
                     }
                 }
             }
