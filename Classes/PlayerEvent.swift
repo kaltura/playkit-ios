@@ -20,7 +20,7 @@ public class PlayerEvents: PKEvent {
     
     // All events EXCLUDING error. Assuming error events are treated differently.
     public static let allEventTypes: [PlayerEvents.Type] = [
-        canPlay.self, durationChange.self, ended.self, loadedMetadata.self,
+        canPlay.self, durationChanged.self, ended.self, loadedMetadata.self,
         play.self, paused.self, playing.self, seeking.self, seeked.self, stateChanged.self
     ]
     
@@ -29,7 +29,7 @@ public class PlayerEvents: PKEvent {
     /// Sent when enough data is available that the media can be played, at least for a couple of frames.
     @objc public static let canPlayEvent = canPlay.self
     /// The metadata has loaded or changed, indicating a change in duration of the media. This is sent, for example, when the media has loaded enough that the duration is known.
-    @objc public static let durationChangeEvent = durationChange.self
+    @objc public static let durationChangedEvent = durationChanged.self
     /// Sent when playback completes.
     @objc public static let endedEvent = ended.self
     /// The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
@@ -56,7 +56,7 @@ public class PlayerEvents: PKEvent {
     // MARK: - Player Basic Events
 
     public class canPlay : PlayerEvents {}
-    public class durationChange : PlayerEvents {
+    public class durationChanged : PlayerEvents {
         public var duration: TimeInterval
         
         init(duration: TimeInterval) {

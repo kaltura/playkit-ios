@@ -379,7 +379,7 @@ class AVPlayerEngine : AVPlayer {
         case #keyPath(currentItem.playbackBufferEmpty):
             self.handleBufferEmptyChange()
         case #keyPath(currentItem.duration):
-            event = PlayerEvents.durationChange(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
+            event = PlayerEvents.durationChanged(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
         case #keyPath(rate):
             event = handleRate()
         case #keyPath(currentItem.status):
