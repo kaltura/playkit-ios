@@ -108,7 +108,7 @@ public class YouboraPlugin: PKPlugin {
             }
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvents.paused.self], block: { (info) in
             PKLog.trace("pause info: \(info)")
             self.youboraManager.pauseHandler()
             self.postEventLogWithMessage(message: "Event info: \(info)")
