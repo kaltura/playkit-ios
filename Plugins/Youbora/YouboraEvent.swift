@@ -12,5 +12,6 @@ public class YouboraReportSent : PKEvent {
     public let message: String
     public init(message: String) {
         self.message = message
+        super.init()
     }
 }

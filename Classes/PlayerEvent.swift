@@ -29,95 +29,76 @@ public class PlayerEvent: PKEvent {
     // MARK: - Player Events Static Reference
     
     /// Sent when enough data is available that the media can be played, at least for a couple of frames.
-    @objc public static let canPlay = CanPlay.self
+    @objc public static let canPlay: PlayerEvent.Type = CanPlay.self
     /// The metadata has loaded or changed, indicating a change in duration of the media. This is sent, for example, when the media has loaded enough that the duration is known.
-    @objc public static let durationChanged = DurationChanged.self
+    @objc public static let durationChanged: PlayerEvent.Type = DurationChanged.self
     /// Sent when playback completes.
-    @objc public static let ended = Ended.self
+    @objc public static let ended: PlayerEvent.Type = Ended.self
     /// The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
-    @objc public static let loadedMetadata = LoadedMetadata.self
+    @objc public static let loadedMetadata: PlayerEvent.Type = LoadedMetadata.self
     /// Sent when an error occurs.
-    @objc public static let error = Error.self
+    @objc public static let error: PlayerEvent.Type = Error.self
     /// Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior pause event.
-    @objc public static let play = Play.self
+    @objc public static let play: PlayerEvent.Type = Play.self
     /// Sent when playback is paused.
-    @objc public static let paused = Paused.self
+    @objc public static let paused: PlayerEvent.Type = Paused.self
     /// Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).
-    @objc public static let playing = Playing.self
+    @objc public static let playing: PlayerEvent.Type = Playing.self
     /// Sent when a seek operation begins.
-    @objc public static let seeking = Seeking.self
+    @objc public static let seeking: PlayerEvent.Type = Seeking.self
     /// Sent when a seek operation completes.
-    @objc public static let seeked = Seeked.self
+    @objc public static let seeked: PlayerEvent.Type = Seeked.self
     /// Sent when tracks available.
-    @objc public static let tracksAvailable = TracksAvailable.self
+    @objc public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
     /// Sent when Playback Params Updated.
-    @objc public static let playbackParamsUpdated = PlaybackParamsUpdated.self
+    @objc public static let playbackParamsUpdated: PlayerEvent.Type = PlaybackParamsUpdated.self
     /// Sent when player state is changed.
-    @objc public static let stateChanged = StateChanged.self
+    @objc public static let stateChanged: PlayerEvent.Type = StateChanged.self
     
     // MARK: - Player Basic Events
 
-    public class CanPlay : PlayerEvent {}
-    public class DurationChanged : PlayerEvent {
-        public var duration: TimeInterval
+    class CanPlay : PlayerEvent {}
+    class DurationChanged : PlayerEvent {
+//        public var duration: TimeInterval
         
         init(duration: TimeInterval) {
-            self.duration = duration
+            super.init([EventDataKeys.Duration: NSNumber(value: duration)])
+//            self.duration = duration
         }
         
-        override public func data() -> [String : AnyObject]? {
-            return [EventDataKeys.Duration: NSNumber(value: duration)]
-        }
+//        override public func data() -> [String : AnyObject]? {
+//            return [EventDataKeys.Duration: NSNumber(value: duration)]
+//        }
     }
     
-    public class Ended : PlayerEvent {}
-    public class LoadedMetadata : PlayerEvent {}
-    public class Error : PlayerEvent {}
-    public class Play : PlayerEvent {}
-    public class Paused : PlayerEvent {}
-    public class Playing : PlayerEvent {}
-    public class Seeking : PlayerEvent {}
-    public class Seeked : PlayerEvent {}
+    class Ended : PlayerEvent {}
+    class LoadedMetadata : PlayerEvent {}
+    class Error : PlayerEvent {}
+    class Play : PlayerEvent {}
+    class Paused : PlayerEvent {}
+    class Playing : PlayerEvent {}
+    class Seeking : PlayerEvent {}
+    class Seeked : PlayerEvent {}
     
     // MARK: - Player Tracks Events
     
-    public class TracksAvailable : PlayerEvent {
-        public var tracks: PKTracks
-        
+    class TracksAvailable : PlayerEvent {
         public init(tracks: PKTracks) {
-            self.tracks = tracks
-        }
-        
-        override public func data() -> [String : AnyObject]? {
-            return [EventDataKeys.Tracks: tracks]
+            super.init([EventDataKeys.Tracks: tracks])
         }
     }
     
-    public class PlaybackParamsUpdated : PlayerEvent {
-        public var currentBitrate: Double
-        
+    class PlaybackParamsUpdated : PlayerEvent {
         init(currentBitrate: Double) {
-            self.currentBitrate = currentBitrate
-        }
-        
-        override public func data() -> [String : AnyObject]? {
-            return [EventDataKeys.CurrentBitrate: NSNumber(value: currentBitrate)]
+            super.init([EventDataKeys.CurrentBitrate: NSNumber(value: currentBitrate)])
         }
     }
     
     // MARK: - Player State Events
 
-    public class StateChanged : PlayerEvent {
-        public var newState: PlayerState
-        public var oldState: PlayerState
-        
+    class StateChanged : PlayerEvent {
         public init(newState: PlayerState, oldState: PlayerState) {
-            self.newState = newState
-            self.oldState = oldState
-        }
-        
-        override public func data() -> [String : AnyObject]? {
-            return [EventDataKeys.NewState: newState as AnyObject, EventDataKeys.OldState: oldState as AnyObject]
+            super.init([EventDataKeys.NewState: newState as AnyObject, EventDataKeys.OldState: oldState as AnyObject])
         }
     }
 }
@@ -154,10 +135,7 @@ public class AdEvents: PKEvent {
         init(mediaTime: TimeInterval, totalTime: TimeInterval) {
             self.mediaTime = mediaTime
             self.totalTime = totalTime
-        }
-        
-        public required init() {
-            fatalError("init() has not been implemented")
+            super.init()
         }
     }
     public class adDidRequestPause : AdEvents {}
@@ -178,6 +156,4 @@ public class AdEvents: PKEvent {
     public class adWebOpenerDidOpenInAppBrowser : WebOpenerEvent {}
     public class adWebOpenerWillCloseInAppBrowser : WebOpenerEvent {}
     public class adWebOpenerDidCloseInAppBrowser : WebOpenerEvent {}
-
-    public required override init() {}
 }

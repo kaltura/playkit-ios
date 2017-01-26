@@ -137,9 +137,7 @@ public class YouboraPlugin: PKPlugin {
         
         self.messageBus?.addObserver(self, events: [PlayerEvent.playbackParamsUpdated], block: { (info) in
             PKLog.trace("playbackParamsUpdated info: \(info)")
-            if let paramsEvent = info as? PlayerEvent.PlaybackParamsUpdated {
-                self.youboraManager.currentBitrate = paramsEvent.currentBitrate
-            }
+            self.youboraManager.currentBitrate = info.eventCurrentBitrate?.doubleValue
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
 
@@ -147,7 +145,7 @@ public class YouboraPlugin: PKPlugin {
             
             if let stateChanged = event as? PlayerEvent.StateChanged {
 
-                switch stateChanged.newState {
+                switch event.eventNewState {
                 case .buffering:
                     self.youboraManager.bufferingHandler()
                     self.postEventLogWithMessage(message: "Event info: Buffering")
@@ -157,18 +155,15 @@ public class YouboraPlugin: PKPlugin {
                     break
                 }
                 
-                switch stateChanged.oldState {
+                switch event.eventOldState {
                 case .buffering:
                     self.youboraManager.bufferedHandler()
                     self.postEventLogWithMessage(message: "Event info: Buffered")
                     break
                 default:
-                    
                     break
                 }
             }
-            
-            
         }
         
         self.messageBus?.addObserver(self, events: AdEvents.allEventTypes, block: { (info) in
