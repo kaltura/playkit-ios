@@ -79,19 +79,19 @@ public class YouboraPlugin: PKPlugin {
         
         PKLog.trace()
         
-        self.messageBus?.addObserver(self, events: [PlayerEvent.canPlay.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.canPlay], block: { (info) in
             PKLog.trace("canPlay info: \(info)")
             
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvent.play.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.play], block: { (info) in
             PKLog.trace("play info: \(info)")
             self.youboraManager.playHandler()
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvent.playing.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.playing], block: { (info) in
             PKLog.trace("playing info: \(info)")
             self.postEventLogWithMessage(message: "Event info: \(info)")
 
@@ -108,44 +108,44 @@ public class YouboraPlugin: PKPlugin {
             }
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvent.paused.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.paused], block: { (info) in
             PKLog.trace("pause info: \(info)")
             self.youboraManager.pauseHandler()
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvent.seeking.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.seeking], block: { (info) in
             PKLog.trace("seeking info: \(info)")
             self.youboraManager.seekingHandler()
             
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvent.seeked.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.seeked], block: { (info) in
             PKLog.trace("seeked info: \(info)")
             self.youboraManager.seekedHandler()
             
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvent.ended.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.ended], block: { (info) in
             PKLog.trace("ended info: \(info)")
             self.youboraManager.endedHandler()
             
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvent.playbackParamsUpdated.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.playbackParamsUpdated], block: { (info) in
             PKLog.trace("playbackParamsUpdated info: \(info)")
-            if let paramsEvent = info as? PlayerEvent.playbackParamsUpdated {
+            if let paramsEvent = info as? PlayerEvent.PlaybackParamsUpdated {
                 self.youboraManager.currentBitrate = paramsEvent.currentBitrate
             }
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
 
-        self.player.addObserver(self, events: [PlayerEvent.stateChanged.self]) { (data: Any) in
+        self.player.addObserver(self, events: [PlayerEvent.stateChanged]) { (event) in
             
-            if let stateChanged = data as? PlayerEvent.stateChanged {
+            if let stateChanged = event as? PlayerEvent.StateChanged {
 
                 switch stateChanged.newState {
                 case .buffering:

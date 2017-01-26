@@ -70,14 +70,14 @@ class AVPlayerEngine : AVPlayer {
                 if isSeeked {
                     // when seeked successfully reset player reached end time indicator
                     self.isPlayedToEndTime = false
-                    self.postEvent(event: PlayerEvent.seeked())
+                    self.postEvent(event: PlayerEvent.Seeked())
                     PKLog.trace("seeked")
                 } else {
                     PKLog.error("seek faild")
                 }
             }
             
-            self.postEvent(event: PlayerEvent.seeking())
+            self.postEvent(event: PlayerEvent.Seeking())
         }
     }
     
@@ -198,7 +198,7 @@ class AVPlayerEngine : AVPlayer {
         if self.rate == 0 {
             PKLog.trace("play player")
             
-            self.postEvent(event: PlayerEvent.play())
+            self.postEvent(event: PlayerEvent.Play())
             super.play()
         }
     }
@@ -334,7 +334,7 @@ class AVPlayerEngine : AVPlayer {
             if lastEvent.indicatedBitrate != self.lastBitrate {
                 self.lastBitrate = lastEvent.indicatedBitrate
                 PKLog.trace("currentBitrate:: \(self.lastBitrate)")
-                self.postEvent(event: PlayerEvent.playbackParamsUpdated(currentBitrate: self.lastBitrate))
+                self.postEvent(event: PlayerEvent.PlaybackParamsUpdated(currentBitrate: self.lastBitrate))
             }
         }
     }
@@ -344,7 +344,7 @@ class AVPlayerEngine : AVPlayer {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         
-        self.postEvent(event: PlayerEvent.error())
+        self.postEvent(event: PlayerEvent.Error())
     }
     
     public func playerPlayedToEnd(notification: NSNotification) {
@@ -353,7 +353,7 @@ class AVPlayerEngine : AVPlayer {
         self.currentState = newState
         self.isPlayedToEndTime = true
         
-        self.postEvent(event: PlayerEvent.ended())
+        self.postEvent(event: PlayerEvent.Ended())
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -379,7 +379,7 @@ class AVPlayerEngine : AVPlayer {
         case #keyPath(currentItem.playbackBufferEmpty):
             self.handleBufferEmptyChange()
         case #keyPath(currentItem.duration):
-            event = PlayerEvent.durationChanged(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
+            event = PlayerEvent.DurationChanged(duration: CMTimeGetSeconds((self.currentItem?.duration)!))
         case #keyPath(rate):
             event = handleRate()
         case #keyPath(currentItem.status):
@@ -422,7 +422,7 @@ class AVPlayerEngine : AVPlayer {
             self.nonObservablePropertiesUpdateTimer?.invalidate()
             // we don't want pause events to be sent when current item reached end.
             if !isPlayedToEndTime {
-                event = PlayerEvent.paused()
+                event = PlayerEvent.Paused()
             }
         }
         return event
@@ -433,7 +433,7 @@ class AVPlayerEngine : AVPlayer {
         
         if currentItem?.status == .readyToPlay {
             let newState = PlayerState.ready
-            self.postEvent(event: PlayerEvent.loadedMetadata())
+            self.postEvent(event: PlayerEvent.LoadedMetadata())
             
             if self.startPosition > 0 {
                 self.currentPosition = self.startPosition
@@ -441,19 +441,19 @@ class AVPlayerEngine : AVPlayer {
             }
             
             self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
-                self.postEvent(event: PlayerEvent.tracksAvailable(tracks: tracks))
+                self.postEvent(event: PlayerEvent.TracksAvailable(tracks: tracks))
             })
             
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
-            event = PlayerEvent.canPlay()
+            event = PlayerEvent.CanPlay()
         } else if currentItem?.status == .failed {
             let newState = PlayerState.error
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
-            event = PlayerEvent.error()
+            event = PlayerEvent.Error()
         }
         
         return event
@@ -489,7 +489,7 @@ class AVPlayerEngine : AVPlayer {
     
     private func postStateChange(newState: PlayerState, oldState: PlayerState) {
         PKLog.trace("stateChanged:: new:\(newState) old:\(oldState)")
-        let stateChangedEvent: PKEvent = PlayerEvent.stateChanged(newState: newState, oldState: oldState)
+        let stateChangedEvent: PKEvent = PlayerEvent.StateChanged(newState: newState, oldState: oldState)
         
         self.postEvent(event: stateChangedEvent)
     }
@@ -502,7 +502,7 @@ class AVPlayerEngine : AVPlayer {
                     if timebaseRate > 0 {
                         self.nonObservablePropertiesUpdateTimer?.invalidate()
                         
-                        self.postEvent(event: PlayerEvent.playing())
+                        self.postEvent(event: PlayerEvent.Playing())
                     }
                     
                     PKLog.trace("timebaseRate:: \(timebaseRate)")
