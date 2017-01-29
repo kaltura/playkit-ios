@@ -96,10 +96,6 @@ public class YouboraPlugin: PKPlugin {
             self.postEventLogWithMessage(message: "Event info: \(info)")
 
             if self.isFirstPlay {
-
-                //let timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(YouboraPlugin.didStartPlaying), userInfo: nil, repeats: false)
-                //timer.fire()
-
                 self.youboraManager.joinHandler()
                 self.youboraManager.bufferedHandler()
                 self.isFirstPlay = false
@@ -108,7 +104,7 @@ public class YouboraPlugin: PKPlugin {
             }
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvent.paused], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.pause], block: { (info) in
             PKLog.trace("pause info: \(info)")
             self.youboraManager.pauseHandler()
             self.postEventLogWithMessage(message: "Event info: \(info)")
@@ -137,7 +133,7 @@ public class YouboraPlugin: PKPlugin {
         
         self.messageBus?.addObserver(self, events: [PlayerEvent.playbackParamsUpdated], block: { (info) in
             PKLog.trace("playbackParamsUpdated info: \(info)")
-            self.youboraManager.currentBitrate = info.eventCurrentBitrate?.doubleValue
+            self.youboraManager.currentBitrate = info.currentBitrate?.doubleValue
             self.postEventLogWithMessage(message: "Event info: \(info)")
         })
 
@@ -145,7 +141,7 @@ public class YouboraPlugin: PKPlugin {
             
             if let stateChanged = event as? PlayerEvent.StateChanged {
 
-                switch event.eventNewState {
+                switch event.newState {
                 case .buffering:
                     self.youboraManager.bufferingHandler()
                     self.postEventLogWithMessage(message: "Event info: Buffering")
@@ -155,7 +151,7 @@ public class YouboraPlugin: PKPlugin {
                     break
                 }
                 
-                switch event.eventOldState {
+                switch event.oldState {
                 case .buffering:
                     self.youboraManager.bufferedHandler()
                     self.postEventLogWithMessage(message: "Event info: Buffered")
@@ -166,7 +162,7 @@ public class YouboraPlugin: PKPlugin {
             }
         }
         
-        self.messageBus?.addObserver(self, events: AdEvents.allEventTypes, block: { (info) in
+        self.messageBus?.addObserver(self, events: AdEvent.allEventTypes, block: { (info) in
             
             PKLog.trace("Ads event info: \(info)")
 
@@ -175,7 +171,7 @@ public class YouboraPlugin: PKPlugin {
     }
     
     private func postEventLogWithMessage(message: String) {
-        let eventLog = YouboraReportSent(message: message)
+        let eventLog = YouboraEvent.YouboraReportSent(message: message as NSString)
         self.messageBus?.post(eventLog)
     }
     
@@ -184,10 +180,3 @@ public class YouboraPlugin: PKPlugin {
         self.youboraManager.joinHandler()
     }
 }
-
-
-
-
-
-
-

@@ -422,7 +422,7 @@ class AVPlayerEngine : AVPlayer {
             self.nonObservablePropertiesUpdateTimer?.invalidate()
             // we don't want pause events to be sent when current item reached end.
             if !isPlayedToEndTime {
-                event = PlayerEvent.Paused()
+                event = PlayerEvent.Pause()
             }
         }
         return event
