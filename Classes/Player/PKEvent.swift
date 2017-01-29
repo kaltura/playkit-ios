@@ -20,7 +20,16 @@ public class PKEvent: NSObject {
 
 // MARK: - PKEvent Data Accessors Extension
 extension PKEvent {
-    // MARK: - Player Data Accessors
+    // MARK: - Event Data Keys
+    struct EventDataKeys {
+        static let Duration = "duration"
+        static let Tracks = "tracks"
+        static let CurrentBitrate = "currentBitrate"
+        static let OldState = "oldState"
+        static let NewState = "newState"
+    }
+    
+    // MARK: Player Data Accessors
     
     /// Duration Value, PKEvent Data Accessor
     public var duration: NSNumber? {
@@ -55,12 +64,14 @@ extension PKEvent {
         return newState
     }
     
-    // MARK: - Ad Data Accessors
+    // MARK: - Ad Data Keys
     struct AdEventDataKeys {
         static let MediaTime = "mediaTime"
         static let TotalTime = "totalTime"
         static let WebOpener = "webOpener"
     }
+    
+    // MARK: Ad Data Accessors
     
     /// MediaTime, PKEvent Ad Data Accessor
     public var mediaTime: NSNumber? {

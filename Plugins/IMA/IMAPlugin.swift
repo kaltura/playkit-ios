@@ -92,7 +92,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
 
         var events: [PKEvent.Type] = []
-        events.append(PlayerEvent.ended.self)
+        events.append(PlayerEvent.ended)
         self.messageBus?.addObserver(self, events: events, block: { (data: Any) -> Void in
             self.contentComplete()
         })
@@ -284,41 +284,41 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     private func convertToPlayerEvent(_ event: IMAAdEventType) -> AdEvent.Type {
         switch event {
         case .AD_BREAK_READY:
-            return AdEvent.adBreakReady.self
+            return AdEvent.adBreakReady
         case .AD_BREAK_ENDED:
-            return AdEvent.adBreakEnded.self
+            return AdEvent.adBreakEnded
         case .AD_BREAK_STARTED:
-            return AdEvent.adBreakStarted.self
+            return AdEvent.adBreakStarted
         case .ALL_ADS_COMPLETED:
-            return AdEvent.adAllCompleted.self
+            return AdEvent.adAllCompleted
         case .CLICKED:
-            return AdEvent.adClicked.self
+            return AdEvent.adClicked
         case .COMPLETE:
-            return AdEvent.adComplete.self
+            return AdEvent.adComplete
         case .CUEPOINTS_CHANGED:
-            return AdEvent.adCuepointsChanged.self
+            return AdEvent.adCuepointsChanged
         case .FIRST_QUARTILE:
-            return AdEvent.adFirstQuartile.self
+            return AdEvent.adFirstQuartile
         case .LOADED:
-            return AdEvent.adLoaded.self
+            return AdEvent.adLoaded
         case .LOG:
-            return AdEvent.adLog.self
+            return AdEvent.adLog
         case .MIDPOINT:
-            return AdEvent.adMidpoint.self
+            return AdEvent.adMidpoint
         case .PAUSE:
-            return AdEvent.adPaused.self
+            return AdEvent.adPaused
         case .RESUME:
-            return AdEvent.adResumed.self
+            return AdEvent.adResumed
         case .SKIPPED:
-            return AdEvent.adSkipped.self
+            return AdEvent.adSkipped
         case .STARTED:
-            return AdEvent.adStarted.self
+            return AdEvent.adStarted
         case .STREAM_LOADED:
-            return AdEvent.adStreamLoaded.self
+            return AdEvent.adStreamLoaded
         case .TAPPED:
-            return AdEvent.adTapped.self
+            return AdEvent.adTapped
         case .THIRD_QUARTILE:
-            return AdEvent.adThirdQuartile.self
+            return AdEvent.adThirdQuartile
         }
     }
 

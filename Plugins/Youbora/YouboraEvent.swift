@@ -15,5 +15,5 @@ public class YouboraEvent: PKEvent {
         }
     }
     
-    @objc public static let youboraReportSent: YouboraEvent.Type = YouboraReportSent.self
+    public static let youboraReportSent: YouboraEvent.Type = YouboraReportSent.self
 }
