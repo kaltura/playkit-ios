@@ -12,6 +12,9 @@ import AVKit
 
 class PlayerController: NSObject, Player {
     
+    // reachability
+    let reachabilityManager = ReachabilityManager.shared
+    
     public var duration: Double {
         get {
             guard let currentPlayer = self.currentPlayer else {
@@ -86,15 +89,26 @@ class PlayerController: NSObject, Player {
                 block(event)
             }
         }
-        
         self.onEventBlock = nil
+        
+        // start reachability notifiier
+        do {
+            try self.reachabilityManager.startNotifier()
+        } catch let e {
+            PKLog.error("failed to start reachability notiifier, error: \(e)")
+        }
     }
     
     func prepare(_ config: PlayerConfig) {
         if let player = self.currentPlayer {
             player.startPosition = config.startTime
-            
-            if let mediaEntry: MediaEntry = config.mediaEntry  {
+
+            if let mediaEntry: MediaEntry = config.mediaEntry {
+                // start reachability notifiying before loading asset to the player.
+                // observe reachability and make sure to remove old observer in case prepare gets called more than once by mistake.
+                NotificationCenter.default.removeObserver(self, name: .ReachabilityChanged, object: nil)
+                NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(notification:)), name: .ReachabilityChanged, object: nil)
+                
                 self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
                 self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
                     if let avAsset: AVAsset = asset {
@@ -143,6 +157,8 @@ class PlayerController: NSObject, Player {
     }
     
     func destroy() {
+        self.reachabilityManager.stopNotifier()
+        NotificationCenter.default.removeObserver(self, name: .ReachabilityChanged, object: nil)
         self.currentPlayer?.destroy()
     }
     
@@ -156,5 +172,20 @@ class PlayerController: NSObject, Player {
     
     public func selectTrack(trackId: String) {
         self.currentPlayer?.selectTrack(trackId: trackId)
+    }
+    
+    // MARK: Reachability Changed
+    
+    @objc func reachabilityChanged(notification: Notification) {
+        let reachability = notification.object as! Reachability
+        if !reachability.isReachable {
+            self.sendReachabilityErrorEvent()
+        }
+    }
+    
+    private func sendReachabilityErrorEvent() {
+        if let block = self.onEventBlock {
+            block(PlayerEvents.error(error: ReachabilityError.unreachable.asNSError))
+        }
     }
 }
