@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// A `PlayerConfig` object defines behavior and info to use when loading a `Player` object.
 public class PlayerConfig: NSObject {
     public var mediaEntry : MediaEntry?
     public var startTime : TimeInterval = 0

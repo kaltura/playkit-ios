@@ -33,8 +33,7 @@ class MessegeBusTest: XCTestCase {
         let media = MediaEntry(json: entry)
         config.set(mediaEntry: media)
         self.player = PlayKitManager.sharedInstance.loadPlayer(config:config)
-        
-        
+        self.player.prepare(config)
     }
     
     override func tearDown() {

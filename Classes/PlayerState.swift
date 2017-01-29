@@ -20,4 +20,6 @@ import Foundation
     case buffering
 /// Sent when player's state errored.    
     case error
+/// Sent when player's state unknown.
+    case unknown = -1
 }
