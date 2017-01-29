@@ -8,6 +8,12 @@
 
 import UIKit
 
+
+/**
+ Manager class used for:
+  - creating `Player` objects.
+  - creating and registering plugins.
+ */
 public class PlayKitManager: NSObject {
 
     public static let versionString: String = Bundle.init(for: PlayKitManager.self)
@@ -19,6 +25,18 @@ public class PlayKitManager: NSObject {
     
     var pluginRegistry = Dictionary<String, PKPlugin.Type>()
     
+    
+    /// Loads and returns a player object using a provided configuration.
+    ///
+    /// - Important: In order to start buffering the video after loading the player
+    /// you must call prepare on the player with the same configuration.
+    /// ````
+    ///     player = PlayKitManager.sharedInstance.loadPlayer(config: config)
+    ///     player.prepare(config)
+    /// ````
+    ///
+    /// - Parameter config: The configuration object to load the player with.
+    /// - Returns: A player loaded using the provided configuration.
     public func loadPlayer(config: PlayerConfig) -> Player {
         let loader = PlayerLoader()
         loader.load(config)
