@@ -8,9 +8,12 @@
 
 import UIKit
 
-public class YouboraReportSent : PKEvent {
-    public let message: String
-    public init(message: String) {
-        self.message = message
+public class YouboraEvent: PKEvent {
+    class YouboraReportSent : YouboraEvent {
+        convenience init(message: NSString) {
+            self.init(["message" : message])
+        }
     }
+    
+    public static let youboraReportSent: YouboraEvent.Type = YouboraReportSent.self
 }

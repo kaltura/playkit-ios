@@ -146,7 +146,7 @@ class PlayerController: NSObject, Player {
         self.currentPlayer?.destroy()
     }
     
-    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {
+    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
         //Assert.shouldNeverHappen();
     }
     
