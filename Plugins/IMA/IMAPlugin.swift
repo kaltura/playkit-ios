@@ -407,13 +407,13 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     }
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
-        self.notify(event: AdEvent.adDidRequestPause())
+        self.notify(event: AdEvent.AdDidRequestPause())
         self.isAdPlayback = true
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(false, alpha: 0)
-        self.notify(event: AdEvent.adDidRequestResume())
+        self.notify(event: AdEvent.AdDidRequestResume())
         self.isAdPlayback = false
     }
     
@@ -421,7 +421,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         var data = [String : TimeInterval]()
         data["mediaTime"] = mediaTime
         data["totalTime"] = totalTime
-        self.notify(event: AdEvent.adDidProgressToTime(mediaTime: mediaTime, totalTime: totalTime))
+        self.notify(event: AdEvent.AdDidProgressToTime(mediaTime: mediaTime, totalTime: totalTime))
     }
     
     // MARK: AVPictureInPictureControllerDelegate
@@ -459,23 +459,23 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     // MARK: IMAWebOpenerDelegate
     
     public func webOpenerWillOpenExternalBrowser(_ webOpener: NSObject) {
-        self.notify(event: AdEvent.adWebOpenerWillOpenExternalBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerWillOpenExternalBrowser(webOpener: webOpener))
     }
     
     public func webOpenerWillOpen(inAppBrowser webOpener: NSObject!) {
-        self.notify(event: AdEvent.adWebOpenerWillOpenInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerWillOpenInAppBrowser(webOpener: webOpener))
     }
     
     public func webOpenerDidOpen(inAppBrowser webOpener: NSObject!) {
-        self.notify(event: AdEvent.adWebOpenerDidOpenInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerDidOpenInAppBrowser(webOpener: webOpener))
     }
     
     public func webOpenerWillClose(inAppBrowser webOpener: NSObject!) {
-        self.notify(event: AdEvent.adWebOpenerWillCloseInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerWillCloseInAppBrowser(webOpener: webOpener))
     }
     
     public func webOpenerDidClose(inAppBrowser webOpener: NSObject!) {
-        self.notify(event: AdEvent.adWebOpenerDidCloseInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerDidCloseInAppBrowser(webOpener: webOpener))
     }
 }
     

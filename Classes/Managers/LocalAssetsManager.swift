@@ -128,12 +128,18 @@ public protocol LocalDataStore {
     func remove(key: String) throws
 }
 
+/**
+ Implementation of LocalDataStore that saves data to files in the Library directory.
+ */ 
 public class DefaultLocalDataStore: LocalDataStore {
 
+    static let pkLocalDataStore = "pkLocalDataStore"
     let storageDirectory: URL
 
     public init() throws {
-        self.storageDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        let baseDir = try FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        self.storageDirectory = baseDir.appendingPathComponent(DefaultLocalDataStore.pkLocalDataStore, isDirectory: true)
+        try FileManager.default.createDirectory(at: self.storageDirectory, withIntermediateDirectories: true, attributes: nil)
     }
 
     private func file(_ key: String) -> URL {

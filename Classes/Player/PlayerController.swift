@@ -185,7 +185,7 @@ class PlayerController: NSObject, Player {
     
     private func sendReachabilityErrorEvent() {
         if let block = self.onEventBlock {
-            block(PlayerEvents.error(error: ReachabilityError.unreachable.asNSError))
+            block(PlayerEvent.Error(error: ReachabilityError.unreachable.asNSError))
         }
     }
 }
