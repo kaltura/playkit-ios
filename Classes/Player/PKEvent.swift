@@ -11,9 +11,9 @@ import Foundation
 /// PKEvent
 public class PKEvent: NSObject {
     // Events that have payload must provide it as a dictionary for objective-c compat.
-    public let data: [String: AnyObject]?
+    public let data: [String : AnyObject]?
     
-    public init(_ data: [String: AnyObject]? = nil) {
+    public required init(_ data: [String : AnyObject]? = nil) {
         self.data = data
     }
 }
@@ -27,6 +27,7 @@ extension PKEvent {
         static let CurrentBitrate = "currentBitrate"
         static let OldState = "oldState"
         static let NewState = "newState"
+        static let Error = "error"
     }
     
     // MARK: Player Data Accessors
@@ -62,6 +63,11 @@ extension PKEvent {
         }
         
         return newState
+    }
+    
+    /// Associated error from error event, PKEvent Data Accessor
+    public var error: NSError? {
+        return self.data?[EventDataKeys.Error] as? NSError
     }
     
     // MARK: - Ad Data Keys
