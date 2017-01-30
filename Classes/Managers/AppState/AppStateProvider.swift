@@ -49,8 +49,7 @@ extension AppStateProviderProtocol {
 /// Used to seperate the events providing from the app state subject and enabling us to mock better.
 final class AppStateProvider: AppStateProviderProtocol {
     
-    convenience init(delegate: AppStateProviderDelegate) {
-        self.init()
+    init(delegate: AppStateProviderDelegate? = nil) {
         self.delegate = delegate
     }
     

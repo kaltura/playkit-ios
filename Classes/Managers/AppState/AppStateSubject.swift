@@ -130,7 +130,7 @@ final class AppStateSubject: AppStateSubjectProtocol {
     static let sharedInstance = AppStateSubject()
     private init() {
         self.appStateProvider = AppStateProvider()
-        appStateProvider.delegate = self
+        self.appStateProvider.delegate = self
     }
     
     let lock: AnyObject = UUID().uuidString as AnyObject
