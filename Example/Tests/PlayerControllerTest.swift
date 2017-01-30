@@ -44,11 +44,11 @@ class PlayerControllerTest: XCTestCase {
     }
     
     func testPlayCommand() {
-        let theExeption = expectation(description: "play command")
+        let asyncExpectation = expectation(description: "play command")
         self.player.play();
-        self.player.addObserver(self, events: [PlayerEvents.playing.self]) { (info: Any) in
-            if info is PlayerEvents.playing {
-                theExeption.fulfill()
+        self.player.addObserver(self, events: [PlayerEvent.playing]) { event in
+            if type(of: event) == PlayerEvent.playing {
+                asyncExpectation.fulfill()
             } else {
                 XCTFail()
             }
@@ -57,11 +57,11 @@ class PlayerControllerTest: XCTestCase {
     }
     
     func testPauseCommand() {
-        let theExeption = expectation(description: "pause command")
+        let asyncExpectation = expectation(description: "pause command")
         self.player.play();
-        self.player.addObserver(self, events: [PlayerEvents.pause.self]) { (info: Any) in
-            if info is PlayerEvents.pause {
-                theExeption.fulfill()
+        self.player.addObserver(self, events: [PlayerEvent.pause]) { event in
+            if type(of: event) == PlayerEvent.pause {
+                asyncExpectation.fulfill()
             } else {
                 XCTFail()
             }
@@ -72,20 +72,19 @@ class PlayerControllerTest: XCTestCase {
     
     
     func testIsPlayingValue() {
-        let theExeption = expectation(description: "play command")
+        let asyncExpectation = expectation(description: "play command")
         self.player.play();
-        self.player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.pause.self]) { (info: Any) in
+        self.player.addObserver(self, events: [PlayerEvent.playing, PlayerEvent.pause]) { event in
             
-            if info is PlayerEvents.playing {
+            if type(of: event) == PlayerEvent.playing {
                 if self.player.isPlaying {
                     self.player.pause()
                 } else {
                     XCTFail()
                 }
-                
-            } else if info is PlayerEvents.pause {
+            } else if type(of: event) == PlayerEvent.pause {
                 if !self.player.isPlaying {
-                    theExeption.fulfill()
+                    asyncExpectation.fulfill()
                 } else {
                     XCTFail()
                 }
@@ -107,14 +106,13 @@ class PlayerControllerTest: XCTestCase {
         var isEnded = false
         var isFirstPlay = true
         
-        player.play()
-        player.addObserver(self, events: [PlayerEvents.ended.self]) { info in
+        self.player.addObserver(self, events: [PlayerEvent.ended]) { info in
             print("ended")
             isEnded = true
             self.player.pause()
         }
-        self.player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.pause.self]) { info in
-            if info is PlayerEvents.playing && isFirstPlay && self.player.isPlaying {
+        self.player.addObserver(self, events: [PlayerEvent.playing, PlayerEvent.pause]) { event in
+            if type(of: event) == PlayerEvent.playing && isFirstPlay && self.player.isPlaying {
                 isFirstPlay = false
                 // seek to end - 1 second
                 self.player.seek(to: CMTimeMake(Int64(self.player.duration - 2), 1))
@@ -124,6 +122,8 @@ class PlayerControllerTest: XCTestCase {
                 XCTFail()
             }
         }
+        player.play()
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 9) {
             asyncExpectation.fulfill()
         }
@@ -145,14 +145,13 @@ class PlayerControllerTest: XCTestCase {
         var isFirstPlay = true
         var isSeekedAfterEnded = false
         
-        player.play()
-        player.addObserver(self, events: [PlayerEvents.ended.self]) { info in
+        player.addObserver(self, events: [PlayerEvent.ended]) { info in
             print("ended")
             isEnded = true
             self.player.seek(to: CMTimeMake(Int64(self.player.duration - 2), 1))
         }
-        player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.pause.self]) { info in
-            if info is PlayerEvents.playing && isFirstPlay && self.player.isPlaying {
+        player.addObserver(self, events: [PlayerEvent.playing, PlayerEvent.pause]) { event in
+            if type(of: event) == PlayerEvent.playing && isFirstPlay && self.player.isPlaying {
                 isFirstPlay = false
                 // seek to end - 2 second
                 self.player.seek(to: CMTimeMake(Int64(self.player.duration - 2), 1))
@@ -162,12 +161,14 @@ class PlayerControllerTest: XCTestCase {
                 asyncExpectation.fulfill()
             }
         }
-        player.addObserver(self, events: [PlayerEvents.seeked.self]) { info in
+        player.addObserver(self, events: [PlayerEvent.seeked]) { info in
             if isEnded {
                 isSeekedAfterEnded = true
                 self.player.play()
             }
         }
+        player.play()
+        
         waitForExpectations(timeout: 20, handler: nil)
     }
 }
