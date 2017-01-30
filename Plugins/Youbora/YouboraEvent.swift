@@ -10,8 +10,8 @@ import UIKit
 
 public class YouboraEvent: PKEvent {
     class YouboraReportSent : YouboraEvent {
-        init(message: NSString) {
-            super.init(["message" : message])
+        convenience init(message: NSString) {
+            self.init(["message" : message])
         }
     }
     

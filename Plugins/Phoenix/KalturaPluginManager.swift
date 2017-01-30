@@ -63,28 +63,28 @@ final class KalturaPluginManager {
             return
         }
 
-        messageBus.addObserver(self, events: [PlayerEvents.ended.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (info) in
             PKLog.trace("ended info: \(info)")
             self.stopTimer()
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvents.error.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvent.error], block: { (info) in
             PKLog.trace("error info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .error)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (info) in
             PKLog.trace("pause info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .pause)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvents.loadedMetadata.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvent.loadedMetadata], block: { (info) in
             PKLog.trace("loadedMetadata info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .load)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvents.playing.self], block: { (info) in
+        messageBus.addObserver(self, events: [PlayerEvent.playing], block: { (info) in
             PKLog.trace("play info: \(info)")
             
             if !self.intervalOn {

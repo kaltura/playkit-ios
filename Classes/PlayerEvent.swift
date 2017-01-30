@@ -50,50 +50,47 @@ public class PlayerEvent: PKEvent {
 
     class CanPlay : PlayerEvent {}
     class DurationChanged : PlayerEvent {
-        init(duration: TimeInterval) {
-            super.init([EventDataKeys.Duration : NSNumber(value: duration)])
+        convenience init(duration: TimeInterval) {
+            self.init([EventDataKeys.Duration : NSNumber(value: duration)])
         }
     }
     
     class Ended : PlayerEvent {}
     class LoadedMetadata : PlayerEvent {}
-    class Error : PlayerEvent {}
     class Play : PlayerEvent {}
     class Pause : PlayerEvent {}
     class Playing : PlayerEvent {}
     class Seeking : PlayerEvent {}
     class Seeked : PlayerEvent {}
     
+    class Error: PlayerEvent {
+        convenience init(error: NSError) {
+            self.init([EventDataKeys.Error : error])
+        }
+    }
+    
     // MARK: - Player Tracks Events
     
     class TracksAvailable : PlayerEvent {
-        init(tracks: PKTracks) {
-            super.init([EventDataKeys.Tracks: tracks])
+        convenience init(tracks: PKTracks) {
+            self.init([EventDataKeys.Tracks : tracks])
         }
     }
     
     class PlaybackParamsUpdated : PlayerEvent {
-        init(currentBitrate: Double) {
-            super.init([EventDataKeys.CurrentBitrate: NSNumber(value: currentBitrate)])
+        convenience init(currentBitrate: Double) {
+            self.init([EventDataKeys.CurrentBitrate : NSNumber(value: currentBitrate)])
         }
     }
     
     // MARK: - Player State Events
 
     class StateChanged : PlayerEvent {
-        init(newState: PlayerState, oldState: PlayerState) {
-            super.init([EventDataKeys.NewState: newState as AnyObject,
-                        EventDataKeys.OldState: oldState as AnyObject])
+        convenience init(newState: PlayerState, oldState: PlayerState) {
+            self.init([EventDataKeys.NewState : newState as AnyObject,
+                        EventDataKeys.OldState : oldState as AnyObject])
         }
     }
-}
-
-
-// MARK: - Ad Event Data Keys
-struct AdEventDataKeys {
-    static let MediaTime = "mediaTime"
-    static let TotalTime = "totalTime"
-    static let WebOpener = "webOpener"
 }
 
 // MARK: - Ad Events
@@ -151,8 +148,8 @@ public class AdEvent: PKEvent {
     class AdThirdQuartile : AdEvent {}
     
     class AdDidProgressToTime : AdEvent {
-        init(mediaTime: TimeInterval, totalTime: TimeInterval) {
-            super.init([AdEventDataKeys.MediaTime: NSNumber(value: mediaTime),
+        convenience init(mediaTime: TimeInterval, totalTime: TimeInterval) {
+            self.init([AdEventDataKeys.MediaTime: NSNumber(value: mediaTime),
                         AdEventDataKeys.TotalTime: NSNumber(value: totalTime)])
         }
     }
@@ -161,12 +158,8 @@ public class AdEvent: PKEvent {
     class AdDidRequestResume : AdEvent {}
     
     class WebOpenerEvent : AdEvent {
-        init(webOpener: NSObject!) {
-            super.init([AdEventDataKeys.WebOpener: webOpener])
-        }
-        
-        required init() {
-            fatalError("init() has not been implemented")
+        convenience init(webOpener: NSObject!) {
+            self.init([AdEventDataKeys.WebOpener: webOpener])
         }
     }
     

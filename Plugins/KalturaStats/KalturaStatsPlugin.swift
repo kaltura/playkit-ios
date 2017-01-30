@@ -81,7 +81,6 @@ public class KalturaStatsPlugin: PKPlugin {
     }
     
     public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
-        
         self.messageBus = messageBus
         self.mediaEntry = mediaConfig
         
@@ -90,8 +89,7 @@ public class KalturaStatsPlugin: PKPlugin {
             self.player = player
         }
         
-        registerToAllEvents()
-        
+        self.registerToAllEvents()
     }
     
     public func destroy() {
@@ -101,52 +99,55 @@ public class KalturaStatsPlugin: PKPlugin {
     }
     
     private func registerToAllEvents() {
-        
         PKLog.trace("registerToAllEvents")
+        guard let messageBus = self.messageBus else {
+            PKLog.error("messageBus is nil !")
+            return
+        }
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.canPlay.self], block: { (info) in
-            PKLog.trace("canPlay info: \(info)")
+        messageBus.addObserver(self, events: [PlayerEvent.canPlay], block: { (event) in
+            PKLog.trace("canPlay event: \(event)")
             self.sendMediaLoaded()
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.play.self, PlayerEvents.playing.self], block: { (info) in
-            PKLog.trace("play info: \(info)")
+        messageBus.addObserver(self, events: [PlayerEvent.play, PlayerEvent.playing], block: { (event) in
+            PKLog.trace("play event: \(event)")
             if self.isFirstPlay {
                 self.sendAnalyticsEvent(action: .PLAY)
                 self.isFirstPlay = false
             }
         })
                 
-        self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
-            PKLog.trace("pause info: \(info)")
+        messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (event) in
+            PKLog.trace("pause event: \(event)")
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.seeking.self], block: { (info) in
-            PKLog.trace("seeking info: \(info)")
+        messageBus.addObserver(self, events: [PlayerEvent.seeking], block: { (event) in
+            PKLog.trace("seeking event: \(event)")
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.seeked.self], block: { (info) in
-            PKLog.trace("seeked info: \(info)")
+        messageBus.addObserver(self, events: [PlayerEvent.seeked], block: { (event) in
+            PKLog.trace("seeked event: \(event)")
             
             self.hasSeeked = true
             self.seekPercent = Float(self.player.currentTime) / Float(self.player.duration)
             self.sendAnalyticsEvent(action: .SEEK);
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.ended.self], block: { (info) in
-            PKLog.trace("ended info: \(info)")
+        messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (event) in
+            PKLog.trace("ended event: \(event)")
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.error.self], block: { (info) in
-            PKLog.trace("error info: \(info)")
+        messageBus.addObserver(self, events: [PlayerEvent.error], block: { (event) in
+            PKLog.trace("error event: \(event)")
             self.sendAnalyticsEvent(action: .ERROR)
         })
         
-        self.player.addObserver(self, events: [PlayerEvents.stateChanged.self]) { (data: Any) in
+        messageBus.addObserver(self, events: [PlayerEvent.stateChanged]) { (data: Any) in
             
-            if let stateChanged = data as? PlayerEvents.stateChanged {
+            if let stateChanged = data as? PlayerEvent.StateChanged {
                 
-                switch stateChanged.newSate {
+                switch stateChanged.newState {
                 case .idle:
                     self.sendWidgetLoaded()
                     break
@@ -175,12 +176,12 @@ public class KalturaStatsPlugin: PKPlugin {
                     self.sendAnalyticsEvent(action: .BUFFER_START)
                     break
                 case .error:
-                    
+                    break
+                case .unknown:
                     break
                 }
             }
         }
-
     }
     
     private func sendWidgetLoaded() {
