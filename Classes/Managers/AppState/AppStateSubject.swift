@@ -24,7 +24,6 @@ protocol AppStateSubjectProtocol: class, AppStateProviderDelegate {
 }
 
 extension AppStateSubjectProtocol {
-    
     /// Starts observing the app state events
     func startObservingAppState() {
         sync {
@@ -111,6 +110,7 @@ extension AppStateSubjectProtocol {
         block()
         objc_sync_exit(lock)
     }
+    
 }
 
 /************************************************************/
@@ -118,7 +118,7 @@ extension AppStateSubjectProtocol {
 /************************************************************/
 
 /// The `AppStateSubject` class provides a way to add/remove application state observers.
-/// 
+///
 /// - note: Subject is a class that is both observing and being observered.
 /// In our case listening to events using the provider and posting using the obervations onObserve.
 ///
@@ -166,5 +166,3 @@ func == (lhs: NotificationObservation, rhs: NotificationObservation) -> Bool {
 protocol AppStateObservable: AnyObject {
     var observations: Set<NotificationObservation> { get }
 }
-
-

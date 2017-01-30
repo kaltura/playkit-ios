@@ -25,7 +25,6 @@ protocol AppStateProviderProtocol {
 }
 
 extension AppStateProviderProtocol {
-    
     /// Add observers for the provided notification names.
     func addObservers() {
         observationNames.forEach { name in
@@ -39,6 +38,7 @@ extension AppStateProviderProtocol {
     func removeObservers() {
         notificationsManager.removeAllObservers()
     }
+    
 }
 
 /************************************************************/
@@ -64,6 +64,7 @@ final class AppStateProvider: AppStateProviderProtocol {
         .UIApplicationWillResignActive,
         .UIApplicationWillEnterForeground
     ]
+    
 }
 
 
