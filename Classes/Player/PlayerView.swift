@@ -32,5 +32,9 @@ class PlayerView: UIView {
             self.playerLayer?.frame = CGRect(origin: CGPoint.zero, size: frame.size)
         }
     }
-
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.playerLayer?.frame = CGRect(origin: CGPoint.zero, size: frame.size)
+    }
 }
