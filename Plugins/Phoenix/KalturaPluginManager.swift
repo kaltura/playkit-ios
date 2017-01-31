@@ -48,6 +48,7 @@ final class KalturaPluginManager {
         }
         
         registerToAllEvents()
+        AppStateSubject.sharedInstance.add(observer: self)
     }
     
     public func destroy() {
@@ -59,7 +60,7 @@ final class KalturaPluginManager {
     func registerToAllEvents() {
         PKLog.trace("Register to all events")
         guard let messageBus = self.messageBus else {
-            PKLog.error("messageBus is nil !")
+            PKLog.error("message bus is nil! shouldn't happen")
             return
         }
 
@@ -101,6 +102,14 @@ final class KalturaPluginManager {
         })
     }
     
+    public func reportConcurrencyEvent() {
+        self.messageBus?.post(OttEvent.OttEventConcurrency())
+    }
+    
+    /************************************************************/
+    // MARK: - Private Implementation
+    /************************************************************/
+    
     private func createTimer() {
         
         if let conf = self.config, let intr = conf.params["timerInterval"] as? Int {
@@ -136,8 +145,22 @@ final class KalturaPluginManager {
             t.invalidate()
         }
     }
+}
+
+/************************************************************/
+// MARK: - App State Handling
+/************************************************************/
+
+extension KalturaPluginManager: AppStateObservable {
     
-    public func reportConcurrencyEvent() {
-        self.messageBus?.post(OttEvent.OttEventConcurrency())
+    var observations: Set<NotificationObservation> {
+        return [
+            NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
+                guard let delegate = self.delegate else { return }
+                PKLog.trace("plugin: \(delegate) will terminate event received, sending analytics stop event")
+                self.destroy()
+                AppStateSubject.sharedInstance.remove(observer: self)
+            }
+        ]
     }
 }
