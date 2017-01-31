@@ -7,156 +7,165 @@
 //
 import Foundation
 
-public class PlayerEvents: PKEvent {
+/// An PlayerEvent is a class used to reflect player events.
+public class PlayerEvent: PKEvent {
     
     // All events EXCLUDING error. Assuming error events are treated differently.
-    public static let allEventTypes: [PlayerEvents.Type] = [
-        canPlay.self, durationChange.self, ended.self, loadedMetadata.self,
-        play.self, pause.self, playing.self, seeking.self, seeked.self, stateChanged.self
+    public static let allEventTypes: [PlayerEvent.Type] = [
+        canPlay, durationChanged, ended, loadedMetadata,
+        play, pause, playing, seeking, seeked, stateChanged,
+        tracksAvailable, playbackParamsUpdated, error
     ]
     
-    /**
-     Sent when enough data is available that the media can be played, at least for a couple of frames.
-     */
-    public class canPlay : PlayerEvents {}
-    /**
-     The metadata has loaded or changed, indicating a change in duration of the media. This is sent, for example, when the media has loaded enough that the duration is known.
-     */
-    public class durationChange : PlayerEvents {
-        public var duration: TimeInterval
-        
-        init(duration: TimeInterval) {
-            self.duration = duration
-        }
-    }
-    /**
-     Sent when playback completes.
-     */
-    public class ended : PlayerEvents {}
-    /**
-     The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
-     */
-    public class loadedMetadata : PlayerEvents {}
-    /**
-     Sent when an error occurs.
-     */
-    public class error : PlayerEvents {}
-    /**
-     Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior pause event.
-     */
-    public class play : PlayerEvents {}
-    /**
-     Sent when playback is paused.
-     */
-    public class pause : PlayerEvents {}
+    // MARK: - Player Events Static Reference
     
-    /**
-     Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).
-     */
-    public class playing : PlayerEvents {}
+    /// Sent when enough data is available that the media can be played, at least for a couple of frames.
+    public static let canPlay: PlayerEvent.Type = CanPlay.self
+    /// The metadata has loaded or changed, indicating a change in duration of the media. This is sent, for example, when the media has loaded enough that the duration is known.
+    public static let durationChanged: PlayerEvent.Type = DurationChanged.self
+    /// Sent when playback completes.
+    public static let ended: PlayerEvent.Type = Ended.self
+    /// The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
+    public static let loadedMetadata: PlayerEvent.Type = LoadedMetadata.self
+    /// Sent when an error occurs.
+    public static let error: PlayerEvent.Type = Error.self
+    /// Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior pause event.
+    public static let play: PlayerEvent.Type = Play.self
+    /// Sent when playback is paused.
+    public static let pause: PlayerEvent.Type = Pause.self
+    /// Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).
+    public static let playing: PlayerEvent.Type = Playing.self
+    /// Sent when a seek operation begins.
+    public static let seeking: PlayerEvent.Type = Seeking.self
+    /// Sent when a seek operation completes.
+    public static let seeked: PlayerEvent.Type = Seeked.self
+    /// Sent when tracks available.
+    public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
+    /// Sent when Playback Params Updated.
+    public static let playbackParamsUpdated: PlayerEvent.Type = PlaybackParamsUpdated.self
+    /// Sent when player state is changed.
+    public static let stateChanged: PlayerEvent.Type = StateChanged.self
     
-    /**
-     Sent when a seek operation begins.
-     */
-    public class seeking : PlayerEvents {}
-   
-    /**
-     Sent when a seek operation completes.
-     */
-    public class seeked : PlayerEvents {}
-    
-    /**
-     Sent when tracks available.
-     */
-    public class tracksAvailable : PlayerEvents {
-        public var tracks: PKTracks
-        
-        public init(tracks: PKTracks) {
-            self.tracks = tracks
-        }
-    }
-    
-    /**
-     Sent when Playback Params Updated.
-     */
-    public class playbackParamsUpdated : PlayerEvents {
-        public var currentBitrate: Double
-        
-        init(currentBitrate: Double) {
-            self.currentBitrate = currentBitrate
-        }
-    }
+    // MARK: - Player Basic Events
 
-    /**
-     Sent when player state is changed.
-     */
-    public class stateChanged : PlayerEvents {
-        public var newSate: PlayerState
-        public var oldSate: PlayerState
-        
-        public init(newState: PlayerState, oldState: PlayerState) {
-            self.newSate = newState
-            self.oldSate = oldState
+    class CanPlay : PlayerEvent {}
+    class DurationChanged : PlayerEvent {
+        convenience init(duration: TimeInterval) {
+            self.init([EventDataKeys.Duration : NSNumber(value: duration)])
+        }
+    }
+    
+    class Ended : PlayerEvent {}
+    class LoadedMetadata : PlayerEvent {}
+    class Play : PlayerEvent {}
+    class Pause : PlayerEvent {}
+    class Playing : PlayerEvent {}
+    class Seeking : PlayerEvent {}
+    class Seeked : PlayerEvent {}
+    
+    class Error: PlayerEvent {
+        convenience init(error: NSError) {
+            self.init([EventDataKeys.Error : error])
+        }
+    }
+    
+    // MARK: - Player Tracks Events
+    
+    class TracksAvailable : PlayerEvent {
+        convenience init(tracks: PKTracks) {
+            self.init([EventDataKeys.Tracks : tracks])
+        }
+    }
+    
+    class PlaybackParamsUpdated : PlayerEvent {
+        convenience init(currentBitrate: Double) {
+            self.init([EventDataKeys.CurrentBitrate : NSNumber(value: currentBitrate)])
+        }
+    }
+    
+    // MARK: - Player State Events
+
+    class StateChanged : PlayerEvent {
+        convenience init(newState: PlayerState, oldState: PlayerState) {
+            self.init([EventDataKeys.NewState : newState as AnyObject,
+                        EventDataKeys.OldState : oldState as AnyObject])
         }
     }
 }
 
-public class AdEvents: PKEvent {
-    
-    public static let allEventTypes: [AdEvents.Type] = [
-        adBreakReady.self, adBreakEnded.self, adBreakStarted.self, adAllCompleted.self, adComplete.self, adClicked.self, adCuepointsChanged.self, adFirstQuartile.self, adLoaded.self, adLog.self, adMidpoint.self, adPaused.self, adResumed.self, adSkipped.self, adStarted.self, adStreamLoaded.self, adTapped.self, adThirdQuartile.self, adDidProgressToTime.self, adDidRequestPause.self, adDidRequestResume.self, adWebOpenerWillOpenExternalBrowser.self, adWebOpenerWillOpenInAppBrowser.self, adWebOpenerDidOpenInAppBrowser.self, adWebOpenerWillCloseInAppBrowser.self, adWebOpenerDidCloseInAppBrowser.self 
+// MARK: - Ad Events
+
+public class AdEvent: PKEvent {
+    public static let allEventTypes: [AdEvent.Type] = [
+        adBreakReady, adBreakEnded, adBreakStarted, adAllCompleted, adComplete, adClicked, adCuepointsChanged, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
     ]
     
-    public class adBreakReady : AdEvents {}
-    public class adBreakEnded : AdEvents {}
-    public class adBreakStarted : AdEvents {}
-    public class adAllCompleted : AdEvents {}
-    public class adComplete : AdEvents {}
-    public class adClicked : AdEvents {}
-    public class adCuepointsChanged : AdEvents {}
-    public class adFirstQuartile : AdEvents {}
-    public class adLoaded : AdEvents {}
-    public class adLog : AdEvents {}
-    public class adMidpoint : AdEvents {}
-    public class adPaused : AdEvents {}
-    public class adResumed : AdEvents {}
-    public class adSkipped : AdEvents {}
-    public class adStarted : AdEvents {}
-    public class adStreamLoaded : AdEvents {}
-    public class adTapped : AdEvents {}
-    public class adThirdQuartile : AdEvents {}
+    public static let adBreakReady: AdEvent.Type = AdBreakReady.self
+    public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self
+    public static let adBreakStarted: AdEvent.Type = AdBreakStarted.self
+    public static let adAllCompleted: AdEvent.Type = AdAllCompleted.self
+    public static let adComplete: AdEvent.Type = AdComplete.self
+    public static let adClicked: AdEvent.Type = AdClicked.self
+    public static let adCuepointsChanged: AdEvent.Type = AdCuepointsChanged.self
+    public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
+    public static let adLoaded: AdEvent.Type = AdLoaded.self
+    public static let adLog: AdEvent.Type = AdLog.self
+    public static let adMidpoint: AdEvent.Type = AdMidpoint.self
+    public static let adPaused: AdEvent.Type = AdPaused.self
+    public static let adResumed: AdEvent.Type = AdResumed.self
+    public static let adSkipped: AdEvent.Type = AdSkipped.self
+    public static let adStarted: AdEvent.Type = AdStarted.self
+    public static let adStreamLoaded: AdEvent.Type = AdStreamLoaded.self
+    public static let adTapped: AdEvent.Type = AdTapped.self
+    public static let adThirdQuartile: AdEvent.Type = AdThirdQuartile.self
+    public static let adDidProgressToTime: AdEvent.Type = AdDidProgressToTime.self
+    public static let adDidRequestPause: AdEvent.Type = AdDidRequestPause.self
+    public static let adDidRequestResume: AdEvent.Type = AdDidRequestResume.self
+    public static let webOpenerEvent: AdEvent.Type = WebOpenerEvent.self
+    public static let adWebOpenerWillOpenExternalBrowser: AdEvent.Type = AdWebOpenerWillOpenExternalBrowser.self
+    public static let adWebOpenerWillOpenInAppBrowser: AdEvent.Type = AdWebOpenerWillOpenInAppBrowser.self
+    public static let adWebOpenerDidOpenInAppBrowser: AdEvent.Type = AdWebOpenerDidOpenInAppBrowser.self
+    public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
+    public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
     
-    public class adDidProgressToTime : AdEvents {
-        public let mediaTime, totalTime: TimeInterval
-        init(mediaTime: TimeInterval, totalTime: TimeInterval) {
-            self.mediaTime = mediaTime
-            self.totalTime = totalTime
-        }
-        
-        public required init() {
-            fatalError("init() has not been implemented")
+    class AdBreakReady : AdEvent {}
+    class AdBreakEnded : AdEvent {}
+    class AdBreakStarted : AdEvent {}
+    class AdAllCompleted : AdEvent {}
+    class AdComplete : AdEvent {}
+    class AdClicked : AdEvent {}
+    class AdCuepointsChanged : AdEvent {}
+    class AdFirstQuartile : AdEvent {}
+    class AdLoaded : AdEvent {}
+    class AdLog : AdEvent {}
+    class AdMidpoint : AdEvent {}
+    class AdPaused : AdEvent {}
+    class AdResumed : AdEvent {}
+    class AdSkipped : AdEvent {}
+    class AdStarted : AdEvent {}
+    class AdStreamLoaded : AdEvent {}
+    class AdTapped : AdEvent {}
+    class AdThirdQuartile : AdEvent {}
+    
+    class AdDidProgressToTime : AdEvent {
+        convenience init(mediaTime: TimeInterval, totalTime: TimeInterval) {
+            self.init([AdEventDataKeys.MediaTime: NSNumber(value: mediaTime),
+                        AdEventDataKeys.TotalTime: NSNumber(value: totalTime)])
         }
     }
-    public class adDidRequestPause : AdEvents {}
-    public class adDidRequestResume : AdEvents {}
+
+    class AdDidRequestPause : AdEvent {}
+    class AdDidRequestResume : AdEvent {}
     
-    public class WebOpenerEvent : AdEvents {
-        let webOpener: NSObject
-        public init(webOpener: NSObject!) {
-            self.webOpener = webOpener
-        }
-        public required init() {
-            fatalError("init() has not been implemented")
+    class WebOpenerEvent : AdEvent {
+        convenience init(webOpener: NSObject!) {
+            self.init([AdEventDataKeys.WebOpener: webOpener])
         }
     }
     
-    public class adWebOpenerWillOpenExternalBrowser : WebOpenerEvent {}
-    public class adWebOpenerWillOpenInAppBrowser : WebOpenerEvent {}
-    public class adWebOpenerDidOpenInAppBrowser : WebOpenerEvent {}
-    public class adWebOpenerWillCloseInAppBrowser : WebOpenerEvent {}
-    public class adWebOpenerDidCloseInAppBrowser : WebOpenerEvent {}
-    
-    
-    
-    public required override init() {}
+    class AdWebOpenerWillOpenExternalBrowser : WebOpenerEvent {}
+    class AdWebOpenerWillOpenInAppBrowser : WebOpenerEvent {}
+    class AdWebOpenerDidOpenInAppBrowser : WebOpenerEvent {}
+    class AdWebOpenerWillCloseInAppBrowser : WebOpenerEvent {}
+    class AdWebOpenerDidCloseInAppBrowser : WebOpenerEvent {}
 }

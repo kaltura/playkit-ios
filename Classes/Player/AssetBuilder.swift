@@ -18,45 +18,60 @@ class AssetBuilder {
         self.mediaEntry = mediaEntry
     }
 
-    func build(readyCallback: @escaping (Error?, AVAsset?)->Void) -> Void {
+    public func getPreferredMediaSource() -> (MediaSource, AssetHandler.Type)? {
         
-        // Select source and handler
-        guard let sources = mediaEntry.sources else { return }
+        guard let sources = mediaEntry.sources else {return nil}
         
-        var selection: (source: MediaSource, handler: AssetHandler.Type)?
+        let defaultHandler = DefaultAssetHandler.self
         
-        // Iterate over all handlers
-        var handlers: [AssetHandler.Type] = [DefaultAssetHandler.self]
+        // Preference: Local, HLS, FPS*, MP4, WVM*
         
-        if let type = NSClassFromString("PlayKit.WidevineClassicAssetHandler") {
-            handlers.append(type as! AssetHandler.Type)
-        }
-        
-        for handler in handlers {
-            // Select the first source that the handler can play.
-            if let playableSource = sources.first(where: handler.sourceFilter) {
-                selection = (source: playableSource, handler: handler)
-                break   // don't ask the other handlers
+        if let source = sources.first(where: {$0 is LocalMediaSource}) {
+            if source.fileExt == "wvm" {
+                return (source, DRMSupport.widevineClassicHandler!)
+            } else {
+                return (source, defaultHandler)
             }
         }
         
-        // Check if something was selected
-        guard let selected = selection else { 
+        if DRMSupport.fairplay {
+            if let source = sources.first(where: {$0.fileExt=="m3u8"}) {
+                return (source, defaultHandler)
+            }
+        } else {
+            if let source = sources.first(where: {$0.fileExt=="m3u8" && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
+                return (source, defaultHandler)
+            }
+        }
+        
+        if let source = sources.first(where: {$0.fileExt=="mp4"}) {
+            return (source, defaultHandler)
+        }
+        
+        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt=="wvm"}) {
+            return (source, DRMSupport.widevineClassicHandler!)
+        }
+        
+        return nil
+    }
+
+    func build(readyCallback: @escaping (Error?, AVAsset?)->Void) -> Void {
+        
+        guard let (source, handlerClass) = getPreferredMediaSource() else {
             PKLog.error("No playable sources")
             readyCallback(AssetError.noPlayableSources, nil)
             return
         }
-
+        
         // Build the asset
-        let handler = selected.handler.init()
-        handler.buildAsset(mediaSource: selected.source, readyCallback: readyCallback)
+        let handler = handlerClass.init()
+        handler.buildAsset(mediaSource: source, readyCallback: readyCallback)
         self.assetHandler = handler
     }
 }
 
 protocol AssetHandler {
     init()
-    static var sourceFilter: (MediaSource)->Bool {get}
     func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?)->Void)
 }
 
@@ -67,3 +82,37 @@ enum AssetError : Error {
     case invalidContentUrl(URL?)
     case noPlayableSources
 }
+
+class DRMSupport {
+    // FairPlay is not available in simulators and before iOS8
+    static let fairplay: Bool = {
+        if TARGET_OS_SIMULATOR==0, #available(iOS 8, *) {
+            return true
+        } else {
+            return false
+        }
+    }()
+    
+    // FairPlay is not available in simulators and is only downloadable in iOS10 and up.
+    static let fairplayOffline: Bool = {
+        if TARGET_OS_SIMULATOR==0, #available(iOS 10, *) {
+            return true
+        } else {
+            return false
+        }
+    }()
+    
+    // Widevine is optional (and not available in simulators)
+    static let widevineClassic = widevineClassicHandler != nil
+    
+    // Preload the Widevine Classic Handler, if available
+    static let widevineClassicHandler: AssetHandler.Type? = {
+        if TARGET_OS_SIMULATOR != 0 {
+            return nil
+        }
+        return NSClassFromString("PlayKit.WidevineClassicAssetHandler") as? AssetHandler.Type
+    }()
+}
+
+
+

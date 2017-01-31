@@ -8,13 +8,14 @@
 
 import Foundation
 
+/// A `PlayerConfig` object defines behavior and info to use when loading a `Player` object.
 public class PlayerConfig: NSObject {
     public var mediaEntry : MediaEntry?
     public var startTime : TimeInterval = 0
     public var allowPlayerEngineExpose = false
     public var subtitleLanguage: String?
     public var audioLanguage: String?
-    public var plugins: [String : AnyObject?]?
+    public var plugins: [String : AnyObject]?
     
     // Builders
     @discardableResult
@@ -48,7 +49,7 @@ public class PlayerConfig: NSObject {
     }
     
     @discardableResult
-    public func set(plugins: [String : AnyObject?]) -> Self {
+    public func set(plugins: [String : AnyObject]) -> Self {
         self.plugins = plugins
         return self
     }

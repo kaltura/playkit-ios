@@ -22,7 +22,7 @@ class OVPSource: OVPBaseObject {
     let deliveryProfileIdKey = "deliveryProfileId"
     let formatKey = "format"
     let protocolsKey = "protocols"
-    let flavorsKey = "flavors"
+    let flavorsKey = "flavorIds"
     let urlKey = "url"
     let drmKey = "drm"
     
@@ -37,15 +37,15 @@ class OVPSource: OVPBaseObject {
         
         self.deliveryProfileId = id
         self.format = jsonObject[formatKey].string
-        if let array = jsonObject[protocolsKey].arrayObject as? [String]?{
-            self.protocols = array
+        if let protocols = jsonObject[protocolsKey].string{
+            self.protocols = protocols.components(separatedBy: ",")
         }
         
-        if let array = jsonObject[flavorsKey].arrayObject as? [String]?{
-            self.flavors = array
+        if let flavors = jsonObject[flavorsKey].string {
+            self.flavors = flavors.components(separatedBy: ",")
         }
         
-        if let url = jsonObject[urlKey].URL{
+        if let url = jsonObject[urlKey].url{
             self.url = url
         }
         

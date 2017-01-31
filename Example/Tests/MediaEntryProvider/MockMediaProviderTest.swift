@@ -13,7 +13,6 @@ class MockMediaProviderTest: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
         
         let bundle = Bundle.main
         let path = bundle.path(forResource: "Entries", ofType: "json")
@@ -29,17 +28,9 @@ class MockMediaProviderTest: XCTestCase {
         let json = JSON(data: data as Data)
         self.fileContent = json.object
 
-        
-        
-        
-        
-        
-        
-        
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
     

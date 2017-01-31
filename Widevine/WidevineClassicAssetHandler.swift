@@ -8,7 +8,10 @@
 
 import Foundation
 import AVFoundation
+
+#if WIDEVINE_ENABLED
 import PlayKitWV
+#endif
 
 class WidevineClassicAssetHandler: AssetHandler {
     
@@ -55,7 +58,8 @@ class WidevineClassicAssetHandler: AssetHandler {
         }
         
         PKLog.trace("playAsset:: url: \(contentUrl.absoluteString), uri: \(licenseUri.absoluteString)")
-        
+       
+        #if WIDEVINE_ENABLED
         WidevineClassicCDM.playAsset(contentUrl.absoluteString, withLicenseUri: licenseUri.absoluteString) {  (_ playbackURL:String?)->Void  in
             
             guard let playbackURL = playbackURL else {
@@ -69,6 +73,7 @@ class WidevineClassicAssetHandler: AssetHandler {
                 readyCallback(nil, AVURLAsset(url: URL(string: playbackURL)!))
             }
         }
+        #endif
     }
 
     required init() {}

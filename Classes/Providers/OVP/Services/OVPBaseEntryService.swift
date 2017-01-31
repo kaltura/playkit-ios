@@ -9,6 +9,7 @@
 import UIKit
 import SwiftyJSON
 
+
 class OVPBaseEntryService {
 
     internal static func list(baseURL: String, ks: String,entryID: String) -> KalturaRequestBuilder? {
@@ -19,6 +20,19 @@ class OVPBaseEntryService {
             request.setBody(key: "ks", value: JSON(ks))
             .setBody(key: "responseProfile", value: JSON(responseProfile))
             .setBody(key: "filter", value: JSON(filter))
+            return request
+        }else{
+            return nil
+        }
+    }
+    
+    internal static func metadata(baseURL: String, ks: String,entryID: String) -> KalturaRequestBuilder? {
+        
+        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "metadata_metadata", action: "list") {
+            request.setBody(key: "ks", value: JSON(ks))
+                .setBody(key: "filter:objectType", value: JSON("KalturaMetadataFilter"))
+                .setBody(key: "filter:objectIdEqual", value: JSON(entryID))
+                .setBody(key: "filter:metadataObjectTypeEqual", value: JSON("1"))
             return request
         }else{
             return nil
@@ -37,6 +51,18 @@ class OVPBaseEntryService {
             return nil
         }
         
+    }
+    
+    internal static func getPlaybackContext(baseURL: String, ks: String, entryID: String) -> KalturaRequestBuilder? {
+        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "baseEntry", action: "getPlaybackContext") {
+            let contextData:[String:Any] = ["objectType":"KalturaContextDataParams"]
+            request.setBody(key: "ks", value: JSON(ks))
+                .setBody(key: "entryId", value: JSON(entryID))
+                .setBody(key: "contextDataParams", value: JSON(contextData))
+            return request
+        }else{
+            return nil
+        }
     }
 
 }
