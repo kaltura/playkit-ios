@@ -106,7 +106,7 @@ public class PlayerDecoratorBase: NSObject, Player {
         return self.player.createPiPController(with: delegate)
     }
     
-    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {
+    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
         //Assert.shouldNeverHappen();
     }
     

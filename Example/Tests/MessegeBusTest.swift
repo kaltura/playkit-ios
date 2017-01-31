@@ -33,12 +33,10 @@ class MessegeBusTest: XCTestCase {
         let media = MediaEntry(json: entry)
         config.set(mediaEntry: media)
         self.player = PlayKitManager.sharedInstance.loadPlayer(config:config)
-        
-        
+        self.player.prepare(config)
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
     

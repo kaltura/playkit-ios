@@ -9,20 +9,6 @@
 import Foundation
 import AVFoundation
 
-// FairPlay is not available in simulators and is only downloadable in iOS10 and up.
-fileprivate let canDownloadFairPlay: Bool = {
-    if TARGET_OS_SIMULATOR==0, #available(iOS 10, *) {
-        return true
-    } else {
-        return false
-    }
-}()
-
-// Widevine is optional (and not available in simulators)
-fileprivate let canDownloadWidevineClassic: Bool = TARGET_OS_SIMULATOR==0 
-    && NSClassFromString("PlayKit.WidevineClassicAssetHandler") != nil
-
-
 /// Manage local (downloaded) assets.
 public class LocalAssetsManager: NSObject {
     let storage: LocalDataStore
@@ -52,7 +38,7 @@ public class LocalAssetsManager: NSObject {
 
         PKLog.debug("Preparing asset for download; asset.url:", asset.url)
         
-        guard #available(iOS 10, *), canDownloadFairPlay else {
+        guard #available(iOS 10, *), DRMSupport.fairplayOffline else {
             PKLog.error("Downloading FairPlay content is not supported on device")
             return
         }
@@ -83,7 +69,7 @@ public class LocalAssetsManager: NSObject {
         
         // On iOS 10 and up: HLS (clear or FP), MP4, WVM
         // Below iOS10: HLS (only clear), MP4, WVM
-        if canDownloadFairPlay {
+        if DRMSupport.fairplayOffline {
             if let source = sources.first(where: {$0.fileExt=="m3u8"}) {
                 return source
             }
@@ -97,7 +83,7 @@ public class LocalAssetsManager: NSObject {
             return source
         }
         
-        if canDownloadWidevineClassic, let source = sources.first(where: {$0.fileExt=="wvm"}) {
+        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt=="wvm"}) {
             return source
         }
         
@@ -142,12 +128,18 @@ public protocol LocalDataStore {
     func remove(key: String) throws
 }
 
+/**
+ Implementation of LocalDataStore that saves data to files in the Library directory.
+ */ 
 public class DefaultLocalDataStore: LocalDataStore {
 
+    static let pkLocalDataStore = "pkLocalDataStore"
     let storageDirectory: URL
 
     public init() throws {
-        self.storageDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        let baseDir = try FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        self.storageDirectory = baseDir.appendingPathComponent(DefaultLocalDataStore.pkLocalDataStore, isDirectory: true)
+        try FileManager.default.createDirectory(at: self.storageDirectory, withIntermediateDirectories: true, attributes: nil)
     }
 
     private func file(_ key: String) -> URL {

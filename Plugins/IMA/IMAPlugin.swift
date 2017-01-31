@@ -92,7 +92,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
 
         var events: [PKEvent.Type] = []
-        events.append(PlayerEvents.ended.self)
+        events.append(PlayerEvent.ended)
         self.messageBus?.addObserver(self, events: events, block: { (data: Any) -> Void in
             self.contentComplete()
         })
@@ -247,7 +247,11 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     
     @objc private func update() {
         if !self.isAdPlayback {
-            self.currentPlaybackTime = self.player.currentTime
+            let currentTime = self.player.currentTime
+            if currentTime.isNaN {
+                return
+            }
+            self.currentPlaybackTime = currentTime
             self.loadAdsIfNeeded()
         }
     }
@@ -277,48 +281,48 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         self.player.view?.bringSubview(toFront: self.loadingView!)
     }
     
-    private func convertToPlayerEvent(_ event: IMAAdEventType) -> AdEvents.Type {
+    private func convertToPlayerEvent(_ event: IMAAdEventType) -> AdEvent.Type {
         switch event {
         case .AD_BREAK_READY:
-            return AdEvents.adBreakReady.self
+            return AdEvent.adBreakReady
         case .AD_BREAK_ENDED:
-            return AdEvents.adBreakEnded.self
+            return AdEvent.adBreakEnded
         case .AD_BREAK_STARTED:
-            return AdEvents.adBreakStarted.self
+            return AdEvent.adBreakStarted
         case .ALL_ADS_COMPLETED:
-            return AdEvents.adAllCompleted.self
+            return AdEvent.adAllCompleted
         case .CLICKED:
-            return AdEvents.adClicked.self
+            return AdEvent.adClicked
         case .COMPLETE:
-            return AdEvents.adComplete.self
+            return AdEvent.adComplete
         case .CUEPOINTS_CHANGED:
-            return AdEvents.adCuepointsChanged.self
+            return AdEvent.adCuepointsChanged
         case .FIRST_QUARTILE:
-            return AdEvents.adFirstQuartile.self
+            return AdEvent.adFirstQuartile
         case .LOADED:
-            return AdEvents.adLoaded.self
+            return AdEvent.adLoaded
         case .LOG:
-            return AdEvents.adLog.self
+            return AdEvent.adLog
         case .MIDPOINT:
-            return AdEvents.adMidpoint.self
+            return AdEvent.adMidpoint
         case .PAUSE:
-            return AdEvents.adPaused.self
+            return AdEvent.adPaused
         case .RESUME:
-            return AdEvents.adResumed.self
+            return AdEvent.adResumed
         case .SKIPPED:
-            return AdEvents.adSkipped.self
+            return AdEvent.adSkipped
         case .STARTED:
-            return AdEvents.adStarted.self
+            return AdEvent.adStarted
         case .STREAM_LOADED:
-            return AdEvents.adStreamLoaded.self
+            return AdEvent.adStreamLoaded
         case .TAPPED:
-            return AdEvents.adTapped.self
+            return AdEvent.adTapped
         case .THIRD_QUARTILE:
-            return AdEvents.adThirdQuartile.self
+            return AdEvent.adThirdQuartile
         }
     }
 
-    private func notify(event: AdEvents) {
+    private func notify(event: AdEvent) {
         self.delegate?.adsPlugin(self, didReceive: event)
         self.messageBus?.post(event)
     }
@@ -403,13 +407,13 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     }
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
-        self.notify(event: AdEvents.adDidRequestPause())
+        self.notify(event: AdEvent.AdDidRequestPause())
         self.isAdPlayback = true
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(false, alpha: 0)
-        self.notify(event: AdEvents.adDidRequestResume())
+        self.notify(event: AdEvent.AdDidRequestResume())
         self.isAdPlayback = false
     }
     
@@ -417,7 +421,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         var data = [String : TimeInterval]()
         data["mediaTime"] = mediaTime
         data["totalTime"] = totalTime
-        self.notify(event: AdEvents.adDidProgressToTime(mediaTime: mediaTime, totalTime: totalTime))
+        self.notify(event: AdEvent.AdDidProgressToTime(mediaTime: mediaTime, totalTime: totalTime))
     }
     
     // MARK: AVPictureInPictureControllerDelegate
@@ -455,23 +459,23 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     // MARK: IMAWebOpenerDelegate
     
     public func webOpenerWillOpenExternalBrowser(_ webOpener: NSObject) {
-        self.notify(event: AdEvents.adWebOpenerWillOpenExternalBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerWillOpenExternalBrowser(webOpener: webOpener))
     }
     
     public func webOpenerWillOpen(inAppBrowser webOpener: NSObject!) {
-        self.notify(event: AdEvents.adWebOpenerWillOpenInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerWillOpenInAppBrowser(webOpener: webOpener))
     }
     
     public func webOpenerDidOpen(inAppBrowser webOpener: NSObject!) {
-        self.notify(event: AdEvents.adWebOpenerDidOpenInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerDidOpenInAppBrowser(webOpener: webOpener))
     }
     
     public func webOpenerWillClose(inAppBrowser webOpener: NSObject!) {
-        self.notify(event: AdEvents.adWebOpenerWillCloseInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerWillCloseInAppBrowser(webOpener: webOpener))
     }
     
     public func webOpenerDidClose(inAppBrowser webOpener: NSObject!) {
-        self.notify(event: AdEvents.adWebOpenerDidCloseInAppBrowser(webOpener: webOpener))
+        self.notify(event: AdEvent.AdWebOpenerDidCloseInAppBrowser(webOpener: webOpener))
     }
 }
     

@@ -22,6 +22,7 @@ public class MediaEntry: NSObject {
     public var sources: [MediaSource]?
     public var duration: Int64?
     public var mediaType: MediaType?
+    public var metadata:[String:String]?
     
     private let idKey = "id"
     private let sourcesKey = "sources"
@@ -119,11 +120,12 @@ public class MediaSource: NSObject {
         self.init(id, contentUrl: nil)
     }
     
-    public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil) {
+    public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil, sourceType: SourceType? = nil) {
         self.id = id
         self.contentUrl = contentUrl
         self.mimeType = mimeType
         self.drmData = drmData
+        self.sourceType = sourceType
     }
     
     public init(json: Any) {

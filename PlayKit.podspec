@@ -15,6 +15,7 @@ s.subspec 'Core' do |sp|
     sp.source_files = 'Classes/**/*'
     sp.dependency 'SwiftyJSON'
     sp.dependency 'Log'
+    sp.dependency 'SwiftyXMLParser'
 end
 
 s.subspec 'IMAPlugin' do |ssp|
@@ -47,9 +48,8 @@ end
 
 s.subspec 'WidevineClassic' do |ssp|
   ssp.source_files = 'Widevine'
-  ssp.dependency 'PlayKitWV'
   ssp.dependency 'PlayKit/Core'
-  ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1' }
+  #ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1' }
 end
 
 s.subspec 'PhoenixPlugin' do |ssp|
