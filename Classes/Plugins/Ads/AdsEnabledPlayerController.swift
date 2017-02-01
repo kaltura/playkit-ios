@@ -90,13 +90,13 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
-        if event is AdEvents.adDidRequestPause {
+        if event is AdEvent.AdDidRequestPause {
             super.pause()
             self.isAdPlayback = true
-        } else if event is AdEvents.adDidRequestResume {
+        } else if event is AdEvent.AdDidRequestResume {
             super.play()
             self.isAdPlayback = false
-        } else if event is AdEvents.adResumed {
+        } else if event is AdEvent.AdResumed {
             self.isPlayEnabled = true
         }
     }

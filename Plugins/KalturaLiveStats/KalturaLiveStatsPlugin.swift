@@ -63,29 +63,29 @@ public class KalturaLiveStatsPlugin: PKPlugin {
         
         PKLog.trace("registerToAllEvents")
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.play.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.play], block: { (info) in
             PKLog.trace("play info: \(info)")
             self.lastReportedStartTime = self.player.currentTime.toInt32()
             self.startLiveEvents()
         })
                 
-        self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.pause], block: { (info) in
             PKLog.trace("pause info: \(info)")
             self.stopLiveEvents()
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.playbackParamsUpdated.self], block: { (info) in
+        self.messageBus?.addObserver(self, events: [PlayerEvent.playbackParamsUpdated], block: { info in
             PKLog.trace("playbackParamsUpdated info: \(info)")
-            if let paramsEvent = info as? PlayerEvents.playbackParamsUpdated {
-                self.lastReportedBitrate = Int32(paramsEvent.currentBitrate)
+            
+            if type(of: info) == PlayerEvent.playbackParamsUpdated {
+                self.lastReportedBitrate = Int32(info.currentBitrate!)
             }
         })
         
-        self.player.addObserver(self, events: [PlayerEvents.stateChanged.self]) { (data: Any) in
+        self.player.addObserver(self, events: [PlayerEvent.stateChanged]) { data in
             
-            if let stateChanged = data as? PlayerEvents.stateChanged {
-                
-                switch stateChanged.newSate {
+            if type(of: data) == PlayerEvent.stateChanged {
+                switch data.newState {
                 case .ready:
                     self.startTimer()
                     if self.isBuffering {

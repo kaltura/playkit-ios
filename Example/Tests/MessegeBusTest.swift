@@ -33,8 +33,7 @@ class MessegeBusTest: XCTestCase {
         let media = MediaEntry(json: entry)
         config.set(mediaEntry: media)
         self.player = PlayKitManager.sharedInstance.loadPlayer(config:config)
-        
-        
+        self.player.prepare(config)
     }
     
     override func tearDown() {
@@ -42,11 +41,11 @@ class MessegeBusTest: XCTestCase {
     }
     
     func testPlayerMetadataLoaded() {
-        let theExeption = expectation(description: "test loadedMetadata event")
+        let asyncExpectation = expectation(description: "test loadedMetadata event")
         
-        self.player.addObserver(self, events: [PlayerEvents.loadedMetadata.self]) { (info: Any) in
-            if info as! PKEvent is PlayerEvents.loadedMetadata {
-                theExeption.fulfill()
+        self.player.addObserver(self, events: [PlayerEvent.loadedMetadata]) { event in
+            if type(of: event) == PlayerEvent.loadedMetadata {
+                asyncExpectation.fulfill()
             } else {
                 XCTFail()
             }
@@ -58,19 +57,18 @@ class MessegeBusTest: XCTestCase {
     }
     
     func testPlayerPlayEventsFlow() {
-        let theExeption = expectation(description: "test play and playing + make sure playing is after play")
+        let asyncExpectation = expectation(description: "test play and playing + make sure playing is after play")
         var isPlay: Bool = false
         
-        self.player.addObserver(self, events: [PlayerEvents.play.self, PlayerEvents.playing.self]) { (info: Any) in
-            if info as! PKEvent is PlayerEvents.play {
+        self.player.addObserver(self, events: [PlayerEvent.play, PlayerEvent.playing]) { event in
+            if type(of: event) == PlayerEvent.play {
                 isPlay = true
-            } else if info as! PKEvent is PlayerEvents.playing {
+            } else if type(of: event) == PlayerEvent.playing {
                 if isPlay {
-                    theExeption.fulfill()
+                    asyncExpectation.fulfill()
                 } else {
                     XCTFail()
                 }
-                
             } else {
                XCTFail()
             }
@@ -84,10 +82,10 @@ class MessegeBusTest: XCTestCase {
     func testPlayerPauseEventsFlow() {
         let theExeption = expectation(description: "test pause")
         
-        self.player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.pause.self]) { (info: Any) in
-            if info as! PKEvent is PlayerEvents.playing {
+        self.player.addObserver(self, events: [PlayerEvent.playing, PlayerEvent.pause]) { event in
+            if type(of: event) == PlayerEvent.playing {
                 self.player.pause()
-            } else if info as! PKEvent is PlayerEvents.pause {
+            } else if type(of: event) == PlayerEvent.pause {
                 theExeption.fulfill()
             } else {
                 XCTFail()
@@ -100,22 +98,22 @@ class MessegeBusTest: XCTestCase {
     }
     
     func testPlayerSeekEventsFlow() {
-        let theExeption = expectation(description: "test seek")
+        let asyncExpectation = expectation(description: "test seek")
         let seekTime:TimeInterval = 3.0
         var isSeeking = false
-        self.player.addObserver(self, events: [PlayerEvents.playing.self, PlayerEvents.seeking.self, PlayerEvents.seeked.self]) { (info: Any) in
-            if info as! PKEvent is PlayerEvents.playing {
+        self.player.addObserver(self, events: [PlayerEvent.playing, PlayerEvent.seeking, PlayerEvent.seeked]) { event in
+            if type(of: event) == PlayerEvent.playing {
                 self.player.seek(to: CMTimeMakeWithSeconds(3, 1000000))
-            } else if info as! PKEvent is PlayerEvents.seeking {
+            } else if type(of: event) == PlayerEvent.seeking {
                 print(self.player.currentTime as Any)
                 if (self.player.currentTime == seekTime){
                     isSeeking = true
                 } else {
                     XCTFail("seeking issue")
                 }
-            } else if info as! PKEvent is PlayerEvents.seeked {
+            } else if type(of: event) == PlayerEvent.seeked {
                 if isSeeking {
-                    theExeption.fulfill()
+                    asyncExpectation.fulfill()
                 } else {
                     XCTFail("seeking issue")
                 }

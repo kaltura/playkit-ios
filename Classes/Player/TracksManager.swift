@@ -11,6 +11,8 @@ import AVFoundation
 
 class TracksManager: NSObject {
     let audioTypeKey: String = "soun"
+    let textOffDisplay: String = "Off"
+    
     private var audioTracks: [Track]?
     private var textTracks: [Track]?
     
@@ -59,8 +61,14 @@ class TracksManager: NSObject {
     }
     
     public func currentTextTrack(item: AVPlayerItem) -> String? {
-        if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicLegible), let option = item.selectedMediaOption(in: group) {
-            return self.textTracks?.filter{($0.title! == option.displayName)}.first?.id
+        if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicLegible) {
+            var displayName: String
+            if let option = item.selectedMediaOption(in: group) {
+                displayName = option.displayName
+            } else {
+                displayName = textOffDisplay
+            }
+            return self.textTracks?.filter{($0.title! == displayName)}.first?.id
         }
         return nil
     }
@@ -126,7 +134,7 @@ class TracksManager: NSObject {
             self.textTracks?.append(track)
         }
         if optionMediaType != "" {
-            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: "Off", language: nil), at: 0)
+            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: textOffDisplay, language: nil), at: 0)
         }
     }
     
