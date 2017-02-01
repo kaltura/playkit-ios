@@ -13,9 +13,12 @@ import AVFoundation
     
     static var pluginName: String { get }
 
+    var mediaEntry: MediaEntry? { get set }
+
     init()
+
     
-    func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus)
+    func load(player: Player, pluginConfig: Any?, messageBus: MessageBus)
     
     func destroy()
 }

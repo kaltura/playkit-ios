@@ -10,6 +10,8 @@
 import GoogleInteractiveMediaAds
 
 public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
+        
+    public var mediaEntry: MediaEntry?
 
     private var player: Player!
     
@@ -68,7 +70,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
     }
     
-    public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
+    public func load(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
         PKLog.trace("load")
         
         self.messageBus = messageBus
@@ -481,7 +483,9 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     
 #else
     public class IMAPlugin:NSObject, PKPlugin  {
-        public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
+        public var mediaEntry: MediaEntry?
+
+        public func load(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
             
         }
         

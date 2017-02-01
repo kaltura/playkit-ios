@@ -26,10 +26,10 @@ public class YouboraPlugin: PKPlugin {
 
     }
     
-    public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
+    public func load(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
     
         self.messageBus = messageBus
-        self.mediaEntry = mediaConfig
+//        self.mediaEntry = mediaConfig
         
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig

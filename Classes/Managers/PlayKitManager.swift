@@ -37,9 +37,9 @@ public class PlayKitManager: NSObject {
     ///
     /// - Parameter config: The configuration object to load the player with.
     /// - Returns: A player loaded using the provided configuration.
-    public func loadPlayer(config: PlayerConfig) -> Player {
+    public func loadPlayer(pluginConfig: PluginConfig?) -> Player {
         let loader = PlayerLoader()
-        loader.load(config)
+        loader.load(pluginConfig: pluginConfig)
         return loader
     }
     

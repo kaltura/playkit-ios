@@ -12,6 +12,13 @@ import AVKit
 
 class PlayerController: NSObject, Player {
     
+    var onEventBlock: ((PKEvent)->Void)?
+    
+    var delegate: PlayerDelegate?
+    
+    private var currentPlayer: AVPlayerEngine?
+    private var assetBuilder: AssetBuilder?
+    
     public var duration: Double {
         get {
             guard let currentPlayer = self.currentPlayer else {
@@ -34,12 +41,6 @@ class PlayerController: NSObject, Player {
         }
     }
 
-    var onEventBlock: ((PKEvent)->Void)?
-    
-    var delegate: PlayerDelegate?
-    
-    private var currentPlayer: AVPlayerEngine?
-    private var assetBuilder: AssetBuilder?
     
     public var currentTime: TimeInterval {
         get {
@@ -76,7 +77,7 @@ class PlayerController: NSObject, Player {
         }
     }
     
-    public init(mediaEntry: PlayerConfig) {
+    public override init() {
         super.init()
         self.currentPlayer = AVPlayerEngine()
         self.currentPlayer?.onEventBlock = { [unowned self] (event:PKEvent) in

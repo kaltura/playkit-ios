@@ -22,41 +22,40 @@ class PlayerLoader: PlayerDecoratorBase {
     var loadedPlugins = Dictionary<String, LoadedPlugin>()
     var messageBus = MessageBus()
     
-    func load(_ config: PlayerConfig) {
+    func load(pluginConfig: PluginConfig?) {
         var playerController: PlayerController
         
-        if config.mediaEntry != nil {
-            playerController = PlayerController(mediaEntry: config)
-            playerController.onEventBlock = { (event:PKEvent) in
-                self.messageBus.post(event)
-            }
-            
-            // TODO::
-            // add event listener on player controller
-            
-            var player: Player = playerController
-            
-            if let plugins = config.plugins {
-                for pluginName in plugins.keys {
-                    if let pluginObject = PlayKitManager.sharedInstance.createPlugin(name: pluginName) {
-                        // TODO::
-                        // send message bus
-                        var decorator: PlayerDecoratorBase? = nil
-                        
-                        pluginObject.load(player: player, mediaConfig: config.mediaEntry!, pluginConfig: plugins[pluginName], messageBus: self.messageBus)
-                        
-                        if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
-                            d.setPlayer(player)
-                            decorator = d
-                            player = d
-                        }
-                        
-                        loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
+        playerController = PlayerController()
+        playerController.onEventBlock = { (event:PKEvent) in
+            self.messageBus.post(event)
+        }
+        
+        // TODO::
+        // add event listener on player controller
+        
+        var player: Player = playerController
+        
+        if let plugins = pluginConfig {
+            for pluginName in plugins.config.keys {
+                if let pluginObject = PlayKitManager.sharedInstance.createPlugin(name: pluginName) {
+                    // TODO::
+                    // send message bus
+                    var decorator: PlayerDecoratorBase? = nil
+                    
+                    pluginObject.load(player: player, pluginConfig: plugins[pluginName], messageBus: self.messageBus)
+                    
+                    if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
+                        d.setPlayer(player)
+                        decorator = d
+                        player = d
                     }
+                    
+                    loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
                 }
             }
-            setPlayer(player)
         }
+        setPlayer(player)
+        
     }
     
     func destroyPlayer() {

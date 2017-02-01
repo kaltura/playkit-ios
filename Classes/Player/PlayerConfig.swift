@@ -12,10 +12,6 @@ import Foundation
 public class PlayerConfig: NSObject {
     public var mediaEntry : MediaEntry?
     public var startTime : TimeInterval = 0
-    public var allowPlayerEngineExpose = false
-    public var subtitleLanguage: String?
-    public var audioLanguage: String?
-    public var plugins: [String : AnyObject]?
     
     // Builders
     @discardableResult
@@ -24,35 +20,25 @@ public class PlayerConfig: NSObject {
         return self
     }
        
-    @discardableResult
-    public func set(allowPlayerEngineExpose: Bool) -> Self {
-        self.allowPlayerEngineExpose = allowPlayerEngineExpose
-        return self
-    }
-    
     @discardableResult 
     public func set(startTime: TimeInterval) -> Self {
         self.startTime = startTime
         return self
     }
-    
-    @discardableResult 
-    public func set(subtitleLanguage: String) -> Self {
-        self.subtitleLanguage = subtitleLanguage
-        return self
-    } 
-    
-    @discardableResult 
-    public func set(audioLanguage: String) -> Self {
-        self.audioLanguage = audioLanguage
-        return self
-    }
-    
-    @discardableResult
-    public func set(plugins: [String : AnyObject]) -> Self {
-        self.plugins = plugins
-        return self
+}
+
+public class PluginConfig: NSObject {
+    public var config = [String : AnyObject]()
+    subscript(idx: String) -> AnyObject? {
+        get {
+            return self.config[idx]
+        }
+        set {
+            self.config[idx] = newValue
+        }
     }
 }
+
+
 
 
