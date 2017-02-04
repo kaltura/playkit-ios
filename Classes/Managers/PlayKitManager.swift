@@ -16,12 +16,12 @@ import UIKit
  */
 public class PlayKitManager: NSObject {
 
-    public static let versionString: String = Bundle.init(for: PlayKitManager.self)
+    public static let versionString: String = Bundle(for: PlayKitManager.self)
         .object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     public static let clientTag = "playkit/ios-\(versionString)"
     
-    public static let sharedInstance : PlayKitManager = PlayKitManager()
+    @objc(sharedInstance) public static let shared: PlayKitManager = PlayKitManager()
     
     var pluginRegistry = Dictionary<String, PKPlugin.Type>()
     
@@ -47,11 +47,11 @@ public class PlayKitManager: NSObject {
         pluginRegistry[pluginClass.pluginName] = pluginClass
     }
     
-    func createPlugin(name: String) -> PKPlugin? {
+    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) -> PKPlugin? {
         let pluginClass = pluginRegistry[name]
         guard pluginClass != nil else {
             return nil
         }
-        return pluginClass?.init()
+        return pluginClass?.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
     }
 }

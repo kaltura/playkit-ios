@@ -52,12 +52,12 @@ public class KalturaStatsPlugin: PKPlugin {
         case ERROR = 99
     }
     
-    private var player: Player!
-    private var messageBus: MessageBus?
-    private var config: AnalyticsConfig!
-    private var mediaEntry: MediaEntry!
+    private var player: Player
+    private var messageBus: MessageBus
+    private var config: AnalyticsConfig?
     
     public static var pluginName: String = "KalturaStatsPlugin"
+    public var mediaEntry: MediaEntry?
     
     private var isFirstPlay = true
     private var isWidgetLoaded = false
@@ -76,20 +76,27 @@ public class KalturaStatsPlugin: PKPlugin {
     private var timer: Timer?
     private var interval = 30
     
-    required public init() {
-        
-    }
+    /************************************************************/
+    // MARK: - PKPlugin
+    /************************************************************/
     
-    public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+        self.player = player
         self.messageBus = messageBus
-        self.mediaEntry = mediaConfig
-        
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
-            self.player = player
         }
-        
         self.registerToAllEvents()
+    }
+    
+    public func onLoad(mediaConfig: MediaConfig) {
+        PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
+        self.mediaEntry = mediaConfig.mediaEntry
+    }
+    
+    public func onUpdateMedia(mediaConfig: MediaConfig) {
+        PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
+        self.mediaEntry = mediaConfig.mediaEntry
     }
     
     public func destroy() {
@@ -98,19 +105,19 @@ public class KalturaStatsPlugin: PKPlugin {
         }
     }
     
+    /************************************************************/
+    // MARK: - Private Implementation
+    /************************************************************/
+    
     private func registerToAllEvents() {
         PKLog.trace("registerToAllEvents")
-        guard let messageBus = self.messageBus else {
-            PKLog.error("messageBus is nil !")
-            return
-        }
         
-        messageBus.addObserver(self, events: [PlayerEvent.canPlay], block: { (event) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.canPlay], block: { [unowned self] (event) in
             PKLog.trace("canPlay event: \(event)")
             self.sendMediaLoaded()
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.play, PlayerEvent.playing], block: { (event) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.play, PlayerEvent.playing], block: { [unowned self] (event) in
             PKLog.trace("play event: \(event)")
             if self.isFirstPlay {
                 self.sendAnalyticsEvent(action: .PLAY)
@@ -118,35 +125,33 @@ public class KalturaStatsPlugin: PKPlugin {
             }
         })
                 
-        messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (event) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.pause], block: { [unowned self] (event) in
             PKLog.trace("pause event: \(event)")
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.seeking], block: { (event) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.seeking], block: { [unowned self] (event) in
             PKLog.trace("seeking event: \(event)")
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.seeked], block: { (event) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.seeked], block: { [unowned self] (event) in
             PKLog.trace("seeked event: \(event)")
-            
             self.hasSeeked = true
             self.seekPercent = Float(self.player.currentTime) / Float(self.player.duration)
             self.sendAnalyticsEvent(action: .SEEK);
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (event) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { [unowned self] (event) in
             PKLog.trace("ended event: \(event)")
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.error], block: { (event) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.error], block: { [unowned self] (event) in
             PKLog.trace("error event: \(event)")
             self.sendAnalyticsEvent(action: .ERROR)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.stateChanged]) { (data: Any) in
-            
-            if let stateChanged = data as? PlayerEvent.StateChanged {
-                
+        self.messageBus.addObserver(self, events: [PlayerEvent.stateChanged]) { [unowned self] event in
+            PKLog.trace("state changed event: \(event)")
+            if let stateChanged = event as? PlayerEvent.StateChanged {
                 switch stateChanged.newState {
                 case .idle:
                     self.sendWidgetLoaded()
@@ -168,17 +173,14 @@ public class KalturaStatsPlugin: PKPlugin {
                         self.createTimer()
                     }
                     self.sendMediaLoaded()
-                    
                     break
                 case .buffering:
                     self.sendWidgetLoaded()
                     self.isBuffering = true
                     self.sendAnalyticsEvent(action: .BUFFER_START)
                     break
-                case .error:
-                    break
-                case .unknown:
-                    break
+                case .error: break
+                case .unknown: break
                 }
             }
         }
@@ -213,7 +215,7 @@ public class KalturaStatsPlugin: PKPlugin {
     
     private func createTimer() {
         
-        if let intr = self.config.params["timerInterval"] as? Int {
+        if let intr = self.config?.params["timerInterval"] as? Int {
             self.interval = intr
         }
 
@@ -271,20 +273,25 @@ public class KalturaStatsPlugin: PKPlugin {
         var confId = 0
         var parterId = ""
         
-        if let sId = self.config.params["sessionId"] as? String {
+        if let sId = self.config?.params["sessionId"] as? String {
             sessionId = sId
         }
         
-        if let cId = self.config.params["uiconfId"] as? Int {
+        if let cId = self.config?.params["uiconfId"] as? Int {
             confId = cId
         }
         
-        if let url = self.config.params["baseUrl"] as? String {
+        if let url = self.config?.params["baseUrl"] as? String {
             baseUrl = url
         }
         
-        if let pId = self.config.params["partnerId"] as? Int {
+        if let pId = self.config?.params["partnerId"] as? Int {
             parterId = String(pId)
+        }
+        
+        guard let mediaEntry = self.mediaEntry else {
+            PKLog.error("send analytics failed due to nil mediaEntry")
+            return
         }
         
         let builder: KalturaRequestBuilder = OVPStatsService.get(baseURL: baseUrl,
@@ -295,7 +302,7 @@ public class KalturaStatsPlugin: PKPlugin {
                                                                  sessionId: sessionId,
                                                                  position: self.player.currentTime.toInt32(),
                                                                  uiConfId: confId,
-                                                                 entryId: self.mediaEntry.id,
+                                                                 entryId: mediaEntry.id,
                                                                  widgetId: "_\(parterId)",
                                                                  isSeek: hasSeeked)!
         

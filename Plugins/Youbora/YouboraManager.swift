@@ -16,39 +16,42 @@ import AVKit
 class YouboraManager: YBPluginGeneric {
 
     private var pkPlayer: Player!
-    private var mediaEntry: MediaEntry!
+    var mediaEntry: MediaEntry!
     public var currentBitrate: Double?
     
-    init!(options: NSObject!, player: Player, media: MediaEntry) {
+    init!(options: NSObject!, player: Player, mediaEntry: MediaEntry) {
         super.init(options: options)
         self.pkPlayer = player
-        self.mediaEntry = media
+        self.mediaEntry = mediaEntry
     }
     
-    override init() {
+    private override init() {
         super.init()
     }
     
-    //MARK: Override methods
-    override func getMediaDuration() -> NSNumber! {
-        return pkPlayer.duration as NSNumber!
+    /************************************************************/
+    // MARK: - Overrides
+    /************************************************************/
+    
+    override func getMediaDuration() -> NSNumber {
+        return NSNumber(value: pkPlayer.duration)
     }
     
-    override func getResource() -> String! {
+    override func getResource() -> String {
         PKLog.trace("Resource")
         return self.mediaEntry.id
     }
     
-    override func getPlayhead() -> NSNumber! {
+    override func getPlayhead() -> NSNumber {
         let currentTIme = self.pkPlayer.currentTime
-        return currentTIme as NSNumber!
+        return NSNumber(value: currentTIme)
     }
     
-    override func getPlayerVersion() -> String! {
-        return "PlayKit-0.1.0"
+    override func getPlayerVersion() -> String {
+        return "PlayKit-\(PlayKitManager.versionString)"
     }
     
-    override func getBitrate() -> NSNumber! {
+    override func getBitrate() -> NSNumber {
         if let bitrate = currentBitrate {
             return NSNumber(value: bitrate)
         }

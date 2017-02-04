@@ -80,18 +80,14 @@ class PlayerController: NSObject, Player {
     public override init() {
         super.init()
         self.currentPlayer = AVPlayerEngine()
-        self.currentPlayer?.onEventBlock = { [unowned self] (event:PKEvent) in
+        self.currentPlayer?.onEventBlock = { [unowned self] (event: PKEvent) in
             PKLog.trace("postEvent:: \(event)")
-            
-            if let block = self.onEventBlock {
-                block(event)
-            }
+            self.onEventBlock?(event)
         }
-        
         self.onEventBlock = nil
     }
     
-    func prepare(_ config: PlayerConfig) {
+    func prepare(_ config: MediaConfig) {
         if let player = self.currentPlayer {
             player.startPosition = config.startTime
             
@@ -130,7 +126,7 @@ class PlayerController: NSObject, Player {
         self.currentPlayer?.currentPosition = CMTimeGetSeconds(time)
     }
     
-    func prepareNext(_ config: PlayerConfig) -> Bool {
+    func prepareNext(_ config: MediaConfig) -> Bool {
         return false
     }
     

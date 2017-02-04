@@ -8,10 +8,25 @@
 
 import Foundation
 
-/// A `PlayerConfig` object defines behavior and info to use when loading a `Player` object.
+/// A `PlayerConfig` object defines mediaConfig and pluginConfig composite object.
 public class PlayerConfig: NSObject {
-    public var mediaEntry : MediaEntry?
-    public var startTime : TimeInterval = 0
+    public var mediaConfig = MediaConfig()
+    public var pluginConfig = PluginConfig()
+    
+    public init(mediaConfig: MediaConfig, pluginConfig: PluginConfig) {
+        self.mediaConfig = mediaConfig
+        self.pluginConfig = pluginConfig
+    }
+}
+
+/// A `MediaConfig` object defines behavior and info to use when preparing a `Player` object.
+public class MediaConfig: NSObject {
+    public var mediaEntry: MediaEntry?
+    public var startTime: TimeInterval = 0
+    
+    override public var description: String {
+        return "Media config, mediaEntry: \(self.mediaEntry)\nstartTime: \(self.startTime)"
+    }
     
     // Builders
     @discardableResult
@@ -27,15 +42,19 @@ public class PlayerConfig: NSObject {
     }
 }
 
+/// A `PluginConfig` object defines config to use when loading a plugin object.
 public class PluginConfig: NSObject {
-    public var config = [String : AnyObject]()
-    subscript(idx: String) -> AnyObject? {
-        get {
-            return self.config[idx]
-        }
-        set {
-            self.config[idx] = newValue
-        }
+    /// Plugins congfig dictionary holds [plugin name : plugin config]
+    public var config: [String : AnyObject]?
+    
+    @discardableResult
+    public func set(config: [String : AnyObject]) -> Self {
+        self.config = config
+        return self
+    }
+    
+    override public var description: String {
+        return "Plugin config:\n\(self.config)"
     }
 }
 

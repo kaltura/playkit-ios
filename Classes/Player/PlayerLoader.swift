@@ -35,14 +35,13 @@ class PlayerLoader: PlayerDecoratorBase {
         
         var player: Player = playerController
         
-        if let plugins = pluginConfig {
-            for pluginName in plugins.config.keys {
-                if let pluginObject = PlayKitManager.sharedInstance.createPlugin(name: pluginName) {
+        if let pluginConfigs = pluginConfig?.config {
+            for pluginName in pluginConfigs.keys {
+                let pluginConfig = pluginConfigs[pluginName]
+                if let pluginObject = PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus) {
                     // TODO::
                     // send message bus
                     var decorator: PlayerDecoratorBase? = nil
-                    
-                    pluginObject.load(player: player, pluginConfig: plugins[pluginName], messageBus: self.messageBus)
                     
                     if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
                         d.setPlayer(player)
@@ -55,7 +54,14 @@ class PlayerLoader: PlayerDecoratorBase {
             }
         }
         setPlayer(player)
-        
+    }
+    
+    override func prepare(_ config: MediaConfig) {
+        // update all loaded plugins with media config
+        for (pluginName, loadedPlugin) in loadedPlugins {
+            loadedPlugin.plugin.onLoad(mediaConfig: config)
+        }
+        super.prepare(config)
     }
     
     func destroyPlayer() {
@@ -96,4 +102,5 @@ class PlayerLoader: PlayerDecoratorBase {
         // TODO:: finilizing + object validation
         messageBus.removeObserver(observer, events: events)
     }
+    
 }
