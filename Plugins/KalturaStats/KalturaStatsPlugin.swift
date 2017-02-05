@@ -52,12 +52,12 @@ public class KalturaStatsPlugin: PKPlugin {
         case ERROR = 99
     }
     
-    private var player: Player
-    private var messageBus: MessageBus
+    private unowned var player: Player
+    private unowned var messageBus: MessageBus
     private var config: AnalyticsConfig?
     
     public static var pluginName: String = "KalturaStatsPlugin"
-    public var mediaEntry: MediaEntry?
+    public weak var mediaEntry: MediaEntry?
     
     private var isFirstPlay = true
     private var isWidgetLoaded = false

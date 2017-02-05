@@ -14,7 +14,7 @@ import AVFoundation
     /// The plugin name.
     static var pluginName: String { get }
     /// The associated media entry.
-    var mediaEntry: MediaEntry? { get set }
+    weak var mediaEntry: MediaEntry? { get set }
 
     init(player: Player, pluginConfig: Any?, messageBus: MessageBus)
     

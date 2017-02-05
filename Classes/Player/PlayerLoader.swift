@@ -26,7 +26,7 @@ class PlayerLoader: PlayerDecoratorBase {
         var playerController: PlayerController
         
         playerController = PlayerController()
-        playerController.onEventBlock = { (event:PKEvent) in
+        playerController.onEventBlock = { [unowned self] event in
             self.messageBus.post(event)
         }
         

@@ -11,10 +11,10 @@ import GoogleInteractiveMediaAds
 
 public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
     
-    public var mediaEntry: MediaEntry?
+    public weak var mediaEntry: MediaEntry?
 
-    private var player: Player
-    private var messageBus: MessageBus
+    private unowned var player: Player
+    private unowned var messageBus: MessageBus
     
     weak var dataSource: AdsPluginDataSource? {
         didSet {

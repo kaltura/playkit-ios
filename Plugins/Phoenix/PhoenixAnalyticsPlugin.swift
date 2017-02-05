@@ -15,7 +15,7 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
     private var kalturaPluginManager: KalturaPluginManager!
     
     public static var pluginName: String = "PhoenixAnalytics"
-    public var mediaEntry: MediaEntry?
+    public weak var mediaEntry: MediaEntry?
     
     /************************************************************/
     // MARK: - PKPlugin

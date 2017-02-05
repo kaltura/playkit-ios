@@ -80,9 +80,9 @@ class PlayerController: NSObject, Player {
     public override init() {
         super.init()
         self.currentPlayer = AVPlayerEngine()
-        self.currentPlayer?.onEventBlock = { [unowned self] (event: PKEvent) in
+        self.currentPlayer?.onEventBlock = { [weak self] event in
             PKLog.trace("postEvent:: \(event)")
-            self.onEventBlock?(event)
+            self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
     }

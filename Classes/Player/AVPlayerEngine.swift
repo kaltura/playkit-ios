@@ -31,6 +31,7 @@ class AVPlayerEngine: AVPlayer {
     private var isObserved: Bool = false
     private var tracksManager = TracksManager()
     private var lastBitrate: Double = 0
+    private var isDestroyed = false
     
     /// Indicates whether the current items was played until the end.
     ///
@@ -169,7 +170,9 @@ class AVPlayerEngine: AVPlayer {
     }
     
     deinit {
-        self.destroy()
+        if !isDestroyed {
+            self.destroy()
+        }
     }
     
     private func startOrResumeNonObservablePropertiesUpdateTimer() {
@@ -214,6 +217,7 @@ class AVPlayerEngine: AVPlayer {
         self.onEventBlock = nil
         // removes app state observer
         AppStateSubject.sharedInstance.remove(observer: self)
+        self.isDestroyed = true
     }
     
     @available(iOS 9.0, *)
@@ -324,8 +328,9 @@ class AVPlayerEngine: AVPlayer {
             removeObserver(self, forKeyPath: keyPath, context: &observerContext)
         }
         
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemNewAccessLogEntry, object: nil)
-        NotificationCenter.default.removeObserver(self)
     }
     
     func onAccessLogEntryNotification(notification: Notification) {

@@ -12,14 +12,14 @@ import AVFoundation
 
 public class YouboraPlugin: PKPlugin {
 
-    private var player: Player
-    private var messageBus: MessageBus
+    private unowned var player: Player
+    private unowned var messageBus: MessageBus
     private var config: AnalyticsConfig?
     private var youboraManager : YouboraManager?
     private var isFirstPlay = true
     
     public static var pluginName: String = "YouboraPlugin"
-    public var mediaEntry: MediaEntry?
+    public weak var mediaEntry: MediaEntry?
     
     /************************************************************/
     // MARK: - PKPlugin
