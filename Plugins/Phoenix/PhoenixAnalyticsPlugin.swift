@@ -10,37 +10,45 @@ import UIKit
 
 public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
 
-    public static var pluginName: String = "PhoenixAnalytics"
-
-    private var player: Player!
+    private unowned var player: Player
     private var config: AnalyticsConfig!
-    private var mediaEntry: MediaEntry!
-
     private var kalturaPluginManager: KalturaPluginManager!
     
-    required public init() {
-        
-    }
+    public static var pluginName: String = "PhoenixAnalytics"
+    public weak var mediaEntry: MediaEntry?
     
-    public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
-        self.kalturaPluginManager = KalturaPluginManager()
-        
-        self.mediaEntry = mediaConfig
+    /************************************************************/
+    // MARK: - PKPlugin
+    /************************************************************/
+    
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+        self.player = player
         if let aConfig = pluginConfig as? AnalyticsConfig {
-            self.player = player
             self.config = aConfig
         }
-
+        self.kalturaPluginManager = KalturaPluginManager(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         self.kalturaPluginManager.delegate = self
-        self.kalturaPluginManager.load(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-
+    }
+    
+    public func onLoad(mediaConfig: MediaConfig) {
+        PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
+        self.mediaEntry = mediaConfig.mediaEntry
+    }
+    
+    public func onUpdateMedia(mediaConfig: MediaConfig) {
+        PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
+        self.mediaEntry = mediaConfig.mediaEntry
     }
     
     public func destroy() {
         self.kalturaPluginManager.destroy()
     }
     
-    internal func pluginManagerDidSendAnalyticsEvent(action: PhoenixAnalyticsType) {
+    /************************************************************/
+    // MARK: - KalturaPluginManagerDelegate
+    /************************************************************/
+    
+    func pluginManagerDidSendAnalyticsEvent(action: PhoenixAnalyticsType) {
         PKLog.trace("Action: \(action)")
         
         var fileId = ""
@@ -64,15 +72,19 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
             parterId = pId
         }
 
+        guard let mediaEntry = self.mediaEntry else {
+            PKLog.error("send analytics failed due to nil mediaEntry")
+            return
+        }
+        
         if let builder: KalturaRequestBuilder = BookmarkService.actionAdd(baseURL: baseUrl,
                                                                        partnerId: parterId,
                                                                        ks: ks,
                                                                        eventType: action.rawValue.uppercased(),
                                                                        currentTime: self.player.currentTime.toInt32(),
-                                                                       assetId: self.mediaEntry.id,
+                                                                       assetId: mediaEntry.id,
                                                                        fileId: fileId) {
             builder.set { (response: Response) in
-                
                 PKLog.trace("Response: \(response)")
                 if response.statusCode == 0 {
                     PKLog.trace("\(response.data)")
@@ -87,14 +99,10 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
                         }
                     }
                 }
-                
             }
-            
             USRExecutor.shared.send(request: builder.build())
         }
-        
     }
-    
 }
 
 
