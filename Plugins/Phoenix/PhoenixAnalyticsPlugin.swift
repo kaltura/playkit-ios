@@ -10,7 +10,7 @@ import UIKit
 
 public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
 
-    private var player: Player!
+    private unowned var player: Player
     private var config: AnalyticsConfig!
     private var kalturaPluginManager: KalturaPluginManager!
     

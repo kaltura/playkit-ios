@@ -14,7 +14,7 @@ public class TVPAPIAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
     public static var pluginName: String = "TVPAPIAnalytics"
     public weak var mediaEntry: MediaEntry?
     
-    private var player: Player
+    private unowned var player: Player
     private var config: AnalyticsConfig?
     private var kalturaPluginManager: KalturaPluginManager
     

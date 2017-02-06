@@ -29,8 +29,8 @@ final class KalturaPluginManager {
 
     public var delegate: KalturaPluginManagerDelegate?
     
-    private var player: Player
-    private var messageBus: MessageBus
+    private unowned var player: Player
+    private unowned var messageBus: MessageBus
     private var config: AnalyticsConfig?
     
     private var isFirstPlay = true
