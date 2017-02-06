@@ -16,6 +16,11 @@ import UIKit
  */
 public class PlayKitManager: NSObject {
 
+    // private init to prevent initializing this singleton
+    private override init() {
+        super.init()
+    }
+    
     public static let versionString: String = Bundle(for: PlayKitManager.self)
         .object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
