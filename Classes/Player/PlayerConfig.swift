@@ -30,19 +30,6 @@ public class MediaConfig: NSObject {
         return MediaConfig.init(mediaEntry: mediaEntry, startTime: startTime)
     }
     
-    // Builders
-    @discardableResult
-    public func set(mediaEntry: MediaEntry) -> Self {
-        self.mediaEntry = mediaEntry
-        return self
-    }
-       
-    @discardableResult 
-    public func set(startTime: TimeInterval) -> Self {
-        self.startTime = startTime
-        return self
-    }
-
     /// Private init.
     private override init() {
         fatalError("Private initializer, use `init(mediaEntry:startTime:)`")
