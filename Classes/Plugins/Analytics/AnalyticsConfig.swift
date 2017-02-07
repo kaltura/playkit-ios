@@ -9,10 +9,8 @@
 import UIKit
 
 public class AnalyticsConfig {
-    public var mediaEntry: MediaEntry?
-    public var params: [String: Any]!
     
-    public init() {
-        
-    }
+    public var params = [String : Any]()
+    
+    public init() {}
 }

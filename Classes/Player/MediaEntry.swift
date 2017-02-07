@@ -64,7 +64,7 @@ public class MediaEntry: NSObject {
     }
     
     override public var description: String {
-        get{
+        get {
             return "id : \(self.id), sources: \(self.sources)"
         }
     }
@@ -150,7 +150,7 @@ public class MediaSource: NSObject {
     }
     
     override public var description: String {
-        get{
+        get {
             return "id : \(self.id), url: \(self.contentUrl)"
         }
     }

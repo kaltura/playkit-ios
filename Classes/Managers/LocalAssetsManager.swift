@@ -53,16 +53,20 @@ public class LocalAssetsManager: NSObject {
 
     }
 
+    /// Create a MediaSource for a local asset. This allows the player to play a downloaded asset.
     private func createLocalMediaSource(for assetId: String, localURL: URL) -> MediaSource {
         return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
     }
 
-    
+    /// Create a MediaEntry for a local asset. This is a convenience function that wraps the result of
+    /// `createLocalMediaSource(for:localURL:)` with a MediaEntry.
     public func createLocalMediaEntry(for assetId: String, localURL: URL) -> MediaEntry {
         let mediaSource = createLocalMediaSource(for: assetId, localURL: localURL)
         return MediaEntry.init(assetId, sources: [mediaSource])
     }
     
+    /// Get the preferred MediaSource for download purposes. This function takes into account
+    /// the capabilities of the device.
     public func getPreferredDownloadableMediaSource(for mediaEntry: MediaEntry) -> MediaSource? {
 
         guard let sources = mediaEntry.sources else {return nil}
@@ -90,6 +94,7 @@ public class LocalAssetsManager: NSObject {
         return nil
     }
 
+    /// Prepare a MediaEntry for download using AVAssetDownloadTask. 
     public func prepareForDownload(of mediaEntry: MediaEntry) -> (AVURLAsset, MediaSource)? {
         guard let source = getPreferredDownloadableMediaSource(for: mediaEntry) else { return nil }
         guard let url = source.contentUrl else { return nil }
@@ -98,7 +103,8 @@ public class LocalAssetsManager: NSObject {
         return (avAsset, source)
     }
     
-    public func registerDownloadedAsset(location: URL, mediaSource: MediaSource) {
+    /// Notifies the SDK that downloading of an asset has finished.
+    public func assetDownloadFinished(location: URL, mediaSource: MediaSource) {
         // FairPlay -- nothing to do
         
         // Widevine: TODO
@@ -128,9 +134,7 @@ public protocol LocalDataStore {
     func remove(key: String) throws
 }
 
-/**
- Implementation of LocalDataStore that saves data to files in the Library directory.
- */ 
+/// Implementation of LocalDataStore that saves data to files in the Library directory.
 public class DefaultLocalDataStore: LocalDataStore {
 
     static let pkLocalDataStore = "pkLocalDataStore"
