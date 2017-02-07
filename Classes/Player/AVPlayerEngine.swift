@@ -13,7 +13,7 @@ import CoreMedia
 
 /// An AVPlayerEngine is a controller used to manage the playback and timing of a media asset.
 /// It provides the interface to control the player’s behavior such as its ability to play, pause, and seek to various points in the timeline.
-class AVPlayerEngine : AVPlayer {
+class AVPlayerEngine: AVPlayer {
     
     // MARK: Player Properties
     
@@ -31,6 +31,7 @@ class AVPlayerEngine : AVPlayer {
     private var isObserved: Bool = false
     private var tracksManager = TracksManager()
     private var lastBitrate: Double = 0
+    private var isDestroyed = false
     
     /// Indicates whether the current items was played until the end.
     ///
@@ -107,7 +108,6 @@ class AVPlayerEngine : AVPlayer {
     public var isPlaying: Bool {
         guard let currentItem = self.currentItem else {
             PKLog.error("current item is empty")
-            
             return false
         }
         
@@ -170,7 +170,9 @@ class AVPlayerEngine : AVPlayer {
     }
     
     deinit {
-        self.destroy()
+        if !isDestroyed {
+            self.destroy()
+        }
     }
     
     private func startOrResumeNonObservablePropertiesUpdateTimer() {
@@ -215,6 +217,7 @@ class AVPlayerEngine : AVPlayer {
         self.onEventBlock = nil
         // removes app state observer
         AppStateSubject.sharedInstance.remove(observer: self)
+        self.isDestroyed = true
     }
     
     @available(iOS 9.0, *)
@@ -325,8 +328,9 @@ class AVPlayerEngine : AVPlayer {
             removeObserver(self, forKeyPath: keyPath, context: &observerContext)
         }
         
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.AVPlayerItemNewAccessLogEntry, object: nil)
-        NotificationCenter.default.removeObserver(self)
     }
     
     func onAccessLogEntryNotification(notification: Notification) {

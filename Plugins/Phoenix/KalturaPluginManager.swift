@@ -29,8 +29,8 @@ final class KalturaPluginManager {
 
     public var delegate: KalturaPluginManagerDelegate?
     
-    private var player: Player?
-    private var messageBus: MessageBus?
+    private unowned var player: Player
+    private unowned var messageBus: MessageBus
     private var config: AnalyticsConfig?
     
     private var isFirstPlay = true
@@ -39,15 +39,17 @@ final class KalturaPluginManager {
     private var timer: Timer?
     private var interval = 30 //Should be provided in plugin config
     
-    public func load(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+    init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+        self.player = player
         self.messageBus = messageBus
-        
+        self.load(pluginConfig: pluginConfig)
+    }
+    
+    func load(pluginConfig: Any?) {
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
-            self.player = player
         }
-        
-        registerToAllEvents()
+        self.registerToAllEvents()
         AppStateSubject.sharedInstance.add(observer: self)
     }
     
@@ -59,33 +61,29 @@ final class KalturaPluginManager {
     
     func registerToAllEvents() {
         PKLog.trace("Register to all events")
-        guard let messageBus = self.messageBus else {
-            PKLog.error("message bus is nil! shouldn't happen")
-            return
-        }
 
-        messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (info) in
             PKLog.trace("ended info: \(info)")
             self.stopTimer()
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.error], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.error], block: { (info) in
             PKLog.trace("error info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .error)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (info) in
             PKLog.trace("pause info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .pause)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.loadedMetadata], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.loadedMetadata], block: { (info) in
             PKLog.trace("loadedMetadata info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .load)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.playing], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.playing], block: { (info) in
             PKLog.trace("play info: \(info)")
             
             if !self.intervalOn {
@@ -103,7 +101,7 @@ final class KalturaPluginManager {
     }
     
     public func reportConcurrencyEvent() {
-        self.messageBus?.post(OttEvent.OttEventConcurrency())
+        self.messageBus.post(OttEvent.OttEventConcurrency())
     }
     
     /************************************************************/
@@ -130,13 +128,11 @@ final class KalturaPluginManager {
         
         self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .hit);
         
-        if let player = self.player {
-            var progress = Float(player.currentTime) / Float(player.duration)
-            PKLog.trace("Progress is \(progress)")
-            
-            if progress > 0.98 {
-                self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
-            }
+        var progress = Float(player.currentTime) / Float(player.duration)
+        PKLog.trace("Progress is \(progress)")
+        
+        if progress > 0.98 {
+            self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
         }
     }
     

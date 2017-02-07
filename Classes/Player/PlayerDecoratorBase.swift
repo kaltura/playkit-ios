@@ -61,11 +61,11 @@ public class PlayerDecoratorBase: NSObject, Player {
         }
     }
     
-    public func prepare(_ config: PlayerConfig) {
+    public func prepare(_ config: MediaConfig) {
         return self.player.prepare(config)
     }
 
-    public func prepareNext(_ config: PlayerConfig) -> Bool {
+    public func prepareNext(_ config: MediaConfig) -> Bool {
         return self.player.prepareNext(config)
     }
     
