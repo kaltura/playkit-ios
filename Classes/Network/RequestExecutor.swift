@@ -13,5 +13,4 @@ public protocol RequestExecutor{
     func send(request:Request)
     func cancel(request:Request)
     func clean()
-
 }

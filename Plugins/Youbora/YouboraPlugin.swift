@@ -103,6 +103,7 @@ public class YouboraPlugin: PKPlugin {
             self.postEventLogWithMessage(message: "playing event: \(event)")
             
             guard let youboraManager = self.youboraManager else { return }
+
             if self.isFirstPlay {
                 youboraManager.joinHandler()
                 youboraManager.bufferedHandler()

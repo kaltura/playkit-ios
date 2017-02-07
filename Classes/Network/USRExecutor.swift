@@ -9,16 +9,14 @@
 import UIKit
 
 
-public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
-    
+public class USRExecutor: NSObject, RequestExecutor, URLSessionDelegate {
     
     var tasks: [URLSessionDataTask] = [URLSessionDataTask]()
-    var taskIdByRequestID: [String:Int] = [String:Int]()
+    var taskIdByRequestID: [String : Int] = [String : Int]()
     
     enum ResponseError: Error {
         case emptyOrIncorrectURL
-        case inCorrectJSONBody
-        
+        case incorrectJSONBody
     }
     
     public static let shared = USRExecutor()
@@ -29,7 +27,7 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
         
         //handle http method
         if let method = r.method {
-            request.httpMethod = method
+            request.httpMethod = method.value
         }
         
         // handle body
@@ -56,8 +54,6 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
             session = URLSession.shared
         }
         
-        
-        
         var task: URLSessionDataTask? = nil
         // settings headers:
         task = session.dataTask(with: request) { (data, response, error) in
@@ -67,9 +63,7 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
                self.tasks.remove(at: i)
             }
         
-            
             DispatchQueue.main.async {
-                
                 if let completion = r.completion {
                     
                     if let error = error as? NSError {
@@ -83,39 +77,30 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
                         return
                     }
                     
-                    
                     if let d = data {
-                        do{
+                        do {
                             let json = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions())
                             let result = Response(data: json, error:nil)
                             completion(result)
-                        }catch {
+                        } catch {
                             let result = Response(data: nil, error:error)
                             completion(result)
 
                         }
-                        
-                        
-                    }else{
+                    } else {
                         let result = Response(data: nil, error:nil)
                         completion(result)
                     }
-                    
                 }
             }
         }
-        
         
         if let tsk = task{
             self.taskIdByRequestID[r.requestId] = task?.taskIdentifier
             self.tasks.append(tsk)
             tsk.resume()
         }
-        
-        
-        
     }
-    
     
     public func cancel(request:Request){
         
@@ -124,9 +109,6 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
             let task = self.tasks[i]
             task.cancel()
         }
-        
-        
-        //taskToCancel?.cancel()
     }
     
     public func taskIndexForRequest(request:Request) -> Int?{
@@ -140,17 +122,15 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
                 }else{
                     return false
                 }
-                
             })
             
             if let index = taskIndex{
                 return index
-            }else{
+            } else {
                 return nil
             }
  
-        }else{
-            
+        } else {
             return nil
         }
     }
@@ -159,26 +139,17 @@ public class USRExecutor :NSObject,RequestExecutor, URLSessionDelegate {
         
     }
     
-    
-    
-    
     // MARK: URLSessionDelegate
     public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?){
         
     }
     
-    
-    
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Swift.Void){
         
     }
     
-    
     public func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession){
         
     }
-    
-    
-    
     
 }

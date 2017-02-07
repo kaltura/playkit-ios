@@ -166,7 +166,7 @@ class AVPlayerEngine: AVPlayer {
         self.onEventBlock = nil
         self.nonObservablePropertiesUpdateTimer = nil
         
-        AppStateSubject.sharedInstance.add(observer: self)
+        AppStateSubject.shared.add(observer: self)
     }
     
     deinit {
@@ -216,7 +216,7 @@ class AVPlayerEngine: AVPlayer {
         self._view = nil
         self.onEventBlock = nil
         // removes app state observer
-        AppStateSubject.sharedInstance.remove(observer: self)
+        AppStateSubject.shared.remove(observer: self)
         self.isDestroyed = true
     }
     

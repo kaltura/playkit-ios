@@ -19,8 +19,7 @@ internal class MediaMarkService {
                                          fileId: String) -> RequestBuilder? {
         
         if let request: RequestBuilder = RequestBuilder(url: baseURL) {
-            request
-                .set(method: "POST")
+            request.set(method: .post)
                 
             if let obj = initObj {
                 request.set(jsonBody: obj)
@@ -34,20 +33,8 @@ internal class MediaMarkService {
                 request.setBody(key: "Action", value: JSON(eventType))
             }
             return request
-        }else{
+        } else {
             return nil
         }
-
-    }
-
-    private static func createBookmark(eventType: String, position: Int32, assetId: String, fileId: String) -> JSON {
-        var json: JSON = JSON.init(["objectType": "KalturaBookmark"])
-        json["type"] = JSON("media")
-        json["id"] = JSON(assetId)
-        json["position"] = JSON(position)
-        json["playerData"] = JSON.init(["action": JSON(eventType), "objectType": JSON("KalturaBookmarkPlayerData"), "fileId": JSON(fileId)])
-
-        
-        return json
     }
 }

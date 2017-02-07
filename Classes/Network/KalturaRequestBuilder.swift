@@ -36,7 +36,7 @@ internal class KalturaRequestBuilder: RequestBuilder{
         super.init(url: path)
         
         self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
-        self.set(method: "POST")
+        self.set(method: .post)
         
     }
        
