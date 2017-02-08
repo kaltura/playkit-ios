@@ -14,12 +14,40 @@ public class LocalAssetsManager: NSObject {
     let storage: LocalDataStore
     var delegates = Set<AssetLoaderDelegate>()
     
+    private override init() {
+        fatalError("Private initializer, use one of the factory methods")
+    }
+    
+    /**
+     Create a new LocalAssetsManager for DRM-protected content. 
+     Uses the default data-store.
+     */
+    public static func managerWithDefaultDataStore() -> LocalAssetsManager {
+        return LocalAssetsManager(storage: DefaultLocalDataStore.defaultDataStore())
+    }
+    
+    /**
+     Create a new LocalAssetsManager for DRM-protected content.
+     
+     - Parameter storage: data store. 
+     */
+    public static func manager(storage: LocalDataStore) -> LocalAssetsManager {
+        return LocalAssetsManager(storage: storage)
+    }
+    
+    /**
+     Create a new LocalAssetsManager for non-DRM content.
+    */
+    public static func manager() -> LocalAssetsManager {
+        return LocalAssetsManager(storage: nil)
+    }
+    
     /**
      Create a new LocalAssetsManager.
      
      - Parameter storage: data store. Used for DRM data, and may only be nil if DRM is not used.
     */
-    public init(storage: LocalDataStore?) {
+    private init(storage: LocalDataStore?) {
         self.storage = storage ?? NullStore.instance
     }
 
@@ -115,9 +143,9 @@ public class LocalAssetsManager: NSObject {
             PKLog.error("LocalDataStore not set")
         }
 
-        public func load(key: String) throws -> Data? {
+        public func load(key: String) throws -> Data {
             PKLog.error("LocalDataStore not set")
-            return nil
+            throw NSError.init(domain: "LocalAssetsManager", code: -1, userInfo: nil)
         }
 
         public func save(key: String, value: Data) throws {
@@ -128,21 +156,30 @@ public class LocalAssetsManager: NSObject {
     }
 }
 
-public protocol LocalDataStore {
+@objc public protocol LocalDataStore: class {
     func save(key: String, value: Data) throws
-    func load(key: String) throws -> Data?
+    func load(key: String) throws -> Data
     func remove(key: String) throws
 }
 
 /// Implementation of LocalDataStore that saves data to files in the Library directory.
-public class DefaultLocalDataStore: LocalDataStore {
+public class DefaultLocalDataStore: NSObject, LocalDataStore {
 
     static let pkLocalDataStore = "pkLocalDataStore"
     let storageDirectory: URL
 
-    public init() throws {
-        let baseDir = try FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+    public static func defaultDataStore() -> DefaultLocalDataStore? {
+        return try? DefaultLocalDataStore(directory: .libraryDirectory)
+    }
+    
+    private override init() {
+        fatalError("Private initializer, use a factory or `init(directory:)`")
+    }
+    
+    public init(directory: FileManager.SearchPathDirectory) throws {
+        let baseDir = try FileManager.default.url(for: directory, in: .userDomainMask, appropriateFor: nil, create: false)
         self.storageDirectory = baseDir.appendingPathComponent(DefaultLocalDataStore.pkLocalDataStore, isDirectory: true)
+        
         try FileManager.default.createDirectory(at: self.storageDirectory, withIntermediateDirectories: true, attributes: nil)
     }
 
@@ -154,7 +191,7 @@ public class DefaultLocalDataStore: LocalDataStore {
         try value.write(to: file(key), options: .atomic)
     }
 
-    public func load(key: String) throws -> Data? {
+    public func load(key: String) throws -> Data {
         return try Data.init(contentsOf: file(key), options: [])
     }
 

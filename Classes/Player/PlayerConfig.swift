@@ -8,49 +8,41 @@
 
 import Foundation
 
-/// A `PlayerConfig` object defines mediaConfig and pluginConfig composite object.
-public class PlayerConfig: NSObject {
-    public var mediaConfig = MediaConfig()
-    public var pluginConfig = PluginConfig()
-    
-    public init(mediaConfig: MediaConfig, pluginConfig: PluginConfig) {
-        self.mediaConfig = mediaConfig
-        self.pluginConfig = pluginConfig
-    }
-}
-
 /// A `MediaConfig` object defines behavior and info to use when preparing a `Player` object.
 public class MediaConfig: NSObject {
-    public var mediaEntry: MediaEntry?
+    public var mediaEntry: MediaEntry
     public var startTime: TimeInterval = 0
     
     override public var description: String {
         return "Media config, mediaEntry: \(self.mediaEntry)\nstartTime: \(self.startTime)"
     }
     
-    // Builders
-    @discardableResult
-    public func set(mediaEntry: MediaEntry) -> Self {
+    public init(mediaEntry: MediaEntry, startTime: TimeInterval = 0) {
         self.mediaEntry = mediaEntry
-        return self
-    }
-       
-    @discardableResult 
-    public func set(startTime: TimeInterval) -> Self {
         self.startTime = startTime
-        return self
+    }
+    
+    public static func config(mediaEntry: MediaEntry) -> MediaConfig {
+        return MediaConfig.init(mediaEntry: mediaEntry)
+    }
+    
+    public static func config(mediaEntry: MediaEntry, startTime: TimeInterval) -> MediaConfig {
+        return MediaConfig.init(mediaEntry: mediaEntry, startTime: startTime)
+    }
+    
+    /// Private init.
+    private override init() {
+        fatalError("Private initializer, use `init(mediaEntry:startTime:)`")
     }
 }
 
 /// A `PluginConfig` object defines config to use when loading a plugin object.
 public class PluginConfig: NSObject {
-    /// Plugins congfig dictionary holds [plugin name : plugin config]
-    public var config: [String : AnyObject]?
+    /// Plugins config dictionary holds [plugin name : plugin config]
+    @objc public var config: [String : AnyObject]?
     
-    @discardableResult
-    public func set(config: [String : AnyObject]) -> Self {
+    public init(config: [String : AnyObject]) {
         self.config = config
-        return self
     }
     
     override public var description: String {

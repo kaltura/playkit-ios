@@ -17,7 +17,9 @@ public class PlayKitManager: NSObject {
 
     // private init to prevent initializing this singleton
     private override init() {
-        super.init()
+        if type(of: self) != PlayKitManager.self {
+            fatalError("Private initializer, use shared instance instead")
+        }
     }
     
     public static let versionString: String = Bundle(for: PlayKitManager.self)
