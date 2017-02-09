@@ -41,12 +41,17 @@ public class PluginConfig: NSObject {
     /// Plugins config dictionary holds [plugin name : plugin config]
     @objc public var config: [String : Any]
     
+    override public var description: String {
+        return "Plugin config:\n\(self.config)"
+    }
+    
     public init(config: [String : Any]) {
         self.config = config
     }
     
-    override public var description: String {
-        return "Plugin config:\n\(self.config)"
+    /// Private init.
+    private override init() {
+        fatalError("Private initializer, use `init(config:)`")
     }
 }
 
