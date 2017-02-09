@@ -8,31 +8,15 @@
 
 import UIKit
 
-public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin, KalturaOTTAnalyticsPluginProtocol {
+public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
     
     public override class var pluginName: String { return "PhoenixAnalytics" }
-    
-    var isFirstPlay: Bool = true
-    var intervalOn: Bool = false
-    var timer: Timer?
-    var interval: TimeInterval = 30
-    
-    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-        self.registerToAllEvents()
-    }
-    
-    public override func destroy() {
-        self.sendAnalyticsEvent(ofType: .stop)
-        self.stopTimer()
-        super.destroy()
-    }
     
     /************************************************************/
     // MARK: - KalturaOTTAnalyticsPluginProtocol
     /************************************************************/
     
-    func buildRequest(ofType type: PhoenixAnalyticsType) -> Request? {
+    override func buildRequest(ofType type: OTTAnalyticsEventType) -> Request? {
         var fileId = ""
         var baseUrl = ""
         var ks = ""
@@ -82,10 +66,6 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin, KalturaOTTAnalytics
         }
         
         return requestBuilder.build()
-    }
-    
-    func send(request: Request) {
-        USRExecutor.shared.send(request: request)
     }
 }
 

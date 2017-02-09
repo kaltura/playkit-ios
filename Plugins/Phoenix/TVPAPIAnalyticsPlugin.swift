@@ -9,31 +9,15 @@
 import UIKit
 import SwiftyJSON
 
-public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin, KalturaOTTAnalyticsPluginProtocol {
+public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
     
     public override class var pluginName: String { return "TVPAPIAnalytics" }
-    
-    var isFirstPlay: Bool = true
-    var intervalOn: Bool = false
-    var timer: Timer?
-    var interval: TimeInterval = 30
-    
-    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-        self.registerToAllEvents()
-    }
-    
-    public override func destroy() {
-        self.sendAnalyticsEvent(ofType: .stop)
-        self.stopTimer()
-        super.destroy()
-    }
     
     /************************************************************/
     // MARK: - KalturaOTTAnalyticsPluginProtocol
     /************************************************************/
     
-    func buildRequest(ofType type: PhoenixAnalyticsType) -> Request? {
+    override func buildRequest(ofType type: OTTAnalyticsEventType) -> Request? {
         var fileId = ""
         var baseUrl = ""
         var initObj : JSON? = nil
@@ -79,10 +63,6 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin, KalturaOTTAnalyticsP
         }
         
         return requestBuilder.build()
-    }
-
-    func send(request: Request) {
-        USRExecutor.shared.send(request: request)
     }
 }
 
