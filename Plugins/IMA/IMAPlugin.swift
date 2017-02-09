@@ -13,7 +13,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     
     public weak var mediaEntry: MediaEntry?
 
-    private unowned var player: Player
+    private var player: Player?
     private unowned var messageBus: MessageBus
     
     weak var dataSource: AdsPluginDataSource? {
@@ -200,7 +200,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         self.loadingView!.addConstraint(NSLayoutConstraint(item: self.loadingView!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: indicator, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         self.loadingView!.addConstraint(NSLayoutConstraint(item: self.loadingView!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: indicator, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
         
-        let videoView = self.player.view
+        let videoView = self.player?.view
         videoView?.addSubview(self.loadingView!)
         videoView?.addConstraint(NSLayoutConstraint(item: videoView!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0))
         videoView?.addConstraint(NSLayoutConstraint(item: videoView!, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.left, multiplier: 1, constant: 0))
@@ -209,7 +209,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     }
     
     private func createAdDisplayContainer() -> IMAAdDisplayContainer {
-        return IMAAdDisplayContainer(adContainer: self.player.view, companionSlots: self.config?.companionView != nil ? [self.companionSlot!] : nil)
+        return IMAAdDisplayContainer(adContainer: self.player!.view, companionSlots: self.config?.companionView != nil ? [self.companionSlot!] : nil)
     }
 
     private func loadAdsIfNeeded() {
@@ -249,8 +249,8 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     
     @objc private func update() {
         if !self.isAdPlayback {
-            let currentTime = self.player.currentTime
-            if currentTime.isNaN {
+            let currentTime = self.player?.currentTime
+            if (currentTime?.isNaN)! {
                 return
             }
             self.currentPlaybackTime = currentTime
@@ -279,7 +279,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         self.loadingView!.alpha = alpha
         self.loadingView!.isHidden = !show
 
-        self.player.view?.bringSubview(toFront: self.loadingView!)
+        self.player?.view?.bringSubview(toFront: self.loadingView!)
     }
     
     private func convertToPlayerEvent(_ event: IMAAdEventType) -> AdEvent.Type {
