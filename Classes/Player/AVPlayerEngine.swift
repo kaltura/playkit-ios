@@ -218,6 +218,7 @@ class AVPlayerEngine: AVPlayer {
         // removes app state observer
         AppStateSubject.sharedInstance.remove(observer: self)
         self.isDestroyed = true
+        self.replaceCurrentItem(with: nil)
     }
     
     @available(iOS 9.0, *)
