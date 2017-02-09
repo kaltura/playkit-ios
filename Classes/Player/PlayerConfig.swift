@@ -39,9 +39,9 @@ public class MediaConfig: NSObject {
 /// A `PluginConfig` object defines config to use when loading a plugin object.
 public class PluginConfig: NSObject {
     /// Plugins config dictionary holds [plugin name : plugin config]
-    @objc public var config: [String : AnyObject]?
+    @objc public var config: [String : Any]
     
-    public init(config: [String : AnyObject]) {
+    public init(config: [String : Any]) {
         self.config = config
     }
     

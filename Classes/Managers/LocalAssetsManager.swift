@@ -156,7 +156,7 @@ public class LocalAssetsManager: NSObject {
     }
 }
 
-@objc public protocol LocalDataStore: class {
+@objc public protocol LocalDataStore {
     func save(key: String, value: Data) throws
     func load(key: String) throws -> Data
     func remove(key: String) throws
