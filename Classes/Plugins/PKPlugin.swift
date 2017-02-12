@@ -9,8 +9,19 @@
 import UIKit
 import AVFoundation
 
+/**
+ Used as a workaround for Apple bug with swift interoperability.
+ 
+ There is an issue with initializing an object based on a protocol.Type with @objc attribute.
+ Therefore we use a wrapper protocol for PKPlugin with @objc and then casting to a PKPlugin without the @objc attribute.
+ 
+ - important:
+ **should not be used! use PKPlugin to add a plugin**
+ */
+@objc public protocol Plugin {}
+
 /// The `PKPlugin` protocol defines all the properties and methods required to define a plugin object.
-@objc public protocol PKPlugin {
+public protocol PKPlugin: Plugin {
     /// The plugin name.
     static var pluginName: String { get }
     /// The associated media entry.

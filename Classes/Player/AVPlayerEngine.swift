@@ -217,6 +217,7 @@ class AVPlayerEngine: AVPlayer {
         self.onEventBlock = nil
         // removes app state observer
         AppStateSubject.shared.remove(observer: self)
+        self.replaceCurrentItem(with: nil)
         self.isDestroyed = true
     }
     
