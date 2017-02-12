@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 import AVKit
 
-@objc public protocol PlayerDelegate: class {
+@objc public protocol PlayerDelegate {
     func playerShouldPlayAd(_ player: Player) -> Bool
     func player(_ player: Player, failedWith error: String)
 }
