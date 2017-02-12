@@ -18,7 +18,9 @@ public class PlayKitManager: NSObject {
 
     // private init to prevent initializing this singleton
     private override init() {
-        super.init()
+        if type(of: self) != PlayKitManager.self {
+            fatalError("Private initializer, use shared instance instead")
+        }
     }
     
     public static let versionString: String = Bundle(for: PlayKitManager.self)
@@ -48,8 +50,11 @@ public class PlayKitManager: NSObject {
         return loader
     }
     
-    public func registerPlugin(_ pluginClass: PKPlugin.Type) {
-        pluginRegistry[pluginClass.pluginName] = pluginClass
+    public func registerPlugin(_ pluginClass: Plugin.Type) {
+        guard let pluginType = pluginClass as? PKPlugin.Type else {
+            fatalError("plugin class must be of type PKPlugin")
+        }
+        pluginRegistry[pluginType.pluginName] = pluginType
     }
     
     func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) -> PKPlugin? {
