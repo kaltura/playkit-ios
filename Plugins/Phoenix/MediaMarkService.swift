@@ -23,7 +23,7 @@ internal class MediaMarkService {
                 .set(method: "POST")
                 
             if let obj = initObj {
-                request.set(jsonBody: obj)
+                request.setBody(key: "initObj", value: obj)
             }
             request
                 .setBody(key: "iFileID", value: JSON(fileId))
