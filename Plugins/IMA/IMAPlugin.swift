@@ -6,7 +6,6 @@
 //  Copyright © 2016 Google, Inc. All rights reserved.
 //
 
-#if IMA_ENABLED
 import GoogleInteractiveMediaAds
 
 public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
@@ -477,31 +476,3 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         self.notify(event: AdEvent.AdWebOpenerDidCloseInAppBrowser(webOpener: webOpener))
     }
 }
-    
-#else
-    public class IMAPlugin: NSObject, PKPlugin  {
-        
-        public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-            
-        }
-
-        public func onLoad(mediaConfig: MediaConfig) {
-            PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-            self.mediaEntry = mediaConfig.mediaEntry
-        }
-        
-        public func onUpdateMedia(mediaConfig: MediaConfig) {
-            PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
-            self.mediaEntry = mediaConfig.mediaEntry
-        }
-        
-        public var mediaEntry: MediaEntry?
-        
-        public static var pluginName = String(describing: IMAPlugin.self)
-        
-        public func destroy() {
-            
-        }
-    }
-
-#endif
