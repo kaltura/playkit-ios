@@ -51,7 +51,7 @@ end
 s.subspec 'WidevineClassic' do |ssp|
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKit/Core'
-  ssp.dependency 'PlayKitWV'
+  #ssp.dependency 'PlayKitWV'
   #ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1' }
 end
 
