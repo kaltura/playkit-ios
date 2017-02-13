@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2012AFAC1E4B56D200BBA61C /* big_buck_bunny_short.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 2012AFAB1E4B56D200BBA61C /* big_buck_bunny_short.mp4 */; };
+		2012AFAF1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFAE1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift */; };
+		2012AFB21E4B860B00BBA61C /* PhoenixPluginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFB11E4B860B00BBA61C /* PhoenixPluginTest.swift */; };
+		2012AFB41E4B872300BBA61C /* PlayerCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFB31E4B872300BBA61C /* PlayerCreator.swift */; };
+		20CD64591E4C9697002C9401 /* AnalyticsPluginConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CD64581E4C9697002C9401 /* AnalyticsPluginConfig.swift */; };
+		20CD645B1E4C985C002C9401 /* BaseQuickSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CD645A1E4C985C002C9401 /* BaseQuickSpec.swift */; };
 		49AD556D5A90D82F391750B8 /* Pods_PlayKit_PlayKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BF84E8D861C5637BA8624EE /* Pods_PlayKit_PlayKit_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
@@ -38,6 +44,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2012AFAB1E4B56D200BBA61C /* big_buck_bunny_short.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = big_buck_bunny_short.mp4; sourceTree = "<group>"; };
+		2012AFAE1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTAnalyticsPluginTest.swift; sourceTree = "<group>"; };
+		2012AFB11E4B860B00BBA61C /* PhoenixPluginTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhoenixPluginTest.swift; path = Phoenix/PhoenixPluginTest.swift; sourceTree = "<group>"; };
+		2012AFB31E4B872300BBA61C /* PlayerCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerCreator.swift; sourceTree = "<group>"; };
+		20CD64581E4C9697002C9401 /* AnalyticsPluginConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalyticsPluginConfig.swift; sourceTree = "<group>"; };
+		20CD645A1E4C985C002C9401 /* BaseQuickSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseQuickSpec.swift; sourceTree = "<group>"; };
 		347179E45954932C0B17A1AF /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		349AFD3D2D9F85463A6A0F41 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		45A6ED5153A41479610084F1 /* PlayKit.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = PlayKit.podspec; path = ../PlayKit.podspec; sourceTree = "<group>"; };
@@ -88,6 +100,48 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2012AFA91E4B56D200BBA61C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2012AFAA1E4B56D200BBA61C /* Video */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		2012AFAA1E4B56D200BBA61C /* Video */ = {
+			isa = PBXGroup;
+			children = (
+				2012AFAB1E4B56D200BBA61C /* big_buck_bunny_short.mp4 */,
+			);
+			path = Video;
+			sourceTree = "<group>";
+		};
+		2012AFAD1E4B85CA00BBA61C /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				2012AFAE1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift */,
+				2012AFB01E4B85D600BBA61C /* Phoenix */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		2012AFB01E4B85D600BBA61C /* Phoenix */ = {
+			isa = PBXGroup;
+			children = (
+				2012AFB11E4B860B00BBA61C /* PhoenixPluginTest.swift */,
+			);
+			name = Phoenix;
+			sourceTree = "<group>";
+		};
+		20CD64571E4C9697002C9401 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				20CD64581E4C9697002C9401 /* AnalyticsPluginConfig.swift */,
+				20CD645A1E4C985C002C9401 /* BaseQuickSpec.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		607FACC71AFB9204008FA782 = {
 			isa = PBXGroup;
 			children = (
@@ -135,6 +189,10 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				2012AFB31E4B872300BBA61C /* PlayerCreator.swift */,
+				20CD64571E4C9697002C9401 /* Helpers */,
+				2012AFAD1E4B85CA00BBA61C /* Analytics */,
+				2012AFA91E4B56D200BBA61C /* Resources */,
 				C23A62C81DF412FD00635FA2 /* MediaEntryProvider */,
 				C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */,
 				BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */,
@@ -306,6 +364,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C24770B01DEDF36900E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */,
+				2012AFAC1E4B56D200BBA61C /* big_buck_bunny_short.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,11 +479,16 @@
 			files = (
 				C23A62D41DF4141000635FA2 /* MediaEntryProviderMock.swift in Sources */,
 				C23A62D11DF413FF00635FA2 /* MockMediaProviderTest.swift in Sources */,
+				20CD645B1E4C985C002C9401 /* BaseQuickSpec.swift in Sources */,
 				C23A62D31DF4140E00635FA2 /* OVPMediaProviederTest.swift in Sources */,
+				20CD64591E4C9697002C9401 /* AnalyticsPluginConfig.swift in Sources */,
 				C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */,
+				2012AFB21E4B860B00BBA61C /* PhoenixPluginTest.swift in Sources */,
 				BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */,
+				2012AFB41E4B872300BBA61C /* PlayerCreator.swift in Sources */,
 				FB09C99C1E28072900D3671F /* SourceSelectorTest.swift in Sources */,
 				C23A62D21DF4140B00635FA2 /* OTTMediaProviderTest.swift in Sources */,
+				2012AFAF1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift in Sources */,
 				C23A62DD1DF47D9C00635FA2 /* OTTSessionProviderTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

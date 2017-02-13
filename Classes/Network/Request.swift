@@ -36,7 +36,7 @@ public protocol Request {
     var completion: completionClosures? { get }
 }
 
-public struct RequestElement : Request {
+public struct RequestElement: Request {
     
     public var requestId: String
     public var method: RequestMethod?

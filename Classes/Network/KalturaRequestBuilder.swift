@@ -9,7 +9,7 @@
 import UIKit
 
 
-internal class KalturaRequestBuilder: RequestBuilder{
+class KalturaRequestBuilder: RequestBuilder {
 
     public var service: String?
     public var action: String?

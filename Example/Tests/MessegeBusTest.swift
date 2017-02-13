@@ -17,8 +17,6 @@ class MessegeBusTest: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        let config = PlayerConfig()
-        
         var source = [String : Any]()
         source["id"] = "test"
         source["url"] = "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
@@ -29,11 +27,10 @@ class MessegeBusTest: XCTestCase {
         var entry = [String : Any]()
         entry["id"] = "test"
         entry["sources"] = sources
+        let mediaConfig = MediaConfig(mediaEntry: MediaEntry(json: entry))
         
-        let media = MediaEntry(json: entry)
-        config.set(mediaEntry: media)
-        self.player = PlayKitManager.sharedInstance.loadPlayer(config:config)
-        self.player.prepare(config)
+        self.player = PlayKitManager.shared.loadPlayer(pluginConfig: nil)
+        self.player.prepare(mediaConfig)
     }
     
     override func tearDown() {
