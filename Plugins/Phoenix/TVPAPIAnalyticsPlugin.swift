@@ -86,8 +86,7 @@ public class TVPAPIAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
                 PKLog.trace("Response: \(response)")
                 if response.statusCode == 0 {
                     PKLog.trace("\(response.data)")
-                    guard let data : [String: Any] = response.data as? [String : Any] else { return }
-                    guard let result = data["concurrent"] as? [String : Any] else { return }
+                    guard let data = response.data as? String, data.lowercased() == "concurrent" else { return }
                     self.kalturaPluginManager.reportConcurrencyEvent()
                 }
             }
