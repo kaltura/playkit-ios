@@ -78,26 +78,22 @@ public class PhoenixAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
         }
         
         if let builder: KalturaRequestBuilder = BookmarkService.actionAdd(baseURL: baseUrl,
-                                                                       partnerId: parterId,
-                                                                       ks: ks,
-                                                                       eventType: action.rawValue.uppercased(),
-                                                                       currentTime: self.player.currentTime.toInt32(),
-                                                                       assetId: mediaEntry.id,
-                                                                       fileId: fileId) {
+                                                                          partnerId: parterId,
+                                                                          ks: ks,
+                                                                          eventType: action.rawValue.uppercased(),
+                                                                          currentTime: self.player.currentTime.toInt32(),
+                                                                          assetId: mediaEntry.id,
+                                                                          fileId: fileId) {
             builder.set { (response: Response) in
                 PKLog.trace("Response: \(response)")
                 if response.statusCode == 0 {
                     PKLog.trace("\(response.data)")
-                    if let data : [String: Any] = response.data as! [String : Any]? {
-                        if let result = data["result"] as! [String: Any]? {
-                            if let errorData = result["error"] as! [String: Any]? {
-                                if let errorCode = errorData["code"] as? Int, errorCode == 4001 {
-                                    
-                                    self.kalturaPluginManager.reportConcurrencyEvent()
-                                }
-                            }
-                        }
-                    }
+                    PKLog.trace("\(response.data)")
+                    guard let data = response.data as? [String : Any] else { return }
+                    guard let result = data["result"] as? [String: Any] else { return }
+                    guard let errorData = result["error"] as? [String: Any] else { return }
+                    guard let errorCode = errorData["code"] as? Int, errorCode == 4001 else { return }
+                    self.kalturaPluginManager.reportConcurrencyEvent()
                 }
             }
             USRExecutor.shared.send(request: builder.build())
