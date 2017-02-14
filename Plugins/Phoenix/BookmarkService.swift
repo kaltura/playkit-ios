@@ -48,7 +48,7 @@ internal class BookmarkService {
     private static func createBookmark(eventType: String, position: Int32, assetId: String, fileId: String) -> JSON {
         var json: JSON = JSON.init(["objectType": "KalturaBookmark"])
         json["type"] = JSON("media")
-        //json["id"] = JSON(assetId)
+        json["id"] = JSON(assetId)
         json["position"] = JSON(position)
         json["playerData"] = JSON.init(["action": JSON(eventType), "objectType": JSON("KalturaBookmarkPlayerData"), "fileId": JSON(fileId)])
 
