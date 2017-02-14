@@ -75,6 +75,13 @@ final class KalturaPluginManager {
         
         self.messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (info) in
             PKLog.trace("pause info: \(info)")
+            // invalidate timer when receiving pause event only after first play
+            // and set intervalOn to false in order to start timer again on play event.
+            if !self.isFirstPlay {
+                self.stopTimer()
+                self.intervalOn = false
+            }
+            
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .pause)
         })
         
@@ -101,7 +108,7 @@ final class KalturaPluginManager {
     }
     
     public func reportConcurrencyEvent() {
-        self.messageBus.post(OttEvent.OttEventConcurrency())
+        self.messageBus.post(OttEvent.Concurrency())
     }
     
     /************************************************************/
@@ -118,14 +125,19 @@ final class KalturaPluginManager {
             t.invalidate()
         }
         
+        // media hit should fire on every time we start the timer.
+        self.sendProgressEvent()
+        
         self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.interval), target: self, selector: #selector(KalturaPluginManager.timerHit), userInfo: nil, repeats: true)
         
     }
     
     @objc private func timerHit() {
-        
         PKLog.trace("timerHit")
-        
+        self.sendProgressEvent()
+    }
+    
+    private func sendProgressEvent() {
         self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .hit);
         
         var progress = Float(player.currentTime) / Float(player.duration)

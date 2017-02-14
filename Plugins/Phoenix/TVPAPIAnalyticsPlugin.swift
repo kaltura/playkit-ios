@@ -54,26 +54,27 @@ public class TVPAPIAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
         
         var fileId = ""
         var baseUrl = ""
-        var initObj : JSON? = nil
+        
+        guard let initObj = self.config?.params["initObj"] as? [String : Any] else {
+            PKLog.error("send analytics failed due to no initObj data")
+            return
+        }
+        
+        guard let mediaEntry = self.mediaEntry else {
+            PKLog.error("send analytics failed due to nil mediaEntry")
+            return
+        }
         
         let method = action == .hit ? "MediaHit" : "MediaMark"
-
+        
         if let url = self.config?.params["baseUrl"] as? String {
             baseUrl = url
         }
         if let fId = self.config?.params["fileId"] as? String {
             fileId = fId
         }
-        if let obj = self.config?.params["initObj"] as? JSON {
-            initObj = obj
-        }
-        
+
         baseUrl = "\(baseUrl)m=\(method)"
-        
-        guard let mediaEntry = self.mediaEntry else {
-            PKLog.error("send analytics failed due to nil mediaEntry")
-            return
-        }
         
         if let builder: RequestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
                                                                                  initObj: initObj,
@@ -82,22 +83,14 @@ public class TVPAPIAnalyticsPlugin: PKPlugin, KalturaPluginManagerDelegate {
                                                                                  assetId: mediaEntry.id,
                                                                                  fileId: fileId) {
             builder.set { (response: Response) in
-                
                 PKLog.trace("Response: \(response)")
                 if response.statusCode == 0 {
-                    
                     PKLog.trace("\(response.data)")
-                    if let data : [String: Any] = response.data as! [String : Any]? {
-                        if let result = data["concurrent"] as! [String: Any]? {
-                            self.kalturaPluginManager.reportConcurrencyEvent()
-                        }
-                    }
- 
+                    guard let data = response.data as? String, data.lowercased() == "concurrent" else { return }
+                    self.kalturaPluginManager.reportConcurrencyEvent()
                 }
             }
-            
             USRExecutor.shared.send(request: builder.build())
-
         }
         
     }
