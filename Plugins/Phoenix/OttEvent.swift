@@ -8,8 +8,11 @@
 
 import UIKit
 
+/// OTT Event
 public class OttEvent : PKEvent {
-
-    public class OttEventConcurrency : OttEvent {}
-
+    
+    class Concurrency : OttEvent {}
+    /// represents the Concurrency event Type.
+    /// Concurrency events fire when more then the allowed connections are exceeded.
+    public static let concurrency: OttEvent.Type = Concurrency.self
 }

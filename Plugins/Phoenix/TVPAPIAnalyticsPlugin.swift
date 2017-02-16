@@ -20,7 +20,16 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
     override func buildRequest(ofType type: OTTAnalyticsEventType) -> Request? {
         var fileId = ""
         var baseUrl = ""
-        var initObj : JSON? = nil
+        
+        guard let initObj = self.config?.params["initObj"] as? [String : Any] else {
+            PKLog.error("send analytics failed due to no initObj data")
+            return nil
+        }
+        
+        guard let mediaEntry = self.mediaEntry else {
+            PKLog.error("send analytics failed due to nil mediaEntry")
+            return nil
+        }
         
         let method = type == .hit ? "MediaHit" : "MediaMark"
         
@@ -30,23 +39,15 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
         if let fId = self.config?.params["fileId"] as? String {
             fileId = fId
         }
-        if let obj = self.config?.params["initObj"] as? JSON {
-            initObj = obj
-        }
-        
+
         baseUrl = "\(baseUrl)m=\(method)"
         
-        guard let mediaEntry = self.mediaEntry else {
-            PKLog.error("send analytics failed due to nil mediaEntry")
-            return nil
-        }
-        
         guard let requestBuilder: RequestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
-                                                                          initObj: initObj,
-                                                                          eventType: type.rawValue,
-                                                                          currentTime: self.player.currentTime.toInt32(),
-                                                                          assetId: mediaEntry.id,
-                                                                          fileId: fileId) else {
+                                                                                    initObj: initObj,
+                                                                                    eventType: type.rawValue,
+                                                                                    currentTime: self.player.currentTime.toInt32(),
+                                                                                    assetId: mediaEntry.id,
+                                                                                    fileId: fileId) else {
             return nil
         }
         
@@ -54,11 +55,8 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
             PKLog.trace("Response: \(response)")
             if response.statusCode == 0 {
                 PKLog.trace("\(response.data)")
-                if let data : [String: Any] = response.data as! [String : Any]? {
-                    if let result = data["concurrent"] as! [String: Any]? {
-                        self.reportConcurrencyEvent()
-                    }
-                }
+                guard let data = response.data as? String, data.lowercased() == "concurrent" else { return }
+                self.reportConcurrencyEvent()
             }
         }
         

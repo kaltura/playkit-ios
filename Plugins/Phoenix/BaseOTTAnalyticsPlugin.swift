@@ -9,7 +9,7 @@
 import Foundation
 
 /// class `BaseOTTAnalyticsPlugin` is a base plugin object used for OTT analytics plugin subclasses
-public class BaseOTTAnalyticsPlugin: KalturaOTTAnalyticsPluginProtocol, AppStateObservable {
+public class BaseOTTAnalyticsPlugin: OTTAnalyticsPluginProtocol, AppStateObservable {
     
     /// abstract implementation subclasses will have names
     public class var pluginName: String {
@@ -41,13 +41,13 @@ public class BaseOTTAnalyticsPlugin: KalturaOTTAnalyticsPluginProtocol, AppState
     }
     
     public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
+        PKLog.info("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
         self.mediaEntry = mediaConfig.mediaEntry
         AppStateSubject.shared.add(observer: self)
     }
     
     public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
+        PKLog.info("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
         self.mediaEntry = mediaConfig.mediaEntry
         AppStateSubject.shared.add(observer: self)
     }
@@ -66,7 +66,7 @@ public class BaseOTTAnalyticsPlugin: KalturaOTTAnalyticsPluginProtocol, AppState
     var observations: Set<NotificationObservation> {
         return [
             NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
-                PKLog.trace("plugin: \(self) will terminate event received, sending analytics stop event")
+                PKLog.debug("plugin: \(self) will terminate event received, sending analytics stop event")
                 self.destroy()
             }
         ]
@@ -92,7 +92,7 @@ public class BaseOTTAnalyticsPlugin: KalturaOTTAnalyticsPluginProtocol, AppState
     /************************************************************/
     
     func sendAnalyticsEvent(ofType type: OTTAnalyticsEventType) {
-        PKLog.trace("Event type: \(type)")
+        PKLog.debug("Event type: \(type)")
         if let request = self.buildRequest(ofType: type) {
             self.send(request: request)
         }
@@ -107,7 +107,7 @@ public class BaseOTTAnalyticsPlugin: KalturaOTTAnalyticsPluginProtocol, AppState
     }
     
     func registerEvents() {
-        PKLog.trace("Register to all player events")
+        PKLog.debug("plugin \(type(of:self)) register to all player events")
         
         self.playerEventsToRegister.forEach { event in
             PKLog.debug("Register event: \(event.self)")
@@ -115,28 +115,35 @@ public class BaseOTTAnalyticsPlugin: KalturaOTTAnalyticsPluginProtocol, AppState
             switch event {
             case let e where e.self == PlayerEvent.ended:
                 self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { event in
-                    PKLog.trace("ended info: \(event)")
+                    PKLog.debug("ended info: \(event)")
                     self.stopTimer()
                     self.sendAnalyticsEvent(ofType: .finish)
                 })
             case let e where e.self == PlayerEvent.error:
                 self.messageBus.addObserver(self, events: [PlayerEvent.error], block: { event in
-                    PKLog.trace("error info: \(event)")
+                    PKLog.debug("error info: \(event)")
                     self.sendAnalyticsEvent(ofType: .error)
                 })
             case let e where e.self == PlayerEvent.pause:
                 self.messageBus.addObserver(self, events: [PlayerEvent.pause], block: { event in
-                    PKLog.trace("pause info: \(event)")
+                    PKLog.debug("pause info: \(event)")
+                    // invalidate timer when receiving pause event only after first play
+                    // and set intervalOn to false in order to start timer again on play event.
+                    if !self.isFirstPlay {
+                        self.stopTimer()
+                        self.intervalOn = false
+                    }
+                    
                     self.sendAnalyticsEvent(ofType: .pause)
                 })
             case let e where e.self == PlayerEvent.loadedMetadata:
                 self.messageBus.addObserver(self, events: [PlayerEvent.loadedMetadata], block: { event in
-                    PKLog.trace("loadedMetadata info: \(event)")
+                    PKLog.debug("loadedMetadata info: \(event)")
                     self.sendAnalyticsEvent(ofType: .load)
                 })
             case let e where e.self == PlayerEvent.playing:
                 self.messageBus.addObserver(self, events: [PlayerEvent.playing], block: { event in
-                    PKLog.trace("play info: \(event)")
+                    PKLog.debug("play info: \(event)")
                     
                     if !self.intervalOn {
                         self.createTimer()
@@ -150,7 +157,7 @@ public class BaseOTTAnalyticsPlugin: KalturaOTTAnalyticsPluginProtocol, AppState
                         self.sendAnalyticsEvent(ofType: .play);
                     }
                 })
-            default: assertionFailure("all events must be handled")
+            default: assertionFailure("plugin \(type(of:self)) all events must be handled")
             }
         }
     }
@@ -160,7 +167,7 @@ public class BaseOTTAnalyticsPlugin: KalturaOTTAnalyticsPluginProtocol, AppState
     /************************************************************/
     
     func reportConcurrencyEvent() {
-        self.messageBus.post(OttEvent.OttEventConcurrency())
+        self.messageBus.post(OttEvent.Concurrency())
     }
 }
 
@@ -179,17 +186,12 @@ extension BaseOTTAnalyticsPlugin {
             t.invalidate()
         }
         
+        // media hit should fire on every time we start the timer.
+        self.sendProgressEvent()
+        
         self.timer = Timer.every(self.interval) { [unowned self] in
-            PKLog.trace("timerHit")
-            
-            self.sendAnalyticsEvent(ofType: .hit);
-            
-            let progress = Float(self.player.currentTime) / Float(self.player.duration)
-            PKLog.trace("Progress is \(progress)")
-            
-            if progress > 0.98 {
-                self.sendAnalyticsEvent(ofType: .finish)
-            }
+            PKLog.debug("timerHit")
+            self.sendProgressEvent()
         }
     }
     
@@ -198,8 +200,18 @@ extension BaseOTTAnalyticsPlugin {
             t.invalidate()
         }
     }
+    
+    fileprivate func sendProgressEvent() {
+        self.sendAnalyticsEvent(ofType: .hit);
+        
+        let progress = Float(self.player.currentTime) / Float(self.player.duration)
+        PKLog.debug("Progress is \(progress)")
+        
+        if progress > 0.98 {
+            self.sendAnalyticsEvent(ofType: .finish)
+        }
+    }
 }
-
 
 
 

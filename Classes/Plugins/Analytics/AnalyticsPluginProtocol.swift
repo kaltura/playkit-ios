@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol KalturaAnalyticsPluginProtocol: PKPlugin {
+protocol AnalyticsPluginProtocol: PKPlugin {
     
     unowned var player: Player { get set }
     unowned var messageBus: MessageBus { get set }

@@ -21,7 +21,7 @@ enum OTTAnalyticsEventType: String {
     case error
 }
 
-protocol KalturaOTTAnalyticsPluginProtocol: KalturaAnalyticsPluginProtocol {
+protocol OTTAnalyticsPluginProtocol: AnalyticsPluginProtocol {
     
     var isFirstPlay: Bool { get set }
     var intervalOn: Bool { get set }

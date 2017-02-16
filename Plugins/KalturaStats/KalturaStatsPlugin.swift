@@ -6,7 +6,7 @@
 //
 //
 
-public class KalturaStatsPlugin: KalturaAnalyticsPluginProtocol {
+public class KalturaStatsPlugin: AnalyticsPluginProtocol {
 
     enum KStatsEventType : Int {
         case WIDGET_LOADED = 1
