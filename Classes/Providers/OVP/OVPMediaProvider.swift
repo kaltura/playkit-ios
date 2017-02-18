@@ -38,6 +38,11 @@ public class OVPMediaProvider: MediaEntryProvider {
     
     
     public init(){}
+    
+    public init(_ sessionProvider: SessionProvider) {
+        self.set(sessionProvider: sessionProvider)
+    }
+    
     /**
      session provider - which resposible for the ks, prtner id, and base server url
      */
