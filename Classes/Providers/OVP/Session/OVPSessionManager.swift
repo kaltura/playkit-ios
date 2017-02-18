@@ -75,7 +75,7 @@ public class OVPSessionManager: SessionProvider {
             }
             else{
                 
-                self.startAnonymouseSession(completion: { (e:Error?) in
+                self.startAnonymousSession(completion: { (e:Error?) in
                     self.ensureKSAfterRefresh(e: e, completion: completion)
                 })
             }
@@ -97,10 +97,7 @@ public class OVPSessionManager: SessionProvider {
     }
     
     
-
-    
-    // FIXME: Anonymous, no e
-    public func startAnonymouseSession(completion:@escaping (_ error:Error?)->Void) -> Void {
+    public func startAnonymousSession(completion:@escaping (_ error:Error?)->Void) -> Void {
         
         let loginRequestBuilder = OVPSessionService.startWidgetSession(baseURL: self.fullServerPath,
                                                                        partnerId: self.partnerId)?

@@ -99,7 +99,7 @@ public class OTTSessionManager: SessionProvider {
         }
     }
     
-    public func startAnonymouseSession(completion:@escaping (_ error:Error?)->Void) {
+    public func startAnonymousSession(completion:@escaping (_ error:Error?)->Void) {
         
         let loginRequestBuilder = OTTUserService.anonymousLogin(baseURL: self.serverURL,
                                                                 partnerId: self.partnerId)
