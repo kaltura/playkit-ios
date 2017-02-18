@@ -23,7 +23,6 @@ enum OTTAnalyticsEventType: String {
 
 protocol OTTAnalyticsPluginProtocol: AnalyticsPluginProtocol {
     
-    var isFirstPlay: Bool { get set }
     var intervalOn: Bool { get set }
     var timer: Timer? { get set }
     var interval: TimeInterval { get set }

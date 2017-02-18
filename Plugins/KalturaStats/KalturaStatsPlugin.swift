@@ -6,7 +6,7 @@
 //
 //
 
-public class KalturaStatsPlugin: AnalyticsPluginProtocol {
+public class KalturaStatsPlugin: BaseAnalyticsPlugin {
 
     enum KStatsEventType : Int {
         case WIDGET_LOADED = 1
@@ -52,14 +52,10 @@ public class KalturaStatsPlugin: AnalyticsPluginProtocol {
         case ERROR = 99
     }
     
-    unowned var player: Player
-    unowned var messageBus: MessageBus
-    var config: AnalyticsConfig?
+    public override class var pluginName: String {
+        return "KalturaStatsPlugin"
+    }
     
-    public static var pluginName: String = "KalturaStatsPlugin"
-    public weak var mediaEntry: MediaEntry?
-    
-    private var isFirstPlay = true
     private var isWidgetLoaded = false
     private var isMediaLoaded = false
     private var isBuffering = false
@@ -77,10 +73,10 @@ public class KalturaStatsPlugin: AnalyticsPluginProtocol {
     private var interval = 30
     
     /************************************************************/
-    // MARK: - KalturaAnalyticsPluginProtocol
+    // MARK: - AnalyticsPluginProtocol
     /************************************************************/
     
-    var playerEventsToRegister: [PlayerEvent.Type] {
+    override var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.ended,
             PlayerEvent.error,
@@ -93,46 +89,45 @@ public class KalturaStatsPlugin: AnalyticsPluginProtocol {
         ]
     }
     
-    func registerEvents() {
-        PKLog.trace("register player events")
+    override func registerEvents() {
+        PKLog.debug("register player events")
         
         self.playerEventsToRegister.forEach { event in
             PKLog.debug("Register event: \(event.self)")
             
             switch event {
             case let e where e.self == PlayerEvent.canPlay:
-                self.messageBus.addObserver(self, events: [PlayerEvent.canPlay], block: { [unowned self] (event) in
-                    PKLog.trace("canPlay event: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                    PKLog.debug("canPlay event: \(event)")
                     self.sendMediaLoaded()
                 })
             case let e where e.self == PlayerEvent.ended || e.self == PlayerEvent.pause || e.self == PlayerEvent.seeking:
-                let events = [PlayerEvent.ended, PlayerEvent.pause, PlayerEvent.seeking]
-                self.messageBus.addObserver(self, events: events, block: { [unowned self] (event) in
-                    PKLog.trace("event: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                    PKLog.debug("\(e.self) event: \(event)")
                 })
             case let e where e.self == PlayerEvent.seeked:
-                self.messageBus.addObserver(self, events: [PlayerEvent.seeked], block: { [unowned self] (event) in
-                    PKLog.trace("seeked event: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                    PKLog.debug("seeked event: \(event)")
                     self.hasSeeked = true
                     self.seekPercent = Float(self.player.currentTime) / Float(self.player.duration)
                     self.sendAnalyticsEvent(action: .SEEK);
                 })
             case let e where e.self == PlayerEvent.playing:
-                self.messageBus.addObserver(self, events: [PlayerEvent.playing], block: { [unowned self] (event) in
-                    PKLog.trace("play event: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                    PKLog.debug("play event: \(event)")
                     if self.isFirstPlay {
                         self.sendAnalyticsEvent(action: .PLAY)
                         self.isFirstPlay = false
                     }
                 })
             case let e where e.self == PlayerEvent.error:
-                self.messageBus.addObserver(self, events: [PlayerEvent.error], block: { [unowned self] (event) in
-                    PKLog.trace("error event: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                    PKLog.debug("error event: \(event)")
                     self.sendAnalyticsEvent(action: .ERROR)
                 })
             case let e where e.self == PlayerEvent.stateChanged:
-                self.messageBus.addObserver(self, events: [PlayerEvent.stateChanged]) { [unowned self] event in
-                    PKLog.trace("state changed event: \(event)")
+                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
+                    PKLog.debug("state changed event: \(event)")
                     if let stateChanged = event as? PlayerEvent.StateChanged {
                         switch stateChanged.newState {
                         case .idle:
@@ -175,26 +170,8 @@ public class KalturaStatsPlugin: AnalyticsPluginProtocol {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        self.player = player
-        self.messageBus = messageBus
-        if let aConfig = pluginConfig as? AnalyticsConfig {
-            self.config = aConfig
-        }
-        self.registerEvents()
-    }
-    
-    public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public func destroy() {
+    public override func destroy() {
+        super.destroy()
         if let t = self.timer {
             t.invalidate()
         }
@@ -247,7 +224,7 @@ public class KalturaStatsPlugin: AnalyticsPluginProtocol {
     
     @objc private func timerHit() {
         var progress = Float(self.player.currentTime) / Float(self.player.duration)
-        PKLog.trace("Progress is \(progress)")
+        PKLog.debug("Progress is \(progress)")
         
         if progress >= 0.25 && !playReached25 && seekPercent <= 0.25 {
             playReached25 = true
@@ -284,7 +261,7 @@ public class KalturaStatsPlugin: AnalyticsPluginProtocol {
     
     private func sendAnalyticsEvent(action: KStatsEventType) {
         
-        PKLog.trace("Action: \(action)")
+        PKLog.debug("Action: \(action)")
         
         var sessionId = ""
         var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
@@ -326,7 +303,7 @@ public class KalturaStatsPlugin: AnalyticsPluginProtocol {
         
         builder.set { (response: Response) in
             
-            PKLog.trace("Response: \(response)")
+            PKLog.debug("Response: \(response)")
             
         }
         

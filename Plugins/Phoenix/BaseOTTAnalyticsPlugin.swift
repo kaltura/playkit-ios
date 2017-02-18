@@ -9,20 +9,8 @@
 import Foundation
 
 /// class `BaseOTTAnalyticsPlugin` is a base plugin object used for OTT analytics plugin subclasses
-public class BaseOTTAnalyticsPlugin: OTTAnalyticsPluginProtocol, AppStateObservable {
+public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProtocol, AppStateObservable {
     
-    /// abstract implementation subclasses will have names
-    public class var pluginName: String {
-        fatalError("abstract property should be implemented in subclasses only")
-    }
-    
-    unowned var player: Player
-    unowned var messageBus: MessageBus
-    public weak var mediaEntry: MediaEntry?
-    
-    var config: AnalyticsConfig?
-    
-    var isFirstPlay: Bool = true
     var intervalOn: Bool = false
     var timer: Timer?
     var interval: TimeInterval = 30
@@ -31,31 +19,20 @@ public class BaseOTTAnalyticsPlugin: OTTAnalyticsPluginProtocol, AppStateObserva
     // MARK: - PKPlugin
     /************************************************************/
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        self.player = player
-        self.messageBus = messageBus
-        if let aConfig = pluginConfig as? AnalyticsConfig {
-            self.config = aConfig
-        }
-        self.registerEvents()
-    }
-    
-    public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.info("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
+    public override func onLoad(mediaConfig: MediaConfig) {
+        super.onLoad(mediaConfig: mediaConfig)
         AppStateSubject.shared.add(observer: self)
     }
     
-    public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.info("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
+    public override func onUpdateMedia(mediaConfig: MediaConfig) {
+        super.onUpdateMedia(mediaConfig: mediaConfig)
         AppStateSubject.shared.add(observer: self)
     }
     
-    public func destroy() {
+    public override func destroy() {
+        super.destroy()
         self.sendAnalyticsEvent(ofType: .stop)
         self.stopTimer()
-        self.messageBus.removeObserver(self, events: playerEventsToRegister)
         AppStateSubject.shared.remove(observer: self)
     }
     
@@ -73,11 +50,11 @@ public class BaseOTTAnalyticsPlugin: OTTAnalyticsPluginProtocol, AppStateObserva
     }
     
     /************************************************************/
-    // MARK: - KalturaAnalyticsPluginProtocol
+    // MARK: - AnalyticsPluginProtocol
     /************************************************************/
     
     /// default events to register
-    var playerEventsToRegister: [PlayerEvent.Type] {
+    override var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.ended,
             PlayerEvent.error,
@@ -87,26 +64,7 @@ public class BaseOTTAnalyticsPlugin: OTTAnalyticsPluginProtocol, AppStateObserva
         ]
     }
     
-    /************************************************************/
-    // MARK: - KalturaOTTAnalyticsPluginProtocol
-    /************************************************************/
-    
-    func sendAnalyticsEvent(ofType type: OTTAnalyticsEventType) {
-        PKLog.debug("Event type: \(type)")
-        if let request = self.buildRequest(ofType: type) {
-            self.send(request: request)
-        }
-    }
-    
-    func buildRequest(ofType type: OTTAnalyticsEventType) -> Request? {
-        fatalError("abstract method should be implemented in subclasses only")
-    }
-    
-    func send(request: Request) {
-        USRExecutor.shared.send(request: request)
-    }
-    
-    func registerEvents() {
+    override func registerEvents() {
         PKLog.debug("plugin \(type(of:self)) register to all player events")
         
         self.playerEventsToRegister.forEach { event in
@@ -114,19 +72,19 @@ public class BaseOTTAnalyticsPlugin: OTTAnalyticsPluginProtocol, AppStateObserva
             
             switch event {
             case let e where e.self == PlayerEvent.ended:
-                self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { event in
-                    PKLog.debug("ended info: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                    PKLog.debug("ended event: \(event)")
                     self.stopTimer()
                     self.sendAnalyticsEvent(ofType: .finish)
                 })
             case let e where e.self == PlayerEvent.error:
-                self.messageBus.addObserver(self, events: [PlayerEvent.error], block: { event in
-                    PKLog.debug("error info: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                    PKLog.debug("error event: \(event)")
                     self.sendAnalyticsEvent(ofType: .error)
                 })
             case let e where e.self == PlayerEvent.pause:
-                self.messageBus.addObserver(self, events: [PlayerEvent.pause], block: { event in
-                    PKLog.debug("pause info: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                    PKLog.debug("pause event: \(event)")
                     // invalidate timer when receiving pause event only after first play
                     // and set intervalOn to false in order to start timer again on play event.
                     if !self.isFirstPlay {
@@ -137,13 +95,13 @@ public class BaseOTTAnalyticsPlugin: OTTAnalyticsPluginProtocol, AppStateObserva
                     self.sendAnalyticsEvent(ofType: .pause)
                 })
             case let e where e.self == PlayerEvent.loadedMetadata:
-                self.messageBus.addObserver(self, events: [PlayerEvent.loadedMetadata], block: { event in
-                    PKLog.debug("loadedMetadata info: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                    PKLog.debug("loadedMetadata event: \(event)")
                     self.sendAnalyticsEvent(ofType: .load)
                 })
             case let e where e.self == PlayerEvent.playing:
-                self.messageBus.addObserver(self, events: [PlayerEvent.playing], block: { event in
-                    PKLog.debug("play info: \(event)")
+                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                    PKLog.debug("play event: \(event)")
                     
                     if !self.intervalOn {
                         self.createTimer()
@@ -160,6 +118,25 @@ public class BaseOTTAnalyticsPlugin: OTTAnalyticsPluginProtocol, AppStateObserva
             default: assertionFailure("plugin \(type(of:self)) all events must be handled")
             }
         }
+    }
+    
+    /************************************************************/
+    // MARK: - OTTAnalyticsPluginProtocol
+    /************************************************************/
+    
+    func sendAnalyticsEvent(ofType type: OTTAnalyticsEventType) {
+        PKLog.debug("Send analytics event of type: \(type)")
+        if let request = self.buildRequest(ofType: type) {
+            self.send(request: request)
+        }
+    }
+    
+    func buildRequest(ofType type: OTTAnalyticsEventType) -> Request? {
+        fatalError("abstract method should be implemented in subclasses only")
+    }
+    
+    func send(request: Request) {
+        USRExecutor.shared.send(request: request)
     }
     
     /************************************************************/
