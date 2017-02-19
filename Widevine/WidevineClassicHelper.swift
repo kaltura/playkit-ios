@@ -76,10 +76,12 @@ import Foundation
         }
         
         static func playAsset(_ assetUri: String!, withLicenseUri licenseUri: String!, readyToPlay block: PlayKitWV.KCDMReadyToPlayBlock!) {
+            PKLog.info("playAsset")
             WidevineClassicCDM.playAsset(assetUri, withLicenseUri: licenseUri, readyToPlay: block)
         }
         
         static func playLocalAsset(_ assetUri: String!, readyToPlay block: PlayKitWV.KCDMReadyToPlayBlock!) {
+            PKLog.info("playLocalAsset")
             WidevineClassicCDM.playLocalAsset(assetUri, readyToPlay: block)
         }
     }
