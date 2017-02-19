@@ -132,10 +132,28 @@ public class LocalAssetsManager: NSObject {
     }
     
     /// Notifies the SDK that downloading of an asset has finished.
-    public func assetDownloadFinished(location: URL, mediaSource: MediaSource) {
+    public func assetDownloadFinished(location: URL, mediaSource: MediaSource,refresh: Bool, callback: @escaping (Error?) -> Void) {
         // FairPlay -- nothing to do
+
+        // Widevine
+        if mediaSource.fileExt == "wvm" {
+            guard let drmData = mediaSource.drmData, let mediaEntry = drmData.first, let licenseUri = mediaEntry.licenseUri  else {
+                // TODO:: error handling
+                PKLog.error("One of your items is nil")
+                return
+            }
+            
+            WidevineClassicHelper.registerLocalAsset(location.absoluteString, licenseUri: licenseUri.absoluteString, refresh:refresh, callback: callback)
+        }
+    }
+    
+    public func unregisterAsset(_ assetUri: String!, callback: @escaping (Error?) -> Void) {
+        // TODO FairPlay
         
-        // Widevine: TODO
+        // Widevine
+        if assetUri.hasSuffix("wvm") {
+            WidevineClassicHelper.unregisterAsset(assetUri, callback: callback)
+        }
     }
     
     private class NullStore: LocalDataStore {
