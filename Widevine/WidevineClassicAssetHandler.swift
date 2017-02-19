@@ -9,10 +9,6 @@
 import Foundation
 import AVFoundation
 
-#if WIDEVINE_ENABLED
-import PlayKitWV
-#endif
-
 class WidevineClassicAssetHandler: AssetHandler {
     
     static let sourceFilter = { (_ src: MediaSource) -> Bool in
@@ -45,6 +41,26 @@ class WidevineClassicAssetHandler: AssetHandler {
             return
         }
         
+        if let localSource = mediaSource as? LocalMediaSource {
+            PKLog.debug("Creating local asset")
+            let asset = AVURLAsset(url: contentUrl)
+
+            WidevineClassicHelper.playLocalAsset(localSource.contentUrl?.absoluteString) { (_ playbackURL:String?) in
+                guard let playbackURL = playbackURL else {
+                    PKLog.error("Invalid media: no url")
+                    readyCallback(AssetError.invalidContentUrl(nil), nil)
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    PKLog.debug("widevine classic:: callback url:\(playbackURL)")
+                    readyCallback(nil, AVURLAsset(url: URL(string: playbackURL)!))
+                }
+            }
+            
+            return
+        }
+        
         guard let drmData = mediaSource.drmData?.first else {
             PKLog.error("Invalid drm data")
             readyCallback(AssetError.noPlayableSources, nil)
@@ -59,8 +75,7 @@ class WidevineClassicAssetHandler: AssetHandler {
         
         PKLog.trace("playAsset:: url: \(contentUrl.absoluteString), uri: \(licenseUri.absoluteString)")
        
-        #if WIDEVINE_ENABLED
-        WidevineClassicCDM.playAsset(contentUrl.absoluteString, withLicenseUri: licenseUri.absoluteString) {  (_ playbackURL:String?)->Void  in
+        WidevineClassicHelper.playAsset(contentUrl.absoluteString, withLicenseUri: licenseUri.absoluteString) {  (_ playbackURL:String?)->Void  in
             
             guard let playbackURL = playbackURL else {
                 PKLog.error("Invalid media: no url")
@@ -73,7 +88,6 @@ class WidevineClassicAssetHandler: AssetHandler {
                 readyCallback(nil, AVURLAsset(url: URL(string: playbackURL)!))
             }
         }
-        #endif
     }
 
     required init() {}
