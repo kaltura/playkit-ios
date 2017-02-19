@@ -14,9 +14,6 @@ public protocol SessionProvider {
     var partnerId: Int64 { get }
     
     func loadKS(completion: @escaping (_ result :Result<String>) -> Void)
-    
-    
-    
 }
 
 

@@ -122,7 +122,7 @@ class AssetLoaderDelegate: NSObject {
                 PKLog.debug("Got response in \(endTime-startTime) sec")
                 let ckc = try self.parseServerResponse(data: data, error: error)
                 callback(Result(data: ckc))
-            } catch let e as Error {
+            } catch let e {
                 callback(Result(error: e))
             }
         })
