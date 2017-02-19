@@ -22,42 +22,47 @@ class PlayerLoader: PlayerDecoratorBase {
     var loadedPlugins = Dictionary<String, LoadedPlugin>()
     var messageBus = MessageBus()
     
-    func load(_ config: PlayerConfig) {
+    func load(pluginConfig: PluginConfig?) {
         var playerController: PlayerController
         
-        if config.mediaEntry != nil {
-            playerController = PlayerController(mediaEntry: config)
-            playerController.onEventBlock = { (event:PKEvent) in
-                self.messageBus.post(event)
-            }
-            
-            // TODO::
-            // add event listener on player controller
-            
-            var player: Player = playerController
-            
-            if let plugins = config.plugins {
-                for pluginName in plugins.keys {
-                    if let pluginObject = PlayKitManager.sharedInstance.createPlugin(name: pluginName) {
-                        // TODO::
-                        // send message bus
-                        var decorator: PlayerDecoratorBase? = nil
-                        
-                        pluginObject.load(player: player, mediaConfig: config.mediaEntry!, pluginConfig: plugins[pluginName], messageBus: self.messageBus)
-                        
-                        if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
-                            d.setPlayer(player)
-                            decorator = d
-                            player = d
-                        }
-                        
-                        loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
+        playerController = PlayerController()
+        playerController.onEventBlock = { [unowned self] event in
+            self.messageBus.post(event)
+        }
+        
+        // TODO::
+        // add event listener on player controller
+        
+        var player: Player = playerController
+        
+        if let pluginConfigs = pluginConfig?.config {
+            for pluginName in pluginConfigs.keys {
+                let pluginConfig = pluginConfigs[pluginName]
+                if let pluginObject = PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus) {
+                    // TODO::
+                    // send message bus
+                    var decorator: PlayerDecoratorBase? = nil
+                    
+                    if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
+                        d.setPlayer(player)
+                        decorator = d
+                        player = d
                     }
+                    
+                    loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
                 }
             }
-            setPlayer(player)
-            playerController.prepare(config)
         }
+        setPlayer(player)
+    }
+    
+    override func prepare(_ config: MediaConfig) {
+        // update all loaded plugins with media config
+        for (pluginName, loadedPlugin) in loadedPlugins {
+            PKLog.trace("Preparing plugin", pluginName)
+            loadedPlugin.plugin.onLoad(mediaConfig: config)
+        }
+        super.prepare(config)
     }
     
     func destroyPlayer() {
@@ -89,7 +94,7 @@ class PlayerLoader: PlayerDecoratorBase {
         self.destroyPlayer()
     }
     
-    public override func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
+    public override func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void) {
         // TODO:: finilizing + object validation
         messageBus.addObserver(observer, events: events, block: block)
     }
@@ -98,4 +103,5 @@ class PlayerLoader: PlayerDecoratorBase {
         // TODO:: finilizing + object validation
         messageBus.removeObserver(observer, events: events)
     }
+    
 }

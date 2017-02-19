@@ -15,40 +15,46 @@ import AVKit
 
 class YouboraManager: YBPluginGeneric {
 
-    private var pkPlayer: Player!
-    private var mediaEntry: MediaEntry!
+    private weak var pkPlayer: Player?
+    weak var mediaEntry: MediaEntry?
     public var currentBitrate: Double?
     
-    init!(options: NSObject!, player: Player, media: MediaEntry) {
+    // for some reason we must implement the initializer this way because the way youbora implemented the init.
+    // this means player and media entry are defined as optionals but they must have values when initialized.
+    // All the checks for optionals in this class are just because we defined them as optionals but they are not so the checks are irrelevant.
+    init!(options: NSObject!, player: Player, mediaEntry: MediaEntry) {
         super.init(options: options)
         self.pkPlayer = player
-        self.mediaEntry = media
+        self.mediaEntry = mediaEntry
     }
     
-    override init() {
+    private override init() {
         super.init()
     }
     
-    //MARK: Override methods
-    override func getMediaDuration() -> NSNumber! {
-        return pkPlayer.duration as NSNumber!
+    /************************************************************/
+    // MARK: - Overrides
+    /************************************************************/
+    
+    override func getMediaDuration() -> NSNumber {
+        return NSNumber(value: pkPlayer?.duration ?? 0)
     }
     
-    override func getResource() -> String! {
+    override func getResource() -> String {
         PKLog.trace("Resource")
-        return self.mediaEntry.id
+        return self.mediaEntry?.id ?? ""
     }
     
-    override func getPlayhead() -> NSNumber! {
-        let currentTIme = self.pkPlayer.currentTime
-        return currentTIme as NSNumber!
+    override func getPlayhead() -> NSNumber {
+        let currentTIme = self.pkPlayer?.currentTime ?? 0
+        return NSNumber(value: currentTIme)
     }
     
-    override func getPlayerVersion() -> String! {
-        return "PlayKit-0.1.0"
+    override func getPlayerVersion() -> String {
+        return "PlayKit-\(PlayKitManager.versionString)"
     }
     
-    override func getBitrate() -> NSNumber! {
+    override func getBitrate() -> NSNumber {
         if let bitrate = currentBitrate {
             return NSNumber(value: bitrate)
         }

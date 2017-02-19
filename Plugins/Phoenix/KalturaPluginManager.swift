@@ -8,7 +8,7 @@
 
 import UIKit
 
-internal enum PhoenixAnalyticsType: String {
+enum PhoenixAnalyticsType: String {
     case hit
     case play
     case stop
@@ -25,12 +25,12 @@ protocol KalturaPluginManagerDelegate {
     func pluginManagerDidSendAnalyticsEvent(action: PhoenixAnalyticsType)
 }
 
-internal class KalturaPluginManager {
+final class KalturaPluginManager {
 
     public var delegate: KalturaPluginManagerDelegate?
     
-    private var player: Player?
-    private var messageBus: MessageBus?
+    private unowned var player: Player
+    private unowned var messageBus: MessageBus
     private var config: AnalyticsConfig?
     
     private var isFirstPlay = true
@@ -39,16 +39,18 @@ internal class KalturaPluginManager {
     private var timer: Timer?
     private var interval = 30 //Should be provided in plugin config
     
-    public func load(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+    init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+        self.player = player
         self.messageBus = messageBus
-        
+        self.load(pluginConfig: pluginConfig)
+    }
+    
+    func load(pluginConfig: Any?) {
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
-            self.player = player
         }
-        
-        registerToAllEvents()
-
+        self.registerToAllEvents()
+        AppStateSubject.sharedInstance.add(observer: self)
     }
     
     public func destroy() {
@@ -58,30 +60,37 @@ internal class KalturaPluginManager {
     }
     
     func registerToAllEvents() {
-        
-        
-        self.messageBus?.addObserver(self, events: [PlayerEvents.ended.self], block: { (info) in
+        PKLog.trace("Register to all events")
+
+        self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (info) in
             PKLog.trace("ended info: \(info)")
             self.stopTimer()
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.error.self], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.error], block: { (info) in
             PKLog.trace("error info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .error)
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (info) in
             PKLog.trace("pause info: \(info)")
+            // invalidate timer when receiving pause event only after first play
+            // and set intervalOn to false in order to start timer again on play event.
+            if !self.isFirstPlay {
+                self.stopTimer()
+                self.intervalOn = false
+            }
+            
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .pause)
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.loadedMetadata.self], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.loadedMetadata], block: { (info) in
             PKLog.trace("loadedMetadata info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .load)
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.loadedMetadata.self], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.playing], block: { (info) in
             PKLog.trace("play info: \(info)")
             
             if !self.intervalOn {
@@ -95,11 +104,16 @@ internal class KalturaPluginManager {
             } else {
                 self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .play);
             }
-            
-            
         })
-        
     }
+    
+    public func reportConcurrencyEvent() {
+        self.messageBus.post(OttEvent.Concurrency())
+    }
+    
+    /************************************************************/
+    // MARK: - Private Implementation
+    /************************************************************/
     
     private func createTimer() {
         
@@ -111,23 +125,26 @@ internal class KalturaPluginManager {
             t.invalidate()
         }
         
+        // media hit should fire on every time we start the timer.
+        self.sendProgressEvent()
+        
         self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.interval), target: self, selector: #selector(KalturaPluginManager.timerHit), userInfo: nil, repeats: true)
         
     }
     
     @objc private func timerHit() {
-        
         PKLog.trace("timerHit")
-        
+        self.sendProgressEvent()
+    }
+    
+    private func sendProgressEvent() {
         self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .hit);
         
-        if let player = self.player {
-            var progress = Float(player.currentTime) / Float(player.duration)
-            PKLog.trace("Progress is \(progress)")
-            
-            if progress > 0.98 {
-                self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
-            }
+        var progress = Float(player.currentTime) / Float(player.duration)
+        PKLog.trace("Progress is \(progress)")
+        
+        if progress > 0.98 {
+            self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
         }
     }
     
@@ -136,8 +153,22 @@ internal class KalturaPluginManager {
             t.invalidate()
         }
     }
+}
+
+/************************************************************/
+// MARK: - App State Handling
+/************************************************************/
+
+extension KalturaPluginManager: AppStateObservable {
     
-    public func reportConcurrencyEvent() {
-        self.messageBus?.post(OttEvent.OttEventConcurrency())
+    var observations: Set<NotificationObservation> {
+        return [
+            NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
+                guard let delegate = self.delegate else { return }
+                PKLog.trace("plugin: \(delegate) will terminate event received, sending analytics stop event")
+                self.destroy()
+                AppStateSubject.sharedInstance.remove(observer: self)
+            }
+        ]
     }
 }

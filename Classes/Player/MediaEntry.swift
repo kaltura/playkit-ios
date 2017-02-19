@@ -22,6 +22,7 @@ public class MediaEntry: NSObject {
     public var sources: [MediaSource]?
     public var duration: Int64?
     public var mediaType: MediaType?
+    public var metadata:[String:String]?
     
     private let idKey = "id"
     private let sourcesKey = "sources"
@@ -63,7 +64,7 @@ public class MediaEntry: NSObject {
     }
     
     override public var description: String {
-        get{
+        get {
             return "id : \(self.id), sources: \(self.sources)"
         }
     }
@@ -119,11 +120,12 @@ public class MediaSource: NSObject {
         self.init(id, contentUrl: nil)
     }
     
-    public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil) {
+    public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil, sourceType: SourceType? = nil) {
         self.id = id
         self.contentUrl = contentUrl
         self.mimeType = mimeType
         self.drmData = drmData
+        self.sourceType = sourceType
     }
     
     public init(json: Any) {
@@ -132,7 +134,7 @@ public class MediaSource: NSObject {
         
         self.id = sj[idKey].string ?? UUID().uuidString
         
-        self.contentUrl = sj[contentUrlKey].URL
+        self.contentUrl = sj[contentUrlKey].url
         
         self.mimeType = sj[mimeTypeKey].string
         
@@ -148,7 +150,7 @@ public class MediaSource: NSObject {
     }
     
     override public var description: String {
-        get{
+        get {
             return "id : \(self.id), url: \(self.contentUrl)"
         }
     }

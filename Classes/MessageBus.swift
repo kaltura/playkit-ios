@@ -10,14 +10,14 @@ import Foundation
 
 private struct Observation {
     weak var observer: AnyObject?
-    let block: (_ info: Any)->Void
+    let block: (PKEvent)->Void
 }
 
 public class MessageBus: NSObject {
-    private var observations = [String: [Observation]]()
+    private var observations = [String : [Observation]]()
     private let lock: AnyObject = UUID().uuidString as AnyObject
     
-    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (_ info: Any)->Void) {
+    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void) {
         sync {
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
@@ -26,6 +26,7 @@ public class MessageBus: NSObject {
                 if array == nil {
                     array = []
                 }
+                
                 array!.append(Observation(observer: observer, block: block))
                 observations[typeId] = array
             }
@@ -36,6 +37,7 @@ public class MessageBus: NSObject {
         sync {
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
+                
                 if let array = observations[typeId] {
                     observations[typeId] = array.filter { $0.observer! !== observer }
                 } else {
@@ -46,12 +48,12 @@ public class MessageBus: NSObject {
     }
     
     public func post(_ event: PKEvent) {
-        let typeId = NSStringFromClass(type(of:event))
-        sync {
+        DispatchQueue.main.async { [weak self] in
+            let typeId = NSStringFromClass(type(of:event))
             // TODO: remove nil observers
-            if let array = observations[typeId] {
+            if let array = self?.observations[typeId] {
                 array.forEach {
-                    if $0.observer != nil {
+                    if $0.self.observer != nil {
                         $0.block(event)
                     }
                 }

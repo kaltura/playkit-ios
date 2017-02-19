@@ -61,11 +61,11 @@ public class PlayerDecoratorBase: NSObject, Player {
         }
     }
     
-    public func prepare(_ config: PlayerConfig) {
+    public func prepare(_ config: MediaConfig) {
         return self.player.prepare(config)
     }
 
-    public func prepareNext(_ config: PlayerConfig) -> Bool {
+    public func prepareNext(_ config: MediaConfig) -> Bool {
         return self.player.prepareNext(config)
     }
     
@@ -106,7 +106,7 @@ public class PlayerDecoratorBase: NSObject, Player {
         return self.player.createPiPController(with: delegate)
     }
     
-    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (Any) -> Void) {
+    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
         //Assert.shouldNeverHappen();
     }
     

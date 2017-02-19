@@ -8,50 +8,53 @@
 
 import Foundation
 
-public class PlayerConfig: NSObject {
-    public var mediaEntry : MediaEntry?
-    public var startTime : TimeInterval = 0
-    public var allowPlayerEngineExpose = false
-    public var subtitleLanguage: String?
-    public var audioLanguage: String?
-    public var plugins: [String : AnyObject?]?
+/// A `MediaConfig` object defines behavior and info to use when preparing a `Player` object.
+public class MediaConfig: NSObject {
+    public var mediaEntry: MediaEntry
+    public var startTime: TimeInterval = 0
     
-    // Builders
-    @discardableResult
-    public func set(mediaEntry: MediaEntry) -> Self {
+    override public var description: String {
+        return "Media config, mediaEntry: \(self.mediaEntry)\nstartTime: \(self.startTime)"
+    }
+    
+    public init(mediaEntry: MediaEntry, startTime: TimeInterval = 0) {
         self.mediaEntry = mediaEntry
-        return self
-    }
-       
-    @discardableResult
-    public func set(allowPlayerEngineExpose: Bool) -> Self {
-        self.allowPlayerEngineExpose = allowPlayerEngineExpose
-        return self
-    }
-    
-    @discardableResult 
-    public func set(startTime: TimeInterval) -> Self {
         self.startTime = startTime
-        return self
     }
     
-    @discardableResult 
-    public func set(subtitleLanguage: String) -> Self {
-        self.subtitleLanguage = subtitleLanguage
-        return self
-    } 
-    
-    @discardableResult 
-    public func set(audioLanguage: String) -> Self {
-        self.audioLanguage = audioLanguage
-        return self
+    public static func config(mediaEntry: MediaEntry) -> MediaConfig {
+        return MediaConfig.init(mediaEntry: mediaEntry)
     }
     
-    @discardableResult
-    public func set(plugins: [String : AnyObject?]) -> Self {
-        self.plugins = plugins
-        return self
+    public static func config(mediaEntry: MediaEntry, startTime: TimeInterval) -> MediaConfig {
+        return MediaConfig.init(mediaEntry: mediaEntry, startTime: startTime)
+    }
+    
+    /// Private init.
+    private override init() {
+        fatalError("Private initializer, use `init(mediaEntry:startTime:)`")
     }
 }
+
+/// A `PluginConfig` object defines config to use when loading a plugin object.
+public class PluginConfig: NSObject {
+    /// Plugins config dictionary holds [plugin name : plugin config]
+    @objc public var config: [String : Any]
+    
+    override public var description: String {
+        return "Plugin config:\n\(self.config)"
+    }
+    
+    public init(config: [String : Any]) {
+        self.config = config
+    }
+    
+    /// Private init.
+    private override init() {
+        fatalError("Private initializer, use `init(config:)`")
+    }
+}
+
+
 
 

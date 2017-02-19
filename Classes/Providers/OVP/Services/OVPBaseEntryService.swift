@@ -25,6 +25,19 @@ class OVPBaseEntryService {
             return nil
         }
     }
+    
+    internal static func metadata(baseURL: String, ks: String,entryID: String) -> KalturaRequestBuilder? {
+        
+        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "metadata_metadata", action: "list") {
+            request.setBody(key: "ks", value: JSON(ks))
+                .setBody(key: "filter:objectType", value: JSON("KalturaMetadataFilter"))
+                .setBody(key: "filter:objectIdEqual", value: JSON(entryID))
+                .setBody(key: "filter:metadataObjectTypeEqual", value: JSON("1"))
+            return request
+        }else{
+            return nil
+        }
+    }
 
     internal static func getContextData(baseURL: String, ks: String,entryID: String) -> KalturaRequestBuilder? {
         

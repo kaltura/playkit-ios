@@ -13,10 +13,9 @@ public class KalturaLiveStatsPlugin: PKPlugin {
         case DVR = 2
     }
     
-    private var player: Player!
-    private var messageBus: MessageBus?
-    private var config: AnalyticsConfig!
-    private var mediaEntry: MediaEntry!
+    private unowned var player: Player
+    private unowned var messageBus: MessageBus
+    private var config: AnalyticsConfig?
     
     public static var pluginName: String = "KalturaLiveStats"
     
@@ -34,22 +33,29 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     private var timer: Timer?
     private var interval = 10
     
-    required public init() {
-        
-    }
+    /************************************************************/
+    // MARK: - PKPlugin
+    /************************************************************/
     
-    public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
-        
+    public weak var mediaEntry: MediaEntry?
+    
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+        self.player = player
         self.messageBus = messageBus
-        self.mediaEntry = mediaConfig
-        
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
-            self.player = player
         }
-        
-        registerToAllEvents()
-        
+        self.registerToAllEvents()
+    }
+    
+    public func onLoad(mediaConfig: MediaConfig) {
+        PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
+        self.mediaEntry = mediaConfig.mediaEntry
+    }
+    
+    public func onUpdateMedia(mediaConfig: MediaConfig) {
+        PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
+        self.mediaEntry = mediaConfig.mediaEntry
     }
     
     public func destroy() {
@@ -59,51 +65,50 @@ public class KalturaLiveStatsPlugin: PKPlugin {
         }
     }
     
+    /************************************************************/
+    // MARK: - Private
+    /************************************************************/
+    
     private func registerToAllEvents() {
         
         PKLog.trace("registerToAllEvents")
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.play.self], block: { (info) in
-            PKLog.trace("play info: \(info)")
+        self.messageBus.addObserver(self, events: [PlayerEvent.play], block: { (event) in
+            PKLog.trace("play info: \(event)")
             self.lastReportedStartTime = self.player.currentTime.toInt32()
             self.startLiveEvents()
         })
                 
-        self.messageBus?.addObserver(self, events: [PlayerEvents.pause.self], block: { (info) in
-            PKLog.trace("pause info: \(info)")
+        self.messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (event) in
+            PKLog.trace("pause info: \(event)")
             self.stopLiveEvents()
         })
         
-        self.messageBus?.addObserver(self, events: [PlayerEvents.playbackParamsUpdated.self], block: { (info) in
-            PKLog.trace("playbackParamsUpdated info: \(info)")
-            if let paramsEvent = info as? PlayerEvents.playbackParamsUpdated {
-                self.lastReportedBitrate = Int32(paramsEvent.currentBitrate)
+        self.messageBus.addObserver(self, events: [PlayerEvent.playbackParamsUpdated], block: { event in
+            PKLog.trace("playbackParamsUpdated info: \(event)")
+            if type(of: event) == PlayerEvent.playbackParamsUpdated {
+                self.lastReportedBitrate = Int32(event.currentBitrate!)
             }
         })
         
-        self.player.addObserver(self, events: [PlayerEvents.stateChanged.self]) { (data: Any) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.stateChanged]) { event in
+            PKLog.trace("playbackParamsUpdated info: \(event)")
             
-            if let stateChanged = data as? PlayerEvents.stateChanged {
-                
-                switch stateChanged.newSate {
+            if type(of: event) == PlayerEvent.stateChanged {
+                switch event.newState {
                 case .ready:
                     self.startTimer()
                     if self.isBuffering {
                         self.isBuffering = false
                         self.sendLiveEvent(theBufferTime: self.calculateBuffer(isBuffering: false))
                     }
-                    break
                 case .buffering:
                     self.isBuffering = true
                     self.bufferStartTime = Date().timeIntervalSince1970.toInt32()
-                    break
-                default:
-                    
-                    break
+                default: break
                 }
             }
         }
-
     }
     
     private func startLiveEvents() {
@@ -123,7 +128,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     
     private func createTimer() {
         
-        if let intr = self.config.params["timerInterval"] as? Int {
+        if let intr = self.config?.params["timerInterval"] as? Int {
             self.interval = intr
         }
 
@@ -172,22 +177,23 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     }
     
     private func sendLiveEvent(theBufferTime: Int32) {
-        
         PKLog.trace("sendLiveEvent - Buffer Time: \(bufferTime)")
+        
+        guard let mediaEntry = self.mediaEntry else { return }
         
         var sessionId = ""
         var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
         var parterId = ""
         
-        if let sId = self.config.params["sessionId"] as? String {
+        if let sId = self.config?.params["sessionId"] as? String {
             sessionId = sId
         }
         
-        if let url = self.config.params["baseUrl"] as? String {
+        if let url = self.config?.params["baseUrl"] as? String {
             baseUrl = url
         }
         
-        if let pId = self.config.params["partnerId"] as? Int {
+        if let pId = self.config?.params["partnerId"] as? Int {
             parterId = String(pId)
         }
         
@@ -199,7 +205,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
                                                                            bitrate: self.lastReportedBitrate,
                                                                            sessionId: sessionId,
                                                                            startTime: self.lastReportedStartTime,
-                                                                           entryId: self.mediaEntry.id,
+                                                                           entryId: mediaEntry.id,
                                                                            isLive: isLive,
                                                                            clientVer: PlayKitManager.clientTag,
                                                                            deliveryType: "hls") {
@@ -209,9 +215,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
                 PKLog.trace("Response: \(response)")
                 
             }
-            
             USRExecutor.shared.send(request: builder.build())
-            
         }
     }
 
