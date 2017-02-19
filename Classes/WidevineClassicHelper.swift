@@ -87,28 +87,26 @@ import Foundation
     }
 #else
     internal class WidevineClassicHelper {
-        static func registerLocalAsset(_ assetUri: String!, licenseUri licenseUri: String!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
-            fatalError()
+        static let fatalMsg = "PlayKitWV is not contained on Podfile"
+        
+        static func registerLocalAsset(_ assetUri: String!, licenseUri licenseUri: String!, refresh: Bool, callback: Any) {
+            fatalError(self.fatalMsg)
         }
         
-        static func unregisterAsset(_ assetUri: String!, callback: @escaping LocalAssetRegistrationBlock) {
-            fatalError()
+        static func unregisterAsset(_ assetUri: String!, callback: Any) {
+            fatalError(fatalMsg)
         }
         
-        static func checkAssetStatus(_ assetUri: String!, callback: @escaping LocalAssetStatusBlock) {
-            fatalError()
+        static func checkAssetStatus(_ assetUri: String!, callback: Any) {
+            fatalError(fatalMsg)
         }
         
-        static func playAsset(_ assetUri: String!, withLicenseUri licenseUri: String!, readyToPlay block: PlayKitWV.KCDMReadyToPlayBlock!) {
-            fatalError()
+        static func playAsset(_ assetUri: String!, withLicenseUri licenseUri: String!, readyToPlay block: Any) {
+            fatalError(fatalMsg)
         }
         
-        static func playLocalAsset(_ assetUri: String!, readyToPlay block: PlayKitWV.KCDMReadyToPlayBlock!) {
-            fatalError()
-        }
-        
-        func fatalError() {
-            fatalError("PlayKitWV is not contained on Podfile")
+        static func playLocalAsset(_ assetUri: String!, readyToPlay block: Any) {
+            fatalError(fatalMsg)
         }
     }
 #endif

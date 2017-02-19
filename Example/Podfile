@@ -28,11 +28,6 @@ post_install do |installer|
         target.build_configurations.each do |config| 
             config.build_settings['SWIFT_VERSION'] = '3.0'
             config.build_settings['ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES'] = 'NO'
-            if target.name == "PlayKit.default-IMAPlugin"
-                config.build_settings['OTHER_LDFLAGS'] = '$(inherited) -framework "GoogleInteractiveMediaAds"'
-	            config.build_settings['OTHER_SWIFT_FLAGS'] = '-DIMA_ENABLED'
-		        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)', 'IMA_ENABLED=1']
-	        end
         end 
     end 
 end
