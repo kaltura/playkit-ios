@@ -142,6 +142,7 @@ public class BasicCastBuilder: NSObject {
             throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
         }
         
+        
     }
 
     
@@ -202,24 +203,15 @@ public class BasicCastBuilder: NSObject {
     internal func flashVars() -> [String: Any]{
         
         var flashVars = [String:Any]()
-        if let proxyData =  self.proxyData() {
-            PKLog.warning("proxyData is empty")
-            flashVars["proxyData"] = proxyData
-        }
         
         if let doubleClickPlugin = self.doubleClickPlugin() {
-            PKLog.warning("doubleClickPlugin is empty")
             flashVars["doubleClick"] = doubleClickPlugin
+        }else{
+            PKLog.warning("doubleClick plugin data is empty")
         }
         
         return flashVars
     }
-    
-    internal func proxyData() ->  [String:Any]? {
-        // Can be implemented on sub classes
-        return nil
-    }
-    
     
     internal func doubleClickPlugin() -> [String:Any]? {
         

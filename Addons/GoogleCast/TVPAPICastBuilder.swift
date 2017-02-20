@@ -66,10 +66,25 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     }
     
     
+    internal override func flashVars() -> [String: Any] {
+        
+        var flashVars = super.flashVars()
+        
+        if let proxyData =  self.proxyData() {
+            flashVars["proxyData"] = proxyData
+        }else{
+            PKLog.warning("proxyData is empty")
+        }
+        
+        return flashVars
+    }
+    
+    
+    
     /**
         Adding the data relevent for the OTT
      */
-    internal override func proxyData() -> [String:Any]? {
+    internal func proxyData() -> [String:Any]? {
         
         let flavorAssets = ["filters":["include":["Format":[self.format!]]]]
         //let baseEntry  = ["vars":["isTrailer":"false"]]
