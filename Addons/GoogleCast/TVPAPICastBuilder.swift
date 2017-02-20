@@ -24,14 +24,7 @@ public class TVPAPICastBuilder: BasicCastBuilder {
 
     internal var initObject: [String:Any]!
     internal var format: String!
-    internal var isTrailer: Bool!
     
-    public override func set(streamType: StreamType?) -> Self{
-        super.set(streamType: streamType)
-        self.isTrailer = streamType == StreamType.trailer
-        
-        return self
-    }
  
     /**
      Set - initObject
@@ -79,16 +72,20 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     internal override func proxyData() -> [String:Any]? {
         
         let flavorAssets = ["filters":["include":["Format":[self.format!]]]]
+        //let baseEntry  = ["vars":["isTrailer":"false"]]
+        var config : [String : Any] = ["flavorassets":flavorAssets]
+            //,"baseentry":baseEntry]
         
-        JSONSerialization.isValidJSONObject(flavorAssets)
-        let baseEntry  = ["vars":["isTrailer":" " + String(self.isTrailer)]]
-        var proxyData : [String : Any] = ["flavorassets":flavorAssets,
-                                          "baseentry":baseEntry,
-                                          "MediaID":self.contentId!,
-                                          "iMediaID":self.contentId!]
         
+        var proxyData = ["MediaID":self.contentId!,
+                         "iMediaID":self.contentId!,
+                         "mediaType":0,
+                         "withDynamic":false] as [String : Any]
+        
+        proxyData["config"] = config
         proxyData["initObj"] = self.initObject!
         return proxyData
+
     }
 }
 

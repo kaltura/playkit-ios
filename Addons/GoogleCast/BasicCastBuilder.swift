@@ -22,7 +22,6 @@ public class BasicCastBuilder: NSObject {
     public enum StreamType {
         case live
         case vod
-        case trailer
     }
     
     enum BasicBuilderDataError: Error {
@@ -33,19 +32,16 @@ public class BasicCastBuilder: NSObject {
         case missingStreamType
     }
     
-    internal var streamType: GCKMediaStreamType!
+   
     internal var contentId: String!
     internal var webPlayerURL: String?
     internal var partnerID: String!
     internal var uiconfID: String!
     internal var adTagURL: String?
+    internal var streamType: GCKMediaStreamType!
     internal var metaData: GCKMediaMetadata?
     
-    
 
-    
-    
-    
     /**
      Set - stream type
      - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
