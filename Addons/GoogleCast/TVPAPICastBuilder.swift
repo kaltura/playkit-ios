@@ -32,6 +32,12 @@ public class TVPAPICastBuilder: BasicCastBuilder {
      */
     @discardableResult
     public func set(initObject: [String:Any]?) -> Self {
+        
+        guard initObject != nil
+            else {
+                PKLog.warning("Trying to set nil to initObject")
+                return self
+        }
         self.initObject = initObject
         return self
     }
@@ -42,6 +48,14 @@ public class TVPAPICastBuilder: BasicCastBuilder {
      */
     @discardableResult
     public func set(format: String?) -> Self {
+        
+        guard format != nil,
+            format?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to format")
+                return self
+        }
+        
         self.format = format
         return self
     }

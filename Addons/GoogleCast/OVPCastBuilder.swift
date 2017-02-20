@@ -24,6 +24,14 @@ public class OVPCastBuilder: BasicCastBuilder{
      */
     @discardableResult
     public func set(ks:String?) -> Self {
+        
+        guard ks != nil,
+            ks?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to ks")
+                return self
+        }
+        
         self.ks = ks
         return self
     }

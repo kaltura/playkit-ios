@@ -65,6 +65,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(contentId: String?) -> Self{
+        
+        guard contentId != nil,
+            contentId?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to content id")
+                return self
+        }
+        
         self.contentId = contentId
         return self
     }
@@ -75,6 +83,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(adTagURL: String?) -> Self {
+        
+        guard adTagURL != nil,
+            adTagURL?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to adTagURL")
+                return self
+        }
+        
         self.adTagURL = adTagURL
         return self
     }
@@ -85,6 +101,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(webPlayerURL: String?) -> Self {
+        
+        guard webPlayerURL != nil,
+            webPlayerURL?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to webPlayerURL")
+                return self
+        }
+        
         self.webPlayerURL = webPlayerURL
         return self
     }
@@ -97,6 +121,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(partnerID: String?) -> Self {
+        
+        guard partnerID != nil,
+            partnerID?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to partnerID")
+                return self
+        }
+        
         self.partnerID = partnerID
         return self
     }
@@ -107,6 +139,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(uiconfID: String?) -> Self {
+        
+        guard uiconfID != nil,
+            uiconfID?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to uiconfID")
+                return self
+        }
+
         self.uiconfID = uiconfID
         return self
     }
@@ -118,13 +158,18 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(metaData: GCKMediaMetadata?) -> Self{
+        
+        guard metaData != nil
+            else {
+                PKLog.warning("Trying to set nil to metaData")
+                return self
+        }
+        
         self.metaData = metaData
         return self
     }
     
     
-    
-
     func validate() throws {
         guard self.contentId != nil else {
             throw BasicCastBuilder.BasicBuilderDataError.missingContentId
