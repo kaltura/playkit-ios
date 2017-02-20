@@ -90,7 +90,7 @@ import Foundation
         static let fatalMsg = "PlayKitWV is not contained on Podfile"
         
         static func registerLocalAsset(_ assetUri: String!, licenseUri licenseUri: String!, refresh: Bool, callback: Any) {
-            fatalError(self.fatalMsg)
+            fatalError(fatalMsg)
         }
         
         static func unregisterAsset(_ assetUri: String!, callback: Any) {
