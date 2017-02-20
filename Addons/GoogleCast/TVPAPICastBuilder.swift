@@ -72,8 +72,6 @@ public class TVPAPICastBuilder: BasicCastBuilder {
         
         if let proxyData =  self.proxyData() {
             flashVars["proxyData"] = proxyData
-        }else{
-            PKLog.warning("proxyData is empty")
         }
         
         return flashVars
@@ -87,10 +85,7 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     internal func proxyData() -> [String:Any]? {
         
         let flavorAssets = ["filters":["include":["Format":[self.format!]]]]
-        //let baseEntry  = ["vars":["isTrailer":"false"]]
         var config : [String : Any] = ["flavorassets":flavorAssets]
-            //,"baseentry":baseEntry]
-        
         
         var proxyData = ["MediaID":self.contentId!,
                          "iMediaID":self.contentId!,

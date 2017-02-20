@@ -35,8 +35,8 @@ public class BasicCastBuilder: NSObject {
    
     internal var contentId: String!
     internal var webPlayerURL: String?
-    internal var partnerID: String!
-    internal var uiconfID: String!
+    internal var partnerID: String?
+    internal var uiconfID: String?
     internal var adTagURL: String?
     internal var streamType: GCKMediaStreamType!
     internal var metaData: GCKMediaMetadata?
@@ -130,14 +130,6 @@ public class BasicCastBuilder: NSObject {
             throw BasicCastBuilder.BasicBuilderDataError.missingContentId
         }
         
-        guard self.partnerID != nil else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingPartnerID
-        }
-        
-        guard self.uiconfID != nil else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingUIConfId
-        }
-        
         guard self.streamType != nil else {
             throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
         }
@@ -185,13 +177,19 @@ public class BasicCastBuilder: NSObject {
         
         var embedConfig: [String:Any] = [:]
         
+        embedConfig["entryID"] = self.contentId
+        
         if let lib = self.webPlayerURL {
           embedConfig["lib"] = lib
         }
         
-        embedConfig["publisherID"] = self.partnerID
-        embedConfig["entryID"] = self.contentId
-        embedConfig["uiconfID"] = self.uiconfID
+        if let publisherID = self.partnerID {
+           embedConfig["publisherID"] = publisherID
+        }
+        
+        if let confID = self.uiconfID{
+           embedConfig["uiconfID"] = confID
+        }
         
         let flashVars = self.flashVars()
         embedConfig["flashVars"] = flashVars
@@ -206,10 +204,7 @@ public class BasicCastBuilder: NSObject {
         
         if let doubleClickPlugin = self.doubleClickPlugin() {
             flashVars["doubleClick"] = doubleClickPlugin
-        }else{
-            PKLog.warning("doubleClick plugin data is empty")
-        }
-        
+        }        
         return flashVars
     }
     
