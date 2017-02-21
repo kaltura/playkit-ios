@@ -10,9 +10,7 @@ import UIKit
 
 public class OVPSessionManager: SessionProvider {
     
-    
     public enum SessionManagerError: Error{
-        
         case failedToGetKS
         case failedToGetLoginResponse
         case failedToRefreshKS
@@ -21,7 +19,6 @@ public class OVPSessionManager: SessionProvider {
         case noRefreshTokenOrTokenToRefresh
         case failedToParseResponse
         case ksExpired
-        
     }
     
     public var serverURL: String
@@ -73,7 +70,7 @@ public class OVPSessionManager: SessionProvider {
                                     self.ensureKSAfterRefresh(e: e, completion: completion)
                 })
             }
-            else{
+            else {
                 
                 self.startAnonymousSession(completion: { (e:Error?) in
                     self.ensureKSAfterRefresh(e: e, completion: completion)
@@ -89,20 +86,17 @@ public class OVPSessionManager: SessionProvider {
     func ensureKSAfterRefresh(e:Error?,completion: @escaping (_ result :Result<String>) -> Void) -> Void {
         if let ks = self.ks {
             completion(Result(data: ks))
-        }else if let error = e {
+        } else if let error = e {
             completion(Result(error: error))
-        }else{
+        } else {
             completion(Result(error: SessionManagerError.ksExpired))
         }
     }
     
     
-    public func startAnonymousSession(completion:@escaping (_ error:Error?)->Void) -> Void {
+    public func startAnonymousSession(completion:@escaping (_ error: Error?) -> Void) -> Void {
         
-        let loginRequestBuilder = OVPSessionService.startWidgetSession(baseURL: self.fullServerPath,
-                                                                       partnerId: self.partnerId)?
-        
-        
+        let loginRequestBuilder = OVPSessionService.startWidgetSession(baseURL: self.fullServerPath, partnerId: self.partnerId)?
             .setOVPBasicParams()
             .set(completion: { (r:Response) in
                 
@@ -126,19 +120,16 @@ public class OVPSessionManager: SessionProvider {
                 }else{
                     completion(SessionManagerError.failedToGetLoginResponse)
                 }
-                
-                
             })
-            
-            
-            if let request = loginRequestBuilder?.build() {
-                self.executor.send(request: request)
-            }
+        
+        if let request = loginRequestBuilder?.build() {
+            self.executor.send(request: request)
+        }
     }
 
 
     
-    public func startSession(username:String,password:String,completion:@escaping (_ error:Error?)->Void) -> Void {
+    public func startSession(username: String, password: String, completion: @escaping (_ error: Error?) -> Void) -> Void {
         
         self.username = username
         self.password = password
@@ -158,8 +149,7 @@ public class OVPSessionManager: SessionProvider {
                 
                 if let data = r.data
                 {
-                    do{
-                        
+                    do {
                         guard   let arrayResult = data as? [Any],
                                 arrayResult.count == 2
                         else {
@@ -171,15 +161,13 @@ public class OVPSessionManager: SessionProvider {
                         self.ks = arrayResult[0] as? String
                         self.tokenExpiration = sessionInfo?.expiry
                         completion(nil)
-                    }catch{
+                    } catch {
                         completion(error)
                     }
                     
-                }else{
+                } else {
                     completion(SessionManagerError.failedToGetLoginResponse)
                 }
-                
-                
             })
             
             

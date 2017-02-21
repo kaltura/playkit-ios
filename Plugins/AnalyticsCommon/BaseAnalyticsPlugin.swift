@@ -8,6 +8,33 @@
 
 import Foundation
 
+/// `AnalyticsError` represents analytics plugins (kaltura stats, kaltura live stats, phoenix and tvpapi) common errors.
+enum AnalyticsError: PKError {
+    
+    case missingMediaEntry
+    case missingInitObject
+    
+    static let Domain = PKErrorDomain.AnalyticsPlugin
+    
+    var code: Int {
+        switch self {
+        case .missingMediaEntry: return 3000
+        case .missingInitObject: return 3001
+        }
+    }
+    
+    var errorDescription: String {
+        switch self {
+        case .missingMediaEntry: return "failed to send analytics event, mediaEntry is nil"
+        case .missingInitObject: return "failed to send analytics event, missing initObj"
+        }
+    }
+    
+    var userInfo: [String: Any] {
+        return [:]
+    }
+}
+
 /// class `BaseAnalyticsPlugin` is a base plugin object used for analytics plugin subclasses
 public class BaseAnalyticsPlugin: AnalyticsPluginProtocol {
     
@@ -34,7 +61,7 @@ public class BaseAnalyticsPlugin: AnalyticsPluginProtocol {
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
         } else {
-            PKLog.warning("There is no Analytics Config.")
+            PKLog.error("There is no Analytics Config.")
         }
         self.registerEvents()
     }

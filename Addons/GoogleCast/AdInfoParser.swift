@@ -26,8 +26,7 @@ public class AdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
         
          guard let customData = mediaStatus.customData as? [String:Any],
             let adsInfo = customData["adsInfo"] as? [String:Any],
-            let metaData : AdsMetadata = AdsMetadata(dict: adsInfo)
-            else{
+            let metaData : AdsMetadata = AdsMetadata(dict: adsInfo) else {
                 PKLog.warning("No Ads info from receiver")
                 return false
         }
@@ -44,10 +43,9 @@ public class AdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
         guard let customData = mediaStatus.customData as? [String:Any],
             let adsInfo = customData["adsInfo"] as? [String:Any],
             let adsData : AdsMetadata = AdsMetadata(dict: adsInfo),
-            let adsBreakInfo = adsData.adsBreakInfo
-            else {
-               PKLog.warning("No Ads info from receiver")
-             return nil
+            let adsBreakInfo = adsData.adsBreakInfo else {
+                PKLog.warning("No Ads info from receiver")
+                return nil
         }
         
         let adsBreakInfoArray = adsBreakInfo.map({ GCKAdBreakInfo(playbackPosition: TimeInterval($0)) })

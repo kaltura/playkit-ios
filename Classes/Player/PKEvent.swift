@@ -66,7 +66,7 @@ extension PKEvent {
     }
     
     /// Associated error from error event, PKEvent Data Accessor
-    public var error: NSError? {
+    public var playerError: NSError? {
         return self.data?[EventDataKeys.Error] as? NSError
     }
     
@@ -75,6 +75,7 @@ extension PKEvent {
         static let MediaTime = "mediaTime"
         static let TotalTime = "totalTime"
         static let WebOpener = "webOpener"
+        static let Error = "error"
     }
     
     // MARK: Ad Data Accessors
@@ -92,5 +93,10 @@ extension PKEvent {
     /// WebOpener, PKEvent Ad Data Accessor
     public var webOpener: NSObject? {
         return self.data?[AdEventDataKeys.WebOpener] as? NSObject
+    }
+    
+    /// Associated error from error event, PKEvent Data Accessor
+    public var adError: NSError? {
+        return self.data?[AdEventDataKeys.Error] as? NSError
     }
 }

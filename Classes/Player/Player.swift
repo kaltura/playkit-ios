@@ -12,7 +12,6 @@ import AVKit
 
 @objc public protocol PlayerDelegate {
     func playerShouldPlayAd(_ player: Player) -> Bool
-    func player(_ player: Player, failedWith error: String)
 }
 
 @objc public protocol Player: NSObjectProtocol {
@@ -50,15 +49,18 @@ import AVKit
     func prepare(_ config: MediaConfig)
     
     /**
-     Convenience method for setting shouldPlayWhenReady to true.
+     send play action for the player.
      */
     func play()
     
     /**
-     Convenience method for setting shouldPlayWhenReady to false.
+     send pause action for the player.
      */
     func pause()
     
+    /**
+     send resume action for the player.
+     */
     func resume()
     
     func seek(to time: CMTime)

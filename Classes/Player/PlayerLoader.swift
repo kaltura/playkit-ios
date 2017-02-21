@@ -30,15 +30,13 @@ class PlayerLoader: PlayerDecoratorBase {
             self.messageBus.post(event)
         }
         
-        // TODO::
-        // add event listener on player controller
-        
         var player: Player = playerController
         
         if let pluginConfigs = pluginConfig?.config {
             for pluginName in pluginConfigs.keys {
                 let pluginConfig = pluginConfigs[pluginName]
-                if let pluginObject = PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus) {
+                do {
+                    let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
                     // TODO::
                     // send message bus
                     var decorator: PlayerDecoratorBase? = nil
@@ -50,6 +48,10 @@ class PlayerLoader: PlayerDecoratorBase {
                     }
                     
                     loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
+                } catch let e {
+                    if case let error = PKPluginError.failedToCreatePlugin {
+                        self.messageBus.post(PlayerEvent.Error(nsError: error.asNSError))
+                    }
                 }
             }
         }

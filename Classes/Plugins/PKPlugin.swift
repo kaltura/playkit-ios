@@ -36,3 +36,32 @@ public protocol PKPlugin: Plugin {
     func destroy()
 }
 
+/// `PKPluginError` represents plugins errors.
+enum PKPluginError: PKError {
+    
+    case failedToCreatePlugin
+    case missingPluginConfig(pluginName: String)
+    
+    static let Domain = PKErrorDomain.Plugin
+    
+    var code: Int {
+        switch self {
+        case .failedToCreatePlugin: return 2000
+        case .missingPluginConfig: return 2001
+        }
+    }
+    
+    var errorDescription: String {
+        switch self {
+        case .failedToCreatePlugin: return "failed to create plugin, doesn't exist in registry"
+        case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName)"
+        }
+    }
+    
+    var userInfo: [String: Any] {
+        switch self {
+        case .failedToCreatePlugin: return [:]
+        case .missingPluginConfig(let pluginName): return [PluginNameKey : pluginName]
+        }
+    }
+}

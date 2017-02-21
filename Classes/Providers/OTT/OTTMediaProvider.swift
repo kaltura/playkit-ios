@@ -11,14 +11,13 @@ import SwiftyJSON
 
 public class OTTMediaProvider: MediaEntryProvider {
     
-    
     var sessionProvider: SessionProvider?
     var mediaId: String?
     var type: AssetType?
     var formats: [String]?
     var executor: RequestExecutor?
     
-    public enum Err: Error {
+    public enum OTTMediaProviderError: Error {
         case invalidInputParams
         case invalidKS
         case fileIsEmptyOrNotFound
@@ -27,7 +26,6 @@ public class OTTMediaProvider: MediaEntryProvider {
         case currentlyProcessingOtherRequest
         case unableToParseObject
     }
-    
     
     public init(){
         
@@ -81,7 +79,7 @@ public class OTTMediaProvider: MediaEntryProvider {
             let mediaId = self.mediaId,
             let type = self.type
             else {
-                callback(Result(data: nil, error: Err.invalidInputParams))
+                callback(Result(data: nil, error: OTTMediaProviderError.invalidInputParams))
                 return
         }
         
@@ -108,7 +106,7 @@ public class OTTMediaProvider: MediaEntryProvider {
         loader.sessionProvider.loadKS { (r:Result<String>) in
             
             guard let ks = r.data else {
-                callback(Result(data: nil, error: Err.invalidKS))
+                callback(Result(data: nil, error: OTTMediaProviderError.invalidKS))
                 return
             }
             
@@ -117,7 +115,7 @@ public class OTTMediaProvider: MediaEntryProvider {
                 .set(completion: { (r:Response) in
                     
                     guard let data = r.data else {
-                        callback(Result(data: nil, error: Err.mediaNotFound))
+                        callback(Result(data: nil, error: OTTMediaProviderError.mediaNotFound))
                         return
                     }
                     
@@ -152,7 +150,7 @@ public class OTTMediaProvider: MediaEntryProvider {
                         
                         callback(Result(data: mediaEntry, error: nil))
                     }else{
-                        callback(Result(data: nil, error: Err.mediaNotFound))
+                        callback(Result(data: nil, error: OTTMediaProviderError.mediaNotFound))
                     }
                     
                 })

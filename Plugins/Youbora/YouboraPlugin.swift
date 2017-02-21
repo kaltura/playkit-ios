@@ -10,6 +10,32 @@ import YouboraLib
 import YouboraPluginAVPlayer
 import AVFoundation
 
+/// `YouboraPluginError` represents youbora plugin errors.
+enum YouboraPluginError: PKError {
+    
+    case failedToSetupYouboraManager
+    
+    static let Domain = PKErrorDomain.Youbora
+    
+    var code: Int {
+        switch self {
+        case .failedToSetupYouboraManager: return 3000
+        }
+    }
+    
+    var errorDescription: String {
+        switch self {
+        case .failedToSetupYouboraManager: return "failed to setup youbora manager, missing config/config params or mediaEntry"
+        }
+    }
+    
+    var userInfo: [String: Any] {
+        switch self {
+        case .failedToSetupYouboraManager: return [:]
+        }
+    }
+}
+
 public class YouboraPlugin: BaseAnalyticsPlugin {
     
     public override class var pluginName: String {
@@ -164,7 +190,8 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
             youboraManager = YouboraManager(options: config.params as NSObject!, player: player, mediaEntry: mediaEntry)
             completionHandler?(true)
         } else {
-            PKLog.warning("There is no config params or MediaEntry, could not setup youbora manager")
+            PKLog.error("config params are wrong or doesn't exist, or missing MediaEntry, could not setup youbora manager")
+            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
             completionHandler?(false)
         }
     }
