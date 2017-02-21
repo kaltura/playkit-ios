@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class AdsConfig {
+public class AdsConfig: NSObject {
     public var language: String = "en"
     public var enableBackgroundPlayback: Bool {
         get {
@@ -26,11 +26,7 @@ public class AdsConfig {
     public var tagsTimes: [TimeInterval : String]?
     public var companionView: UIView?
     public var webOpenerPresentingController: UIViewController?
-    
-    public init() {
-        
-    }
-    
+
     // Builders
     @discardableResult
     public func set(language: String) -> Self {

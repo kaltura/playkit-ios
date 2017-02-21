@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 import AVKit
 
-@objc public protocol PlayerDelegate: class {
+@objc public protocol PlayerDelegate {
     func playerShouldPlayAd(_ player: Player) -> Bool
     func player(_ player: Player, failedWith error: String)
 }
@@ -37,7 +37,7 @@ import AVKit
     /**
      Get the player's duration.
      */
-    var duration: Double { get }
+    var duration: TimeInterval { get }
     
     var currentAudioTrack: String? { get }
     
@@ -47,7 +47,7 @@ import AVKit
      Prepare for playing an entry.
      play when it's ready.
      */
-    func prepare(_ config: PlayerConfig)
+    func prepare(_ config: MediaConfig)
     
     /**
      Convenience method for setting shouldPlayWhenReady to true.
@@ -66,7 +66,7 @@ import AVKit
     /**
      Prepare for playing the next entry.      
     */
-    func prepareNext(_ config: PlayerConfig) -> Bool
+    func prepareNext(_ config: MediaConfig) -> Bool
 
     /**
      Load the entry that was prepared with prepareNext(), without waiting for the current entry to end.

@@ -128,7 +128,7 @@ public class RequestBuilder: NSObject {
     public func setParam(key: String, value:String) -> Self {
         
         if var params = self.urlParams {
-            self.urlParams![key] = value
+            params[key] = value
         }else{
             self.urlParams = [key:value]
         }

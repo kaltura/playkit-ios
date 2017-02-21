@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.1.7'
+s.version          = '0.1.x-dev'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 
 
@@ -21,9 +21,11 @@ end
 s.subspec 'IMAPlugin' do |ssp|
     ssp.source_files = 'Plugins/IMA'
     ssp.xcconfig = { 'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
+                  'OTHER_LDFLAGS' => '$(inherited) -framework "GoogleInteractiveMediaAds"',
                   'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
                   'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' }
     ssp.dependency 'PlayKit/Core'
+    ssp.dependency 'GoogleAds-IMA-iOS-SDK', '3.4.1'
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
@@ -49,7 +51,9 @@ end
 s.subspec 'WidevineClassic' do |ssp|
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKit/Core'
-  #ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1' }
+  #ssp.dependency 'PlayKitWV'
+  #ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1',
+   #                           'OTHER_SWIFT_FLAGS' => '$(inherited) -DWIDEVINE_ENABLED' }
 end
 
 s.subspec 'PhoenixPlugin' do |ssp|

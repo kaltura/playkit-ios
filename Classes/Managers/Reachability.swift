@@ -10,101 +10,6 @@ import Foundation
 import SystemConfiguration
 
 /************************************************************/
-// MARK: - ReachabilityError
-/************************************************************/
-
-/// Reachability error
-// - important: if needs to change domain/code/description please make sure to update documentation!
-enum ReachabilityError: Error {
-    /// Network connection is unreachable.
-    case unreachable
-    case unableToSetCallback
-    case unableToSetDispatchQueue
-    
-    var asNSError: NSError {
-        let userInfo = [NSLocalizedDescriptionKey : self.description]
-        switch self {
-        case .unreachable:
-            let error = NSError(domain: ErrorManager.Domain.PlayKitReachability.rawValue, code: self.code, userInfo: userInfo)
-            return error
-        case .unableToSetCallback: return NSError(domain: ErrorManager.Domain.PlayKitReachability.rawValue, code: self.code, userInfo: nil)
-        case .unableToSetDispatchQueue: return NSError(domain: ErrorManager.Domain.PlayKitReachability.rawValue, code: self.code, userInfo: nil)
-        }
-    }
-    
-    var code: Int {
-        switch self {
-        case .unreachable: return 100
-        case .unableToSetCallback: return 101
-        case .unableToSetDispatchQueue: return 102
-        }
-    }
-    
-    var description: String {
-        switch self {
-        case .unreachable: return "Network connection is unreachable"
-        case .unableToSetCallback: return "unable to set reachability callback"
-        case .unableToSetDispatchQueue: return "unable to set reachability dispatch queue"
-        }
-    }
-}
-
-/************************************************************/
-// MARK: - ReachabilityManager
-/************************************************************/
-
-class ReachabilityManager {
-    static let shared = ReachabilityManager()
-    private init() {}
-    
-    let reachability = Reachability()
-    
-    /// counts the amount of objects requested to be notified on changes.
-    /// used in order to start actual notifier once for everyone and stop once reaches zero.
-    private var count: Int = 0
-    
-    func startNotifier() throws {
-        sync {
-            count += 1
-        }
-        try self.reachability?.startNotifier()
-    }
-    
-    func stopNotifier() {
-        sync {
-            if count > 0 {
-                count -= 1
-                if count == 0 {
-                    self.reachability?.stopNotifier()
-                }
-            }
-        }
-    }
-    
-    private func sync(block: () -> ()) {
-        objc_sync_enter(count)
-        block()
-        objc_sync_exit(count)
-    }
-    
-    deinit {
-        self.reachability?.stopNotifier()
-    }
-    
-    var isReachable: Bool? {
-        return self.reachability?.isReachable
-    }
-    
-    var isReachableViaWiFi: Bool? {
-        return self.reachability?.isReachableViaWiFi
-    }
-    
-    var isReachableViaWWAN: Bool? {
-        return self.reachability?.isReachableViaWWAN
-    }
-}
-
-/************************************************************/
 // MARK: - Reachability
 /************************************************************/
 
@@ -154,6 +59,11 @@ class Reachability {
     required init(reachabilityRef: SCNetworkReachability) {
         reachableOnWWAN = true
         self.reachabilityRef = reachabilityRef
+    }
+    
+    convenience init?(hostname: String) {
+        guard let ref = SCNetworkReachabilityCreateWithName(nil, hostname) else { return nil }
+        self.init(reachabilityRef: ref)
     }
     
     convenience init?() {
@@ -319,4 +229,3 @@ extension Reachability {
         return !self.isWWANFlagSet
     }
 }
-

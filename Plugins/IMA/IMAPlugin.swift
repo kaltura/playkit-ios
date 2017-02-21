@@ -6,14 +6,14 @@
 //  Copyright © 2016 Google, Inc. All rights reserved.
 //
 
-#if IMA_ENABLED
 import GoogleInteractiveMediaAds
 
 public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
-
-    private var player: Player!
     
-    private var messageBus: MessageBus?
+    public weak var mediaEntry: MediaEntry?
+
+    private unowned var player: Player
+    private unowned var messageBus: MessageBus
     
     weak var dataSource: AdsPluginDataSource? {
         didSet {
@@ -34,7 +34,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     private var pictureInPictureProxy: IMAPictureInPictureProxy?
     private var loadingView: UIView?
     
-    private var config: AdsConfig!
+    private var config: AdsConfig?
     private var adTagUrl: String?
     private var tagsTimes: [TimeInterval : String]? {
         didSet {
@@ -56,73 +56,72 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         }
     }
     
-    override public required init() {
-        
-    }
+    /************************************************************/
+    // MARK: - PKPlugin
+    /************************************************************/
     
-    //MARK: plugin protocol methods
-    
-    public static var pluginName: String {
-        get {
-            return String(describing: IMAPlugin.self)
-        }
-    }
-    
-    public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
-        PKLog.trace("load")
-        
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
         self.messageBus = messageBus
-        
+        self.player = player
+        super.init()
         if let adsConfig = pluginConfig as? AdsConfig {
             self.config = adsConfig
-            self.player = player
-            
             if IMAPlugin.loader == nil {
-                self.setupLoader(with: self.config)
+                self.setupLoader(with: adsConfig)
             }
             
             IMAPlugin.loader.contentComplete()
             IMAPlugin.loader.delegate = self
             
-            if let adTagUrl = self.config.adTagUrl {
+            if let adTagUrl = adsConfig.adTagUrl {
                 self.adTagUrl = adTagUrl
-            } else if let adTagsTimes = self.config.tagsTimes {
+            } else if let adTagsTimes = adsConfig.tagsTimes {
                 self.tagsTimes = adTagsTimes
+                self.sortedTagsTimes = adTagsTimes.keys.sorted()
             }
         }
-
+        
         var events: [PKEvent.Type] = []
         events.append(PlayerEvent.ended)
-        self.messageBus?.addObserver(self, events: events, block: { (data: Any) -> Void in
+        self.messageBus.addObserver(self, events: events, block: { (data: Any) -> Void in
             self.contentComplete()
         })
-
+        
         self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
-
+    
+    public func onLoad(mediaConfig: MediaConfig) {
+        PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
+        self.mediaEntry = mediaConfig.mediaEntry
+    }
+    
+    public func onUpdateMedia(mediaConfig: MediaConfig) {
+        PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
+        self.mediaEntry = mediaConfig.mediaEntry
+    }
+    
+    public static var pluginName = String(describing: IMAPlugin.self)
+    
     public func destroy() {
         PKLog.trace("destroy")
         self.destroyManager()
-        self.player = nil
         self.timer?.invalidate()
     }
+    
+    /************************************************************/
+    // MARK: - Internal
+    /************************************************************/
     
     func getPlayerDecorator() -> PlayerDecoratorBase? {
         return AdsEnabledPlayerController(adsPlugin: self)
     }
-    //MARK: public methods
     
     func requestAds() {
         if self.adTagUrl != nil && self.adTagUrl != "" {
             self.startAdCalled = false
             
             var request: IMAAdsRequest
-            
-//            if let avPlayer = self.player.playerEngine as? AVPlayer {
-//                request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), avPlayerVideoDisplay: IMAAVPlayerVideoDisplay(avPlayer: avPlayer), pictureInPictureProxy: self.pictureInPictureProxy, userContext: nil)
-//            } else {
-                request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), contentPlayhead: self, userContext: nil)
-//            }
+            request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), contentPlayhead: self, userContext: nil)
             
             IMAPlugin.loader.requestAds(with: request)
             PKLog.trace("request Ads")
@@ -162,7 +161,9 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         IMAPlugin.loader.contentComplete()
     }
     
-    //MARK: private methods
+    /************************************************************/
+    // MARK: - Private
+    /************************************************************/
     
     private func setupLoader(with config: AdsConfig) {
         let imaSettings: IMASettings! = IMASettings()
@@ -178,8 +179,8 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
 //            self.pictureInPictureProxy = IMAPictureInPictureProxy(avPictureInPictureControllerDelegate: self)
 //        }
         
-        if (self.config.companionView != nil) {
-            self.companionSlot = IMACompanionAdSlot(view: self.config.companionView, width: Int32(self.config.companionView!.frame.size.width), height: Int32(self.config.companionView!.frame.size.height))
+        if let companionView = self.config?.companionView {
+            self.companionSlot = IMACompanionAdSlot(view: companionView, width: Int32(companionView.frame.size.width), height: Int32(companionView.frame.size.height))
         }
     }
     
@@ -207,7 +208,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     }
     
     private func createAdDisplayContainer() -> IMAAdDisplayContainer {
-        return IMAAdDisplayContainer(adContainer: self.player.view, companionSlots: self.config.companionView != nil ? [self.companionSlot!] : nil)
+        return IMAAdDisplayContainer(adContainer: self.player.view, companionSlots: self.config?.companionView != nil ? [self.companionSlot!] : nil)
     }
 
     private func loadAdsIfNeeded() {
@@ -258,14 +259,13 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     
     private func createRenderingSettings() {
         self.renderingSettings.webOpenerDelegate = self
-        if let webOpenerPresentingController = self.config.webOpenerPresentingController {
+        if let webOpenerPresentingController = self.config?.webOpenerPresentingController {
             self.renderingSettings.webOpenerPresentingController = webOpenerPresentingController
         }
-        
-        if let bitrate = self.config.videoBitrate {
+        if let bitrate = self.config?.videoBitrate {
             self.renderingSettings.bitrate = bitrate
         }
-        if let mimeTypes = self.config.videoMimeTypes {
+        if let mimeTypes = self.config?.videoMimeTypes {
             self.renderingSettings.mimeTypes = mimeTypes
         }
     }
@@ -324,7 +324,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
 
     private func notify(event: AdEvent) {
         self.delegate?.adsPlugin(self, didReceive: event)
-        self.messageBus?.post(event)
+        self.messageBus.post(event)
     }
     
     private func destroyManager() {
@@ -335,19 +335,17 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     // MARK: AdsLoaderDelegate
     
     public func adsLoader(_ loader: IMAAdsLoader!, adsLoadedWith adsLoadedData: IMAAdsLoadedData!) {
-        if let _ = self.player {
-            self.loaderFailed = false
-            
-            self.manager = adsLoadedData.adsManager
-            self.manager!.delegate = self
-            self.createRenderingSettings()
-            
-            if self.startAdCalled {
-                self.manager!.initialize(with: self.renderingSettings)
-            }
-            
-            PKLog.trace("ads manager set")
+        self.loaderFailed = false
+        
+        self.manager = adsLoadedData.adsManager
+        self.manager!.delegate = self
+        self.createRenderingSettings()
+        
+        if self.startAdCalled {
+            self.manager!.initialize(with: self.renderingSettings)
         }
+        
+        PKLog.trace("ads manager set")
     }
     
     public func adsLoader(_ loader: IMAAdsLoader!, failedWith adErrorData: IMAAdLoadingErrorData!) {
@@ -478,26 +476,3 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         self.notify(event: AdEvent.AdWebOpenerDidCloseInAppBrowser(webOpener: webOpener))
     }
 }
-    
-#else
-    public class IMAPlugin:NSObject, PKPlugin  {
-        public func load(player: Player, mediaConfig: MediaEntry, pluginConfig: Any?, messageBus: MessageBus) {
-            
-        }
-        
-        public static var pluginName: String {
-            get {
-                return String(describing: IMAPlugin.self)
-            }
-        }
-        
-        override public required init() {
-            super.init()
-        }
-        
-        public func destroy() {
-            
-        }
-    }
-
-#endif

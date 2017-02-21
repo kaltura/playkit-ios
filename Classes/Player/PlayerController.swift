@@ -11,9 +11,12 @@ import AVFoundation
 import AVKit
 
 class PlayerController: NSObject, Player {
+    var onEventBlock: ((PKEvent)->Void)?
     
-    // reachability
-    let reachabilityManager = ReachabilityManager.shared
+    var delegate: PlayerDelegate?
+    
+    private var currentPlayer: AVPlayerEngine?
+    private var assetBuilder: AssetBuilder?
     
     public var duration: Double {
         get {
@@ -37,12 +40,6 @@ class PlayerController: NSObject, Player {
         }
     }
 
-    var onEventBlock: ((PKEvent)->Void)?
-    
-    var delegate: PlayerDelegate?
-    
-    private var currentPlayer: AVPlayerEngine?
-    private var assetBuilder: AssetBuilder?
     
     public var currentTime: TimeInterval {
         get {
@@ -79,36 +76,21 @@ class PlayerController: NSObject, Player {
         }
     }
     
-    public init(mediaEntry: PlayerConfig) {
+    public override init() {
         super.init()
         self.currentPlayer = AVPlayerEngine()
-        self.currentPlayer?.onEventBlock = { [unowned self] (event:PKEvent) in
+        self.currentPlayer?.onEventBlock = { [weak self] event in
             PKLog.trace("postEvent:: \(event)")
-            
-            if let block = self.onEventBlock {
-                block(event)
-            }
+            self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
-        
-        // start reachability notifiier
-        do {
-            try self.reachabilityManager.startNotifier()
-        } catch let e {
-            PKLog.error("failed to start reachability notiifier, error: \(e)")
-        }
     }
     
-    func prepare(_ config: PlayerConfig) {
+    func prepare(_ config: MediaConfig) {
         if let player = self.currentPlayer {
             player.startPosition = config.startTime
 
             if let mediaEntry: MediaEntry = config.mediaEntry {
-                // start reachability notifiying before loading asset to the player.
-                // observe reachability and make sure to remove old observer in case prepare gets called more than once by mistake.
-                NotificationCenter.default.removeObserver(self, name: .ReachabilityChanged, object: nil)
-                NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(notification:)), name: .ReachabilityChanged, object: nil)
-                
                 self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
                 self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
                     if let avAsset: AVAsset = asset {
@@ -143,7 +125,7 @@ class PlayerController: NSObject, Player {
         self.currentPlayer?.currentPosition = CMTimeGetSeconds(time)
     }
     
-    func prepareNext(_ config: PlayerConfig) -> Bool {
+    func prepareNext(_ config: MediaConfig) -> Bool {
         return false
     }
     
@@ -157,8 +139,6 @@ class PlayerController: NSObject, Player {
     }
     
     func destroy() {
-        self.reachabilityManager.stopNotifier()
-        NotificationCenter.default.removeObserver(self, name: .ReachabilityChanged, object: nil)
         self.currentPlayer?.destroy()
     }
     
@@ -172,20 +152,5 @@ class PlayerController: NSObject, Player {
     
     public func selectTrack(trackId: String) {
         self.currentPlayer?.selectTrack(trackId: trackId)
-    }
-    
-    // MARK: Reachability Changed
-    
-    @objc func reachabilityChanged(notification: Notification) {
-        let reachability = notification.object as! Reachability
-        if !reachability.isReachable {
-            self.sendReachabilityErrorEvent()
-        }
-    }
-    
-    private func sendReachabilityErrorEvent() {
-        if let block = self.onEventBlock {
-            block(PlayerEvent.Error(error: ReachabilityError.unreachable.asNSError))
-        }
     }
 }

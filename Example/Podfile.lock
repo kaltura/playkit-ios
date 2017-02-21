@@ -1,15 +1,16 @@
 PODS:
-  - GoogleAds-IMA-iOS-SDK (3.3.1)
+  - GoogleAds-IMA-iOS-SDK (3.4.1)
   - Log (1.0)
-  - PlayKit (0.1.7):
-    - PlayKit/Core (= 0.1.7)
-  - PlayKit/Core (0.1.7):
+  - PlayKit (0.1.x-dev):
+    - PlayKit/Core (= 0.1.x-dev)
+  - PlayKit/Core (0.1.x-dev):
     - Log
     - SwiftyJSON
     - SwiftyXMLParser
-  - PlayKit/IMAPlugin (0.1.7):
+  - PlayKit/IMAPlugin (0.1.x-dev):
+    - GoogleAds-IMA-iOS-SDK (= 3.4.1)
     - PlayKit/Core
-  - PlayKit/YouboraPlugin (0.1.7):
+  - PlayKit/YouboraPlugin (0.1.x-dev):
     - PlayKit/Core
     - Youbora-AVPlayer/dynamic
   - SwiftyJSON (3.1.4)
@@ -29,14 +30,14 @@ EXTERNAL SOURCES:
     :path: ../../playkit-ios
 
 SPEC CHECKSUMS:
-  GoogleAds-IMA-iOS-SDK: 5643300870bd3289c47c0d0b5a2dbf595b05c336
+  GoogleAds-IMA-iOS-SDK: 7355db22ce69be4607ed0cc5112847b2b0c5e89d
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
-  PlayKit: a7f92b59a236c9c6fbe8b36d4e862dcf76001d5a
+  PlayKit: 72bc8bc843b7430c0b459ad441fe3a629d47156b
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
   SwiftyXMLParser: 8d2295fb4fbc6e2ff241e7c8d7717e159be35969
   Youbora-AVPlayer: 02aea2a12a4f7e6a61d8a1747e5dfc177bf2354b
   Youbora-YouboraLib: 523adf7cd09c4a213e3485e6ec7c48d498986246
 
-PODFILE CHECKSUM: c8864665a079c30446a406ef26291ceb68c00526
+PODFILE CHECKSUM: f5f270df82125b92d356315fb11d456cdd5c64ce
 
-COCOAPODS: 1.1.1
+COCOAPODS: 1.2.0

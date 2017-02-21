@@ -29,8 +29,8 @@ final class KalturaPluginManager {
 
     public var delegate: KalturaPluginManagerDelegate?
     
-    private var player: Player?
-    private var messageBus: MessageBus?
+    private unowned var player: Player
+    private unowned var messageBus: MessageBus
     private var config: AnalyticsConfig?
     
     private var isFirstPlay = true
@@ -39,15 +39,18 @@ final class KalturaPluginManager {
     private var timer: Timer?
     private var interval = 30 //Should be provided in plugin config
     
-    public func load(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+    init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+        self.player = player
         self.messageBus = messageBus
-        
+        self.load(pluginConfig: pluginConfig)
+    }
+    
+    func load(pluginConfig: Any?) {
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
-            self.player = player
         }
-        
-        registerToAllEvents()
+        self.registerToAllEvents()
+        AppStateSubject.sharedInstance.add(observer: self)
     }
     
     public func destroy() {
@@ -58,33 +61,36 @@ final class KalturaPluginManager {
     
     func registerToAllEvents() {
         PKLog.trace("Register to all events")
-        guard let messageBus = self.messageBus else {
-            PKLog.error("messageBus is nil !")
-            return
-        }
 
-        messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (info) in
             PKLog.trace("ended info: \(info)")
             self.stopTimer()
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.error], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.error], block: { (info) in
             PKLog.trace("error info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .error)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (info) in
             PKLog.trace("pause info: \(info)")
+            // invalidate timer when receiving pause event only after first play
+            // and set intervalOn to false in order to start timer again on play event.
+            if !self.isFirstPlay {
+                self.stopTimer()
+                self.intervalOn = false
+            }
+            
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .pause)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.loadedMetadata], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.loadedMetadata], block: { (info) in
             PKLog.trace("loadedMetadata info: \(info)")
             self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .load)
         })
         
-        messageBus.addObserver(self, events: [PlayerEvent.playing], block: { (info) in
+        self.messageBus.addObserver(self, events: [PlayerEvent.playing], block: { (info) in
             PKLog.trace("play info: \(info)")
             
             if !self.intervalOn {
@@ -101,6 +107,14 @@ final class KalturaPluginManager {
         })
     }
     
+    public func reportConcurrencyEvent() {
+        self.messageBus.post(OttEvent.Concurrency())
+    }
+    
+    /************************************************************/
+    // MARK: - Private Implementation
+    /************************************************************/
+    
     private func createTimer() {
         
         if let conf = self.config, let intr = conf.params["timerInterval"] as? Int {
@@ -111,23 +125,26 @@ final class KalturaPluginManager {
             t.invalidate()
         }
         
+        // media hit should fire on every time we start the timer.
+        self.sendProgressEvent()
+        
         self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.interval), target: self, selector: #selector(KalturaPluginManager.timerHit), userInfo: nil, repeats: true)
         
     }
     
     @objc private func timerHit() {
-        
         PKLog.trace("timerHit")
-        
+        self.sendProgressEvent()
+    }
+    
+    private func sendProgressEvent() {
         self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .hit);
         
-        if let player = self.player {
-            var progress = Float(player.currentTime) / Float(player.duration)
-            PKLog.trace("Progress is \(progress)")
-            
-            if progress > 0.98 {
-                self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
-            }
+        var progress = Float(player.currentTime) / Float(player.duration)
+        PKLog.trace("Progress is \(progress)")
+        
+        if progress > 0.98 {
+            self.delegate?.pluginManagerDidSendAnalyticsEvent(action: .finish)
         }
     }
     
@@ -136,8 +153,22 @@ final class KalturaPluginManager {
             t.invalidate()
         }
     }
+}
+
+/************************************************************/
+// MARK: - App State Handling
+/************************************************************/
+
+extension KalturaPluginManager: AppStateObservable {
     
-    public func reportConcurrencyEvent() {
-        self.messageBus?.post(OttEvent.OttEventConcurrency())
+    var observations: Set<NotificationObservation> {
+        return [
+            NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
+                guard let delegate = self.delegate else { return }
+                PKLog.trace("plugin: \(delegate) will terminate event received, sending analytics stop event")
+                self.destroy()
+                AppStateSubject.sharedInstance.remove(observer: self)
+            }
+        ]
     }
 }
