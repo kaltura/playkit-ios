@@ -210,22 +210,4 @@ extension Reachability {
 
         return true
     }
-    
-    /// Indicates if we are reachable via cellular network.
-    var isReachableViaWWAN: Bool {
-        // Make sure we are running on device + we are reachable + We are on WWAN
-        return self.isOnDevice && self.isReachableFlagSet && self.isWWANFlagSet
-    }
-    
-    /// Indicates if we are reachable via WiFi.
-    var isReachableViaWiFi: Bool {
-        // Make sure we are reachable
-        guard self.isReachableFlagSet else { return false }
-        
-        // If we're reachable and running on simulator then we are on WiFi
-        guard self.isOnDevice else { return true }
-        
-        // Make sure we are NOT on WWAN
-        return !self.isWWANFlagSet
-    }
 }
