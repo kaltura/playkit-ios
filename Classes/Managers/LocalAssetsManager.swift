@@ -132,26 +132,48 @@ public class LocalAssetsManager: NSObject {
     }
     
     /// Notifies the SDK that downloading of an asset has finished.
-    public func assetDownloadFinished(location: URL, mediaSource: MediaSource,refresh: Bool, callback: @escaping (Error?) -> Void) {
+    public func assetDownloadFinished(location: URL, mediaSource: MediaSource, callback: @escaping (Error?) -> Void) {
         // FairPlay -- nothing to do
 
         // Widevine
-        if mediaSource.fileExt == "wvm" {
-            guard let drmData = mediaSource.drmData, let mediaEntry = drmData.first, let licenseUri = mediaEntry.licenseUri  else {
-                // TODO:: error handling
-                PKLog.error("One of your items is nil")
+        if mediaSource.sourceType == MediaSource.SourceType.wvm_wideVine {
+            guard let licenseUri = extractLicenseUri(mediaSource: mediaSource) else {
                 return
             }
             
-            WidevineClassicHelper.registerLocalAsset(location.absoluteString, licenseUri: licenseUri.absoluteString, refresh:refresh, callback: callback)
+            WidevineClassicHelper.registerLocalAsset(location.absoluteString, licenseUri: licenseUri, refresh:false, callback: callback)
         }
+    }
+    
+    /// Refresh Downloaded Asset
+    public func refreshDownloadedAsset(location: URL, mediaSource: MediaSource, callback: @escaping (Error?) -> Void) {
+        // FairPlay -- nothing to do
+        
+        // Widevine
+        if mediaSource.sourceType == MediaSource.SourceType.wvm_wideVine {
+            guard let licenseUri = extractLicenseUri(mediaSource: mediaSource) else {
+                return
+            }
+            
+            WidevineClassicHelper.registerLocalAsset(location.absoluteString, licenseUri: licenseUri, refresh:true, callback: callback)
+        }
+    }
+    
+    private func extractLicenseUri(mediaSource: MediaSource) -> String? {
+        guard let drmData = mediaSource.drmData?.first, let licenseUri = drmData.licenseUri  else {
+            // TODO:: error handling
+            PKLog.error("Invalid DRM Data")
+            return nil
+        }
+        
+        return licenseUri.absoluteString
     }
     
     public func unregisterAsset(_ assetUri: String!, callback: @escaping (Error?) -> Void) {
         // TODO FairPlay
         
         // Widevine
-        if assetUri.hasSuffix("wvm") {
+        if assetUri.hasSuffix(".wvm") {
             WidevineClassicHelper.unregisterAsset(assetUri, callback: callback)
         }
     }
