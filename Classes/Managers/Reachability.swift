@@ -103,7 +103,7 @@ func callback(reachability: SCNetworkReachability, flags: SCNetworkReachabilityF
 
 extension Reachability {
     
-    func startNotifier() throws {
+    func startNotifier() {
         
         guard let reachabilityRef = self.reachabilityRef, !notifierRunning else { return }
         
@@ -111,12 +111,10 @@ extension Reachability {
         context.info = UnsafeMutableRawPointer(Unmanaged<Reachability>.passUnretained(self).toOpaque())
         if !SCNetworkReachabilitySetCallback(reachabilityRef, callback, &context) {
             stopNotifier()
-            throw ReachabilityError.unableToSetCallback
         }
         
         if !SCNetworkReachabilitySetDispatchQueue(reachabilityRef, reachabilityQueue) {
             stopNotifier()
-            throw ReachabilityError.unableToSetDispatchQueue
         }
         
         // Perform an intial check
