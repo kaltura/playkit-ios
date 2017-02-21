@@ -24,9 +24,10 @@ import AVFoundation
 public protocol PKPlugin: Plugin {
     /// The plugin name.
     static var pluginName: String { get }
-    /// The associated media entry.
-    weak var mediaEntry: MediaEntry? { get set }
 
+    /// The player associated with the plugin
+    unowned var player: Player { get set }
+    
     init(player: Player, pluginConfig: Any?, messageBus: MessageBus)
     
     /// On first load. used for doing initialization for the first time with the media config.

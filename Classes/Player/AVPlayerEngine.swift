@@ -11,7 +11,7 @@ import AVFoundation
 import AVKit
 import CoreMedia
 
-/// `AVPlayerEngineError` represents player engine errors.
+/// `PlayerError` represents player errors.
 enum PlayerError: PKError {
     
     case failedToLoadAssetFromKeys(rootError: NSError?)

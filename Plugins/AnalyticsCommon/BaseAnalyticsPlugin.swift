@@ -36,17 +36,9 @@ enum AnalyticsError: PKError {
 }
 
 /// class `BaseAnalyticsPlugin` is a base plugin object used for analytics plugin subclasses
-public class BaseAnalyticsPlugin: AnalyticsPluginProtocol {
+public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
-    /// abstract implementation subclasses will have names
-    public class var pluginName: String {
-        fatalError("abstract property should be overriden in subclass")
-    }
-    
-    unowned var player: Player
     unowned var messageBus: MessageBus
-    public weak var mediaEntry: MediaEntry?
-    
     var config: AnalyticsConfig?
     var isFirstPlay: Bool = true
     
@@ -54,10 +46,9 @@ public class BaseAnalyticsPlugin: AnalyticsPluginProtocol {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        PKLog.info("initializing plugin \(type(of:self))")
-        self.player = player
+    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
         self.messageBus = messageBus
+        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
         } else {
@@ -66,18 +57,8 @@ public class BaseAnalyticsPlugin: AnalyticsPluginProtocol {
         self.registerEvents()
     }
     
-    public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.info("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.info("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public func destroy() {
-        PKLog.info("destroying plugin \(type(of:self))")
+    public override func destroy() {
+        super.destroy()
         self.messageBus.removeObserver(self, events: playerEventsToRegister)
     }
 

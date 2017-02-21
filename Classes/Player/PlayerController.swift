@@ -19,6 +19,10 @@ class PlayerController: NSObject, Player {
     private var currentPlayer: AVPlayerEngine
     private var assetBuilder: AssetBuilder?
     
+    public var mediaEntry: MediaEntry? {
+        return assetBuilder?.mediaEntry
+    }
+    
     public var duration: Double {
         return self.currentPlayer.duration
     }
@@ -56,16 +60,12 @@ class PlayerController: NSObject, Player {
     
     func prepare(_ config: MediaConfig) {
         currentPlayer.startPosition = config.startTime
-        if let mediaEntry: MediaEntry = config.mediaEntry  {
-            self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
-            self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
-                if let avAsset: AVAsset = asset {
-                    self.currentPlayer.asset = avAsset
-                }
-            })
-        } else {
-            PKLog.error("mediaEntry is empty")
-        }
+        self.assetBuilder = AssetBuilder(mediaEntry: config.mediaEntry)
+        self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
+            if let avAsset: AVAsset = asset {
+                self.currentPlayer.asset = avAsset
+            }
+        })
     }
     
     func play() {

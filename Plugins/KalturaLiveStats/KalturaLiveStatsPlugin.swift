@@ -176,7 +176,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     private func sendLiveEvent(theBufferTime: Int32) {
         PKLog.debug("sendLiveEvent - Buffer Time: \(bufferTime)")
         
-        guard let mediaEntry = self.mediaEntry else { return }
+        guard let mediaEntry = self.player.mediaEntry else { return }
         
         var sessionId = ""
         var baseUrl = "https://stats.kaltura.com/api_v3/index.php"

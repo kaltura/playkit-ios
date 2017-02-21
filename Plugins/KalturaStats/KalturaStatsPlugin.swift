@@ -284,7 +284,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
             parterId = String(pId)
         }
         
-        guard let mediaEntry = self.mediaEntry else {
+        guard let mediaEntry = self.player.mediaEntry else {
             PKLog.error("send analytics failed due to nil mediaEntry")
             return
         }

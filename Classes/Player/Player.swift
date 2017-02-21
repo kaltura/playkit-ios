@@ -17,7 +17,10 @@ import AVKit
 @objc public protocol Player: NSObjectProtocol {
     
     @objc var delegate: PlayerDelegate? { get set }
-        
+    
+    /// The player's associated media entry.
+    weak var mediaEntry: MediaEntry? { get }
+    
     /**
      Get the player's layer component.
      */

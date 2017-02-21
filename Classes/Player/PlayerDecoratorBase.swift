@@ -11,6 +11,7 @@ import AVFoundation
 import AVKit
 
 public class PlayerDecoratorBase: NSObject, Player {
+
     private var player: Player!
     
     public var delegate: PlayerDelegate? {
@@ -22,7 +23,11 @@ public class PlayerDecoratorBase: NSObject, Player {
         }
     }
 
-     public var currentTime: TimeInterval {
+    weak public var mediaEntry: MediaEntry? {
+        return self.player.mediaEntry
+    }
+    
+    public var currentTime: TimeInterval {
         get {
             return self.player.currentTime
         }
@@ -32,33 +37,23 @@ public class PlayerDecoratorBase: NSObject, Player {
     }
     
     public var duration: Double {
-        get {
-            return self.player.duration
-        }
+        return self.player.duration
     }
     
     public var currentAudioTrack: String? {
-        get {
-            return self.player.currentAudioTrack
-        }
+        return self.player.currentAudioTrack
     }
 
     public var currentTextTrack: String? {
-        get {
-            return self.player.currentTextTrack
-        }
+        return self.player.currentTextTrack
     }
     
     public var isPlaying: Bool {
-        get {
-            return self.player.isPlaying
-        }
+        return self.player.isPlaying
     }
     
     public var view: UIView! {
-        get {
-            return self.player.view
-        }
+        return self.player.view
     }
     
     public func prepare(_ config: MediaConfig) {

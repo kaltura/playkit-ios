@@ -37,11 +37,8 @@ extension IMAPluginError {
     }
 }
 
-public class IMAPlugin: NSObject, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
-    
-    public weak var mediaEntry: MediaEntry?
+public class IMAPlugin: BasePlugin, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
 
-    private unowned var player: Player
     private unowned var messageBus: MessageBus
     
     weak var dataSource: AdsPluginDataSource? {
@@ -86,11 +83,9 @@ public class IMAPlugin: NSObject, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoad
     // MARK: - PKPlugin
     /************************************************************/
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        PKLog.info("intializing plugin \(type(of:self))")
+    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
         self.messageBus = messageBus
-        self.player = player
-        super.init()
+        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let adsConfig = pluginConfig as? AdsConfig {
             self.config = adsConfig
             if IMAPlugin.loader == nil {
@@ -117,20 +112,10 @@ public class IMAPlugin: NSObject, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoad
         self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
     
-    public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.debug("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
+    public override class var pluginName: String { return "IMAPlugin" }
     
-    public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.debug("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public static var pluginName = String(describing: IMAPlugin.self)
-    
-    public func destroy() {
-        PKLog.info("destroying plugin \(type(of:self))")
+    public override func destroy() {
+        super.destroy()
         self.destroyManager()
         self.timer?.invalidate()
     }
