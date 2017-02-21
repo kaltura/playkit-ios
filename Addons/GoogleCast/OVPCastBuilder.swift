@@ -25,7 +25,7 @@ public class OVPCastBuilder: BasicCastBuilder{
     }
     
   
-    override func embedConfig() -> [String : Any]? {
+    override func embedConfig() -> [String: Any]? {
      
         if var customData = super.embedConfig(), let ks = self.ks , ks.isEmpty == false {
             customData["ks"] = self.ks

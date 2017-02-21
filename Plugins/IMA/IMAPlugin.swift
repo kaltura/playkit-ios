@@ -416,7 +416,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
-        var data = [String : TimeInterval]()
+        var data = [String: TimeInterval]()
         data["mediaTime"] = mediaTime
         data["totalTime"] = totalTime
         self.notify(event: AdEvent.AdDidProgressToTime(mediaTime: mediaTime, totalTime: totalTime))

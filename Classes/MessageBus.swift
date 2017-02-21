@@ -14,7 +14,7 @@ private struct Observation {
 }
 
 public class MessageBus: NSObject {
-    private var observations = [String : [Observation]]()
+    private var observations = [String: [Observation]]()
     private let lock: AnyObject = UUID().uuidString as AnyObject
     
     public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void) {

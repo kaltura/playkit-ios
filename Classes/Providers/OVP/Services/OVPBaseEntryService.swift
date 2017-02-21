@@ -15,7 +15,7 @@ class OVPBaseEntryService {
     internal static func list(baseURL: String, ks: String,entryID: String) -> KalturaRequestBuilder? {
         
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "baseEntry", action: "list") {
-            let responseProfile = ["fields":"mediaType,dataUrl,id,name,duration,msDuration,flavorParamsIds","type":1] as [String : Any]
+            let responseProfile = ["fields":"mediaType,dataUrl,id,name,duration,msDuration,flavorParamsIds","type":1] as [String: Any]
             let filter = ["redirectFromEntryId":entryID]
             request.setBody(key: "ks", value: JSON(ks))
             .setBody(key: "responseProfile", value: JSON(responseProfile))

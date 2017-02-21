@@ -73,7 +73,7 @@ public class TVPAPICastBuilder: BasicCastBuilder {
         
         JSONSerialization.isValidJSONObject(flavorAssets)
         let baseEntry  = ["vars":["isTrailer":" false"]]
-        var proxyData : [String : Any] = ["flavorassets":flavorAssets,
+        var proxyData : [String: Any] = ["flavorassets":flavorAssets,
                                           "baseentry":baseEntry,
                                           "MediaID":self.contentId!,
                                           "iMediaID":self.contentId!]
