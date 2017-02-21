@@ -62,4 +62,11 @@ public class PlayKitManager: NSObject {
         }
         return pluginClass?.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
     }
+    
+    /// sets the logging level for our logger.
+    @objc public var logLevel: PKLogLevel = .debug {
+        didSet {
+            PKLog.minLevel = logLevel.toLoggerLevel
+        }
+    }
 }
