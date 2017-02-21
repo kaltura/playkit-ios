@@ -11,7 +11,6 @@ import AVFoundation
 import AVKit
 
 class PlayerController: NSObject, Player {
-    
     var onEventBlock: ((PKEvent)->Void)?
     
     var delegate: PlayerDelegate?
@@ -90,8 +89,8 @@ class PlayerController: NSObject, Player {
     func prepare(_ config: MediaConfig) {
         if let player = self.currentPlayer {
             player.startPosition = config.startTime
-            
-            if let mediaEntry: MediaEntry = config.mediaEntry  {
+
+            if let mediaEntry: MediaEntry = config.mediaEntry {
                 self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
                 self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
                     if let avAsset: AVAsset = asset {
