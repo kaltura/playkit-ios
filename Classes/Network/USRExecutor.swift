@@ -12,7 +12,7 @@ import UIKit
 public class USRExecutor: NSObject, RequestExecutor, URLSessionDelegate {
     
     var tasks: [URLSessionDataTask] = [URLSessionDataTask]()
-    var taskIdByRequestID: [String : Int] = [String : Int]()
+    var taskIdByRequestID: [String: Int] = [String: Int]()
     
     enum ResponseError: Error {
         case emptyOrIncorrectURL

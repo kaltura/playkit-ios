@@ -38,6 +38,7 @@ class PlayerControllerTest: XCTestCase {
     
     override func tearDown() {
         super.tearDown()
+        self.player.destroy()
     }
     
     func testPlayCommand() {

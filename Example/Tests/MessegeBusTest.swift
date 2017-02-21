@@ -35,6 +35,7 @@ class MessegeBusTest: XCTestCase {
     
     override func tearDown() {
         super.tearDown()
+        self.player.destroy()
     }
     
     func testPlayerMetadataLoaded() {

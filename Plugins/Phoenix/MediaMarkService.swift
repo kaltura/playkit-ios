@@ -12,7 +12,7 @@ import SwiftyJSON
 internal class MediaMarkService {
 
     internal static func sendTVPAPIEVent(baseURL: String,
-                                         initObj: [String : Any],
+                                         initObj: [String: Any],
                                          eventType: String,
                                          currentTime: Int32,
                                          assetId: String,

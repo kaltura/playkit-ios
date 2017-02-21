@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum AnalyticsPluginConfig {
+enum PluginTestConfiguration {
     case TVPAPI
     case Phoenix
     

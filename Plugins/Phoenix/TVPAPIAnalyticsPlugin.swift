@@ -21,7 +21,7 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
         var fileId = ""
         var baseUrl = ""
         
-        guard let initObj = self.config?.params["initObj"] as? [String : Any] else {
+        guard let initObj = self.config?.params["initObj"] as? [String: Any] else {
             PKLog.error("send analytics failed due to no initObj data")
             return nil
         }

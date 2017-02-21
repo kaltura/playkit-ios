@@ -156,7 +156,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     /************************************************************/
     
     private func setupYouboraManager(completionHandler: ((_ succeeded: Bool) -> Void)? = nil) {
-        if let config = self.config, var media = config.params["media"] as? [String : Any], let mediaEntry = self.mediaEntry {
+        if let config = self.config, var media = config.params["media"] as? [String: Any], let mediaEntry = self.mediaEntry {
             media["resource"] = mediaEntry.id
             media["title"] = mediaEntry.id
             media["duration"] = self.player.duration

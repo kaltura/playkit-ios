@@ -22,7 +22,7 @@ class OTTSessionProviderTest: XCTestCase {
     func testOTTSessionProvider() {
         
         let sessionProvider = OTTSessionManager(serverURL:"http://52.210.223.65:8080/v4_0/api_v3", partnerId:198, executor: nil)
-        sessionProvider.startAnonymouseSession { (e:Error?) in
+        sessionProvider.startAnonymousSession { (e:Error?) in
             if e == nil{
                 sessionProvider.loadKS(completion: { (r:Result<String>) in
                     print(r.data)

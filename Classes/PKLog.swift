@@ -41,7 +41,7 @@ import Log
 
 public let PKLog: Logger = {
     let logger = Logger()
-    logger.minLevel = .trace
+    logger.minLevel = .debug
     return logger
 }()
 

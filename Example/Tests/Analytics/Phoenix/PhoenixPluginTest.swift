@@ -11,7 +11,7 @@ import Quick
 import Nimble
 @testable import PlayKit
 
-class PhoenixPluginTest: BaseQuickSpec {
+class PhoenixPluginTest: QuickSpec {
     
     /************************************************************/
     // MARK: - Mocks
@@ -19,7 +19,7 @@ class PhoenixPluginTest: BaseQuickSpec {
     
     class PhoenixAnalyticsPluginMock: PhoenixAnalyticsPlugin {
         
-        public override class var pluginName: String { return AnalyticsPluginConfig.Phoenix.pluginName }
+        public override class var pluginName: String { return PluginTestConfiguration.Phoenix.pluginName }
     }
     
     /************************************************************/

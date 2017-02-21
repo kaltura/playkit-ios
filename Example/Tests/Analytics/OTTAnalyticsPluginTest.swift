@@ -19,7 +19,7 @@ protocol MockableOTTAnalyticsPluginProtocol {
 }
 
 /// Shared tests for phoenix and tvpapi
-class OTTAnalyticsPluginTest: BaseQuickSpec {
+class OTTAnalyticsPluginTest: QuickSpec {
     
     struct OTTAnalyticsPluginInvocationCount {
         var firstPlayCount: Int = 0
@@ -33,9 +33,9 @@ class OTTAnalyticsPluginTest: BaseQuickSpec {
     // MARK: - Mocks
     /************************************************************/
     
-    class PhoenixAnalyticsPluginMock: PhoenixAnalyticsPlugin, MockableOTTAnalyticsPluginProtocol {
+    class OTTAnalyticsPluginTestPhoenixMock: PhoenixAnalyticsPlugin, MockableOTTAnalyticsPluginProtocol {
         
-        public override class var pluginName: String { return AnalyticsPluginConfig.Phoenix.pluginName }
+        public override class var pluginName: String { return PluginTestConfiguration.Phoenix.pluginName }
         
         var onAnalyticsEvent: ((OTTAnalyticsEventType, MockableOTTAnalyticsPluginProtocol) -> Void)?
         var onTerminate: ((MockableOTTAnalyticsPluginProtocol) -> Void)?
@@ -57,9 +57,9 @@ class OTTAnalyticsPluginTest: BaseQuickSpec {
         }
     }
     
-    class TVPAPIAnalyticsPluginMock: TVPAPIAnalyticsPlugin, MockableOTTAnalyticsPluginProtocol {
+    class OTTAnalyticsPluginTestTVPAPIMock: TVPAPIAnalyticsPlugin, MockableOTTAnalyticsPluginProtocol {
         
-        public override class var pluginName: String { return AnalyticsPluginConfig.TVPAPI.pluginName }
+        public override class var pluginName: String { return PluginTestConfiguration.TVPAPI.pluginName }
         
         var onAnalyticsEvent: ((OTTAnalyticsEventType, MockableOTTAnalyticsPluginProtocol) -> Void)?
         var onTerminate: ((MockableOTTAnalyticsPluginProtocol) -> Void)?
@@ -101,16 +101,16 @@ class OTTAnalyticsPluginTest: BaseQuickSpec {
     
     override func spec() {
         describe("OTT analytics plugins test") {
-            PlayKitManager.shared.registerPlugin(OTTAnalyticsPluginTest.PhoenixAnalyticsPluginMock.self)
-            PlayKitManager.shared.registerPlugin(OTTAnalyticsPluginTest.TVPAPIAnalyticsPluginMock.self)
+            PlayKitManager.shared.registerPlugin(OTTAnalyticsPluginTestPhoenixMock.self)
+            PlayKitManager.shared.registerPlugin(OTTAnalyticsPluginTestTVPAPIMock.self)
             var player: PlayerLoader!
-            var phoenixPluginMock: OTTAnalyticsPluginTest.PhoenixAnalyticsPluginMock!
-            var tvpapiPluginMock: OTTAnalyticsPluginTest.TVPAPIAnalyticsPluginMock!
+            var phoenixPluginMock: OTTAnalyticsPluginTestPhoenixMock!
+            var tvpapiPluginMock: OTTAnalyticsPluginTestTVPAPIMock!
             
             beforeEach {
                 player = self.createPlayerForPhoenixAndTVPAPI()
-                phoenixPluginMock = player.loadedPlugins[OTTAnalyticsPluginTest.PhoenixAnalyticsPluginMock.pluginName]!.plugin as! OTTAnalyticsPluginTest.PhoenixAnalyticsPluginMock
-                tvpapiPluginMock = player.loadedPlugins[OTTAnalyticsPluginTest.TVPAPIAnalyticsPluginMock.pluginName]!.plugin as! OTTAnalyticsPluginTest.TVPAPIAnalyticsPluginMock
+                phoenixPluginMock = player.loadedPlugins[OTTAnalyticsPluginTestPhoenixMock.pluginName]!.plugin as! OTTAnalyticsPluginTestPhoenixMock
+                tvpapiPluginMock = player.loadedPlugins[OTTAnalyticsPluginTestTVPAPIMock.pluginName]!.plugin as! OTTAnalyticsPluginTestTVPAPIMock
             }
             
             afterEach {
@@ -144,7 +144,8 @@ class OTTAnalyticsPluginTest: BaseQuickSpec {
                                 expect(analyticsPluginMock.invocationCount.pauseCount).to(equal(3)) // 3 in total, 2 from player.pause() and 1 from ended after seek to end
                                 expect(analyticsPluginMock.invocationCount.firstPlayCount).to(equal(1)) // 1 from player.play() first play should happen only once
                                 expect(analyticsPluginMock.invocationCount.loadCount).to(equal(1)) // 1 from player.play()
-                                expect(analyticsPluginMock.invocationCount.endedCount).to(equal(1)) // 1 from ended after seek to end
+                                expect(analyticsPluginMock.invocationCount.endedCount).to(equal(2)) // 1 from ended after seek to end and 1 from player destroy
+                                print(type(of: analyticsPluginMock))
                                 analyticsPluginMock.finishedHandling = true
                             }
                         }

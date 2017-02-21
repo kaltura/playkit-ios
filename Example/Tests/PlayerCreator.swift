@@ -15,7 +15,10 @@ enum PlayerCreationError: Error {
     case PluginNamesCountMismatch
 }
 
-protocol PlayerCreator {}
+protocol PlayerCreator { }
+
+// make sure all quick spec classes have player creator.
+extension QuickSpec: PlayerCreator { }
 
 /************************************************************/
 // MARK: - Basic Player
@@ -63,8 +66,8 @@ extension PlayerCreator where Self: QuickSpec {
     
     func createPlayerForPhoenixAndTVPAPI(shouldStartPreparing: Bool = true) -> PlayerLoader {
         let pluginConfigDict: [String : Any] = [
-            AnalyticsPluginConfig.Phoenix.pluginName : AnalyticsPluginConfig.Phoenix.paramsDict,
-            AnalyticsPluginConfig.TVPAPI.pluginName : AnalyticsPluginConfig.TVPAPI.paramsDict
+            PluginTestConfiguration.Phoenix.pluginName : PluginTestConfiguration.Phoenix.paramsDict,
+            PluginTestConfiguration.TVPAPI.pluginName : PluginTestConfiguration.TVPAPI.paramsDict
         ]
         return self.createPlayer(pluginConfigDict: pluginConfigDict, shouldStartPreparing: shouldStartPreparing)
     }

@@ -57,7 +57,7 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
             PKLog.trace("Response: \(response)")
             if response.statusCode == 0 {
                 PKLog.trace("\(response.data)")
-                guard let data = response.data as? [String : Any] else { return }
+                guard let data = response.data as? [String: Any] else { return }
                 guard let result = data["result"] as? [String: Any] else { return }
                 guard let errorData = result["error"] as? [String: Any] else { return }
                 guard let errorCode = errorData["code"] as? Int, errorCode == 4001 else { return }

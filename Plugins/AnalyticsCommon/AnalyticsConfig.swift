@@ -10,7 +10,7 @@ import UIKit
 
 public class AnalyticsConfig {
     
-    public var params = [String : Any]()
+    public var params = [String: Any]()
     
     public init() {}
 }
