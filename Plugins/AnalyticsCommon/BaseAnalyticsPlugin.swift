@@ -52,7 +52,9 @@ public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
         } else {
-            PKLog.error("There is no Analytics Config.")
+            PKLog.error("There is no Analytics Config!")
+            let error = PKPluginError.missingPluginConfig(pluginName: type(of: self).pluginName).asNSError
+            self.messageBus.post(PlayerEvent.PluginError(nsError: error))
         }
         self.registerEvents()
     }

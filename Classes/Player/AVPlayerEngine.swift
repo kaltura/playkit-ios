@@ -23,10 +23,10 @@ enum PlayerError: PKError {
     
     var code: Int {
         switch self {
-        case .failedToLoadAssetFromKeys: return 1000
-        case .assetNotPlayable: return 1001
-        case .failedToPlayToEndTime: return 1002
-        case .playerItemErrorLogEvent: return 1003
+        case .failedToLoadAssetFromKeys: return 7000
+        case .assetNotPlayable: return 7001
+        case .failedToPlayToEndTime: return 7002
+        case .playerItemErrorLogEvent: return 7003
         }
     }
     

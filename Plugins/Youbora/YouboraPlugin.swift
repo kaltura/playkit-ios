@@ -182,18 +182,27 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     /************************************************************/
     
     private func setupYouboraManager(completionHandler: ((_ succeeded: Bool) -> Void)? = nil) {
-        if let config = self.config, var media = config.params["media"] as? [String: Any], let mediaEntry = self.player.mediaEntry {
-            media["resource"] = mediaEntry.id
-            media["title"] = mediaEntry.id
-            media["duration"] = self.player.duration
-            config.params["media"] = media
-            youboraManager = YouboraManager(options: config.params as NSObject!, player: player, mediaEntry: mediaEntry)
-            completionHandler?(true)
-        } else {
-            PKLog.error("config params are wrong or doesn't exist, or missing MediaEntry, could not setup youbora manager")
+        
+        guard let config = self.config, var media = config.params["media"] as? [String: Any] else {
+            PKLog.error("config params are wrong or doesn't exist, could not setup youbora manager")
             self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
             completionHandler?(false)
+            return
         }
+        
+        guard let mediaEntry = self.player.mediaEntry else {
+            PKLog.error("missing MediaEntry, could not setup youbora manager")
+            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
+            completionHandler?(false)
+            return
+        }
+        
+        media["resource"] = mediaEntry.id
+        media["title"] = mediaEntry.id
+        media["duration"] = self.player.duration
+        config.params["media"] = media
+        youboraManager = YouboraManager(options: config.params as NSObject!, player: player, mediaEntry: mediaEntry)
+        completionHandler?(true)
     }
     
     private func startMonitoring(player: Player) {
