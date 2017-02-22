@@ -37,7 +37,7 @@ internal class OVPStatsService {
                 .setParam(key: "event:widgetId", value: widgetId)
                 .setParam(key: "event:referrer", value: referrer)
             
-                .set(method: "GET")
+                .set(method: .get)
             return request
         }else{
             return nil

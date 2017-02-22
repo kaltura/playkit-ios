@@ -21,7 +21,6 @@ extension KalturaRequestBuilder {
     @discardableResult
     internal func setApiVersion(apiVersion:String) -> Self {
         self.setBody(key: "apiVersion", value: JSON(apiVersion))
-        
         return self
     }
     
@@ -33,7 +32,6 @@ extension KalturaRequestBuilder {
 
     @discardableResult
     internal func setOTTBasicParams() -> Self {
-        
         self.setClientTag(clientTag: "java:16-09-10")
         self.setApiVersion(apiVersion: "3.6.1078.11798")
         return self
