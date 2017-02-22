@@ -15,8 +15,8 @@ class PlayerController: NSObject, Player {
     
     var delegate: PlayerDelegate?
     
-    private var currentPlayer: AVPlayerEngine?
-    private var assetBuilder: AssetBuilder?
+    fileprivate var currentPlayer: AVPlayerEngine?
+    fileprivate var assetBuilder: AssetBuilder?
     
     public var duration: Double {
         get {
@@ -86,8 +86,9 @@ class PlayerController: NSObject, Player {
         self.onEventBlock = nil
     }
     
-    // reachability
-    internal var reachability = Reachability()
+    // Every player that is created should own Reachability instance
+    let reachability = Reachability()
+    var shouldRefresh: Bool = false
     
     func prepare(_ config: MediaConfig) {
         if let player = self.currentPlayer {
@@ -98,6 +99,10 @@ class PlayerController: NSObject, Player {
                 self.assetBuilder?.build(readyCallback: { (error: Error?, asset: AVAsset?) in
                     if let avAsset: AVAsset = asset {
                         self.currentPlayer?.asset = avAsset
+                        
+                        if DRMSupport.widevineClassicHandler != nil {
+                            self.addAssetRefreshObservers()
+                        }
                     }
                 })
             } else {
@@ -143,7 +148,7 @@ class PlayerController: NSObject, Player {
     
     func destroy() {
         self.currentPlayer?.destroy()
-        self.removeReachabilityObserver()
+        self.removeAssetRefreshObservers()
     }
     
     func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
@@ -160,33 +165,84 @@ class PlayerController: NSObject, Player {
 }
 
 /************************************************************/
-// MARK: - Session Termination Handling
+// MARK: - Reachability & Application States Handling
 /************************************************************/
 extension PlayerController {
-    
-    func addReachabilityObserver() -> Void {
-        // start reachability notifiying before loading asset to the player.
-        // observe reachability and make sure to remove old observer in case prepare gets called more than once by mistake.
-        NotificationCenter.default.removeObserver(self, name: .ReachabilityChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(notification:)), name: .ReachabilityChanged, object: nil)
-    }
-    
-    func removeReachabilityObserver() -> Void {
-        self.reachability?.stopNotifier()
-        NotificationCenter.default.removeObserver(self, name: .ReachabilityChanged, object: nil)
-    }
-    
-    @objc func reachabilityChanged(notification: Notification) {
-        let reachability = notification.object as! Reachability
-        if !reachability.isReachable {
-            self.sendReachabilityErrorEvent()
+    private func prepareToRefreshAsset() {
+        if let handler = self.assetBuilder?.assetHandler as? RefreshableAssetHandler {
+            if let (source, handlerClass) = self.assetBuilder!.getPreferredMediaSource() {
+                handler.prepareToRefreshAsset(mediaSource: source, refreshCallback: { [unowned self](shouldRefresh) in
+                    if shouldRefresh {
+                        self.shouldRefresh = true
+                    }
+                })
+            }
         }
+    }
+    
+    private func refreshAsset() {
+        if let handler = self.assetBuilder?.assetHandler as? RefreshableAssetHandler {
+            
+            if let (source, handlerClass) = self.assetBuilder!.getPreferredMediaSource() {
+                self.currentPlayer?.startPosition = (self.currentPlayer?.currentPosition)!
+                handler.refreshAsset(mediaSource: source)
+            }
+        }
+    }
+    
+    func addAssetRefreshObservers() {
+        self.addReachabilityObserver()
+        self.addAppStateChangeObserver()
+        self.prepareToRefreshAsset()
+    }
+    
+    func removeAssetRefreshObservers() {
+        self.removeReachabilityObserver()
+        self.removeAppStateChangeObserver()
+    }
+    
+    // Reachability Handling
+    private func addReachabilityObserver() -> Void {
+        self.reachability?.startNotifier()
+        
+        self.reachability?.onReachable = { [unowned self] reachability in
+            self.handleRefreshAsset()
+        }
+    }
+    
+    private func removeReachabilityObserver() -> Void {
+        self.reachability?.stopNotifier()
     }
     
     private func sendReachabilityErrorEvent() {
         if let block = self.onEventBlock {
             PKLog.error("unreachable");
             // TODO: error handling
+        }
+    }
+    
+    // Application States Handling
+    private func addAppStateChangeObserver() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(PlayerController.applicationDidBecomeActive),
+                                               name: .UIApplicationDidBecomeActive,
+                                               object: nil)
+    }
+    
+    private func removeAppStateChangeObserver() {
+        NotificationCenter.default.removeObserver(self,
+                                                  name: .UIApplicationDidBecomeActive,
+                                                  object: nil)
+    }
+    
+    @objc private func applicationDidBecomeActive() {
+        self.handleRefreshAsset()
+    }
+    
+    private func handleRefreshAsset() {
+        if self.shouldRefresh {
+            self.shouldRefresh = false
+            self.refreshAsset()
         }
     }
 }

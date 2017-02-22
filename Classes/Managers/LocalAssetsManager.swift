@@ -136,12 +136,8 @@ public class LocalAssetsManager: NSObject {
         // FairPlay -- nothing to do
 
         // Widevine
-        if mediaSource.sourceType == MediaSource.SourceType.wvm_wideVine {
-            guard let licenseUri = extractLicenseUri(mediaSource: mediaSource) else {
-                return
-            }
-            
-            WidevineClassicHelper.registerLocalAsset(location.absoluteString, licenseUri: licenseUri, refresh:false, callback: callback)
+        if mediaSource.fileExt == "wvm" {
+            WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:false, callback: callback)
         }
     }
     
@@ -150,23 +146,9 @@ public class LocalAssetsManager: NSObject {
         // FairPlay -- nothing to do
         
         // Widevine
-        if mediaSource.sourceType == MediaSource.SourceType.wvm_wideVine {
-            guard let licenseUri = extractLicenseUri(mediaSource: mediaSource) else {
-                return
-            }
-            
-            WidevineClassicHelper.registerLocalAsset(location.absoluteString, licenseUri: licenseUri, refresh:true, callback: callback)
+        if mediaSource.fileExt == "wvm" {
+            WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:true, callback: callback)
         }
-    }
-    
-    private func extractLicenseUri(mediaSource: MediaSource) -> String? {
-        guard let drmData = mediaSource.drmData?.first, let licenseUri = drmData.licenseUri  else {
-            // TODO:: error handling
-            PKLog.error("Invalid DRM Data")
-            return nil
-        }
-        
-        return licenseUri.absoluteString
     }
     
     public func unregisterAsset(_ assetUri: String!, callback: @escaping (Error?) -> Void) {

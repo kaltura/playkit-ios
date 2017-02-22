@@ -9,7 +9,12 @@
 import Foundation
 import AVFoundation
 
-class WidevineClassicAssetHandler: AssetHandler {
+typealias ReadyCallback = (Error?, AVAsset?) -> Void
+typealias RefreshCallback = (Bool) -> Void
+
+class WidevineClassicAssetHandler: RefreshableAssetHandler {
+    
+    var readyCallback: ReadyCallback?
     
     static let sourceFilter = { (_ src: MediaSource) -> Bool in
         
@@ -31,10 +36,62 @@ class WidevineClassicAssetHandler: AssetHandler {
         
         return false
     }
-
-
-    internal func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?) -> Void) {
+    
+    func prepareToRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping RefreshCallback) {
+        guard let contentUrl = mediaSource.contentUrl else {
+            PKLog.error("Invalid media: no url")
+            refreshCallback(false)
+            return
+        }
         
+        guard let licenseUri = mediaSource.drmData?.first?.licenseUri else {
+            PKLog.error("Missing licenseUri")
+            refreshCallback(false)
+            return
+        }
+        
+        WidevineClassicHelper.prepareToRefreshAsset(contentUrl.absoluteString) { (shouldRefresh) in
+            if shouldRefresh {
+                refreshCallback(true)
+            }
+        }
+    }
+    
+    func refreshAsset(mediaSource: MediaSource) {
+        
+        guard let contentUrl = mediaSource.contentUrl else {
+            PKLog.error("Invalid media: no url")
+            return
+        }
+        
+        guard let licenseUri = mediaSource.drmData?.first?.licenseUri else {
+            PKLog.error("Missing licenseUri")
+            return
+        }
+        
+        WidevineClassicHelper.playAsset(contentUrl.absoluteString, withLicenseUri: licenseUri.absoluteString) {  (_ playbackURL:String?)->Void  in
+            if playbackURL == "" {
+                PKLog.error("Invalid media: no url")
+                self.readyCallback?(AssetError.invalidContentUrl(nil), nil)
+                return
+                
+            }
+            
+            guard let playbackURL = playbackURL else {
+                PKLog.error("Invalid media: no url")
+                self.readyCallback?(AssetError.invalidContentUrl(nil), nil)
+                return
+            }
+            
+            DispatchQueue.main.async {
+                PKLog.debug("widevine classic:: callback url:\(playbackURL)")
+                self.readyCallback?(nil, AVURLAsset(url: URL(string: playbackURL)!))
+            }
+        }
+    }
+    
+    internal func buildAsset(mediaSource: MediaSource, readyCallback: @escaping ReadyCallback) {
+        self.readyCallback = readyCallback
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
             readyCallback(AssetError.invalidContentUrl(nil), nil)
@@ -89,7 +146,7 @@ class WidevineClassicAssetHandler: AssetHandler {
             }
         }
     }
-
+    
     required init() {}
 }
 

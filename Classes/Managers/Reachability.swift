@@ -13,10 +13,6 @@ import SystemConfiguration
 // MARK: - Reachability
 /************************************************************/
 
-extension Notification.Name {
-    static let ReachabilityChanged = NSNotification.Name("com.kaltura.playkit.ReachabilityChanged")
-}
-
 /// A `Reachability` object offers handling on reachability changed events.
 ///
 /// To observe reachability changes use notification center
@@ -44,9 +40,6 @@ class Reachability {
     var onReachable: ReachabilityHandler?
     /// On unreachable handler block (single object)
     var onUnreachable: ReachabilityHandler?
-    
-    // notifications
-    var notificationCenter: NotificationCenter = NotificationCenter.default
     
     fileprivate var isOnDevice: Bool = {
         #if (arch(i386) || arch(x86_64)) && os(iOS)
@@ -148,8 +141,6 @@ extension Reachability {
         
         let block = isReachable ? onReachable : onUnreachable
         block?(self)
-        
-        self.notificationCenter.post(name: .ReachabilityChanged, object: self)
         
         self.previousFlags = flags
     }
