@@ -55,10 +55,10 @@ public class PlayKitManager: NSObject {
         pluginRegistry[pluginType.pluginName] = pluginType
     }
     
-    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) throws -> PKPlugin {
+    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) -> PKPlugin {
         guard let pluginClass = pluginRegistry[name] else {
             PKLog.error("plugin with name: \(name) doesn't exist in pluginRegistry")
-            throw PKPluginError.failedToCreatePlugin
+            self.messageBus.post(PlayerEvent.Error(nsError: PKPluginError.failedToCreatePlugin.asNSError))
         }
         return pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
     }

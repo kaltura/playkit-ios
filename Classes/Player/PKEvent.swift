@@ -66,7 +66,7 @@ extension PKEvent {
     }
     
     /// Associated error from error event, PKEvent Data Accessor
-    public var playerError: NSError? {
+    public var error: NSError? {
         return self.data?[EventDataKeys.Error] as? NSError
     }
     
@@ -95,7 +95,7 @@ extension PKEvent {
         return self.data?[AdEventDataKeys.WebOpener] as? NSObject
     }
     
-    /// Associated error from error event, PKEvent Data Accessor
+    /// Associated error from error event, PKEvent Ad Data Accessor
     public var adError: NSError? {
         return self.data?[AdEventDataKeys.Error] as? NSError
     }

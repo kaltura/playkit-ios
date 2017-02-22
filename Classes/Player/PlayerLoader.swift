@@ -35,23 +35,17 @@ class PlayerLoader: PlayerDecoratorBase {
         if let pluginConfigs = pluginConfig?.config {
             for pluginName in pluginConfigs.keys {
                 let pluginConfig = pluginConfigs[pluginName]
-                do {
-                    let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
-                    
-                    var decorator: PlayerDecoratorBase? = nil
-                    
-                    if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
-                        d.setPlayer(player)
-                        decorator = d
-                        player = d
-                    }
-                    
-                    loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
-                } catch let e {
-                    if case let error = PKPluginError.failedToCreatePlugin {
-                        self.messageBus.post(PlayerEvent.Error(nsError: error.asNSError))
-                    }
+                let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
+                
+                var decorator: PlayerDecoratorBase? = nil
+                
+                if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
+                    d.setPlayer(player)
+                    decorator = d
+                    player = d
                 }
+                
+                loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
             }
         }
         setPlayer(player)
