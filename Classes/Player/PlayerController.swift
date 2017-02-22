@@ -86,6 +86,9 @@ class PlayerController: NSObject, Player {
         self.onEventBlock = nil
     }
     
+    // reachability
+    internal var reachability = Reachability()
+    
     func prepare(_ config: MediaConfig) {
         if let player = self.currentPlayer {
             player.startPosition = config.startTime
@@ -140,6 +143,7 @@ class PlayerController: NSObject, Player {
     
     func destroy() {
         self.currentPlayer?.destroy()
+        self.removeReachabilityObserver()
     }
     
     func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
@@ -152,5 +156,37 @@ class PlayerController: NSObject, Player {
     
     public func selectTrack(trackId: String) {
         self.currentPlayer?.selectTrack(trackId: trackId)
+    }
+}
+
+/************************************************************/
+// MARK: - Session Termination Handling
+/************************************************************/
+extension PlayerController {
+    
+    func addReachabilityObserver() -> Void {
+        // start reachability notifiying before loading asset to the player.
+        // observe reachability and make sure to remove old observer in case prepare gets called more than once by mistake.
+        NotificationCenter.default.removeObserver(self, name: .ReachabilityChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(notification:)), name: .ReachabilityChanged, object: nil)
+    }
+    
+    func removeReachabilityObserver() -> Void {
+        self.reachability?.stopNotifier()
+        NotificationCenter.default.removeObserver(self, name: .ReachabilityChanged, object: nil)
+    }
+    
+    @objc func reachabilityChanged(notification: Notification) {
+        let reachability = notification.object as! Reachability
+        if !reachability.isReachable {
+            self.sendReachabilityErrorEvent()
+        }
+    }
+    
+    private func sendReachabilityErrorEvent() {
+        if let block = self.onEventBlock {
+            PKLog.error("unreachable");
+            // TODO: error handling
+        }
     }
 }
