@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class OTTSessionManager: SessionProvider {
+@objc public class OTTSessionManager: NSObject, SessionProvider {
     
     
     enum SessionManagerError: Error{
@@ -153,18 +153,18 @@ public class OTTSessionManager: SessionProvider {
     }
     
     
-    public func loadKS(completion: @escaping (_ result :Result<String>) -> Void) {
+    public func loadKS(completion: @escaping (String?, Error?) -> Void) {
         let now = Date()
         
         if let expiration = self.tokenExpiration, expiration.timeIntervalSince(now) > saftyMargin {
-            completion(Result(data:self.ks, error: nil))
+            completion(self.ks, nil)
         }else{
             
             self.refreshKS(completion: completion)
         }
     }
     
-    public func refreshKS(completion: @escaping (_ result :Result<String>) -> Void){
+    public func refreshKS(completion: @escaping (String?, Error?) -> Void){
         
         if let refreshToken = self.refreshToken, let ks = self.ks{
             
@@ -180,7 +180,7 @@ public class OTTSessionManager: SessionProvider {
                         do{
                         response = try OTTMultiResponseParser.parse(data: data)
                         }catch{
-                            completion(Result(data: nil, error: error))
+                            completion(nil, error)
                         }
                         
                         if let response = response, response.count == 2, let loginSession = response[0] as? OTTLoginSession, let session = response[1] as? OTTSession{
@@ -189,14 +189,14 @@ public class OTTSessionManager: SessionProvider {
                             self.refreshToken = loginSession.refreshToken
                             self.tokenExpiration = session.tokenExpiration
                             
-                            completion(Result(data: self.ks, error: nil))
+                            completion(self.ks, nil)
                             
                         }else{
-                            completion(Result(data: nil, error: SessionManagerError.failedToRefreshKS))
+                            completion(nil, SessionManagerError.failedToRefreshKS)
                         }
                         
                     }else{
-                        completion(Result(data: nil, error: SessionManagerError.failedToRefreshKS))
+                        completion(nil, SessionManagerError.failedToRefreshKS)
                     }
                     
                 }))
@@ -205,14 +205,14 @@ public class OTTSessionManager: SessionProvider {
                     self.executor.send(request: request)
                     
                 }else{
-                    completion(Result(data: nil, error: SessionManagerError.failedToBuildRefreshRequest))
+                    completion(nil, SessionManagerError.failedToBuildRefreshRequest)
                 }
                 
             }else{
-               completion(Result(data: nil, error: SessionManagerError.invalidRefreshCallResponse))
+               completion(nil, SessionManagerError.invalidRefreshCallResponse)
             }
         }else{
-            completion(Result(data: nil, error: SessionManagerError.noRefreshTokenOrTokenToRefresh))
+            completion(nil, SessionManagerError.noRefreshTokenOrTokenToRefresh)
         }
 
     }

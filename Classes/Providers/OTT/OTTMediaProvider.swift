@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-public class OTTMediaProvider: MediaEntryProvider {
+@objc public class OTTMediaProvider: NSObject, MediaEntryProvider {
     
     
     var sessionProvider: SessionProvider?
@@ -29,7 +29,7 @@ public class OTTMediaProvider: MediaEntryProvider {
     }
     
     
-    public init(){
+    public override init(){
         
     }
     
@@ -74,14 +74,14 @@ public class OTTMediaProvider: MediaEntryProvider {
         
     }
     
-    public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
+    public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
         
         
         guard let sessionProvider = self.sessionProvider,
             let mediaId = self.mediaId,
             let type = self.type
             else {
-                callback(Result(data: nil, error: Err.invalidInputParams))
+                callback(nil, Err.invalidInputParams)
                 return
         }
         
@@ -104,11 +104,10 @@ public class OTTMediaProvider: MediaEntryProvider {
         
     }
     
-    func startLoad(loader:LoaderInfo,callback: @escaping (Result<MediaEntry>) -> Void) {
-        loader.sessionProvider.loadKS { (r:Result<String>) in
-            
-            guard let ks = r.data else {
-                callback(Result(data: nil, error: Err.invalidKS))
+    func startLoad(loader:LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) {
+        loader.sessionProvider.loadKS { (ks, error) in
+            guard let ks = ks else {
+                callback(nil, Err.invalidKS)
                 return
             }
             
@@ -117,7 +116,7 @@ public class OTTMediaProvider: MediaEntryProvider {
                 .set(completion: { (r:Response) in
                     
                     guard let data = r.data else {
-                        callback(Result(data: nil, error: Err.mediaNotFound))
+                        callback(nil, Err.mediaNotFound)
                         return
                     }
                     
@@ -125,7 +124,7 @@ public class OTTMediaProvider: MediaEntryProvider {
                     do {
                         object = try OTTResponseParser.parse(data: data)
                     }catch{
-                        callback(Result(data: nil, error: error))
+                        callback(nil, error)
                     }
                     
                     if let asset = object as? OTTAsset {
@@ -150,9 +149,9 @@ public class OTTMediaProvider: MediaEntryProvider {
                             }
                         }
                         
-                        callback(Result(data: mediaEntry, error: nil))
+                        callback(mediaEntry, nil)
                     }else{
-                        callback(Result(data: nil, error: Err.mediaNotFound))
+                        callback(nil, Err.mediaNotFound)
                     }
                     
                 })

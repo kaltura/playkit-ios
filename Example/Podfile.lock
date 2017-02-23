@@ -1,4 +1,7 @@
 PODS:
+  - google-cast-sdk (3.3.0):
+    - google-cast-sdk/Core (= 3.3.0)
+  - google-cast-sdk/Core (3.3.0)
   - GoogleAds-IMA-iOS-SDK (3.4.1)
   - Log (1.0)
   - Nimble (6.0.1)
@@ -10,6 +13,9 @@ PODS:
     - Log
     - SwiftyJSON
     - SwiftyXMLParser
+  - PlayKit/GoogleCastAddon (0.1.x-dev):
+    - google-cast-sdk
+    - PlayKit/Core
   - PlayKit/IMAPlugin (0.1.x-dev):
     - GoogleAds-IMA-iOS-SDK (= 3.4.1)
     - PlayKit/Core
@@ -37,6 +43,7 @@ DEPENDENCIES:
   - GoogleAds-IMA-iOS-SDK (~> 3.3)
   - Nimble (= 6.0.1)
   - PlayKit (from `../../playkit-ios`)
+  - PlayKit/GoogleCastAddon (from `../../playkit-ios`)
   - PlayKit/IMAPlugin (from `../../playkit-ios`)
   - PlayKit/KalturaLiveStatsPlugin (from `../../playkit-ios`)
   - PlayKit/KalturaStatsPlugin (from `../../playkit-ios`)
@@ -49,6 +56,7 @@ EXTERNAL SOURCES:
     :path: ../../playkit-ios
 
 SPEC CHECKSUMS:
+  google-cast-sdk: da1989cbc1b9ff7b50ddb9dae5b1969d95a65a0f
   GoogleAds-IMA-iOS-SDK: 7355db22ce69be4607ed0cc5112847b2b0c5e89d
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
   Nimble: 1527fd1bd2b4cf0636251a36bc8ab37e81da8347
@@ -61,4 +69,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 25eed3c6d61ea6aa08f2373344715de01155899a
 
-COCOAPODS: 1.2.0
+COCOAPODS: 1.2.0.beta.1
