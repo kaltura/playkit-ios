@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class OVPSessionManager: SessionProvider {
+@objc public class OVPSessionManager: NSObject, SessionProvider {
     
     public enum SessionManagerError: Error{
         case failedToGetKS
@@ -56,9 +56,9 @@ public class OVPSessionManager: SessionProvider {
         self.init(serverURL: serverURL, partnerId: partnerId, executor: executor)
     }
     
-    public func loadKS(completion: @escaping (_ result :Result<String>) -> Void){
+    public func loadKS(completion: @escaping (String?, Error?) -> Void){
         if let ks = self.ks, self.tokenExpiration?.compare(Date()) == ComparisonResult.orderedDescending {
-                completion(Result(data: ks))
+                completion(ks, nil)
         }else{
             
             self.ks = nil
@@ -83,13 +83,13 @@ public class OVPSessionManager: SessionProvider {
     }
     
     
-    func ensureKSAfterRefresh(e:Error?,completion: @escaping (_ result :Result<String>) -> Void) -> Void {
+    func ensureKSAfterRefresh(e:Error?,completion: @escaping (String?, Error?) -> Void) -> Void {
         if let ks = self.ks {
-            completion(Result(data: ks))
+            completion(ks, nil)
         } else if let error = e {
-            completion(Result(error: error))
+            completion(nil, error)
         } else {
-            completion(Result(error: SessionManagerError.ksExpired))
+            completion(nil, SessionManagerError.ksExpired)
         }
     }
     
@@ -100,10 +100,9 @@ public class OVPSessionManager: SessionProvider {
             .setOVPBasicParams()
             .set(completion: { (r:Response) in
                 
-                if let data = r.data
-                {
+                if let data = r.data {
                     var result: OVPBaseObject? = nil
-                    do{
+                    do {
                         result = try OVPResponseParser.parse(data:data)
                         if let widgetSession = result as? OVPStartWidgetSessionResponse {
                             self.ks = widgetSession.ks

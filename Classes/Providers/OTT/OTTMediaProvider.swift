@@ -9,13 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-public class OTTMediaProvider: MediaEntryProvider {
-    
-    var sessionProvider: SessionProvider?
-    var mediaId: String?
-    var type: AssetType?
-    var formats: [String]?
-    var executor: RequestExecutor?
+@objc public class OTTMediaProvider: NSObject, MediaEntryProvider {
     
     public enum OTTMediaProviderError: Error {
         case invalidInputParams
@@ -27,12 +21,16 @@ public class OTTMediaProvider: MediaEntryProvider {
         case unableToParseObject
     }
     
-    public init(){
-        
-    }
+    var sessionProvider: SessionProvider?
+    var mediaId: String?
+    var type: AssetType?
+    var formats: [String]?
+    var executor: RequestExecutor?
+    
+    public override init() { }
     
     @discardableResult
-    public func set(sessionProvider:SessionProvider?) -> Self {
+    public func set(sessionProvider: SessionProvider?) -> Self {
         self.sessionProvider = sessionProvider
         return self
     }
@@ -61,25 +59,20 @@ public class OTTMediaProvider: MediaEntryProvider {
         return self
     }
     
-    
     struct LoaderInfo {
-        
         var sessionProvider: SessionProvider
         var mediaId: String
         var type: AssetType
         var formats: [String]
         var executor: RequestExecutor
-        
     }
     
-    public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
-        
-        
+    public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
         guard let sessionProvider = self.sessionProvider,
             let mediaId = self.mediaId,
             let type = self.type
             else {
-                callback(Result(data: nil, error: OTTMediaProviderError.invalidInputParams))
+                callback(nil, OTTMediaProviderError.invalidInputParams)
                 return
         }
         
@@ -102,11 +95,11 @@ public class OTTMediaProvider: MediaEntryProvider {
         
     }
     
-    func startLoad(loader:LoaderInfo,callback: @escaping (Result<MediaEntry>) -> Void) {
-        loader.sessionProvider.loadKS { (r:Result<String>) in
-            
-            guard let ks = r.data else {
-                callback(Result(data: nil, error: OTTMediaProviderError.invalidKS))
+
+    func startLoad(loader: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) {
+        loader.sessionProvider.loadKS { (ks, error) in
+            guard let ks = ks else {
+                callback(nil, OTTMediaProviderError.invalidKS)
                 return
             }
             
@@ -115,15 +108,15 @@ public class OTTMediaProvider: MediaEntryProvider {
                 .set(completion: { (r:Response) in
                     
                     guard let data = r.data else {
-                        callback(Result(data: nil, error: OTTMediaProviderError.mediaNotFound))
+                        callback(nil, OTTMediaProviderError.mediaNotFound)
                         return
                     }
                     
                     var object: OTTBaseObject? = nil
                     do {
                         object = try OTTResponseParser.parse(data: data)
-                    }catch{
-                        callback(Result(data: nil, error: error))
+                    } catch {
+                        callback(nil, error)
                     }
                     
                     if let asset = object as? OTTAsset {
@@ -147,19 +140,15 @@ public class OTTMediaProvider: MediaEntryProvider {
                                 mediaEntry.sources = sources
                             }
                         }
-                        
-                        callback(Result(data: mediaEntry, error: nil))
-                    }else{
-                        callback(Result(data: nil, error: OTTMediaProviderError.mediaNotFound))
+                        callback(mediaEntry, nil)
+                    } else {
+                        callback(nil, OTTMediaProviderError.mediaNotFound)
                     }
-                    
                 })
-            
             if let assetRequest = requestBuilder?.build() {
                 loader.executor.send(request: assetRequest)
             }
         }
-        
     }
 }
 

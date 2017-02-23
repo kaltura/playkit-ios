@@ -79,6 +79,11 @@ protocol AssetHandler {
     func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?)->Void)
 }
 
+protocol RefreshableAssetHandler: AssetHandler {
+    func shouldRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping (Bool)->Void)
+    func refreshAsset(mediaSource: MediaSource)
+}
+
 enum AssetError : Error {
     case noFpsCertificate
     case noLicenseUri

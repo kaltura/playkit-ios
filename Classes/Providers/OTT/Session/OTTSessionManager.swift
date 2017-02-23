@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class OTTSessionManager: SessionProvider {
+@objc public class OTTSessionManager: NSObject, SessionProvider {
     
     enum SessionManagerError: Error{
         case failedToGetKS
@@ -96,7 +96,6 @@ public class OTTSessionManager: SessionProvider {
         let sessionGetRequest = OTTSessionService.get(baseURL: self.serverURL,
                                                       ks:"1:result:ks")
         
-        
         if let r1 = loginRequestBuilder, let r2 = sessionGetRequest {
             
             let mrb = KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: r1)
@@ -133,63 +132,60 @@ public class OTTSessionManager: SessionProvider {
         }
     }
     
-    public func loadKS(completion: @escaping (_ result: Result<String>) -> Void) {
+    public func loadKS(completion: @escaping (String?, Error?) -> Void) {
         let now = Date()
         
         if let expiration = self.tokenExpiration, expiration.timeIntervalSince(now) > saftyMargin {
-            completion(Result(data:self.ks, error: nil))
+            completion(self.ks, nil)
         } else {
-            
             self.refreshKS(completion: completion)
         }
     }
     
-    public func refreshKS(completion: @escaping (_ result :Result<String>) -> Void){
+    public func refreshKS(completion: @escaping (String?, Error?) -> Void) {
         
-        if let refreshToken = self.refreshToken, let ks = self.ks{
+        guard let refreshToken = self.refreshToken, let ks = self.ks else {
+            completion(nil, SessionManagerError.noRefreshTokenOrTokenToRefresh)
+            return
+        }
+        
+        let refreshSessionRequest = OTTUserService.refreshSession(baseURL: self.serverURL, refreshToken: refreshToken, ks: ks)
+        let getSessionRequest = OTTSessionService.get(baseURL: self.serverURL, ks: "1:result:ks")
+        
+        guard let req1 = refreshSessionRequest, let req2 = getSessionRequest else {
+            completion(nil, SessionManagerError.invalidRefreshCallResponse)
+            return
+        }
+        
+        let mrb: KalturaMultiRequestBuilder? = (KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: req1).add(request: req2))?.setOTTBasicParams().set(completion: { (r:Response) in
             
-            let refreshSessionRequest = OTTUserService.refreshSession(baseURL: self.serverURL, refreshToken: refreshToken, ks: ks)
-            let getSessionRequest = OTTSessionService.get(baseURL: self.serverURL, ks: "1:result:ks")
-            
-            if let req1 = refreshSessionRequest, let req2 = getSessionRequest {
-                
-                let mrb: KalturaMultiRequestBuilder? = (KalturaMultiRequestBuilder(url: self.serverURL)?.add(request: req1).add(request: req2))?.setOTTBasicParams().set(completion: { (r:Response) in
-                    
-                    if let data = r.data{
-                        var response: [OTTBaseObject]? = nil
-                        do {
-                            response = try OTTMultiResponseParser.parse(data: data)
-                        } catch {
-                            completion(Result(data: nil, error: error))
-                        }
-                        
-                        if let response = response, response.count == 2, let loginSession = response[0] as? OTTLoginSession, let session = response[1] as? OTTSession{
-                            
-                            self.ks = loginSession.ks
-                            self.refreshToken = loginSession.refreshToken
-                            self.tokenExpiration = session.tokenExpiration
-                            
-                            completion(Result(data: self.ks, error: nil))
-                        } else {
-                            completion(Result(data: nil, error: SessionManagerError.failedToRefreshKS))
-                        }
-                    } else {
-                        completion(Result(data: nil, error: SessionManagerError.failedToRefreshKS))
-                    }
-                })
-                
-                if let request = mrb?.build() {
-                    self.executor.send(request: request)
-                    
-                } else {
-                    completion(Result(data: nil, error: SessionManagerError.failedToBuildRefreshRequest))
-                }
-                
-            } else {
-               completion(Result(data: nil, error: SessionManagerError.invalidRefreshCallResponse))
+            guard let data = r.data else {
+                completion(nil, SessionManagerError.failedToRefreshKS)
+                return
             }
+            
+            var response: [OTTBaseObject]? = nil
+            do {
+                response = try OTTMultiResponseParser.parse(data: data)
+            } catch {
+                completion(nil, error)
+            }
+            
+            if let response = response, response.count == 2, let loginSession = response[0] as? OTTLoginSession, let session = response[1] as? OTTSession {
+                
+                self.ks = loginSession.ks
+                self.refreshToken = loginSession.refreshToken
+                self.tokenExpiration = session.tokenExpiration
+                completion(self.ks, nil)
+            } else {
+                completion(nil, SessionManagerError.failedToRefreshKS)
+            }
+        })
+        
+        if let request = mrb?.build() {
+            self.executor.send(request: request)
         } else {
-            completion(Result(data: nil, error: SessionManagerError.noRefreshTokenOrTokenToRefresh))
+            completion(nil, SessionManagerError.failedToBuildRefreshRequest)
         }
     }
 }

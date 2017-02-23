@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyXMLParser
 
-public class OVPMediaProvider: MediaEntryProvider {
+@objc public class OVPMediaProvider: NSObject, MediaEntryProvider {
 
     //This object is initiate at the begning of loadMedia methos and contain all neccessery info to load.
     struct LoaderInfo {
@@ -17,11 +17,13 @@ public class OVPMediaProvider: MediaEntryProvider {
         var entryId: String
         var uiconfId: Int64?
         var executor: RequestExecutor
-        var apiServerURL: String
+        var apiServerURL: String {
+            return self.sessionProvider.serverURL + "/api_v3"
+        }
     }
     
     enum OVPMediaProviderError: Error {
-        case invalidParam(paramName:String)
+        case invalidParam(paramName: String)
         case invalidKS
         case invalidParams
         case invalidResponse
@@ -33,10 +35,10 @@ public class OVPMediaProvider: MediaEntryProvider {
     private var executor: RequestExecutor?
     private var uiconfId: Int64?
     
-    public init(){}
+    public override init() {}
     
     public init(_ sessionProvider: SessionProvider) {
-        self.set(sessionProvider: sessionProvider)
+        self.sessionProvider = sessionProvider
     }
     
     /**
@@ -75,46 +77,39 @@ public class OVPMediaProvider: MediaEntryProvider {
         return self
     }
     
-    public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
+    public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void){
         
         // session provider is required in order to have the base url and the partner id
         guard let sessionProvider = self.sessionProvider else {
-            PKLog.error("Proivder must have session info")
-            callback(Result(data: nil, error: OVPMediaProviderError.invalidParam(paramName: "sessionProvider")))
+            PKLog.debug("Proivder must have session info")
+            callback(nil, OVPMediaProviderError.invalidParam(paramName: "sessionProvider"))
             return
         }
         
         // entryId is requierd
         guard let entryId = self.entryId else {
-            PKLog.error("Proivder must have entryId")
-            callback(Result(data: nil, error: OVPMediaProviderError.invalidParam(paramName: "entryId")))
+            PKLog.debug("Proivder must have entryId")
+            callback(nil, OVPMediaProviderError.invalidParam(paramName: "entryId"))
             return
         }
         
-        // if there is not executor we are using the default one
-        var executor: RequestExecutor = USRExecutor.shared
-        if let exe = self.executor {
-            executor = exe
-        }
-        
         //building the loader info which contain all required fields
-        let loaderInfo = LoaderInfo(sessionProvider: sessionProvider, entryId: entryId, uiconfId: self.uiconfId, executor: executor, apiServerURL: sessionProvider.serverURL + "/api_v3")
+        let loaderInfo = LoaderInfo(sessionProvider: sessionProvider, entryId: entryId, uiconfId: self.uiconfId, executor: executor ?? USRExecutor.shared)
         
         self.startLoading(loadInfo: loaderInfo, callback: callback)
     }
     
-    func startLoading(loadInfo: LoaderInfo, callback: @escaping (Result<MediaEntry>) -> Void) -> Void {
+    func startLoading(loadInfo:LoaderInfo,callback: @escaping (MediaEntry?, Error?) -> Void) -> Void {
         
-        loadInfo.sessionProvider.loadKS { (ksResponse: Result<String>) in
+        loadInfo.sessionProvider.loadKS { (resKS, error) in
             
             let mrb = KalturaMultiRequestBuilder(url: loadInfo.apiServerURL)?.setOVPBasicParams()
             var ks: String? = nil
             
             // checking if we got ks from the session, otherwise we should work as anonymous
-            if let data = ksResponse.data, data.isEmpty == false {
+            if let data = resKS, data.isEmpty == false {
                 ks = data
-            }
-            else{
+            } else{
                 // Adding "startWidgetSession" request in case we don't have ks
                 let loginRequestBuilder = OVPSessionService.startWidgetSession(baseURL: loadInfo.apiServerURL,
                                                                                partnerId: loadInfo.sessionProvider.partnerId)
@@ -127,11 +122,10 @@ public class OVPMediaProvider: MediaEntryProvider {
             
             // if we don't have forwared token and not real token we can't continue
             guard let token = ks else {
-                PKLog.error("can't find ks and can't request as anonymous ks (WidgetSession) ")
-                callback(Result(data: nil, error: OVPMediaProviderError.invalidKS))
+                PKLog.debug("can't find ks and can't request as anonymous ks (WidgetSession)")
+                callback(nil, OVPMediaProviderError.invalidKS)
                 return
             }
-            
             
             // Request for Entry data
             let listRequest = OVPBaseEntryService.list(baseURL: loadInfo.apiServerURL,
@@ -142,11 +136,11 @@ public class OVPMediaProvider: MediaEntryProvider {
             let getPlaybackContext =  OVPBaseEntryService.getPlaybackContext(baseURL: loadInfo.apiServerURL,
                                                                              ks: token,
                                                                              entryID: loadInfo.entryId)
+            
             let metadataRequest = OVPBaseEntryService.metadata(baseURL: loadInfo.apiServerURL, ks: token, entryID: loadInfo.entryId)
             
             guard let req1 = listRequest, let req2 = getPlaybackContext, let req3 = metadataRequest else {
-                PKLog.error("can't get all requests")
-                callback(Result(data: nil, error: OVPMediaProviderError.invalidParams))
+                callback(nil, OVPMediaProviderError.invalidParams)
                 return
             }
             
@@ -160,8 +154,8 @@ public class OVPMediaProvider: MediaEntryProvider {
                     
                     // At leat we need to get response of Entry and Playback, on anonymous we will have additional startWidgetSession call
                     guard responses.count >= 2 else {
-                        PKLog.error("didn't get response for all requests")
-                        callback(Result(data: nil, error: OVPMediaProviderError.invalidResponse ))
+                        PKLog.debug("didn't get response for all requests")
+                        callback(nil, OVPMediaProviderError.invalidResponse)
                         return
                     }
                     
@@ -174,23 +168,21 @@ public class OVPMediaProvider: MediaEntryProvider {
                         let contextData = contextDataResponse as? OVPPlaybackContext,
                         let sources = contextData.sources,
                         let metadataListObject = metaData as? OVPList,
-                        let metadataList = metadataListObject.objects as? [OVPMetadata] else {
-                            
-                            PKLog.error("Response is not containing Entry info or playback data")
-                            callback(Result(data: nil, error: OVPMediaProviderError.invalidResponse ))
+                        let metadataList = metadataListObject.objects as? [OVPMetadata]
+                        else {
+                            PKLog.debug("Response is not containing Entry info or playback data")
+                            callback(nil, OVPMediaProviderError.invalidResponse)
                             return
                     }
                     
-                    
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach { (source: OVPSource) in
-                        
                         //detecting the source type
                         let sourceType = self.getSourceType(source: source)
                         //If source type is not supported source will not be created
                         guard sourceType != .unknown else { return }
                         
-                        var ksForURL = ksResponse.data
+                        var ksForURL = resKS
                         
                         // retrieving the ks from the response of StartWidgetSession
                         if responses.count > 2 {
@@ -221,14 +213,13 @@ public class OVPMediaProvider: MediaEntryProvider {
                     mediaEntry.duration = entry.duration
                     mediaEntry.sources = mediaSources
                     mediaEntry.metadata = metaDataItems
-                    callback(Result(data: mediaEntry, error: nil ))
+                    callback(mediaEntry, nil)
                 })
-            
             
             if let request = mrb?.build() {
                 loadInfo.executor.send(request: request)
             } else {
-                callback(Result(data: nil, error: OVPMediaProviderError.invalidParams))
+                callback(nil, OVPMediaProviderError.invalidParams)
             }
         }
     }
