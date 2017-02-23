@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class OVPSessionManager: SessionProvider {
+@objc public class OVPSessionManager: NSObject, SessionProvider {
     
     
     public enum SessionManagerError: Error{
@@ -59,9 +59,9 @@ public class OVPSessionManager: SessionProvider {
         self.init(serverURL: serverURL, partnerId: partnerId, executor: executor)
     }
     
-    public func loadKS(completion: @escaping (_ result :Result<String>) -> Void){
+    public func loadKS(completion: @escaping (String?, Error?) -> Void){
         if let ks = self.ks, self.tokenExpiration?.compare(Date()) == ComparisonResult.orderedDescending {
-                completion(Result(data: ks))
+                completion(ks, nil)
         }else{
             
             self.ks = nil
@@ -86,13 +86,13 @@ public class OVPSessionManager: SessionProvider {
     }
     
     
-    func ensureKSAfterRefresh(e:Error?,completion: @escaping (_ result :Result<String>) -> Void) -> Void {
+    func ensureKSAfterRefresh(e:Error?,completion: @escaping (String?, Error?) -> Void) -> Void {
         if let ks = self.ks {
-            completion(Result(data: ks))
+            completion(ks, nil)
         }else if let error = e {
-            completion(Result(error: error))
+            completion(nil, error)
         }else{
-            completion(Result(error: SessionManagerError.ksExpired))
+            completion(nil, SessionManagerError.ksExpired)
         }
     }
     

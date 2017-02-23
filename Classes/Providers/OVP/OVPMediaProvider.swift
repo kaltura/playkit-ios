@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyXMLParser
 
-public class OVPMediaProvider: MediaEntryProvider {
+@objc public class OVPMediaProvider: NSObject, MediaEntryProvider {
    
 
     
@@ -37,10 +37,10 @@ public class OVPMediaProvider: MediaEntryProvider {
     private var uiconfId: Int64?
     
     
-    public init(){}
+    public override init(){}
     
     public init(_ sessionProvider: SessionProvider) {
-        self.set(sessionProvider: sessionProvider)
+        self.sessionProvider = sessionProvider
     }
     
     /**
@@ -81,12 +81,12 @@ public class OVPMediaProvider: MediaEntryProvider {
     
     
     
-    public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void){
+    public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void){
         
         // session provider is required in order to have the base url and the partner id
         guard let sessionProvider = self.sessionProvider
             else {
-                callback(Result(data: nil, error: Err.invalidParam(paramName: "sessionProvider")))
+                callback(nil, Err.invalidParam(paramName: "sessionProvider"))
                 PKLog.debug("Proivder must have session info")
                 return
         }
@@ -94,7 +94,7 @@ public class OVPMediaProvider: MediaEntryProvider {
         // entryId is requierd
         guard let entryId = self.entryId
             else {
-                callback(Result(data: nil, error: Err.invalidParam(paramName: "entryId")))
+                callback(nil, Err.invalidParam(paramName: "entryId"))
                 PKLog.debug("Proivder must have entryId")
                 return
         }
@@ -113,18 +113,17 @@ public class OVPMediaProvider: MediaEntryProvider {
     }
     
     
-    func startLoading(loadInfo:LoaderInfo,callback: @escaping (Result<MediaEntry>) -> Void) -> Void {
+    func startLoading(loadInfo:LoaderInfo,callback: @escaping (MediaEntry?, Error?) -> Void) -> Void {
         
-        loadInfo.sessionProvider.loadKS { (ksResponse:Result<String>) in
+        loadInfo.sessionProvider.loadKS { (resKS, error) in
             
             let mrb = KalturaMultiRequestBuilder(url: loadInfo.apiServerURL)?.setOVPBasicParams()
             var ks: String? = nil
             
             // checking if we got ks from the session, otherwise we should work as anonymous
-            if let data = ksResponse.data, data.isEmpty == false {
+            if let data = resKS, data.isEmpty == false {
                 ks = data
-            }
-            else{
+            } else{
                 // Adding "startWidgetSession" request in case we don't have ks
                 let loginRequestBuilder = OVPSessionService.startWidgetSession(baseURL: loadInfo.apiServerURL,
                                                                                partnerId: loadInfo.sessionProvider.partnerId)
@@ -137,7 +136,7 @@ public class OVPMediaProvider: MediaEntryProvider {
             
             // if we don't have forwared token and not real token we can't continue
             guard let token = ks else {
-                callback(Result(data: nil, error: Err.invalidKS))
+                callback(nil, Err.invalidKS)
                 PKLog.debug("can't find ks and can't request as anonymous ks (WidgetSession) ")
                 return
             }
@@ -156,7 +155,7 @@ public class OVPMediaProvider: MediaEntryProvider {
             
             guard let req1 = listRequest,
                 let req2 = getPlaybackContext, let req3 = metadataRequest else {
-                    callback(Result(data: nil, error: Err.invalidParams))
+                    callback(nil, Err.invalidParams)
                     return
             }
             
@@ -171,7 +170,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                     // At leat we need to get response of Entry and Playback, on anonymous we will have additional startWidgetSession call
                     guard responses.count >= 2
                         else {
-                            callback(Result(data: nil, error: Err.invalidResponse ))
+                            callback(nil, Err.invalidResponse)
                             PKLog.debug("didn't get response for all requests")
                             return
                     }
@@ -188,7 +187,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                         let metadataListObject = metaData as? OVPList,
                         let metadataList = metadataListObject.objects as? [OVPMetadata]
                         else{
-                            callback(Result(data: nil, error: Err.invalidResponse ))
+                            callback(nil, Err.invalidResponse)
                             PKLog.debug("Response is not containing Entry info or playback data")
                             return
                     }
@@ -202,7 +201,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                         //If source type is not supported source will not be created
                         guard sourceType != .unknown else { return }
                         
-                        var ksForURL = ksResponse.data
+                        var ksForURL = resKS
                         
                         // retrieving the ks from the response of StartWidgetSession
                         if responses.count > 2 {
@@ -233,7 +232,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                     mediaEntry.duration = entry.duration
                     mediaEntry.sources = mediaSources
                     mediaEntry.metadata = metaDataItems
-                    callback(Result(data: mediaEntry, error: nil ))
+                    callback(mediaEntry, nil)
                 })
             
             
@@ -241,7 +240,7 @@ public class OVPMediaProvider: MediaEntryProvider {
                 loadInfo.executor.send(request: request)
                 
             }else{
-                callback(Result(data: nil, error: Err.invalidParams))
+                callback(nil, Err.invalidParams)
             }
         }
         
