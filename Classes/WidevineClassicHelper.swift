@@ -141,7 +141,7 @@ import Foundation
             fatalError(fatalMsg)
         }
         
-        static func prepareToRefreshAsset(_ assetUri: String!, callback: @escaping RefreshAssetBlock) {
+        static func prepareToRefreshAsset(_ assetUri: String!, callback: Any) {
             fatalError(fatalMsg)
         }
         
