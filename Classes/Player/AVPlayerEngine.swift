@@ -219,6 +219,7 @@ class AVPlayerEngine: AVPlayer {
         AppStateSubject.shared.remove(observer: self)
         self.replaceCurrentItem(with: nil)
         self.isDestroyed = true
+        self.replaceCurrentItem(with: nil)
     }
     
     @available(iOS 9.0, *)
