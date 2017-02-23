@@ -9,7 +9,7 @@
 import UIKit
 
 
-public class Result<T> {
+public class Result<T>: NSObject {
     
     public var data: T? = nil
     public var error: Error? = nil

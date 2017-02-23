@@ -11,7 +11,7 @@ import Foundation
 /// The interface of `AppStateSubject`, allows us to better divide the logic and mock easier.
 protocol AppStateSubjectProtocol: class, AppStateProviderDelegate {
     associatedtype InstanceType
-    static var sharedInstance: InstanceType { get }
+    static var shared: InstanceType { get }
     /// Lock object for synchronizing access.
     var lock: AnyObject { get }
     /// The app state events provider.
@@ -127,7 +127,7 @@ extension AppStateSubjectProtocol {
 final class AppStateSubject: AppStateSubjectProtocol {
     
     // singleton object and private init to prevent unwanted creation of more objects.
-    static let sharedInstance = AppStateSubject()
+    static let shared = AppStateSubject()
     private init() {
         self.appStateProvider = AppStateProvider()
         self.appStateProvider.delegate = self

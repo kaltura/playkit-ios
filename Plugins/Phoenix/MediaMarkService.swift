@@ -12,7 +12,7 @@ import SwiftyJSON
 internal class MediaMarkService {
 
     internal static func sendTVPAPIEVent(baseURL: String,
-                                         initObj: JSON?,
+                                         initObj: [String: Any],
                                          eventType: String,
                                          currentTime: Int32,
                                          assetId: String,
@@ -20,12 +20,8 @@ internal class MediaMarkService {
         
         if let request: RequestBuilder = RequestBuilder(url: baseURL) {
             request
-                .set(method: "POST")
-                
-            if let obj = initObj {
-                request.set(jsonBody: obj)
-            }
-            request
+                .set(method: .post)
+                .setBody(key: "initObj", value: JSON(initObj))
                 .setBody(key: "iFileID", value: JSON(fileId))
                 .setBody(key: "iMediaID", value: JSON(assetId))
                 .setBody(key: "iLocation", value: JSON(currentTime))

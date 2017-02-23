@@ -9,16 +9,25 @@
 import UIKit
 import SwiftyJSON
 
-public typealias completionClosures =  (_ response:Response)->Void
+public typealias completionClosures =  (_ response: Response) -> Void
 
-
-
-
+public enum RequestMethod {
+    case get
+    case post
+    
+    /// The `RequestMethod` value, for example for get we need "GET" etc.
+    var value: String {
+        switch self {
+        case .get: return "GET"
+        case .post: return "POST"
+        }
+    }
+}
 
 public protocol Request {
     
     var requestId: String { get }
-    var method: String? { get }
+    var method: RequestMethod? { get }
     var url: URL { get }
     var dataBody: Data? { get }
     var headers: [String:String]? { get }
@@ -27,11 +36,10 @@ public protocol Request {
     var completion: completionClosures? { get }
 }
 
-
-public struct RequestElement : Request {
+public struct RequestElement: Request {
     
     public var requestId: String
-    public var method: String?
+    public var method: RequestMethod?
     public var url: URL
     public var dataBody: Data?
     public var headers: [String:String]?
@@ -40,14 +48,13 @@ public struct RequestElement : Request {
     public var completion: completionClosures?
 }
 
-
 public class RequestBuilder: NSObject {
     
     public lazy var requestId: String =  {
         return UUID().uuidString
     }()
     
-    public var method: String? = nil
+    public var method: RequestMethod? = nil
     public var url: URL
     public var jsonBody: JSON? = nil
     public var headers: [String:String]? = nil
@@ -56,14 +63,12 @@ public class RequestBuilder: NSObject {
     public var completion: completionClosures? = nil
     public var urlParams: [String: String]? = nil
     
-    public init?(url:String){
-        
+    public init?(url: String){
         if let path = URL(string: url) {
             self.url = path
-        }else{
+        } else {
             return nil
         }
-        
     }
     
     @discardableResult
@@ -73,7 +78,7 @@ public class RequestBuilder: NSObject {
     }
     
     @discardableResult
-    public func set(method: String?) -> Self{
+    public func set(method: RequestMethod?) -> Self{
         self.method = method
         return self
     }
@@ -113,7 +118,6 @@ public class RequestBuilder: NSObject {
         return self
     }
     
-    
     @discardableResult
     public func setBody(key: String, value:JSON) -> Self {
         
@@ -128,7 +132,7 @@ public class RequestBuilder: NSObject {
     public func setParam(key: String, value:String) -> Self {
         
         if var params = self.urlParams {
-            self.urlParams![key] = value
+            params[key] = value
         }else{
             self.urlParams = [key:value]
         }
@@ -136,8 +140,7 @@ public class RequestBuilder: NSObject {
     }
     
     public func build() -> Request {
-        
-        
+    
         var bodyData: Data? = nil
         if let body = self.jsonBody {
             do {
@@ -167,8 +170,7 @@ public class RequestBuilder: NSObject {
             
         }
         
-        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)        
-        
+        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
     }
 }
 

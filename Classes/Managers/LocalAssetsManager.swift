@@ -132,10 +132,32 @@ public class LocalAssetsManager: NSObject {
     }
     
     /// Notifies the SDK that downloading of an asset has finished.
-    public func assetDownloadFinished(location: URL, mediaSource: MediaSource) {
+    public func assetDownloadFinished(location: URL, mediaSource: MediaSource, callback: @escaping (Error?) -> Void) {
+        // FairPlay -- nothing to do
+
+        // Widevine
+        if mediaSource.fileExt == "wvm" {
+            WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:false, callback: callback)
+        }
+    }
+    
+    /// Renew Downloaded Asset
+    public func renewDownloadedAsset(location: URL, mediaSource: MediaSource, callback: @escaping (Error?) -> Void) {
         // FairPlay -- nothing to do
         
-        // Widevine: TODO
+        // Widevine
+        if mediaSource.fileExt == "wvm" {
+            WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:true, callback: callback)
+        }
+    }
+    
+    public func unregisterAsset(_ assetUri: String!, callback: @escaping (Error?) -> Void) {
+        // TODO FairPlay
+        
+        // Widevine
+        if assetUri.hasSuffix(".wvm") {
+            WidevineClassicHelper.unregisterAsset(assetUri, callback: callback)
+        }
     }
     
     private class NullStore: LocalDataStore {

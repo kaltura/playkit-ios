@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 /**
  Manager class used for:
   - creating `Player` objects.
@@ -31,7 +30,6 @@ public class PlayKitManager: NSObject {
     @objc(sharedInstance) public static let shared: PlayKitManager = PlayKitManager()
     
     var pluginRegistry = Dictionary<String, PKPlugin.Type>()
-    
     
     /// Loads and returns a player object using a provided configuration.
     ///
