@@ -24,9 +24,9 @@ import SystemConfiguration
 ///     // unreachable!
 /// }
 /// ````
-class Reachability {
+class PKReachability {
     
-    typealias ReachabilityHandler = (Reachability) -> Void
+    typealias ReachabilityHandler = (PKReachability) -> Void
     
     fileprivate var reachabilityRef: SCNetworkReachability?
     /// Indicates if notifier is active and listening to network changes.
@@ -83,7 +83,7 @@ func callback(reachability: SCNetworkReachability, flags: SCNetworkReachabilityF
     
     guard let info = info else { return }
     
-    let reachability = Unmanaged<Reachability>.fromOpaque(info).takeUnretainedValue()
+    let reachability = Unmanaged<PKReachability>.fromOpaque(info).takeUnretainedValue()
     
     DispatchQueue.main.async {
         reachability.reachabilityChanged()
@@ -94,14 +94,14 @@ func callback(reachability: SCNetworkReachability, flags: SCNetworkReachabilityF
 // MARK: - Notifier
 /************************************************************/
 
-extension Reachability {
+extension PKReachability {
     
     func startNotifier() {
         
         guard let reachabilityRef = self.reachabilityRef, !notifierRunning else { return }
         
         var context = SCNetworkReachabilityContext(version: 0, info: nil, retain: nil, release: nil, copyDescription: nil)
-        context.info = UnsafeMutableRawPointer(Unmanaged<Reachability>.passUnretained(self).toOpaque())
+        context.info = UnsafeMutableRawPointer(Unmanaged<PKReachability>.passUnretained(self).toOpaque())
         if !SCNetworkReachabilitySetCallback(reachabilityRef, callback, &context) {
             stopNotifier()
         }
@@ -131,7 +131,7 @@ extension Reachability {
 // MARK: - Network Flag Handling
 /************************************************************/
 
-extension Reachability {
+extension PKReachability {
     
     func reachabilityChanged() {
         let flags = reachabilityFlags
@@ -182,7 +182,7 @@ extension Reachability {
 // MARK: - Reachability Testing
 /************************************************************/
 
-extension Reachability {
+extension PKReachability {
     /// Indicates if we are reachable
     var isReachable: Bool {
         guard isReachableFlagSet else { return false }

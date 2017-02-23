@@ -141,8 +141,8 @@ public class LocalAssetsManager: NSObject {
         }
     }
     
-    /// Refresh Downloaded Asset
-    public func refreshDownloadedAsset(location: URL, mediaSource: MediaSource, callback: @escaping (Error?) -> Void) {
+    /// Renew Downloaded Asset
+    public func renewDownloadedAsset(location: URL, mediaSource: MediaSource, callback: @escaping (Error?) -> Void) {
         // FairPlay -- nothing to do
         
         // Widevine

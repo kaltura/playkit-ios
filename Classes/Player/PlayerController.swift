@@ -87,7 +87,7 @@ class PlayerController: NSObject, Player {
     }
     
     // Every player that is created should own Reachability instance
-    let reachability = Reachability()
+    let reachability = PKReachability()
     var shouldRefresh: Bool = false
     
     func prepare(_ config: MediaConfig) {
@@ -168,10 +168,10 @@ class PlayerController: NSObject, Player {
 // MARK: - Reachability & Application States Handling
 /************************************************************/
 extension PlayerController {
-    private func prepareToRefreshAsset() {
+    private func shouldRefreshAsset() {
         if let handler = self.assetBuilder?.assetHandler as? RefreshableAssetHandler {
             if let (source, handlerClass) = self.assetBuilder!.getPreferredMediaSource() {
-                handler.prepareToRefreshAsset(mediaSource: source, refreshCallback: { [unowned self](shouldRefresh) in
+                handler.shouldRefreshAsset(mediaSource: source, refreshCallback: { [unowned self](shouldRefresh) in
                     if shouldRefresh {
                         self.shouldRefresh = true
                     }
@@ -193,7 +193,7 @@ extension PlayerController {
     func addAssetRefreshObservers() {
         self.addReachabilityObserver()
         self.addAppStateChangeObserver()
-        self.prepareToRefreshAsset()
+        self.shouldRefreshAsset()
     }
     
     func removeAssetRefreshObservers() {

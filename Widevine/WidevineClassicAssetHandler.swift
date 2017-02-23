@@ -37,7 +37,7 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         return false
     }
     
-    func prepareToRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping RefreshCallback) {
+    func shouldRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping RefreshCallback) {
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
             refreshCallback(false)
@@ -50,7 +50,7 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
             return
         }
         
-        WidevineClassicHelper.prepareToRefreshAsset(contentUrl.absoluteString) { (shouldRefresh) in
+        WidevineClassicHelper.shouldRefreshAsset(contentUrl.absoluteString) { (shouldRefresh) in
             if shouldRefresh {
                 refreshCallback(true)
             }

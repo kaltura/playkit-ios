@@ -76,7 +76,7 @@ protocol AssetHandler {
 }
 
 protocol RefreshableAssetHandler: AssetHandler {
-    func prepareToRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping (Bool)->Void)
+    func shouldRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping (Bool)->Void)
     func refreshAsset(mediaSource: MediaSource)
 }
 

@@ -86,8 +86,8 @@ import Foundation
             WidevineClassicCDM.playAsset(assetUri, withLicenseUri: licenseUri, readyToPlay: block)
         }
         
-        static func prepareToRefreshAsset(_ assetUri: String!, callback: @escaping RefreshAssetBlock) {
-            PKLog.info("prepareToRefreshAsset")
+        static func shouldRefreshAsset(_ assetUri: String, callback: @escaping RefreshAssetBlock) {
+            PKLog.info("shouldRefreshAsset")
             
             WidevineClassicCDM.setEventBlock({ (event: KCDMEventType, data: [AnyHashable : Any]?) in
                 switch event {
@@ -141,7 +141,7 @@ import Foundation
             fatalError(fatalMsg)
         }
         
-        static func prepareToRefreshAsset(_ assetUri: String!, callback: Any) {
+        static func shouldRefreshAsset(_ assetUri: String, callback: Any) {
             fatalError(fatalMsg)
         }
         
