@@ -22,18 +22,22 @@ public class TVPAPICastBuilder: BasicCastBuilder {
         case missingFormat
     }
 
-        internal var initObject: [String:Any]!
-    
-
+    internal var initObject: [String:Any]!
     internal var format: String!
     
-    
+ 
     /**
      Set - initObject
      - Parameter initObject: that the receiver will use to represent the user
      */
     @discardableResult
     public func set(initObject: [String:Any]?) -> Self {
+        
+        guard initObject != nil
+            else {
+                PKLog.warning("Trying to set nil to initObject")
+                return self
+        }
         self.initObject = initObject
         return self
     }
@@ -44,6 +48,14 @@ public class TVPAPICastBuilder: BasicCastBuilder {
      */
     @discardableResult
     public func set(format: String?) -> Self {
+        
+        guard format != nil,
+            format?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to format")
+                return self
+        }
+        
         self.format = format
         return self
     }
@@ -51,9 +63,11 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     
     /**
      
-      In order to comunicate with Kaltura receiver you should have init object and format this will throw if the input is not valid
+      In order to comunicate with Kaltura receiver you should have init object and format this will throw exception if the input is not valid
      */
     override func validate() throws {
+        
+        try super.validate()
         
         guard self.initObject != nil else {
             throw TVPAPICastBuilder.BasicBuilderDataError.missingInitObject
@@ -66,20 +80,36 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     }
     
     
-    internal override func proxyData() -> [String:Any]? {
+    internal override func flashVars() -> [String: Any] {
         
-
+        var flashVars = super.flashVars()
+        
+        if let proxyData =  self.proxyData() {
+            flashVars["proxyData"] = proxyData
+        }
+        
+        return flashVars
+    }
+    
+    
+    
+    /**
+        Adding the data relevent for the OTT
+     */
+    internal func proxyData() -> [String:Any]? {
+        
         let flavorAssets = ["filters":["include":["Format":[self.format!]]]]
+        var config : [String : Any] = ["flavorassets":flavorAssets]
         
-        JSONSerialization.isValidJSONObject(flavorAssets)
-        let baseEntry  = ["vars":["isTrailer":" false"]]
-        var proxyData : [String: Any] = ["flavorassets":flavorAssets,
-                                          "baseentry":baseEntry,
-                                          "MediaID":self.contentId!,
-                                          "iMediaID":self.contentId!]
+        var proxyData = ["MediaID":self.contentId!,
+                         "iMediaID":self.contentId!,
+                         "mediaType":0,
+                         "withDynamic":false] as [String : Any]
         
+        proxyData["config"] = config
         proxyData["initObj"] = self.initObject!
         return proxyData
+
     }
 }
 

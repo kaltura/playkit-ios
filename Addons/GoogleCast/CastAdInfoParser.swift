@@ -10,14 +10,17 @@ import UIKit
 import GoogleCast
 
 /**
- AdInfoParser
+ CastAdInfoParser
  
- Parser
+ This class can be used to handle advertisement UI while casting while using google components.
+ There is 2 options to use this class :
+ 1. set 
+ 
  */
-public class AdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
+public class CastAdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
     
     
-    public static let shared = AdInfoParser()
+    public static let shared = CastAdInfoParser()
     
     /**
      return A boolean flag indicating whether your receiver is currently playing an ad ot not
@@ -58,7 +61,8 @@ public class AdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
 
 
 /**
-  An object which represent the Ads info
+  An object which represent the Ads info 
+  The receiver is sending this data by the mediaStatus's customData
  */
 private class AdsMetadata: NSObject {
     
