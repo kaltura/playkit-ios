@@ -19,7 +19,7 @@ enum YouboraPluginError: PKError {
     
     var code: Int {
         switch self {
-        case .failedToSetupYouboraManager: return 3000
+        case .failedToSetupYouboraManager: return 4000
         }
     }
     
