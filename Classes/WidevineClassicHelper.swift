@@ -8,12 +8,11 @@
 
 import Foundation
 
+typealias LocalAssetRegistrationBlock = (Error?) -> Void
+typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
+
 #if WIDEVINE_ENABLED
     import PlayKitWV
-    
-    typealias LocalAssetRegistrationBlock = (Error?) -> Void
-    typealias LocalAssetStatusBlock = (Error?, _ expiryTime: TimeInterval, _ availableTime: TimeInterval) -> Void
-    typealias RefreshAssetBlock = (Bool) -> Void
     
     internal class WidevineClassicHelper {
         static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
@@ -86,7 +85,7 @@ import Foundation
             WidevineClassicCDM.playAsset(assetUri, withLicenseUri: licenseUri, readyToPlay: block)
         }
         
-        static func shouldRefreshAsset(_ assetUri: String, callback: @escaping RefreshAssetBlock) {
+        static func shouldRefreshAsset(_ assetUri: String, callback: @escaping (Bool) -> Void) {
             PKLog.info("shouldRefreshAsset")
             
             WidevineClassicCDM.setEventBlock({ (event: KCDMEventType, data: [AnyHashable : Any]?) in
@@ -121,27 +120,27 @@ import Foundation
     internal class WidevineClassicHelper {
         static let fatalMsg = "PlayKitWV is not contained on Podfile"
         
-        static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: Any) {
+        static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
             fatalError(fatalMsg)
         }
         
-        static func unregisterAsset(_ assetUri: String!, callback: Any) {
+        static func unregisterAsset(_ assetUri: String!, callback: @escaping LocalAssetRegistrationBlock) {
             fatalError(fatalMsg)
         }
         
-        static func checkAssetStatus(_ assetUri: String!, callback: Any) {
+        static func checkAssetStatus(_ assetUri: String!, callback: @escaping LocalAssetStatusBlock) {
             fatalError(fatalMsg)
         }
         
-        static func playAsset(_ assetUri: String!, withLicenseUri licenseUri: String!, readyToPlay block: Any) {
+        static func playAsset(_ assetUri: String!, withLicenseUri licenseUri: String!, readyToPlay block: (String?) -> Void) {
             fatalError(fatalMsg)
         }
         
-        static func playLocalAsset(_ assetUri: String!, readyToPlay block: Any) {
+        static func playLocalAsset(_ assetUri: String!, readyToPlay block: (String?) -> Void) {
             fatalError(fatalMsg)
         }
         
-        static func shouldRefreshAsset(_ assetUri: String, callback: Any) {
+        static func shouldRefreshAsset(_ assetUri: String, callback: (Bool) -> Void) {
             fatalError(fatalMsg)
         }
         
