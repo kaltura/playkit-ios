@@ -37,7 +37,7 @@ public class OVPCastBuilder: BasicCastBuilder{
     }
     
   
-    override func embedConfig() -> [String : Any]? {
+    override func embedConfig() -> [String: Any]? {
      
         if var embedConfig = super.embedConfig(), let ks = self.ks , ks.isEmpty == false {
             embedConfig["ks"] = self.ks

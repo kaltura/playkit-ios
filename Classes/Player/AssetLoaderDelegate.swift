@@ -215,7 +215,7 @@ class AssetLoaderDelegate: NSObject {
             return
         }
         
-        var resourceLoadingRequestOptions: [String : AnyObject]? = nil
+        var resourceLoadingRequestOptions: [String: AnyObject]? = nil
         
         if #available(iOS 10.0, *), shouldPersist {
             resourceLoadingRequestOptions = [AVAssetResourceLoadingRequestStreamingContentKeyRequestRequiresPersistentKey: true as AnyObject]

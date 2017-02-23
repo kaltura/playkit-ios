@@ -9,7 +9,7 @@
 import UIKit
 
 
-internal class KalturaRequestBuilder: RequestBuilder{
+class KalturaRequestBuilder: RequestBuilder {
 
     public var service: String?
     public var action: String?
@@ -36,7 +36,7 @@ internal class KalturaRequestBuilder: RequestBuilder{
         super.init(url: path)
         
         self.add(headerKey: "Content-Type", headerValue: "application/json").add(headerKey: "Accept", headerValue: "application/json")
-        self.set(method: "POST")
+        self.set(method: .post)
         
     }
        
