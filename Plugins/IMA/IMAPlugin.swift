@@ -8,12 +8,16 @@
 
 import GoogleInteractiveMediaAds
 
+/************************************************************/
+// MARK: - IMAPluginError
+/************************************************************/
+
 /// `IMAPluginError` used to wrap an `IMAAdError` and provide converation to `NSError`
 struct IMAPluginError: PKError {
     
     var adError: IMAAdError
     
-    static let Domain = PKErrorDomain.IMA
+    static let Domain = "com.kaltura.playkit.error.ima"
     
     var code: Int {
         return adError.code.rawValue
@@ -25,17 +29,23 @@ struct IMAPluginError: PKError {
     
     var userInfo: [String: Any] {
         return [
-            ErrorTypeKey : adError.type.rawValue
+            PKErrorKeys.ErrorTypeKey : adError.type.rawValue
         ]
     }
 }
 
 // IMA plugin error userInfo keys.
-extension IMAPluginError {
-    var ErrorTypeKey: String {
-        return "errorType"
-    }
+extension PKErrorKeys {
+    static let ErrorTypeKey = "errorType"
 }
+
+extension PKErrorDomain {
+    public static let IMA = IMAPluginError.Domain
+}
+
+/************************************************************/
+// MARK: - IMAPlugin
+/************************************************************/
 
 public class IMAPlugin: BasePlugin, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
 

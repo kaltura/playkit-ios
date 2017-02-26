@@ -10,12 +10,16 @@ import YouboraLib
 import YouboraPluginAVPlayer
 import AVFoundation
 
+/************************************************************/
+// MARK: - YouboraPluginError
+/************************************************************/
+
 /// `YouboraPluginError` represents youbora plugin errors.
 enum YouboraPluginError: PKError {
     
     case failedToSetupYouboraManager
     
-    static let Domain = PKErrorDomain.Youbora
+    static let Domain = "com.kaltura.playkit.error.youbora"
     
     var code: Int {
         switch self {
@@ -35,6 +39,14 @@ enum YouboraPluginError: PKError {
         }
     }
 }
+
+extension PKErrorDomain {
+    public static let Youbora = YouboraPluginError.Domain
+}
+
+/************************************************************/
+// MARK: - YouboraPlugin
+/************************************************************/
 
 public class YouboraPlugin: BaseAnalyticsPlugin {
     

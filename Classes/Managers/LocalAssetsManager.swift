@@ -122,7 +122,7 @@ public class LocalAssetsManager: NSObject {
             return source
         }
         
-        PKLog.error("no preferred downloadable media sources!")
+        PKLog.error("no downloadable media sources!")
         return nil
     }
 

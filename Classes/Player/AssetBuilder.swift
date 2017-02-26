@@ -55,7 +55,7 @@ class AssetBuilder {
             return (source, DRMSupport.widevineClassicHandler!)
         }
         
-        PKLog.error("no preferred media sources!")
+        PKLog.error("no playable media sources!")
         return nil
     }
 

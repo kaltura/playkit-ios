@@ -89,36 +89,18 @@ extension PKError where Self: RawRepresentable, Self.RawValue == String {
 /************************************************************/
 
 // general userInfo keys.
-extension PKError {
-    var RootErrorKey: String {
-        return "rootError"
-    }
-    
-    var RootCodeKey: String {
-        return "rootCode"
-    }
-    
-    var RootDomainKey: String {
-        return "rootDomain"
-    }
-}
-
-// general plugin error userInfo keys.
-extension PKPluginError  {
-    var PluginNameKey: String {
-        return "pluginName"
-    }
+struct PKErrorKeys {
+    static let RootErrorKey = "rootError"
+    static let RootCodeKey = "rootCode"
+    static let RootDomainKey = "rootDomain"
 }
 
 /************************************************************/
 // MARK: - PlayKit Error Domains
 /************************************************************/
 
-@objc public class PKErrorDomain: NSObject { // public interface
-    public static let IMA = "com.kaltura.playkit.error.ima"
-    public static let Plugin = "com.kaltura.playkit.error.plugins"
-    public static let Player = "com.kaltura.playkit.error.player"
-    public static let Youbora = "com.kaltura.playkit.error.youbora"
-    public static let AnalyticsPlugin = "com.kaltura.playkit.error.analyticsPlugin"
+@objc public class PKErrorDomain: NSObject {
+    public static let Plugin = PKPluginError.Domain
+    public static let Player = PlayerError.Domain
 }
 

@@ -37,13 +37,17 @@ public protocol PKPlugin: Plugin {
     func destroy()
 }
 
+/************************************************************/
+// MARK: - PKPluginError
+/************************************************************/
+
 /// `PKPluginError` represents plugins errors.
 enum PKPluginError: PKError {
     
     case failedToCreatePlugin
     case missingPluginConfig(pluginName: String)
     
-    static let Domain = PKErrorDomain.Plugin
+    static let Domain = "com.kaltura.playkit.error.plugins"
     
     var code: Int {
         switch self {
@@ -62,7 +66,12 @@ enum PKPluginError: PKError {
     var userInfo: [String: Any] {
         switch self {
         case .failedToCreatePlugin: return [:]
-        case .missingPluginConfig(let pluginName): return [PluginNameKey : pluginName]
+        case .missingPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey : pluginName]
         }
     }
+}
+
+// general plugin error userInfo keys.
+extension PKErrorKeys {
+    static let PluginNameKey = "pluginName"
 }

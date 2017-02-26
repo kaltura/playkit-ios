@@ -19,7 +19,7 @@ enum PlayerError: PKError {
     case failedToPlayToEndTime(rootError: NSError)
     case playerItemErrorLogEvent(errorLogEvent: AVPlayerItemErrorLogEvent)
     
-    static let Domain = PKErrorDomain.Player
+    static let Domain = "com.kaltura.playkit.error.player"
     
     var code: Int {
         switch self {
@@ -41,13 +41,13 @@ enum PlayerError: PKError {
     
     var userInfo: [String: Any] {
         switch self {
-        case .failedToLoadAssetFromKeys(let rootError): return [RootErrorKey : rootError]
+        case .failedToLoadAssetFromKeys(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
         case .assetNotPlayable: return [:]
-        case .failedToPlayToEndTime(let rootError): return [RootErrorKey : rootError]
+        case .failedToPlayToEndTime(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
         case .playerItemErrorLogEvent(let errorLogEvent):
             return [
-                RootCodeKey : errorLogEvent.errorStatusCode,
-                RootDomainKey : errorLogEvent.errorDomain
+                PKErrorKeys.RootCodeKey : errorLogEvent.errorStatusCode,
+                PKErrorKeys.RootDomainKey : errorLogEvent.errorDomain
             ]
         }
     }

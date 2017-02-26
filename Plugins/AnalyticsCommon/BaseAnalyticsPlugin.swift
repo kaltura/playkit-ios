@@ -8,13 +8,17 @@
 
 import Foundation
 
+/************************************************************/
+// MARK: - AnalyticsPluginError
+/************************************************************/
+
 /// `AnalyticsError` represents analytics plugins (kaltura stats, kaltura live stats, phoenix and tvpapi) common errors.
-enum AnalyticsError: PKError {
+enum AnalyticsPluginError: PKError {
     
     case missingMediaEntry
     case missingInitObject
     
-    static let Domain = PKErrorDomain.AnalyticsPlugin
+    static let Domain = "com.kaltura.playkit.error.analyticsPlugin"
     
     var code: Int {
         switch self {
@@ -34,6 +38,14 @@ enum AnalyticsError: PKError {
         return [:]
     }
 }
+
+extension PKErrorDomain {
+    public static let AnalyticsPlugin = AnalyticsPluginError.Domain
+}
+
+/************************************************************/
+// MARK: - BaseAnalyticsPlugin
+/************************************************************/
 
 /// class `BaseAnalyticsPlugin` is a base plugin object used for analytics plugin subclasses
 public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
