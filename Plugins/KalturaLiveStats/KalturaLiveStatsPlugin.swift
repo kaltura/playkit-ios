@@ -6,20 +6,17 @@
 //
 //
 
-public class KalturaLiveStatsPlugin: PKPlugin {
+public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
 
     enum KLiveStatsEventType : Int {
         case LIVE = 1
         case DVR = 2
     }
     
-    private unowned var player: Player
-    private unowned var messageBus: MessageBus
-    private var config: AnalyticsConfig?
+    public override class var pluginName: String {
+        return "KalturaLiveStats"
+    }
     
-    public static var pluginName: String = "KalturaLiveStats"
-    
-    private var isFirstPlay = true
     private var isLive = false
     private var eventIdx = 0
     private var currentBitrate = -1
@@ -37,28 +34,8 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public weak var mediaEntry: MediaEntry?
-    
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        self.player = player
-        self.messageBus = messageBus
-        if let aConfig = pluginConfig as? AnalyticsConfig {
-            self.config = aConfig
-        }
-        self.registerToAllEvents()
-    }
-    
-    public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public func destroy() {
+    public override func destroy() {
+        super.destroy()
         eventIdx = 0
         if let t = self.timer {
             t.invalidate()
@@ -66,50 +43,70 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     }
     
     /************************************************************/
-    // MARK: - Private
+    // MARK: - AnalyticsPluginProtocol
     /************************************************************/
     
-    private func registerToAllEvents() {
+    override var playerEventsToRegister: [PlayerEvent.Type] {
+        return [
+            PlayerEvent.play,
+            PlayerEvent.playbackParamsUpdated,
+            PlayerEvent.pause,
+            PlayerEvent.stateChanged
+        ]
+    }
+    
+    override func registerEvents() {
+        PKLog.debug("register player events")
         
-        PKLog.trace("registerToAllEvents")
-        
-        self.messageBus.addObserver(self, events: [PlayerEvent.play], block: { (event) in
-            PKLog.trace("play info: \(event)")
-            self.lastReportedStartTime = self.player.currentTime.toInt32()
-            self.startLiveEvents()
-        })
-                
-        self.messageBus.addObserver(self, events: [PlayerEvent.pause], block: { (event) in
-            PKLog.trace("pause info: \(event)")
-            self.stopLiveEvents()
-        })
-        
-        self.messageBus.addObserver(self, events: [PlayerEvent.playbackParamsUpdated], block: { event in
-            PKLog.trace("playbackParamsUpdated info: \(event)")
-            if type(of: event) == PlayerEvent.playbackParamsUpdated {
-                self.lastReportedBitrate = Int32(event.currentBitrate!)
-            }
-        })
-        
-        self.messageBus.addObserver(self, events: [PlayerEvent.stateChanged]) { event in
-            PKLog.trace("playbackParamsUpdated info: \(event)")
+        self.playerEventsToRegister.forEach { event in
+            PKLog.debug("Register event: \(event.self)")
             
-            if type(of: event) == PlayerEvent.stateChanged {
-                switch event.newState {
-                case .ready:
-                    self.startTimer()
-                    if self.isBuffering {
-                        self.isBuffering = false
-                        self.sendLiveEvent(theBufferTime: self.calculateBuffer(isBuffering: false))
-                    }
-                case .buffering:
-                    self.isBuffering = true
-                    self.bufferStartTime = Date().timeIntervalSince1970.toInt32()
-                default: break
+            switch event {
+            case let e where e.self == PlayerEvent.play:
+                self.messageBus.addObserver(self, events: [e.self]){ [unowned self] event in
+                    PKLog.debug("play event: \(event)")
+                    self.lastReportedStartTime = self.player.currentTime.toInt32()
+                    self.startLiveEvents()
                 }
+            case let e where e.self == PlayerEvent.pause:
+                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
+                    PKLog.debug("pause event: \(event)")
+                    self.stopLiveEvents()
+                }
+            case let e where e.self == PlayerEvent.playbackParamsUpdated:
+                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
+                    PKLog.debug("playbackParamsUpdated event: \(event)")
+                    if type(of: event) == PlayerEvent.playbackParamsUpdated {
+                        self.lastReportedBitrate = Int32(event.currentBitrate!)
+                    }
+                }
+            case let e where e.self == PlayerEvent.stateChanged:
+                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
+                    PKLog.debug("playbackParamsUpdated event: \(event)")
+                    
+                    if type(of: event) == PlayerEvent.stateChanged {
+                        switch event.newState {
+                        case .ready:
+                            self.startTimer()
+                            if self.isBuffering {
+                                self.isBuffering = false
+                                self.sendLiveEvent(theBufferTime: self.calculateBuffer(isBuffering: false))
+                            }
+                        case .buffering:
+                            self.isBuffering = true
+                            self.bufferStartTime = Date().timeIntervalSince1970.toInt32()
+                        default: break
+                        }
+                    }
+                }
+            default: assertionFailure("all events must be handled")
             }
         }
     }
+    
+    /************************************************************/
+    // MARK: - Private
+    /************************************************************/
     
     private func startLiveEvents() {
         if !self.isLive {
@@ -177,7 +174,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
     }
     
     private func sendLiveEvent(theBufferTime: Int32) {
-        PKLog.trace("sendLiveEvent - Buffer Time: \(bufferTime)")
+        PKLog.debug("sendLiveEvent - Buffer Time: \(bufferTime)")
         
         guard let mediaEntry = self.mediaEntry else { return }
         
@@ -212,7 +209,7 @@ public class KalturaLiveStatsPlugin: PKPlugin {
             
             builder.set { (response: Response) in
                 
-                PKLog.trace("Response: \(response)")
+                PKLog.debug("Response: \(response)")
                 
             }
             USRExecutor.shared.send(request: builder.build())

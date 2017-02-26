@@ -38,5 +38,10 @@ import Log
      PKLog.warning(one, two, three, separator: " - ")
      PKLog.error(error, terminator: "\n")
  */
-public let PKLog = Logger()
+
+public let PKLog: Logger = {
+    let logger = Logger()
+    logger.minLevel = .debug
+    return logger
+}()
 

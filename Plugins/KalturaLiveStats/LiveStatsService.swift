@@ -44,7 +44,7 @@ internal class LiveStatsService {
                 .setParam(key: "event:entryId", value: entryId)
                 .setParam(key: "event:deliveryType", value: deliveryType)
             
-                .set(method: "GET")
+                .set(method: .get)
             return request
         }else{
             return nil

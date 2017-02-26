@@ -11,7 +11,7 @@ import SwiftyJSON
 
 
 
-public class MockMediaEntryProvider: MediaEntryProvider {
+@objc public class MockMediaEntryProvider: NSObject, MediaEntryProvider {
   
 
     
@@ -47,7 +47,7 @@ public class MockMediaEntryProvider: MediaEntryProvider {
         return self
     }
     
-    public init(){
+    public override init(){
         
     }
     
@@ -58,11 +58,11 @@ public class MockMediaEntryProvider: MediaEntryProvider {
     }
 
     
-    public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void){
+    public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void){
         
         
         guard let id = self.id else {
-            callback(Result(data: nil, error: MockError.invalidParam(paramName: "id")))
+            callback(nil, MockError.invalidParam(paramName: "id"))
             return
         }
         
@@ -71,11 +71,11 @@ public class MockMediaEntryProvider: MediaEntryProvider {
             json = JSON(self.content)
         }else if self.url != nil{
             guard let stringPath = self.url?.absoluteString else {
-                 callback(Result(data: nil, error: MockError.invalidParam(paramName: "url")))
+                 callback(nil, MockError.invalidParam(paramName: "url"))
                 return
             }
             guard  let data = NSData(contentsOfFile: stringPath)  else {
-                 callback(Result(data: nil, error: MockError.fileIsEmptyOrNotFound))
+                 callback(nil, MockError.fileIsEmptyOrNotFound)
                 return
             }
             json = JSON(data: data as Data)
@@ -83,25 +83,25 @@ public class MockMediaEntryProvider: MediaEntryProvider {
         
         
         guard  let jsonContent = json else {
-            callback(Result(data: nil, error: MockError.unableToParseJSON))
+            callback(nil, MockError.unableToParseJSON)
             return
         }
         
         let loderInfo = LoaderInfo(id: id, content: jsonContent)
         
         guard  loderInfo.content != .null  else {
-            callback(Result(data: nil, error: MockError.unableToParseJSON))
+            callback(nil, MockError.unableToParseJSON)
             return
         }
         
         let jsonObject: JSON = loderInfo.content[loderInfo.id]
         guard jsonObject != .null else {
-            callback(Result(data: nil, error:MockError.mediaNotFound))
+            callback(nil, MockError.mediaNotFound)
             return
         }
         
         let mediaEntry : MediaEntry? = MediaEntry(json: jsonObject.object)
-        callback(Result(data: mediaEntry, error: nil))
+        callback(mediaEntry, nil)
     }
     
     public func cancel() {

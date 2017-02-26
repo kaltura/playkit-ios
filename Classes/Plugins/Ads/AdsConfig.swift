@@ -23,7 +23,7 @@ public class AdsConfig: NSObject {
     public var videoBitrate: Int32?
     public var videoMimeTypes: [AnyObject]?
     public var adTagUrl: String?
-    public var tagsTimes: [TimeInterval : String]?
+    public var tagsTimes: [TimeInterval: String]?
     public var companionView: UIView?
     public var webOpenerPresentingController: UIViewController?
 
@@ -53,7 +53,7 @@ public class AdsConfig: NSObject {
     }
     
     @discardableResult
-    public func set(tagsTimes: [TimeInterval : String]) -> Self {
+    public func set(tagsTimes: [TimeInterval: String]) -> Self {
         self.tagsTimes = tagsTimes
         return self
     }
