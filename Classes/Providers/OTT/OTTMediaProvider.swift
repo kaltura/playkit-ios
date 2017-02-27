@@ -11,14 +11,7 @@ import SwiftyJSON
 
 @objc public class OTTMediaProvider: NSObject, MediaEntryProvider {
     
-    
-    var sessionProvider: SessionProvider?
-    var mediaId: String?
-    var type: AssetType?
-    var formats: [String]?
-    var executor: RequestExecutor?
-    
-    public enum Err: Error {
+    public enum OTTMediaProviderError: Error {
         case invalidInputParams
         case invalidKS
         case fileIsEmptyOrNotFound
@@ -28,13 +21,16 @@ import SwiftyJSON
         case unableToParseObject
     }
     
+    var sessionProvider: SessionProvider?
+    var mediaId: String?
+    var type: AssetType?
+    var formats: [String]?
+    var executor: RequestExecutor?
     
-    public override init(){
-        
-    }
+    public override init() { }
     
     @discardableResult
-    public func set(sessionProvider:SessionProvider?) -> Self {
+    public func set(sessionProvider: SessionProvider?) -> Self {
         self.sessionProvider = sessionProvider
         return self
     }
@@ -63,25 +59,20 @@ import SwiftyJSON
         return self
     }
     
-    
     struct LoaderInfo {
-        
         var sessionProvider: SessionProvider
         var mediaId: String
         var type: AssetType
         var formats: [String]
         var executor: RequestExecutor
-        
     }
     
     public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
-        
-        
         guard let sessionProvider = self.sessionProvider,
             let mediaId = self.mediaId,
             let type = self.type
             else {
-                callback(nil, Err.invalidInputParams)
+                callback(nil, OTTMediaProviderError.invalidInputParams)
                 return
         }
         
@@ -104,10 +95,11 @@ import SwiftyJSON
         
     }
     
-    func startLoad(loader:LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) {
+
+    func startLoad(loader: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) {
         loader.sessionProvider.loadKS { (ks, error) in
             guard let ks = ks else {
-                callback(nil, Err.invalidKS)
+                callback(nil, OTTMediaProviderError.invalidKS)
                 return
             }
             
@@ -116,14 +108,14 @@ import SwiftyJSON
                 .set(completion: { (r:Response) in
                     
                     guard let data = r.data else {
-                        callback(nil, Err.mediaNotFound)
+                        callback(nil, OTTMediaProviderError.mediaNotFound)
                         return
                     }
                     
                     var object: OTTBaseObject? = nil
                     do {
                         object = try OTTResponseParser.parse(data: data)
-                    }catch{
+                    } catch {
                         callback(nil, error)
                     }
                     
@@ -148,19 +140,15 @@ import SwiftyJSON
                                 mediaEntry.sources = sources
                             }
                         }
-                        
                         callback(mediaEntry, nil)
-                    }else{
-                        callback(nil, Err.mediaNotFound)
+                    } else {
+                        callback(nil, OTTMediaProviderError.mediaNotFound)
                     }
-                    
                 })
-            
             if let assetRequest = requestBuilder?.build() {
                 loader.executor.send(request: assetRequest)
             }
         }
-        
     }
 }
 

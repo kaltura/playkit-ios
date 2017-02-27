@@ -11,8 +11,7 @@ import SwiftyJSON
 
 class OTTMultiResponseParser: NSObject {
     
-    
-    enum error: Error {
+    enum OTTMultiResponseParserError: Error {
         case typeNotFound
         case emptyResponse
         case notMultiResponse
@@ -21,7 +20,7 @@ class OTTMultiResponseParser: NSObject {
     static func parse(data:Any) throws -> [OTTBaseObject] {
         
         let jsonResponse = JSON(data)
-        if let resultArrayJSON = jsonResponse["result"].array{
+        if let resultArrayJSON = jsonResponse["result"].array {
             
             var resultArray: [OTTBaseObject] = [OTTBaseObject]()
             for jsonObject: JSON in resultArrayJSON{
@@ -29,8 +28,8 @@ class OTTMultiResponseParser: NSObject {
                 let objectType: OTTBaseObject.Type? = OTTObjectMapper.classByJsonObject(json: jsonObject.dictionaryObject)
                 if let type = objectType{
                      object = type.init(json: jsonObject.object)
-                }else{
-                    throw error.typeNotFound
+                } else {
+                    throw OTTMultiResponseParserError.typeNotFound
                 }
                 
                 if let obj = object{
@@ -39,7 +38,7 @@ class OTTMultiResponseParser: NSObject {
             }
             
             return resultArray
-        }else{
+        } else {
             return [OTTBaseObject]()
         }
     }

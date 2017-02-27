@@ -80,13 +80,11 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         if self.isPlayEnabled {
             super.play()
         }
-        self.delegate?.player(self, failedWith: error)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String) {
         super.play()
         self.isAdPlayback = false
-        self.delegate?.player(self, failedWith: error)
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {

@@ -10,5 +10,5 @@ import UIKit
 
 protocol OVPBaseObject{
     
-    init?(json:Any)
+    init?(json: Any)
 }

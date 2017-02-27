@@ -8,17 +8,52 @@
 
 import GoogleInteractiveMediaAds
 
-public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
-    
-    public weak var mediaEntry: MediaEntry?
+/************************************************************/
+// MARK: - IMAPluginError
+/************************************************************/
 
-    private unowned var player: Player
+/// `IMAPluginError` used to wrap an `IMAAdError` and provide converation to `NSError`
+struct IMAPluginError: PKError {
+    
+    var adError: IMAAdError
+    
+    static let Domain = "com.kaltura.playkit.error.ima"
+    
+    var code: Int {
+        return adError.code.rawValue
+    }
+    
+    var errorDescription: String {
+        return adError.message
+    }
+    
+    var userInfo: [String: Any] {
+        return [
+            PKErrorKeys.ErrorTypeKey : adError.type.rawValue
+        ]
+    }
+}
+
+// IMA plugin error userInfo keys.
+extension PKErrorKeys {
+    static let ErrorTypeKey = "errorType"
+}
+
+extension PKErrorDomain {
+    public static let IMA = IMAPluginError.Domain
+}
+
+/************************************************************/
+// MARK: - IMAPlugin
+/************************************************************/
+
+public class IMAPlugin: BasePlugin, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
+
     private unowned var messageBus: MessageBus
     
     weak var dataSource: AdsPluginDataSource? {
         didSet {
-            PKLog.trace("data source set")
-            
+            PKLog.debug("data source set")
             self.setupMainView()
         }
     }
@@ -51,19 +86,16 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     private var timer: Timer?
     
     public var currentTime: TimeInterval {
-        get {
-            return self.currentPlaybackTime
-        }
+        return self.currentPlaybackTime
     }
     
     /************************************************************/
     // MARK: - PKPlugin
     /************************************************************/
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
         self.messageBus = messageBus
-        self.player = player
-        super.init()
+        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let adsConfig = pluginConfig as? AdsConfig {
             self.config = adsConfig
             if IMAPlugin.loader == nil {
@@ -79,31 +111,21 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
                 self.tagsTimes = adTagsTimes
                 self.sortedTagsTimes = adTagsTimes.keys.sorted()
             }
+        } else {
+            PKLog.error("missing plugin config")
         }
         
-        var events: [PKEvent.Type] = []
-        events.append(PlayerEvent.ended)
-        self.messageBus.addObserver(self, events: events, block: { (data: Any) -> Void in
+        self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (data: Any) -> Void in
             self.contentComplete()
         })
         
         self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
     
-    public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
+    public override class var pluginName: String { return "IMAPlugin" }
     
-    public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public static var pluginName = String(describing: IMAPlugin.self)
-    
-    public func destroy() {
-        PKLog.trace("destroy")
+    public override func destroy() {
+        super.destroy()
         self.destroyManager()
         self.timer?.invalidate()
     }
@@ -170,7 +192,6 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         imaSettings.language = config.language
         imaSettings.enableBackgroundPlayback = config.enableBackgroundPlayback
         imaSettings.autoPlayAdBreaks = config.autoPlayAdBreaks
-        
         IMAPlugin.loader = IMAAdsLoader(settings: imaSettings)
     }
 
@@ -229,7 +250,6 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     private func updateAdTag(_ adTag: String, tagTimeKeyForRemove: TimeInterval) {
         self.tagsTimes![tagTimeKeyForRemove] = nil
         self.destroyManager()
-        
         self.adTagUrl = adTag
         self.requestAds()
         self.start(showLoadingView: false)
@@ -351,8 +371,9 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     public func adsLoader(_ loader: IMAAdsLoader!, failedWith adErrorData: IMAAdLoadingErrorData!) {
         self.loaderFailed = true
         self.showLoadingView(false, alpha: 0)
-        self.delegate?.adsPlugin(self, loaderFailedWith: adErrorData.adError.message)
         PKLog.error(adErrorData.adError.message)
+        self.messageBus.post(AdEvent.Error(nsError: IMAPluginError(adError: adErrorData.adError).asNSError))
+        self.delegate?.adsPlugin(self, loaderFailedWith: adErrorData.adError.message)
     }
     
     // MARK: AdsManagerDelegate
@@ -395,13 +416,14 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         
         let event = converted.init()
         self.notify(event: event)
-        PKLog.trace("ads manager event: " + String(describing: converted))
+        PKLog.debug("ads manager event: " + String(describing: converted))
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
         self.showLoadingView(false, alpha: 0)
-        self.delegate?.adsPlugin(self, managerFailedWith: error.message)
         PKLog.error(error.message)
+        self.messageBus.post(AdEvent.Error(nsError: IMAPluginError(adError: error).asNSError))
+        self.delegate?.adsPlugin(self, managerFailedWith: error.message)
     }
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {

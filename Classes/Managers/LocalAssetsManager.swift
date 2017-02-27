@@ -97,7 +97,10 @@ public class LocalAssetsManager: NSObject {
     /// the capabilities of the device.
     public func getPreferredDownloadableMediaSource(for mediaEntry: MediaEntry) -> MediaSource? {
 
-        guard let sources = mediaEntry.sources else {return nil}
+        guard let sources = mediaEntry.sources else {
+            PKLog.error("no media sources in mediaEntry!")
+            return nil
+        }
         
         // On iOS 10 and up: HLS (clear or FP), MP4, WVM
         // Below iOS10: HLS (only clear), MP4, WVM
@@ -119,6 +122,7 @@ public class LocalAssetsManager: NSObject {
             return source
         }
         
+        PKLog.error("no downloadable media sources!")
         return nil
     }
 

@@ -9,9 +9,7 @@ enum FairPlayError : Error {
     case malformedServerResponse
     case noCKCInResponse
     case malformedCKCInResponse
-    
 }
-
 
 class AssetLoaderDelegate: NSObject {
     
