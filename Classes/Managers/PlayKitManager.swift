@@ -48,18 +48,15 @@ public class PlayKitManager: NSObject {
         return loader
     }
     
-    public func registerPlugin(_ pluginClass: Plugin.Type) {
-        guard let pluginType = pluginClass as? PKPlugin.Type else {
-            fatalError("plugin class must be of type PKPlugin")
-        }
-        pluginRegistry[pluginType.pluginName] = pluginType
+    public func registerPlugin(_ pluginClass: BasePlugin.Type) {
+        pluginRegistry[pluginClass.pluginName] = pluginClass
     }
     
-    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) -> PKPlugin? {
-        let pluginClass = pluginRegistry[name]
-        guard pluginClass != nil else {
-            return nil
+    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) throws -> PKPlugin {
+        guard let pluginClass = pluginRegistry[name] else {
+            PKLog.error("plugin with name: \(name) doesn't exist in pluginRegistry")
+            throw PKPluginError.failedToCreatePlugin
         }
-        return pluginClass?.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        return pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
     }
 }

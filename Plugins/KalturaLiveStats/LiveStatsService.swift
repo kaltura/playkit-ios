@@ -46,7 +46,7 @@ internal class LiveStatsService {
             
                 .set(method: .get)
             return request
-        }else{
+        } else {
             return nil
         }
     }
