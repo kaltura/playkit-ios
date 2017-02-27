@@ -11,48 +11,6 @@ import AVFoundation
 import AVKit
 import CoreMedia
 
-/// `PlayerError` represents player errors.
-enum PlayerError: PKError {
-    
-    case failedToLoadAssetFromKeys(rootError: NSError?)
-    case assetNotPlayable
-    case failedToPlayToEndTime(rootError: NSError)
-    case playerItemErrorLogEvent(errorLogEvent: AVPlayerItemErrorLogEvent)
-    
-    static let Domain = "com.kaltura.playkit.error.player"
-    
-    var code: Int {
-        switch self {
-        case .failedToLoadAssetFromKeys: return 7000
-        case .assetNotPlayable: return 7001
-        case .failedToPlayToEndTime: return 7002
-        case .playerItemErrorLogEvent: return 7003
-        }
-    }
-    
-    var errorDescription: String {
-        switch self {
-        case .failedToLoadAssetFromKeys: return "Can't use this AVAsset because one of it's keys failed to load"
-        case .assetNotPlayable: return "Can't use this AVAsset because it isn't playable"
-        case .failedToPlayToEndTime: return "Item failed to play to its end time"
-        case .playerItemErrorLogEvent(let errorLogEvent): return errorLogEvent.errorComment ?? ""
-        }
-    }
-    
-    var userInfo: [String: Any] {
-        switch self {
-        case .failedToLoadAssetFromKeys(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
-        case .assetNotPlayable: return [:]
-        case .failedToPlayToEndTime(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
-        case .playerItemErrorLogEvent(let errorLogEvent):
-            return [
-                PKErrorKeys.RootCodeKey : errorLogEvent.errorStatusCode,
-                PKErrorKeys.RootDomainKey : errorLogEvent.errorDomain
-            ]
-        }
-    }
-}
-
 /// An AVPlayerEngine is a controller used to manage the playback and timing of a media asset.
 /// It provides the interface to control the player’s behavior such as its ability to play, pause, and seek to various points in the timeline.
 class AVPlayerEngine: AVPlayer {

@@ -9,19 +9,8 @@
 import UIKit
 import AVFoundation
 
-/**
- Used as a workaround for Apple bug with swift interoperability.
- 
- There is an issue with initializing an object based on a protocol.Type with @objc attribute.
- Therefore we use a wrapper protocol for PKPlugin with @objc and then casting to a PKPlugin without the @objc attribute.
- 
- - important:
- **should not be used! use PKPlugin to add a plugin**
- */
-@objc public protocol Plugin {}
-
 /// The `PKPlugin` protocol defines all the properties and methods required to define a plugin object.
-public protocol PKPlugin: Plugin {
+public protocol PKPlugin {
     /// The plugin name.
     static var pluginName: String { get }
 
@@ -34,44 +23,7 @@ public protocol PKPlugin: Plugin {
     func onLoad(mediaConfig: MediaConfig)
     /// On update media. used to update the plugin with new media config when available
     func onUpdateMedia(mediaConfig: MediaConfig)
+    
     func destroy()
 }
 
-/************************************************************/
-// MARK: - PKPluginError
-/************************************************************/
-
-/// `PKPluginError` represents plugins errors.
-enum PKPluginError: PKError {
-    
-    case failedToCreatePlugin
-    case missingPluginConfig(pluginName: String)
-    
-    static let Domain = "com.kaltura.playkit.error.plugins"
-    
-    var code: Int {
-        switch self {
-        case .failedToCreatePlugin: return 2000
-        case .missingPluginConfig: return 2001
-        }
-    }
-    
-    var errorDescription: String {
-        switch self {
-        case .failedToCreatePlugin: return "failed to create plugin, doesn't exist in registry"
-        case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName)"
-        }
-    }
-    
-    var userInfo: [String: Any] {
-        switch self {
-        case .failedToCreatePlugin: return [:]
-        case .missingPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey : pluginName]
-        }
-    }
-}
-
-// general plugin error userInfo keys.
-extension PKErrorKeys {
-    static let PluginNameKey = "pluginName"
-}

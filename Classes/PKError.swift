@@ -7,6 +7,98 @@
 //
 
 import Foundation
+import AVFoundation
+
+
+
+/************************************************************/
+// MARK: - PlayerError
+/************************************************************/
+
+/// `PlayerError` represents player errors.
+enum PlayerError: PKError {
+    
+    case failedToLoadAssetFromKeys(rootError: NSError?)
+    case assetNotPlayable
+    case failedToPlayToEndTime(rootError: NSError)
+    case playerItemErrorLogEvent(errorLogEvent: AVPlayerItemErrorLogEvent)
+    
+    static let Domain = "com.kaltura.playkit.error.player"
+    
+    var code: Int {
+        switch self {
+        case .failedToLoadAssetFromKeys: return 7000
+        case .assetNotPlayable: return 7001
+        case .failedToPlayToEndTime: return 7002
+        case .playerItemErrorLogEvent: return 7003
+        }
+    }
+    
+    var errorDescription: String {
+        switch self {
+        case .failedToLoadAssetFromKeys: return "Can't use this AVAsset because one of it's keys failed to load"
+        case .assetNotPlayable: return "Can't use this AVAsset because it isn't playable"
+        case .failedToPlayToEndTime: return "Item failed to play to its end time"
+        case .playerItemErrorLogEvent(let errorLogEvent): return errorLogEvent.errorComment ?? ""
+        }
+    }
+    
+    var userInfo: [String: Any] {
+        switch self {
+        case .failedToLoadAssetFromKeys(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
+        case .assetNotPlayable: return [:]
+        case .failedToPlayToEndTime(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
+        case .playerItemErrorLogEvent(let errorLogEvent):
+            return [
+                PKErrorKeys.RootCodeKey : errorLogEvent.errorStatusCode,
+                PKErrorKeys.RootDomainKey : errorLogEvent.errorDomain
+            ]
+        }
+    }
+}
+
+/************************************************************/
+// MARK: - PKPluginError
+/************************************************************/
+
+/// `PKPluginError` represents plugins errors.
+enum PKPluginError: PKError {
+    
+    case failedToCreatePlugin
+    case missingPluginConfig(pluginName: String)
+    
+    static let Domain = "com.kaltura.playkit.error.plugins"
+    
+    var code: Int {
+        switch self {
+        case .failedToCreatePlugin: return 2000
+        case .missingPluginConfig: return 2001
+        }
+    }
+    
+    var errorDescription: String {
+        switch self {
+        case .failedToCreatePlugin: return "failed to create plugin, doesn't exist in registry"
+        case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName)"
+        }
+    }
+    
+    var userInfo: [String: Any] {
+        switch self {
+        case .failedToCreatePlugin: return [:]
+        case .missingPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey : pluginName]
+        }
+    }
+}
+
+// general plugin error userInfo keys.
+extension PKErrorKeys {
+    static let PluginNameKey = "pluginName"
+}
+
+/************************************************************/
+// MARK: - PKError
+/************************************************************/
 
 /// `PKError` is used as a protocol for errors that can be converted to `NSError` if need be.
 /// - important: should be used on enums for best results on multiple cases!

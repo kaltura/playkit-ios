@@ -9,7 +9,7 @@
 import Foundation
 
 /// class `BasePlugin` is a base plugin object used for plugin subclasses
-public class BasePlugin: NSObject, PKPlugin {
+@objc public class BasePlugin: NSObject, PKPlugin {
     
     /// abstract implementation subclasses will have names
     public class var pluginName: String {
