@@ -10,9 +10,7 @@ import UIKit
 
 @objc public class OVPSessionManager: NSObject, SessionProvider {
     
-    
     public enum SessionManagerError: Error{
-        
         case failedToGetKS
         case failedToGetLoginResponse
         case failedToRefreshKS
@@ -21,7 +19,6 @@ import UIKit
         case noRefreshTokenOrTokenToRefresh
         case failedToParseResponse
         case ksExpired
-        
     }
     
     public var serverURL: String
@@ -73,7 +70,7 @@ import UIKit
                                     self.ensureKSAfterRefresh(e: e, completion: completion)
                 })
             }
-            else{
+            else {
                 
                 self.startAnonymousSession(completion: { (e:Error?) in
                     self.ensureKSAfterRefresh(e: e, completion: completion)
@@ -89,27 +86,23 @@ import UIKit
     func ensureKSAfterRefresh(e:Error?,completion: @escaping (String?, Error?) -> Void) -> Void {
         if let ks = self.ks {
             completion(ks, nil)
-        }else if let error = e {
+        } else if let error = e {
             completion(nil, error)
-        }else{
+        } else {
             completion(nil, SessionManagerError.ksExpired)
         }
     }
     
     
-    public func startAnonymousSession(completion:@escaping (_ error:Error?)->Void) -> Void {
+    public func startAnonymousSession(completion:@escaping (_ error: Error?) -> Void) -> Void {
         
-        let loginRequestBuilder = OVPSessionService.startWidgetSession(baseURL: self.fullServerPath,
-                                                                       partnerId: self.partnerId)?
-        
-        
+        let loginRequestBuilder = OVPSessionService.startWidgetSession(baseURL: self.fullServerPath, partnerId: self.partnerId)?
             .setOVPBasicParams()
             .set(completion: { (r:Response) in
                 
-                if let data = r.data
-                {
+                if let data = r.data {
                     var result: OVPBaseObject? = nil
-                    do{
+                    do {
                         result = try OVPResponseParser.parse(data:data)
                         if let widgetSession = result as? OVPStartWidgetSessionResponse {
                             self.ks = widgetSession.ks
@@ -126,19 +119,16 @@ import UIKit
                 }else{
                     completion(SessionManagerError.failedToGetLoginResponse)
                 }
-                
-                
             })
-            
-            
-            if let request = loginRequestBuilder?.build() {
-                self.executor.send(request: request)
-            }
+        
+        if let request = loginRequestBuilder?.build() {
+            self.executor.send(request: request)
+        }
     }
 
 
     
-    public func startSession(username:String,password:String,completion:@escaping (_ error:Error?)->Void) -> Void {
+    public func startSession(username: String, password: String, completion: @escaping (_ error: Error?) -> Void) -> Void {
         
         self.username = username
         self.password = password
@@ -158,8 +148,7 @@ import UIKit
                 
                 if let data = r.data
                 {
-                    do{
-                        
+                    do {
                         guard   let arrayResult = data as? [Any],
                                 arrayResult.count == 2
                         else {
@@ -171,15 +160,13 @@ import UIKit
                         self.ks = arrayResult[0] as? String
                         self.tokenExpiration = sessionInfo?.expiry
                         completion(nil)
-                    }catch{
+                    } catch {
                         completion(error)
                     }
                     
-                }else{
+                } else {
                     completion(SessionManagerError.failedToGetLoginResponse)
                 }
-                
-                
             })
             
             

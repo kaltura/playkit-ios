@@ -27,8 +27,6 @@ public class PlayerEvent: PKEvent {
     public static let ended: PlayerEvent.Type = Ended.self
     /// The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
     public static let loadedMetadata: PlayerEvent.Type = LoadedMetadata.self
-    /// Sent when an error occurs.
-    public static let error: PlayerEvent.Type = Error.self
     /// Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior pause event.
     public static let play: PlayerEvent.Type = Play.self
     /// Sent when playback is paused.
@@ -45,6 +43,11 @@ public class PlayerEvent: PKEvent {
     public static let playbackParamsUpdated: PlayerEvent.Type = PlaybackParamsUpdated.self
     /// Sent when player state is changed.
     public static let stateChanged: PlayerEvent.Type = StateChanged.self
+    
+    /// Sent when an error occurs.
+    public static let error: PlayerEvent.Type = Error.self
+    /// Sent when an plugin error occurs.
+    public static let pluginError: PlayerEvent.Type = PluginError.self
     
     // MARK: - Player Basic Events
 
@@ -64,8 +67,14 @@ public class PlayerEvent: PKEvent {
     class Seeked : PlayerEvent {}
     
     class Error: PlayerEvent {
-        convenience init(error: NSError) {
-            self.init([EventDataKeys.Error : error])
+        convenience init(nsError: NSError) {
+            self.init([EventDataKeys.Error : nsError])
+        }
+    }
+    
+    class PluginError: PlayerEvent {
+        convenience init(nsError: NSError) {
+            self.init([EventDataKeys.Error : nsError])
         }
     }
     
@@ -127,6 +136,8 @@ public class AdEvent: PKEvent {
     public static let adWebOpenerDidOpenInAppBrowser: AdEvent.Type = AdWebOpenerDidOpenInAppBrowser.self
     public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
     public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
+    /// Sent when an error occurs.
+    public static let error: AdEvent.Type = Error.self
     
     class AdBreakReady : AdEvent {}
     class AdBreakEnded : AdEvent {}
@@ -146,6 +157,12 @@ public class AdEvent: PKEvent {
     class AdStreamLoaded : AdEvent {}
     class AdTapped : AdEvent {}
     class AdThirdQuartile : AdEvent {}
+    
+    class Error: AdEvent {
+        convenience init(nsError: NSError) {
+            self.init([AdEventDataKeys.Error : nsError])
+        }
+    }
     
     class AdDidProgressToTime : AdEvent {
         convenience init(mediaTime: TimeInterval, totalTime: TimeInterval) {

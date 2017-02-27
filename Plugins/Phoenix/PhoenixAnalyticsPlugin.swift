@@ -38,8 +38,9 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
             parterId = pId
         }
         
-        guard let mediaEntry = self.mediaEntry else {
+        guard let mediaEntry = self.player.mediaEntry else {
             PKLog.error("send analytics failed due to nil mediaEntry")
+            self.messageBus.post(PlayerEvent.PluginError(nsError: AnalyticsPluginError.missingMediaEntry.asNSError))
             return nil
         }
         

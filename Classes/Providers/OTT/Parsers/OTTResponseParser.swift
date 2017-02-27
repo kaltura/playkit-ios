@@ -11,10 +11,9 @@ import SwiftyJSON
 
 class OTTResponseParser: ResponseParser {
     
-    enum error: Error {
+    enum OTTResponseParserError: Error {
         case typeNotFound
         case invalidJsonObject
-        
     }
     
     static func parse(data:Any) throws -> OTTBaseObject {
@@ -26,10 +25,10 @@ class OTTResponseParser: ResponseParser {
             if let object = type.init(json: resultObjectJSON) {
                 return object
             }else{
-              throw error.invalidJsonObject
+              throw OTTResponseParserError.invalidJsonObject
             }
         }else{
-            throw error.typeNotFound
+            throw OTTResponseParserError.typeNotFound
         }
     }
 }

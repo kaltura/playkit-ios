@@ -12,13 +12,15 @@ import AVKit
 
 @objc public protocol PlayerDelegate {
     func playerShouldPlayAd(_ player: Player) -> Bool
-    func player(_ player: Player, failedWith error: String)
 }
 
 @objc public protocol Player: NSObjectProtocol {
     
     @objc var delegate: PlayerDelegate? { get set }
-        
+    
+    /// The player's associated media entry.
+    weak var mediaEntry: MediaEntry? { get }
+    
     /**
      Get the player's layer component.
      */
@@ -50,15 +52,18 @@ import AVKit
     func prepare(_ config: MediaConfig)
     
     /**
-     Convenience method for setting shouldPlayWhenReady to true.
+     send play action for the player.
      */
     func play()
     
     /**
-     Convenience method for setting shouldPlayWhenReady to false.
+     send pause action for the player.
      */
     func pause()
     
+    /**
+     send resume action for the player.
+     */
     func resume()
     
     func seek(to time: CMTime)
