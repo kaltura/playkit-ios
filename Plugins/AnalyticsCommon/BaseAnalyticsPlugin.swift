@@ -8,18 +8,49 @@
 
 import Foundation
 
-/// class `BaseAnalyticsPlugin` is a base plugin object used for analytics plugin subclasses
-public class BaseAnalyticsPlugin: AnalyticsPluginProtocol {
+/************************************************************/
+// MARK: - AnalyticsPluginError
+/************************************************************/
+
+/// `AnalyticsError` represents analytics plugins (kaltura stats, kaltura live stats, phoenix and tvpapi) common errors.
+enum AnalyticsPluginError: PKError {
     
-    /// abstract implementation subclasses will have names
-    public class var pluginName: String {
-        fatalError("abstract property should be overriden in subclass")
+    case missingMediaEntry
+    case missingInitObject
+    
+    static let Domain = "com.kaltura.playkit.error.analyticsPlugin"
+    
+    var code: Int {
+        switch self {
+        case .missingMediaEntry: return 3000
+        case .missingInitObject: return 3001
+        }
     }
     
-    unowned var player: Player
-    unowned var messageBus: MessageBus
-    public weak var mediaEntry: MediaEntry?
+    var errorDescription: String {
+        switch self {
+        case .missingMediaEntry: return "failed to send analytics event, mediaEntry is nil"
+        case .missingInitObject: return "failed to send analytics event, missing initObj"
+        }
+    }
     
+    var userInfo: [String: Any] {
+        return [:]
+    }
+}
+
+extension PKErrorDomain {
+    public static let AnalyticsPlugin = AnalyticsPluginError.Domain
+}
+
+/************************************************************/
+// MARK: - BaseAnalyticsPlugin
+/************************************************************/
+
+/// class `BaseAnalyticsPlugin` is a base plugin object used for analytics plugin subclasses
+public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
+    
+    unowned var messageBus: MessageBus
     var config: AnalyticsConfig?
     var isFirstPlay: Bool = true
     
@@ -27,30 +58,21 @@ public class BaseAnalyticsPlugin: AnalyticsPluginProtocol {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        PKLog.info("initializing plugin \(type(of:self))")
-        self.player = player
+    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
         self.messageBus = messageBus
+        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
         } else {
-            PKLog.warning("There is no Analytics Config.")
+            PKLog.error("There is no Analytics Config!")
+            let error = PKPluginError.missingPluginConfig(pluginName: type(of: self).pluginName).asNSError
+            self.messageBus.post(PlayerEvent.PluginError(nsError: error))
         }
         self.registerEvents()
     }
     
-    public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.info("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.info("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public func destroy() {
-        PKLog.info("destroying plugin \(type(of:self))")
+    public override func destroy() {
+        super.destroy()
         self.messageBus.removeObserver(self, events: playerEventsToRegister)
     }
 

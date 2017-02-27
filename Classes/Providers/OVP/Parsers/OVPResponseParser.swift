@@ -14,7 +14,6 @@ class OVPResponseParser: ResponseParser {
     enum error: Error {
         case typeNotFound
         case invalidJsonObject
-        
     }
     
     static func parse(data:Any) throws -> OVPBaseObject {
@@ -25,10 +24,10 @@ class OVPResponseParser: ResponseParser {
         if let type = objectType{
             if let object = type.init(json: resultObjectJSON) {
                 return object
-            }else{
+            } else {
                 throw error.invalidJsonObject
             }
-        }else{
+        } else {
             throw error.typeNotFound
         }
     }
@@ -43,19 +42,16 @@ class OVPResponseParser: ResponseParser {
             if let object = type.init(json: resultObjectJSON) {
                 if let result = object as? T {
                     return result
-                }else{
+                } else {
                     return nil
                 }
-            }else{
+            } else {
                 throw error.invalidJsonObject
             }
-        }else{
+        } else {
             throw error.typeNotFound
         }
-
     }
-    
-    
 }
 
 

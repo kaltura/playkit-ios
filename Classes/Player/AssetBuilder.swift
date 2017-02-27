@@ -20,7 +20,10 @@ class AssetBuilder {
 
     public func getPreferredMediaSource() -> (MediaSource, AssetHandler.Type)? {
         
-        guard let sources = mediaEntry.sources else {return nil}
+        guard let sources = mediaEntry.sources else {
+            PKLog.error("no media sources in mediaEntry!")
+            return nil
+        }
         
         let defaultHandler = DefaultAssetHandler.self
         
@@ -52,6 +55,7 @@ class AssetBuilder {
             return (source, DRMSupport.widevineClassicHandler!)
         }
         
+        PKLog.error("no playable media sources!")
         return nil
     }
 
