@@ -48,8 +48,8 @@ class PlayerLoader: PlayerDecoratorBase {
                     
                     loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
                 } catch let e {
-                    if case let error = PKPluginError.failedToCreatePlugin {
-                        self.messageBus.post(PlayerEvent.Error(nsError: error.asNSError))
+                    if case PKPluginError.failedToCreatePlugin = e {
+                        self.messageBus.post(PlayerEvent.Error(nsError: PKPluginError.failedToCreatePlugin.asNSError))
                     }
                 }
             }
