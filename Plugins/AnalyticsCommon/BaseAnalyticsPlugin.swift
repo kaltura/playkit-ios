@@ -50,7 +50,6 @@ extension PKErrorDomain {
 /// class `BaseAnalyticsPlugin` is a base plugin object used for analytics plugin subclasses
 public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
-    unowned var messageBus: MessageBus
     var config: AnalyticsConfig?
     var isFirstPlay: Bool = true
     
@@ -58,15 +57,12 @@ public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        self.messageBus = messageBus
-        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
         } else {
-            PKLog.error("There is no Analytics Config!")
-            let error = PKPluginError.missingPluginConfig(pluginName: type(of: self).pluginName).asNSError
-            self.messageBus.post(PlayerEvent.PluginError(nsError: error))
+            PKLog.warning("There is no Analytics Config! for \(type(of: self))")
         }
         self.registerEvents()
     }

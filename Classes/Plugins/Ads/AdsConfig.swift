@@ -9,17 +9,11 @@
 import Foundation
 
 public class AdsConfig: NSObject {
+    
+    public let enableBackgroundPlayback = true
+    public let autoPlayAdBreaks = false
+    
     public var language: String = "en"
-    public var enableBackgroundPlayback: Bool {
-        get {
-            return true
-        }
-    }
-    public var autoPlayAdBreaks: Bool {
-        get {
-            return false
-        }
-    }
     public var videoBitrate: Int32?
     public var videoMimeTypes: [AnyObject]?
     public var adTagUrl: String?

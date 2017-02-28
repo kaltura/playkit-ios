@@ -42,9 +42,9 @@ public class PlayKitManager: NSObject {
     ///
     /// - Parameter config: The configuration object to load the player with.
     /// - Returns: A player loaded using the provided configuration.
-    public func loadPlayer(pluginConfig: PluginConfig?) -> Player {
+    public func loadPlayer(pluginConfig: PluginConfig?) throws -> Player {
         let loader = PlayerLoader()
-        loader.load(pluginConfig: pluginConfig)
+        try loader.load(pluginConfig: pluginConfig)
         return loader
     }
     
@@ -55,8 +55,8 @@ public class PlayKitManager: NSObject {
     func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) throws -> PKPlugin {
         guard let pluginClass = pluginRegistry[name] else {
             PKLog.error("plugin with name: \(name) doesn't exist in pluginRegistry")
-            throw PKPluginError.failedToCreatePlugin
+            throw PKPluginError.failedToCreatePlugin.asNSError
         }
-        return pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        return try pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
     }
 }

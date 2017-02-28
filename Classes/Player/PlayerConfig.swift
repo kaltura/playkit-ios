@@ -9,7 +9,7 @@
 import Foundation
 
 /// A `MediaConfig` object defines behavior and info to use when preparing a `Player` object.
-public class MediaConfig: NSObject {
+@objc public class MediaConfig: NSObject {
     public var mediaEntry: MediaEntry
     public var startTime: TimeInterval = 0
     
@@ -37,7 +37,7 @@ public class MediaConfig: NSObject {
 }
 
 /// A `PluginConfig` object defines config to use when loading a plugin object.
-public class PluginConfig: NSObject {
+@objc public class PluginConfig: NSObject {
     /// Plugins config dictionary holds [plugin name : plugin config]
     @objc public var config: [String: Any]
     
@@ -52,6 +52,14 @@ public class PluginConfig: NSObject {
     /// Private init.
     private override init() {
         fatalError("Private initializer, use `init(config:)`")
+    }
+}
+
+extension PluginConfig: NSCopying {
+    
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = PluginConfig(config: config)
+        return copy
     }
 }
 

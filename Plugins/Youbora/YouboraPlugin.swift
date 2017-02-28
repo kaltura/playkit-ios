@@ -60,6 +60,13 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     // MARK: - PKPlugin
     /************************************************************/
     
+    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        guard let _ = pluginConfig as? AnalyticsConfig else {
+            throw PKPluginError.missingPluginConfig(pluginName: type(of: self).pluginName).asNSError
+        }
+    }
+    
     public override func onLoad(mediaConfig: MediaConfig) {
         super.onLoad(mediaConfig: mediaConfig)
         self.setupYouboraManager() { succeeded in
@@ -197,14 +204,14 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
         
         guard let config = self.config, var media = config.params["media"] as? [String: Any] else {
             PKLog.error("config params are wrong or doesn't exist, could not setup youbora manager")
-            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
+            self.messageBus.post(PlayerEvent.PluginError(error: YouboraPluginError.failedToSetupYouboraManager))
             completionHandler?(false)
             return
         }
         
         guard let mediaEntry = self.player.mediaEntry else {
             PKLog.error("missing MediaEntry, could not setup youbora manager")
-            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
+            self.messageBus.post(PlayerEvent.PluginError(error: YouboraPluginError.failedToSetupYouboraManager))
             completionHandler?(false)
             return
         }

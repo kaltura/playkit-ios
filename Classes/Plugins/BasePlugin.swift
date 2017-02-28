@@ -17,10 +17,12 @@ import Foundation
     }
 
     public unowned var player: Player
+    public unowned var messageBus: MessageBus
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         PKLog.info("initializing plugin \(type(of:self))")
         self.player = player
+        self.messageBus = messageBus
     }
     
     public func onLoad(mediaConfig: MediaConfig) {

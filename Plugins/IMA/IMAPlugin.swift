@@ -49,8 +49,6 @@ extension PKErrorDomain {
 
 public class IMAPlugin: BasePlugin, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
 
-    private unowned var messageBus: MessageBus
-    
     weak var dataSource: AdsPluginDataSource? {
         didSet {
             PKLog.debug("data source set")
@@ -93,9 +91,8 @@ public class IMAPlugin: BasePlugin, PlayerDecoratorProvider, AdsPlugin, IMAAdsLo
     // MARK: - PKPlugin
     /************************************************************/
     
-    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        self.messageBus = messageBus
-        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let adsConfig = pluginConfig as? AdsConfig {
             self.config = adsConfig
             if IMAPlugin.loader == nil {
@@ -113,6 +110,7 @@ public class IMAPlugin: BasePlugin, PlayerDecoratorProvider, AdsPlugin, IMAAdsLo
             }
         } else {
             PKLog.error("missing plugin config")
+            throw PKPluginError.missingPluginConfig(pluginName: type(of: self).pluginName)
         }
         
         self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (data: Any) -> Void in

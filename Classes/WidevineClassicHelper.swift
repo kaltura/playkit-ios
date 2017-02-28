@@ -14,7 +14,12 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
 #if WIDEVINE_ENABLED
     import PlayKitWV
     
-    internal class WidevineClassicHelper {
+    enum WidevineClassicError: Error { // FIXME: add handling
+        case invalidDRMData
+        case missingWidevineFile
+    }
+    
+    class WidevineClassicHelper {
         static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
             PKLog.info("registerLocalAsset")
             
@@ -30,7 +35,6 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
                     break
                 default:
                     PKLog.debug("event::", event)
-                    break
                 }
             }, forAsset: assetUri)
             
@@ -146,8 +150,6 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
         
         static func extractLicenseUri(mediaSource: MediaSource) -> String? {
             fatalError(fatalMsg)
-            
-            return nil
         }
     }
 #endif
