@@ -48,9 +48,9 @@ public struct RequestElement: Request {
     public var completion: completionClosures?
 }
 
-public class RequestBuilder: NSObject {
+@objc public class RequestBuilder: NSObject {
     
-    public lazy var requestId: String =  {
+    public lazy var requestId: String = {
         return UUID().uuidString
     }()
     

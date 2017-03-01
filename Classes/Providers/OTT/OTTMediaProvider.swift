@@ -30,31 +30,31 @@ import SwiftyJSON
     public override init() { }
     
     @discardableResult
-    public func set(sessionProvider: SessionProvider?) -> Self {
+    @nonobjc public func set(sessionProvider: SessionProvider?) -> Self {
         self.sessionProvider = sessionProvider
         return self
     }
     
     @discardableResult
-    public func set(mediaId:String?) -> Self {
+    @nonobjc public func set(mediaId:String?) -> Self {
         self.mediaId = mediaId
         return self
     }
     
     @discardableResult
-    public func set(type:AssetType?) -> Self {
+    @nonobjc public func set(type:AssetType?) -> Self {
         self.type = type
         return self
     }
     
     @discardableResult
-    public func set(formats:[String]?) -> Self {
+    @nonobjc public func set(formats:[String]?) -> Self {
         self.formats = formats
         return self
     }
     
     @discardableResult
-    public func set(executor:RequestExecutor?) -> Self {
+    @nonobjc public func set(executor:RequestExecutor?) -> Self {
         self.executor = executor
         return self
     }
@@ -67,7 +67,7 @@ import SwiftyJSON
         var executor: RequestExecutor
     }
     
-    public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
+    @objc public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
         guard let sessionProvider = self.sessionProvider,
             let mediaId = self.mediaId,
             let type = self.type

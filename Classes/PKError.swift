@@ -192,7 +192,7 @@ struct PKErrorKeys {
 /************************************************************/
 
 @objc public class PKErrorDomain: NSObject {
-    public static let Plugin = PKPluginError.Domain
-    public static let Player = PlayerError.Domain
+    @objc public static let Plugin = PKPluginError.Domain
+    @objc public static let Player = PlayerError.Domain
 }
 

@@ -13,29 +13,29 @@ func getJson(_ json: Any) -> JSON {
     return json as? JSON ?? JSON(json)
 }
 
-public enum MediaType {
-    case Live
+@objc public enum MediaType: Int {
+    case live
+    case unknown
 }
 
-public class MediaEntry: NSObject {
-    public var id: String
-    public var sources: [MediaSource]?
-    public var duration: Int64?
-    public var mediaType: MediaType?
-    public var metadata:[String:String]?
+@objc public class MediaEntry: NSObject {
+    @objc public var id: String
+    @objc public var sources: [MediaSource]?
+    @objc public var duration: TimeInterval = 0
+    @objc public var mediaType: MediaType = .unknown
+    @objc public var metadata:[String:String]?
     
     private let idKey = "id"
     private let sourcesKey = "sources"
     private let mediaTypeKey = "mediaType"
     private let durationKey = "duration"
     
-    
     internal init(id: String) {
         self.id = id
         super.init()
     }
     
-    public init(_ id: String, sources: [MediaSource], duration: Int64 = 0) {
+    public init(_ id: String, sources: [MediaSource], duration: TimeInterval = 0) {
         self.id = id
         self.sources = sources
         self.duration = duration
@@ -48,7 +48,7 @@ public class MediaEntry: NSObject {
         
         self.id = jsonObject[idKey].string ?? ""
         
-        self.duration = jsonObject[durationKey].int64
+        self.duration = jsonObject[durationKey].double ?? 0.0
         
         if let sources = jsonObject[sourcesKey].array {
             self.sources = sources.map { MediaSource(json: $0) }
@@ -56,7 +56,7 @@ public class MediaEntry: NSObject {
         
         if let mediaTypeStr = jsonObject[mediaTypeKey].string {
             if mediaTypeStr == "Live" {
-                self.mediaType = MediaType.Live
+                self.mediaType = MediaType.live
             }
         }
         
@@ -70,42 +70,38 @@ public class MediaEntry: NSObject {
     }
 }
 
-public class MediaSource: NSObject {
+@objc public class MediaSource: NSObject {
     
-    
-    public enum SourceType: Int {
-        case hls_clear
-        case hls_fair_play
-        case wvm_wideVine
-        case mp4_clear
+    @objc public enum SourceType: Int {
+        case hlsClear
+        case hlsFairPlay
+        case wvmWideVine
+        case mp4Clear
         case unknown
         
         var fileExtension: String {
             get {
                 switch self {
-                case .hls_clear,
-                     .hls_fair_play:
+                case .hlsClear,
+                     .hlsFairPlay:
                     return "m3u8"
-                case .wvm_wideVine:
+                case .wvmWideVine:
                     return "wvm"
-                case .mp4_clear:
+                case .mp4Clear:
                     return "mp4"
                 case .unknown:
                     return "mp4"
                 }
-                
             }
         }
-        
     }
     
-    
-    public var id: String
-    public var contentUrl: URL?
-    public var mimeType: String?
-    public var drmData: [DRMData]?
-    public var sourceType: SourceType?
-    public var fileExt: String {
+    @objc public var id: String
+    @objc public var contentUrl: URL?
+    @objc public var mimeType: String?
+    @objc public var drmData: [DRMData]?
+    @objc public var sourceType: SourceType = .unknown
+    @objc public var fileExt: String {
         return contentUrl?.pathExtension ?? ""
     }
     
@@ -115,12 +111,11 @@ public class MediaSource: NSObject {
     private let drmDataKey: String = "drmData"
     private let sourceTypeKey: String = "sourceType"
     
-    
-    public convenience init (id: String){
+    @objc public convenience init (id: String) {
         self.init(id, contentUrl: nil)
     }
     
-    public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil, sourceType: SourceType? = nil) {
+    @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil, sourceType: SourceType = .unknown) {
         self.id = id
         self.contentUrl = contentUrl
         self.mimeType = mimeType
@@ -128,7 +123,7 @@ public class MediaSource: NSObject {
         self.sourceType = sourceType
     }
     
-    public init(json: Any) {
+    @objc public init(json: Any) {
         
         let sj = getJson(json)
         
@@ -142,8 +137,8 @@ public class MediaSource: NSObject {
             self.drmData = drmData.flatMap { DRMData.fromJSON($0) }
         }
         
-        if let sourceType = sj[sourceTypeKey].int {
-            self.sourceType = SourceType(rawValue: sourceType)
+        if let st = sj[sourceTypeKey].int, let sourceType = SourceType(rawValue: st) {
+            self.sourceType = sourceType
         }
         
         super.init()
@@ -156,7 +151,7 @@ public class MediaSource: NSObject {
     }
 }
 
-open class DRMData: NSObject {
+@objc open class DRMData: NSObject {
     var licenseUri: URL?
     
     init(licenseUri: String?) {
@@ -165,7 +160,7 @@ open class DRMData: NSObject {
         }
     }
     
-    public static func fromJSON(_ json: Any) -> DRMData? {
+    @objc public static func fromJSON(_ json: Any) -> DRMData? {
         
         let sj = getJson(json)
         

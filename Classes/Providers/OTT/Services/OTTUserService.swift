@@ -32,7 +32,7 @@ public class OTTUserService: NSObject {
                 .setBody(key: "refreshToken", value: JSON(refreshToken))
                 .setBody(key: "ks", value: JSON(ks))
             return request
-        }else{
+        } else {
             return nil
         }
 
@@ -42,7 +42,7 @@ public class OTTUserService: NSObject {
         if let request = KalturaRequestBuilder(url: baseURL, service: "ottUser", action: "anonymousLogin") {
             request.setBody(key: "partnerId", value: JSON(NSNumber.init(value: partnerId)))
             return request
-        }else{
+        } else {
             return nil
         }
         
