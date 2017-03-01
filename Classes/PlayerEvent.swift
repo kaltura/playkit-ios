@@ -8,10 +8,10 @@
 import Foundation
 
 /// An PlayerEvent is a class used to reflect player events.
-public class PlayerEvent: PKEvent {
+@objc public class PlayerEvent: PKEvent {
     
     // All events EXCLUDING error. Assuming error events are treated differently.
-    public static let allEventTypes: [PlayerEvent.Type] = [
+    @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, ended, loadedMetadata,
         play, pause, playing, seeking, seeked, stateChanged,
         tracksAvailable, playbackParamsUpdated, error
@@ -20,34 +20,34 @@ public class PlayerEvent: PKEvent {
     // MARK: - Player Events Static Reference
     
     /// Sent when enough data is available that the media can be played, at least for a couple of frames.
-    public static let canPlay: PlayerEvent.Type = CanPlay.self
+    @objc public static let canPlay: PlayerEvent.Type = CanPlay.self
     /// The metadata has loaded or changed, indicating a change in duration of the media. This is sent, for example, when the media has loaded enough that the duration is known.
-    public static let durationChanged: PlayerEvent.Type = DurationChanged.self
+    @objc public static let durationChanged: PlayerEvent.Type = DurationChanged.self
     /// Sent when playback completes.
-    public static let ended: PlayerEvent.Type = Ended.self
+    @objc public static let ended: PlayerEvent.Type = Ended.self
     /// The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
-    public static let loadedMetadata: PlayerEvent.Type = LoadedMetadata.self
+    @objc public static let loadedMetadata: PlayerEvent.Type = LoadedMetadata.self
     /// Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior pause event.
-    public static let play: PlayerEvent.Type = Play.self
+    @objc public static let play: PlayerEvent.Type = Play.self
     /// Sent when playback is paused.
-    public static let pause: PlayerEvent.Type = Pause.self
+    @objc public static let pause: PlayerEvent.Type = Pause.self
     /// Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).
-    public static let playing: PlayerEvent.Type = Playing.self
+    @objc public static let playing: PlayerEvent.Type = Playing.self
     /// Sent when a seek operation begins.
-    public static let seeking: PlayerEvent.Type = Seeking.self
+    @objc public static let seeking: PlayerEvent.Type = Seeking.self
     /// Sent when a seek operation completes.
-    public static let seeked: PlayerEvent.Type = Seeked.self
+    @objc public static let seeked: PlayerEvent.Type = Seeked.self
     /// Sent when tracks available.
-    public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
+    @objc public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
     /// Sent when Playback Params Updated.
-    public static let playbackParamsUpdated: PlayerEvent.Type = PlaybackParamsUpdated.self
+    @objc public static let playbackParamsUpdated: PlayerEvent.Type = PlaybackParamsUpdated.self
     /// Sent when player state is changed.
-    public static let stateChanged: PlayerEvent.Type = StateChanged.self
+    @objc public static let stateChanged: PlayerEvent.Type = StateChanged.self
     
     /// Sent when an error occurs.
-    public static let error: PlayerEvent.Type = Error.self
+    @objc public static let error: PlayerEvent.Type = Error.self
     /// Sent when an plugin error occurs.
-    public static let pluginError: PlayerEvent.Type = PluginError.self
+    @objc public static let pluginError: PlayerEvent.Type = PluginError.self
     
     // MARK: - Player Basic Events
 
@@ -104,40 +104,40 @@ public class PlayerEvent: PKEvent {
 
 // MARK: - Ad Events
 
-public class AdEvent: PKEvent {
-    public static let allEventTypes: [AdEvent.Type] = [
+@objc public class AdEvent: PKEvent {
+    @objc public static let allEventTypes: [AdEvent.Type] = [
         adBreakReady, adBreakEnded, adBreakStarted, adAllCompleted, adComplete, adClicked, adCuepointsChanged, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
     ]
     
-    public static let adBreakReady: AdEvent.Type = AdBreakReady.self
-    public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self
-    public static let adBreakStarted: AdEvent.Type = AdBreakStarted.self
-    public static let adAllCompleted: AdEvent.Type = AdAllCompleted.self
-    public static let adComplete: AdEvent.Type = AdComplete.self
-    public static let adClicked: AdEvent.Type = AdClicked.self
-    public static let adCuepointsChanged: AdEvent.Type = AdCuepointsChanged.self
-    public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
-    public static let adLoaded: AdEvent.Type = AdLoaded.self
-    public static let adLog: AdEvent.Type = AdLog.self
-    public static let adMidpoint: AdEvent.Type = AdMidpoint.self
-    public static let adPaused: AdEvent.Type = AdPaused.self
-    public static let adResumed: AdEvent.Type = AdResumed.self
-    public static let adSkipped: AdEvent.Type = AdSkipped.self
-    public static let adStarted: AdEvent.Type = AdStarted.self
-    public static let adStreamLoaded: AdEvent.Type = AdStreamLoaded.self
-    public static let adTapped: AdEvent.Type = AdTapped.self
-    public static let adThirdQuartile: AdEvent.Type = AdThirdQuartile.self
-    public static let adDidProgressToTime: AdEvent.Type = AdDidProgressToTime.self
-    public static let adDidRequestPause: AdEvent.Type = AdDidRequestPause.self
-    public static let adDidRequestResume: AdEvent.Type = AdDidRequestResume.self
-    public static let webOpenerEvent: AdEvent.Type = WebOpenerEvent.self
-    public static let adWebOpenerWillOpenExternalBrowser: AdEvent.Type = AdWebOpenerWillOpenExternalBrowser.self
-    public static let adWebOpenerWillOpenInAppBrowser: AdEvent.Type = AdWebOpenerWillOpenInAppBrowser.self
-    public static let adWebOpenerDidOpenInAppBrowser: AdEvent.Type = AdWebOpenerDidOpenInAppBrowser.self
-    public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
-    public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
+    @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
+    @objc public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self
+    @objc public static let adBreakStarted: AdEvent.Type = AdBreakStarted.self
+    @objc public static let adAllCompleted: AdEvent.Type = AdAllCompleted.self
+    @objc public static let adComplete: AdEvent.Type = AdComplete.self
+    @objc public static let adClicked: AdEvent.Type = AdClicked.self
+    @objc public static let adCuepointsChanged: AdEvent.Type = AdCuepointsChanged.self
+    @objc public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
+    @objc public static let adLoaded: AdEvent.Type = AdLoaded.self
+    @objc public static let adLog: AdEvent.Type = AdLog.self
+    @objc public static let adMidpoint: AdEvent.Type = AdMidpoint.self
+    @objc public static let adPaused: AdEvent.Type = AdPaused.self
+    @objc public static let adResumed: AdEvent.Type = AdResumed.self
+    @objc public static let adSkipped: AdEvent.Type = AdSkipped.self
+    @objc public static let adStarted: AdEvent.Type = AdStarted.self
+    @objc public static let adStreamLoaded: AdEvent.Type = AdStreamLoaded.self
+    @objc public static let adTapped: AdEvent.Type = AdTapped.self
+    @objc public static let adThirdQuartile: AdEvent.Type = AdThirdQuartile.self
+    @objc public static let adDidProgressToTime: AdEvent.Type = AdDidProgressToTime.self
+    @objc public static let adDidRequestPause: AdEvent.Type = AdDidRequestPause.self
+    @objc public static let adDidRequestResume: AdEvent.Type = AdDidRequestResume.self
+    @objc public static let webOpenerEvent: AdEvent.Type = WebOpenerEvent.self
+    @objc public static let adWebOpenerWillOpenExternalBrowser: AdEvent.Type = AdWebOpenerWillOpenExternalBrowser.self
+    @objc public static let adWebOpenerWillOpenInAppBrowser: AdEvent.Type = AdWebOpenerWillOpenInAppBrowser.self
+    @objc public static let adWebOpenerDidOpenInAppBrowser: AdEvent.Type = AdWebOpenerDidOpenInAppBrowser.self
+    @objc public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
+    @objc public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
     /// Sent when an error occurs.
-    public static let error: AdEvent.Type = Error.self
+    @objc public static let error: AdEvent.Type = Error.self
     
     class AdBreakReady : AdEvent {}
     class AdBreakEnded : AdEvent {}
