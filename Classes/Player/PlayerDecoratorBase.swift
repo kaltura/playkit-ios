@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-public class PlayerDecoratorBase: NSObject, Player {
+@objc public class PlayerDecoratorBase: NSObject, Player {
 
     private var player: Player!
     

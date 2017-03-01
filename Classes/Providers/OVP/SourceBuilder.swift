@@ -86,13 +86,10 @@ class SourceBuilder {
     }
     
     @discardableResult
-    func set(fileExtension:String) -> SourceBuilder {
+    func set(fileExtension: String) -> SourceBuilder {
         self.fileExtension = fileExtension
         return self
     }
-    
-    
-    
     
     func build() -> URL? {
         

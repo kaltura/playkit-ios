@@ -18,7 +18,7 @@ class AssetBuilder {
         self.mediaEntry = mediaEntry
     }
 
-    public func getPreferredMediaSource() -> (MediaSource, AssetHandler.Type)? {
+    func getPreferredMediaSource() -> (MediaSource, AssetHandler.Type)? {
         
         guard let sources = mediaEntry.sources else {
             PKLog.error("no media sources in mediaEntry!")

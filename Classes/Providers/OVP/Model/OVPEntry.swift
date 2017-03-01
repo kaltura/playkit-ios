@@ -16,7 +16,7 @@ class OVPEntry: OVPBaseObject {
     var dataURL: URL?
     var mediaType: Int?
     var flavorParamsIds: String?
-    var duration: Int64?
+    var duration: TimeInterval = 0
     var name: String?
     var type: Int?
     
@@ -46,7 +46,7 @@ class OVPEntry: OVPBaseObject {
         
         self.mediaType = jsonObject[mediaTypeKey].int
         self.flavorParamsIds = jsonObject[flavorParamsIdsKey].string
-        self.duration = jsonObject[durationKey].int64
+        self.duration = jsonObject[durationKey].double ?? 0
         self.name = jsonObject[nameKey].string
         self.type = jsonObject[typeKey].int
         
