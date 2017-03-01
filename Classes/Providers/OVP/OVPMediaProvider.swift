@@ -37,7 +37,7 @@ import SwiftyXMLParser
     
     public override init() {}
     
-    public init(_ sessionProvider: SessionProvider) {
+    @objc public init(_ sessionProvider: SessionProvider) {
         self.sessionProvider = sessionProvider
     }
     
@@ -45,7 +45,7 @@ import SwiftyXMLParser
      session provider - which resposible for the ks, prtner id, and base server url
      */
     @discardableResult
-    public func set(sessionProvider: SessionProvider?) -> Self {
+    @nonobjc public func set(sessionProvider: SessionProvider?) -> Self {
         self.sessionProvider = sessionProvider
         return self
     }
@@ -54,7 +54,7 @@ import SwiftyXMLParser
      entryId - entry which we need to play
      */
     @discardableResult
-    public func set(entryId: String?) -> Self {
+    @nonobjc public func set(entryId: String?) -> Self {
         self.entryId = entryId
         return self
     }
@@ -63,7 +63,7 @@ import SwiftyXMLParser
      executor - which resposible for the network, it can be set to
      */
     @discardableResult
-    public func set( executor: RequestExecutor?) -> Self {
+    @nonobjc public func set( executor: RequestExecutor?) -> Self {
         self.executor = executor
         return self
     }
@@ -72,7 +72,7 @@ import SwiftyXMLParser
      uiconfId - UI Configuration id
      */
     @discardableResult
-    public func set(uiconfId: Int64?) -> Self{
+    @nonobjc public func set(uiconfId: Int64?) -> Self{
         self.uiconfId = uiconfId
         return self
     }
@@ -255,15 +255,15 @@ import SwiftyXMLParser
             switch format {
             case "applehttp":
                 if source.drm == nil {
-                    return MediaSource.SourceType.hls_clear
+                    return MediaSource.SourceType.hlsClear
                 } else {
-                    return MediaSource.SourceType.hls_fair_play
+                    return MediaSource.SourceType.hlsFairPlay
                 }
             case "url":
                 if source.drm == nil {
-                    return MediaSource.SourceType.mp4_clear
+                    return MediaSource.SourceType.mp4Clear
                 } else {
-                    return MediaSource.SourceType.wvm_wideVine
+                    return MediaSource.SourceType.wvmWideVine
                 }
             default:
                 return MediaSource.SourceType.unknown

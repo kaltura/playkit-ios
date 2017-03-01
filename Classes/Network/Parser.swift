@@ -8,6 +8,4 @@
 
 import UIKit
 
-public protocol ResponseParser {
-    
-}
+public protocol ResponseParser { }

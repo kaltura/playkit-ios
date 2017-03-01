@@ -9,24 +9,24 @@
 import Foundation
 
 /// A `MediaConfig` object defines behavior and info to use when preparing a `Player` object.
-public class MediaConfig: NSObject {
-    public var mediaEntry: MediaEntry
-    public var startTime: TimeInterval = 0
+@objc public class MediaConfig: NSObject {
+    @objc public var mediaEntry: MediaEntry
+    @objc public var startTime: TimeInterval = 0
     
-    override public var description: String {
+    @objc public override var description: String {
         return "Media config, mediaEntry: \(self.mediaEntry)\nstartTime: \(self.startTime)"
     }
     
-    public init(mediaEntry: MediaEntry, startTime: TimeInterval = 0) {
+    @objc public init(mediaEntry: MediaEntry, startTime: TimeInterval = 0) {
         self.mediaEntry = mediaEntry
         self.startTime = startTime
     }
     
-    public static func config(mediaEntry: MediaEntry) -> MediaConfig {
+    @objc public static func config(mediaEntry: MediaEntry) -> MediaConfig {
         return MediaConfig.init(mediaEntry: mediaEntry)
     }
     
-    public static func config(mediaEntry: MediaEntry, startTime: TimeInterval) -> MediaConfig {
+    @objc public static func config(mediaEntry: MediaEntry, startTime: TimeInterval) -> MediaConfig {
         return MediaConfig.init(mediaEntry: mediaEntry, startTime: startTime)
     }
     
@@ -37,15 +37,15 @@ public class MediaConfig: NSObject {
 }
 
 /// A `PluginConfig` object defines config to use when loading a plugin object.
-public class PluginConfig: NSObject {
+@objc public class PluginConfig: NSObject {
     /// Plugins config dictionary holds [plugin name : plugin config]
     @objc public var config: [String: Any]
     
-    override public var description: String {
+    public override var description: String {
         return "Plugin config:\n\(self.config)"
     }
     
-    public init(config: [String: Any]) {
+    @objc public init(config: [String: Any]) {
         self.config = config
     }
     

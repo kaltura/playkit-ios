@@ -22,25 +22,29 @@ import UIKit
     
     let saftyMargin = 5*60.0
     
-    public var serverURL: String
-    public var partnerId: Int64
+    @objc public var serverURL: String
+    @objc public var partnerId: Int64
     public var executor: RequestExecutor
     
     private var ks: String?
     private var refreshToken: String?
     private var tokenExpiration: Date?
     
-    public init(serverURL:String, partnerId:Int64, executor: RequestExecutor?) {
+    public init(serverURL: String, partnerId: Int64, executor: RequestExecutor?) {
         self.serverURL = serverURL
         self.partnerId = partnerId
         if let exe = executor{
             self.executor = exe
-        }else{
+        } else {
             self.executor = USRExecutor.shared
         }
     }
     
-    public func startSession(username: String, password: String, completion: @escaping (_ error: Error?) -> Void) -> Void {
+    @objc public convenience init(serverURL: String, partnerId: Int64) {
+        self.init(serverURL: serverURL, partnerId: partnerId, executor: nil)
+    }
+    
+    @objc public func startSession(username: String, password: String, completion: @escaping (_ error: Error?) -> Void) -> Void {
         
         let loginRequestBuilder = OTTUserService.login(baseURL: self.serverURL,
                                                        partnerId: partnerId,
@@ -89,12 +93,11 @@ import UIKit
         }
     }
     
-    public func startAnonymousSession(completion:@escaping (_ error: Error?) -> Void) {
+    @objc public func startAnonymousSession(completion:@escaping (_ error: Error?) -> Void) {
         
         let loginRequestBuilder = OTTUserService.anonymousLogin(baseURL: self.serverURL,
                                                                 partnerId: self.partnerId)
-        let sessionGetRequest = OTTSessionService.get(baseURL: self.serverURL,
-                                                      ks:"1:result:ks")
+        let sessionGetRequest = OTTSessionService.get(baseURL: self.serverURL, ks: "1:result:ks")
         
         if let r1 = loginRequestBuilder, let r2 = sessionGetRequest {
             
@@ -132,7 +135,7 @@ import UIKit
         }
     }
     
-    public func loadKS(completion: @escaping (String?, Error?) -> Void) {
+    @objc public func loadKS(completion: @escaping (String?, Error?) -> Void) {
         let now = Date()
         
         if let expiration = self.tokenExpiration, expiration.timeIntervalSince(now) > saftyMargin {
@@ -142,7 +145,7 @@ import UIKit
         }
     }
     
-    public func refreshKS(completion: @escaping (String?, Error?) -> Void) {
+    @objc public func refreshKS(completion: @escaping (String?, Error?) -> Void) {
         
         guard let refreshToken = self.refreshToken, let ks = self.ks else {
             completion(nil, SessionManagerError.noRefreshTokenOrTokenToRefresh)

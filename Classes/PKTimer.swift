@@ -12,7 +12,7 @@ import Foundation
 extension Timer {
     
     /// Create a timer that will call `block` after interval once.
-    public class func after(_ interval: TimeInterval, _ block: @escaping () -> Void) -> Timer {
+    class func after(_ interval: TimeInterval, _ block: @escaping () -> Void) -> Timer {
         let fireDate: CFAbsoluteTime = CFAbsoluteTimeGetCurrent() + interval
         let timer: Timer = CFRunLoopTimerCreateWithHandler(kCFAllocatorDefault, fireDate, 0, 0, 0) { _ in
             block()
@@ -22,7 +22,7 @@ extension Timer {
     }
     
     /// Create a timer that will call `block` every interval.
-    public class func every(_ interval: TimeInterval, _ block: @escaping () -> Void) -> Timer {
+    class func every(_ interval: TimeInterval, _ block: @escaping () -> Void) -> Timer {
         let fireDate: CFAbsoluteTime = CFAbsoluteTimeGetCurrent() + interval
         let timer: Timer = CFRunLoopTimerCreateWithHandler(kCFAllocatorDefault, fireDate, interval, 0, 0) { _ in
             block()
