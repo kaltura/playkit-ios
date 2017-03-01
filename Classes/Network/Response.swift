@@ -11,5 +11,4 @@ import UIKit
 public class Response: Result<Any> {
 
     public let statusCode: Int = 0
-    
 }
