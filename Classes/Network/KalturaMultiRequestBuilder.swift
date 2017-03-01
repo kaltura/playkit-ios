@@ -9,12 +9,11 @@
 import UIKit
 import SwiftyJSON
 
-internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
+class KalturaMultiRequestBuilder: KalturaRequestBuilder {
     
-    
-    internal var requests: [KalturaRequestBuilder] = [KalturaRequestBuilder]()
+    var requests: [KalturaRequestBuilder] = [KalturaRequestBuilder]()
 
-    internal init?(url: String) {
+    init?(url: String) {
         super.init(url: url, service: "multirequest", action: nil)
     }
     
@@ -23,6 +22,7 @@ internal class KalturaMultiRequestBuilder: KalturaRequestBuilder {
         self.requests.append(request)
         return self
     }
+    
     override public func build() -> Request {
         
         let data = self.kalturaMultiRequestData()

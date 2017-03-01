@@ -9,11 +9,11 @@
 import Foundation
 
 /// PKEvent
-public class PKEvent: NSObject {
+@objc public class PKEvent: NSObject {
     // Events that have payload must provide it as a dictionary for objective-c compat.
-    public let data: [String: AnyObject]?
+    @objc public let data: [String: Any]?
     
-    public required init(_ data: [String: AnyObject]? = nil) {
+    @objc public required init(_ data: [String: Any]? = nil) {
         self.data = data
     }
 }
@@ -33,22 +33,22 @@ extension PKEvent {
     // MARK: Player Data Accessors
     
     /// Duration Value, PKEvent Data Accessor
-    public var duration: NSNumber? {
+    @objc public var duration: NSNumber? {
         return self.data?[EventDataKeys.Duration] as? NSNumber
     }
     
     /// Tracks Value, PKEvent Data Accessor
-    public var tracks: PKTracks? {
+    @objc public var tracks: PKTracks? {
         return self.data?[EventDataKeys.Tracks] as? PKTracks
     }
     
     /// Current Bitrate Value, PKEvent Data Accessor
-    public var currentBitrate: NSNumber? {
+    @objc public var currentBitrate: NSNumber? {
         return self.data?[EventDataKeys.CurrentBitrate] as? NSNumber
     }
     
     /// Current Old State Value, PKEvent Data Accessor
-    public var oldState: PlayerState {
+    @objc public var oldState: PlayerState {
         guard let oldState = self.data?[EventDataKeys.OldState] as? PlayerState else {
             return PlayerState.unknown
         }
@@ -57,7 +57,7 @@ extension PKEvent {
     }
     
     /// Current New State Value, PKEvent Data Accessor
-    public var newState: PlayerState {
+    @objc public var newState: PlayerState {
         guard let newState = self.data?[EventDataKeys.NewState] as? PlayerState else {
             return PlayerState.unknown
         }
@@ -66,7 +66,7 @@ extension PKEvent {
     }
     
     /// Associated error from error event, PKEvent Data Accessor
-    public var error: NSError? {
+    @objc public var error: NSError? {
         return self.data?[EventDataKeys.Error] as? NSError
     }
     
@@ -81,22 +81,22 @@ extension PKEvent {
     // MARK: Ad Data Accessors
     
     /// MediaTime, PKEvent Ad Data Accessor
-    public var mediaTime: NSNumber? {
+    @objc public var mediaTime: NSNumber? {
         return self.data?[AdEventDataKeys.MediaTime] as? NSNumber
     }
     
     /// TotalTime, PKEvent Ad Data Accessor
-    public var totalTime: NSNumber? {
+    @objc public var totalTime: NSNumber? {
         return self.data?[AdEventDataKeys.TotalTime] as? NSNumber
     }
     
     /// WebOpener, PKEvent Ad Data Accessor
-    public var webOpener: NSObject? {
+    @objc public var webOpener: NSObject? {
         return self.data?[AdEventDataKeys.WebOpener] as? NSObject
     }
     
     /// Associated error from error event, PKEvent Ad Data Accessor
-    public var adError: NSError? {
+    @objc public var adError: NSError? {
         return self.data?[AdEventDataKeys.Error] as? NSError
     }
 }
