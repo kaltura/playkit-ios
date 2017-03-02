@@ -219,7 +219,6 @@ class AssetLoaderDelegate: NSObject {
             resourceLoadingRequestOptions = [AVAssetResourceLoadingRequestStreamingContentKeyRequestRequiresPersistentKey: true as AnyObject]
         }
         
-        
         let spcData: Data!
         
         do {
@@ -248,7 +247,6 @@ class AssetLoaderDelegate: NSObject {
          in the CKC message that it returns. If the Apple device finds this type of TLLV in a CKC that delivers an FPS
          content key, it will honor the type of rental or lease specified when the key is used.
          */
-        
         
         performCKCRequest(spcData) {(result: Result<Data>) -> Void in
             if let ckcData = result.data {

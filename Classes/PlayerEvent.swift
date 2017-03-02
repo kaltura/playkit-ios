@@ -67,9 +67,9 @@ public class PlayerEvent: PKEvent {
     class Seeked : PlayerEvent {}
     
     class Error: PlayerEvent {
-        /*convenience init(nsError: NSError) {
+        convenience init(nsError: NSError) {
             self.init([EventDataKeys.Error : nsError])
-        }*/
+        }
         
         convenience init(error: PKError) {
             self.init([EventDataKeys.Error : error.asNSError])
@@ -77,9 +77,9 @@ public class PlayerEvent: PKEvent {
     }
     
     class PluginError: PlayerEvent {
-        /*convenience init(nsError: NSError) {
+        convenience init(nsError: NSError) {
             self.init([EventDataKeys.Error : nsError])
-        }*/
+        }
         
         convenience init(error: PKError) {
             self.init([EventDataKeys.Error : error.asNSError])

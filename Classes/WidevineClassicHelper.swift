@@ -14,10 +14,46 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
 #if WIDEVINE_ENABLED
     import PlayKitWV
     
-    enum WidevineClassicError: Error { // FIXME: add handling
+    /************************************************************/
+    // MARK: - WidevineClassicError
+    /************************************************************/
+    
+    enum WidevineClassicError: PKError { 
+        
         case invalidDRMData
         case missingWidevineFile
+        
+        static let Domain = "com.kaltura.playkit.error.drm.widevine"
+        
+        var code: Int {
+            switch self {
+            case .invalidDRMData: return 6000
+            case .missingWidevineFile: return 6001
+            }
+        }
+        
+        var errorDescription: String {
+            switch self {
+            case.invalidDRMData: return "Couldn't extract license uri, invalid DRM data"
+            case .missingWidevineFile: return "Couldn't register asset, Widevine file not found"
+            }
+        }
+        
+        var userInfo: [String : Any] {
+            switch self {
+            case .invalidDRMData: return [:]
+            case .missingWidevineFile: return [:]
+            }
+        }
     }
+    
+    extension PKErrorDomain {
+        @objc public static let Widevine = WidevineClassicError.Domain
+    }
+    
+    /************************************************************/
+    // MARK: - Widevine Classic
+    /************************************************************/
     
     class WidevineClassicHelper {
         static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
@@ -29,8 +65,7 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
                     callback(nil)
                     break
                 case KCDMEvent_FileNotFound:
-                    // TODO:: Fix error
-                    callback(NSError(domain: "widevine", code: -1, userInfo: nil))
+                    callback(WidevineClassicError.missingWidevineFile.asNSError)
                     PKLog.error("Widevine file not found")
                     break
                 default:
@@ -38,8 +73,12 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
                 }
             }, forAsset: assetUri)
             
-            guard let licenseUri = WidevineClassicHelper.extractLicenseUri(mediaSource: mediaSource) else {
+            let (lu, e) = WidevineClassicHelper.extractLicenseUri(mediaSource: mediaSource)
+            guard let licenseUri = lu else {
                 PKLog.error("no licenseUri")
+                if let error = e?.asNSError {
+                    callback(error)
+                }
                 return
             }
             
@@ -110,23 +149,22 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
             WidevineClassicCDM.playLocalAsset(assetUri, readyToPlay: block)
         }
         
-        static func extractLicenseUri(mediaSource: MediaSource) -> String? {
+        static func extractLicenseUri(mediaSource: MediaSource) -> (String?, PKError?) {
             guard let drmData = mediaSource.drmData?.first, let licenseUri = drmData.licenseUri  else {
-                // TODO:: error handling
                 PKLog.error("Invalid DRM Data")
-                return nil
+                return (nil, WidevineClassicError.invalidDRMData)
             }
             
-            return licenseUri.absoluteString
+            return (licenseUri.absoluteString, nil)
         }
     }
 #else
     internal class WidevineClassicHelper {
         static let fatalMsg = "PlayKitWV is not contained on Podfile"
         
-        static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
+        /*static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
             fatalError(fatalMsg)
-        }
+        }*/
         
         static func unregisterAsset(_ assetUri: String!, callback: @escaping LocalAssetRegistrationBlock) {
             fatalError(fatalMsg)
@@ -148,7 +186,7 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
             fatalError(fatalMsg)
         }
         
-        static func extractLicenseUri(mediaSource: MediaSource) -> String? {
+        static func extractLicenseUri(mediaSource: MediaSource) -> (String?, PKError?) {
             fatalError(fatalMsg)
         }
     }
