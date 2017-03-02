@@ -8,7 +8,7 @@
 
 import Foundation
 import AVFoundation 
-import MediaPlayer
+
 /************************************************************/
 // MARK: - PlayerError
 /************************************************************/
@@ -66,7 +66,7 @@ enum PlayerError: PKError {
 /// `PKPluginError` represents plugins errors.
 enum PKPluginError: PKError {
     
-    case failedToCreatePlugin
+    case failedToCreatePlugin(pluginName: String)
     case missingPluginConfig(pluginName: String)
     
     static let Domain = "com.kaltura.playkit.error.plugins"
@@ -80,15 +80,15 @@ enum PKPluginError: PKError {
     
     var errorDescription: String {
         switch self {
-        case .failedToCreatePlugin: return "failed to create plugin, doesn't exist in registry"
+        case .failedToCreatePlugin(let pluginName): return "failed to create plugin (\(pluginName)), doesn't exist in registry"
         case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName)"
         }
     }
     
     var userInfo: [String: Any] {
         switch self {
-        case .failedToCreatePlugin: return [:]
-        case .missingPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey : pluginName]
+        case .failedToCreatePlugin(let pluginName): return [PKErrorKeys.PluginNameKey: pluginName]
+        case .missingPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey: pluginName]
         }
     }
 }

@@ -54,7 +54,7 @@ import UIKit
     func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) throws -> PKPlugin {
         guard let pluginClass = pluginRegistry[name] else {
             PKLog.error("plugin with name: \(name) doesn't exist in pluginRegistry")
-            throw PKPluginError.failedToCreatePlugin.asNSError
+            throw PKPluginError.failedToCreatePlugin(pluginName: name).asNSError
         }
         return try pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
     }
