@@ -22,8 +22,8 @@ enum AnalyticsPluginError: PKError {
     
     var code: Int {
         switch self {
-        case .missingMediaEntry: return 3000
-        case .missingInitObject: return 3001
+        case .missingMediaEntry: return PKErrorCode.MissingMediaEntry
+        case .missingInitObject: return PKErrorCode.MissingInitObject
         }
     }
     
@@ -43,6 +43,11 @@ extension PKErrorDomain {
     @objc public static let AnalyticsPlugin = AnalyticsPluginError.Domain
 }
 
+extension PKErrorCode {
+    @objc public static let MissingMediaEntry = 2100
+    @objc public static let MissingInitObject = 2101
+}
+
 /************************************************************/
 // MARK: - BaseAnalyticsPlugin
 /************************************************************/
@@ -57,7 +62,7 @@ extension PKErrorDomain {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig

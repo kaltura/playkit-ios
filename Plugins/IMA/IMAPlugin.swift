@@ -91,7 +91,7 @@ extension PKErrorDomain {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let adsConfig = pluginConfig as? AdsConfig {
             self.config = adsConfig
@@ -110,7 +110,7 @@ extension PKErrorDomain {
             }
         } else {
             PKLog.error("missing plugin config")
-            throw PKPluginError.missingPluginConfig(pluginName: type(of: self).pluginName)
+            throw PKPluginError.missingPluginConfig(pluginName: IMAPlugin.pluginName)
         }
         
         self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (data: Any) -> Void in

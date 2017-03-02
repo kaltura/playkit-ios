@@ -23,7 +23,7 @@ enum YouboraPluginError: PKError {
     
     var code: Int {
         switch self {
-        case .failedToSetupYouboraManager: return 4000
+        case .failedToSetupYouboraManager: return PKErrorCode.FailedToSetupYouboraManager
         }
     }
     
@@ -44,6 +44,10 @@ extension PKErrorDomain {
     @objc public static let Youbora = YouboraPluginError.Domain
 }
 
+extension PKErrorCode {
+    @objc public static let FailedToSetupYouboraManager = 2200
+}
+
 /************************************************************/
 // MARK: - YouboraPlugin
 /************************************************************/
@@ -59,6 +63,14 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     /************************************************************/
     // MARK: - PKPlugin
     /************************************************************/
+    
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        guard let _ = pluginConfig as? AnalyticsConfig else {
+            PKLog.error("missing plugin config")
+            throw PKPluginError.missingPluginConfig(pluginName: YouboraPlugin.pluginName)
+        }
+    }
     
     public override func onLoad(mediaConfig: MediaConfig) {
         super.onLoad(mediaConfig: mediaConfig)

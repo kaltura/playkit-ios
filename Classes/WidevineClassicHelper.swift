@@ -27,8 +27,8 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
         
         var code: Int {
             switch self {
-            case .invalidDRMData: return 6000
-            case .missingWidevineFile: return 6001
+            case .invalidDRMData: return 6200
+            case .missingWidevineFile: return 6201
             }
         }
         

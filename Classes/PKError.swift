@@ -8,7 +8,7 @@
 
 import Foundation
 import AVFoundation 
-
+import MediaPlayer
 /************************************************************/
 // MARK: - PlayerError
 /************************************************************/
@@ -25,10 +25,10 @@ enum PlayerError: PKError {
     
     var code: Int {
         switch self {
-        case .failedToLoadAssetFromKeys: return 7000
-        case .assetNotPlayable: return 7001
-        case .failedToPlayToEndTime: return 7002
-        case .playerItemErrorLogEvent: return 7003
+        case .failedToLoadAssetFromKeys: return PKErrorCode.FailedToLoadAssetFromKeys
+        case .assetNotPlayable: return PKErrorCode.AssetNotPlayable
+        case .failedToPlayToEndTime: return PKErrorCode.FailedToPlayToEndTime
+        case .playerItemErrorLogEvent: return PKErrorCode.PlayerItemErrorLogEvent
         }
     }
     
@@ -43,7 +43,11 @@ enum PlayerError: PKError {
     
     var userInfo: [String: Any] {
         switch self {
-        case .failedToLoadAssetFromKeys(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
+        case .failedToLoadAssetFromKeys(let rootError):
+            if let rError = rootError {
+                return [PKErrorKeys.RootErrorKey : rError]
+            }
+            return [:]
         case .assetNotPlayable: return [:]
         case .failedToPlayToEndTime(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
         case .playerItemErrorLogEvent(let errorLogEvent):
@@ -69,8 +73,8 @@ enum PKPluginError: PKError {
     
     var code: Int {
         switch self {
-        case .failedToCreatePlugin: return 2000
-        case .missingPluginConfig: return 2001
+        case .failedToCreatePlugin: return PKErrorCode.FailedToCreatePlugin
+        case .missingPluginConfig: return PKErrorCode.MissingPluginConfig
         }
     }
     
@@ -175,12 +179,27 @@ extension PKError where Self: RawRepresentable, Self.RawValue == String {
 }
 
 /************************************************************/
+// MARK: - Error
+/************************************************************/
+// extension for easier access to domain and code properties.
+extension Error {
+    
+    public var domain: String {
+        return self._domain
+    }
+    
+    public var code: Int {
+        return self._code
+    }
+}
+
+/************************************************************/
 // MARK: - PKError UserInfo Keys
 /************************************************************/
 
 // general userInfo keys.
 struct PKErrorKeys {
-    static let RootErrorKey = "rootError"
+    static let RootErrorKey = NSUnderlyingErrorKey
     static let RootCodeKey = "rootCode"
     static let RootDomainKey = "rootDomain"
 }
@@ -192,5 +211,20 @@ struct PKErrorKeys {
 @objc public class PKErrorDomain: NSObject {
     @objc public static let Plugin = PKPluginError.Domain
     @objc public static let Player = PlayerError.Domain
+}
+
+/************************************************************/
+// MARK: - PlayKit Error Codes
+/************************************************************/
+
+@objc public class PKErrorCode: NSObject {
+    // PlayerError
+    @objc public static let FailedToLoadAssetFromKeys = 7000
+    @objc public static let AssetNotPlayable = 7001
+    @objc public static let FailedToPlayToEndTime = 7002
+    @objc public static let PlayerItemErrorLogEvent = 7003
+    // PKPluginError
+    @objc public static let FailedToCreatePlugin = 2000
+    @objc public static let MissingPluginConfig = 2001
 }
 
