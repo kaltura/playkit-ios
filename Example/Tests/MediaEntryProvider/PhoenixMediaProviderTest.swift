@@ -1,5 +1,5 @@
 //
-//  OTTMediaProviderTest.swift
+//  PhoenixMediaProviderTest.swift
 //  PlayKit
 //
 //  Created by Rivka Peleg on 04/12/2016.
@@ -11,7 +11,7 @@ import PlayKit
 
 
 
-class OTTMediaProviderTest: XCTestCase, SessionProvider {
+class PhoenixMediaProviderTest: XCTestCase, SessionProvider {
     
 
 
@@ -36,7 +36,7 @@ class OTTMediaProviderTest: XCTestCase, SessionProvider {
         
         let theExeption = expectation(description: "test")
         
-        let provider = OTTMediaProvider()
+        let provider = PhoenixMediaProvider()
         .set(sessionProvider: self)
         .set(mediaId: mediaID)
         .set(type: AssetType.media)

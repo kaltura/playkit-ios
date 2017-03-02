@@ -9,9 +9,9 @@
 import UIKit
 import SwiftyJSON
 
-@objc public class OTTMediaProvider: NSObject, MediaEntryProvider {
+@objc public class PhoenixMediaProvider: NSObject, MediaEntryProvider {
     
-    public enum OTTMediaProviderError: Error {
+    public enum PhoenixMediaProviderError: Error {
         case invalidInputParams
         case invalidKS
         case fileIsEmptyOrNotFound
@@ -48,6 +48,12 @@ import SwiftyJSON
     }
     
     @discardableResult
+    @nonobjc public func set(contextType:AssetType?) -> Self {
+        self.type = type
+        return self
+    }
+
+    @discardableResult
     @nonobjc public func set(formats:[String]?) -> Self {
         self.formats = formats
         return self
@@ -72,7 +78,7 @@ import SwiftyJSON
             let mediaId = self.mediaId,
             let type = self.type
             else {
-                callback(nil, OTTMediaProviderError.invalidInputParams)
+                callback(nil, PhoenixMediaProviderError.invalidInputParams)
                 return
         }
         
@@ -99,7 +105,7 @@ import SwiftyJSON
     func startLoad(loader: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) {
         loader.sessionProvider.loadKS { (ks, error) in
             guard let ks = ks else {
-                callback(nil, OTTMediaProviderError.invalidKS)
+                callback(nil, PhoenixMediaProviderError.invalidKS)
                 return
             }
             
@@ -108,7 +114,7 @@ import SwiftyJSON
                 .set(completion: { (r:Response) in
                     
                     guard let data = r.data else {
-                        callback(nil, OTTMediaProviderError.mediaNotFound)
+                        callback(nil, PhoenixMediaProviderError.mediaNotFound)
                         return
                     }
                     
@@ -142,7 +148,7 @@ import SwiftyJSON
                         }
                         callback(mediaEntry, nil)
                     } else {
-                        callback(nil, OTTMediaProviderError.mediaNotFound)
+                        callback(nil, PhoenixMediaProviderError.mediaNotFound)
                     }
                 })
             if let assetRequest = requestBuilder?.build() {
