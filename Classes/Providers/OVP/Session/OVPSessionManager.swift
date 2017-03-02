@@ -21,8 +21,8 @@ import UIKit
         case ksExpired
     }
     
-    public var serverURL: String
-    public var partnerId: Int64
+    @objc public var serverURL: String
+    @objc public var partnerId: Int64
     
     private var executor: RequestExecutor
     private var version: String
@@ -31,14 +31,12 @@ import UIKit
     private var ks: String? = nil
     private var tokenExpiration: Date?
 
-    
     private var username: String?
     private var password: String?
     
-    
     private let defaultSessionExpiry = TimeInterval(24*60*60)
     
-    public init(serverURL: String, partnerId: Int64, executor: RequestExecutor? = nil) {
+    public init(serverURL: String, partnerId: Int64, executor: RequestExecutor?) {
         self.serverURL = serverURL
         self.partnerId = partnerId
         self.version = "api_v3"
@@ -46,20 +44,24 @@ import UIKit
         
         if let exe  = executor {
             self.executor = exe
-        }else{
+        } else {
             self.executor = USRExecutor.shared
         }
     }
-        
+    
+    @objc public convenience init(serverURL: String, partnerId: Int64) {
+        self.init(serverURL: serverURL, partnerId: partnerId, executor: nil)
+    }
+    
     @available(*, deprecated, message: "Use init(serverURL:partnerId:executor:)")
-    public convenience init(serverURL: String, version:String, partnerId: Int64, executor: RequestExecutor?) {
+    public convenience init(serverURL: String, version: String, partnerId: Int64, executor: RequestExecutor?) {
         self.init(serverURL: serverURL, partnerId: partnerId, executor: executor)
     }
     
     public func loadKS(completion: @escaping (String?, Error?) -> Void){
         if let ks = self.ks, self.tokenExpiration?.compare(Date()) == ComparisonResult.orderedDescending {
                 completion(ks, nil)
-        }else{
+        } else {
             
             self.ks = nil
             if let username = self.username,
@@ -76,10 +78,7 @@ import UIKit
                     self.ensureKSAfterRefresh(e: e, completion: completion)
                 })
             }
-            
-            
         }
-        
     }
     
     

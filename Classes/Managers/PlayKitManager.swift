@@ -13,7 +13,7 @@ import UIKit
   - creating `Player` objects.
   - creating and registering plugins.
  */
-public class PlayKitManager: NSObject {
+@objc public class PlayKitManager: NSObject {
 
     // private init to prevent initializing this singleton
     private override init() {
@@ -22,10 +22,9 @@ public class PlayKitManager: NSObject {
         }
     }
     
-    public static let versionString: String = Bundle(for: PlayKitManager.self)
-        .object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    @objc public static let versionString: String = Bundle(for: PlayKitManager.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
-    public static let clientTag = "playkit/ios-\(versionString)"
+    @objc public static let clientTag = "playkit/ios-\(versionString)"
     
     @objc(sharedInstance) public static let shared: PlayKitManager = PlayKitManager()
     
@@ -42,13 +41,13 @@ public class PlayKitManager: NSObject {
     ///
     /// - Parameter config: The configuration object to load the player with.
     /// - Returns: A player loaded using the provided configuration.
-    public func loadPlayer(pluginConfig: PluginConfig?) throws -> Player {
+    @objc public func loadPlayer(pluginConfig: PluginConfig?) throws -> Player {
         let loader = PlayerLoader()
         try loader.load(pluginConfig: pluginConfig)
         return loader
     }
     
-    public func registerPlugin(_ pluginClass: BasePlugin.Type) {
+    @objc public func registerPlugin(_ pluginClass: BasePlugin.Type) {
         pluginRegistry[pluginClass.pluginName] = pluginClass
     }
     

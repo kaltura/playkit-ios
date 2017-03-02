@@ -407,7 +407,7 @@ class AVPlayerEngine: AVPlayer {
     
     private func handleBufferEmptyChange() {
         if self.currentItem != nil {
-            let newState = PlayerState.idle
+            let newState = PlayerState.buffering
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
         }

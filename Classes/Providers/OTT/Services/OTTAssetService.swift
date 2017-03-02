@@ -9,15 +9,12 @@
 import UIKit
 import SwiftyJSON
 
-
-
 public enum AssetType: String {
     case media = "media"
     case epg = "epg"
 }
 
-
-internal class OTTAssetService {
+class OTTAssetService {
 
     internal static func get(baseURL: String, ks: String,assetId: String, type: AssetType) -> KalturaRequestBuilder? {
         
@@ -29,7 +26,7 @@ internal class OTTAssetService {
             .setBody(key: "type", value: JSON(type.rawValue))
             .setBody(key: "with", value: JSON([["type":"files","objectType":"KalturaCatalogWithHolder"]]))
             return request
-        }else{
+        } else {
             return nil
         }
     }

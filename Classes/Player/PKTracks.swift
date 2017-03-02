@@ -8,9 +8,9 @@
 
 import Foundation
 
-public class PKTracks: NSObject {
-    public var audioTracks: [Track]?
-    public var textTracks: [Track]?
+@objc public class PKTracks: NSObject {
+    @objc public var audioTracks: [Track]?
+    @objc public var textTracks: [Track]?
     
     init(audioTracks: [Track]?, textTracks: [Track]?) {
         PKLog.debug("init::")

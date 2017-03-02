@@ -162,9 +162,9 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
     internal class WidevineClassicHelper {
         static let fatalMsg = "PlayKitWV is not contained on Podfile"
         
-        /*static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
+        static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
             fatalError(fatalMsg)
-        }*/
+        }
         
         static func unregisterAsset(_ assetUri: String!, callback: @escaping LocalAssetRegistrationBlock) {
             fatalError(fatalMsg)

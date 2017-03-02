@@ -10,10 +10,9 @@ import UIKit
 
 @objc public class AnalyticsConfig: NSObject {
     
-    public var params: [String: Any]
+    @objc public var params: [String: Any]
     
-    public init(params: [String: Any]) {
+    @objc public init(params: [String: Any]) {
         self.params = params
     }
 }
-

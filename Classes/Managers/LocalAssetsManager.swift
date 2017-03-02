@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 
 /// Manage local (downloaded) assets.
-public class LocalAssetsManager: NSObject {
+@objc public class LocalAssetsManager: NSObject {
     let storage: LocalDataStore
     var delegates = Set<AssetLoaderDelegate>()
     
@@ -22,7 +22,7 @@ public class LocalAssetsManager: NSObject {
      Create a new LocalAssetsManager for DRM-protected content. 
      Uses the default data-store.
      */
-    public static func managerWithDefaultDataStore() -> LocalAssetsManager {
+    @objc public static func managerWithDefaultDataStore() -> LocalAssetsManager {
         return LocalAssetsManager(storage: DefaultLocalDataStore.defaultDataStore())
     }
     
@@ -31,14 +31,14 @@ public class LocalAssetsManager: NSObject {
      
      - Parameter storage: data store. 
      */
-    public static func manager(storage: LocalDataStore) -> LocalAssetsManager {
+    @objc public static func manager(storage: LocalDataStore) -> LocalAssetsManager {
         return LocalAssetsManager(storage: storage)
     }
     
     /**
      Create a new LocalAssetsManager for non-DRM content.
     */
-    public static func manager() -> LocalAssetsManager {
+    @objc public static func manager() -> LocalAssetsManager {
         return LocalAssetsManager(storage: nil)
     }
     
@@ -59,7 +59,7 @@ public class LocalAssetsManager: NSObject {
         - asset: an AVURLAsset, ready to be downloaded
         - mediaSource: the original source for the asset. mediaSource.contentUrl and asset.url should point at the same file.
     */
-    public func prepareForDownload(asset: AVURLAsset, mediaSource: MediaSource) {
+    @objc public func prepareForDownload(asset: AVURLAsset, mediaSource: MediaSource) {
         
         // This function is a noop if no DRM data or DRM is not FairPlay.
         guard let drmData = mediaSource.drmData?.first as? FairPlayDRMData else {return}
@@ -88,14 +88,14 @@ public class LocalAssetsManager: NSObject {
 
     /// Create a MediaEntry for a local asset. This is a convenience function that wraps the result of
     /// `createLocalMediaSource(for:localURL:)` with a MediaEntry.
-    public func createLocalMediaEntry(for assetId: String, localURL: URL) -> MediaEntry {
+    @objc public func createLocalMediaEntry(for assetId: String, localURL: URL) -> MediaEntry {
         let mediaSource = createLocalMediaSource(for: assetId, localURL: localURL)
         return MediaEntry.init(assetId, sources: [mediaSource])
     }
     
     /// Get the preferred MediaSource for download purposes. This function takes into account
     /// the capabilities of the device.
-    public func getPreferredDownloadableMediaSource(for mediaEntry: MediaEntry) -> MediaSource? {
+    @objc public func getPreferredDownloadableMediaSource(for mediaEntry: MediaEntry) -> MediaSource? {
 
         guard let sources = mediaEntry.sources else {
             PKLog.error("no media sources in mediaEntry!")
@@ -124,15 +124,6 @@ public class LocalAssetsManager: NSObject {
         
         PKLog.error("no downloadable media sources!")
         return nil
-    }
-
-    /// Prepare a MediaEntry for download using AVAssetDownloadTask. 
-    public func prepareForDownload(of mediaEntry: MediaEntry) -> (AVURLAsset, MediaSource)? {
-        guard let source = getPreferredDownloadableMediaSource(for: mediaEntry) else { return nil }
-        guard let url = source.contentUrl else { return nil }
-        let avAsset = AVURLAsset(url: url)
-        prepareForDownload(asset: avAsset, mediaSource: source)
-        return (avAsset, source)
     }
     
     /// Notifies the SDK that downloading of an asset has finished.
@@ -189,7 +180,7 @@ public class LocalAssetsManager: NSObject {
 }
 
 /// Implementation of LocalDataStore that saves data to files in the Library directory.
-public class DefaultLocalDataStore: NSObject, LocalDataStore {
+@objc public class DefaultLocalDataStore: NSObject, LocalDataStore {
 
     static let pkLocalDataStore = "pkLocalDataStore"
     let storageDirectory: URL
@@ -223,6 +214,18 @@ public class DefaultLocalDataStore: NSObject, LocalDataStore {
 
     public func remove(key: String) throws {
         try FileManager.default.removeItem(at: file(key))
+    }
+}
+
+extension LocalAssetsManager {
+    
+    /// Prepare a MediaEntry for download using AVAssetDownloadTask.
+    public func prepareForDownload(of mediaEntry: MediaEntry) -> (AVURLAsset, MediaSource)? {
+        guard let source = getPreferredDownloadableMediaSource(for: mediaEntry) else { return nil }
+        guard let url = source.contentUrl else { return nil }
+        let avAsset = AVURLAsset(url: url)
+        prepareForDownload(asset: avAsset, mediaSource: source)
+        return (avAsset, source)
     }
 }
 

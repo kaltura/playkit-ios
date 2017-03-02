@@ -41,7 +41,7 @@ enum YouboraPluginError: PKError {
 }
 
 extension PKErrorDomain {
-    public static let Youbora = YouboraPluginError.Domain
+    @objc public static let Youbora = YouboraPluginError.Domain
 }
 
 /************************************************************/
@@ -59,13 +59,6 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     /************************************************************/
     // MARK: - PKPlugin
     /************************************************************/
-    
-    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
-        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-        guard let _ = pluginConfig as? AnalyticsConfig else {
-            throw PKPluginError.missingPluginConfig(pluginName: type(of: self).pluginName).asNSError
-        }
-    }
     
     public override func onLoad(mediaConfig: MediaConfig) {
         super.onLoad(mediaConfig: mediaConfig)
@@ -202,25 +195,43 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     
     private func setupYouboraManager(completionHandler: ((_ succeeded: Bool) -> Void)? = nil) {
         
-        guard let config = self.config, var media = config.params["media"] as? [String: Any] else {
-            PKLog.error("config params are wrong or doesn't exist, could not setup youbora manager")
-            self.messageBus.post(PlayerEvent.PluginError(error: YouboraPluginError.failedToSetupYouboraManager))
-            completionHandler?(false)
-            return
-        }
-        
         guard let mediaEntry = self.player.mediaEntry else {
             PKLog.error("missing MediaEntry, could not setup youbora manager")
-            self.messageBus.post(PlayerEvent.PluginError(error: YouboraPluginError.failedToSetupYouboraManager))
+            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
             completionHandler?(false)
             return
         }
         
-        media["resource"] = mediaEntry.id
-        media["title"] = mediaEntry.id
-        media["duration"] = self.player.duration
-        config.params["media"] = media
-        youboraManager = YouboraManager(options: config.params as NSObject!, player: player, mediaEntry: mediaEntry)
+        guard let config = self.config else {
+            PKLog.error("config params doesn't exist, could not setup youbora manager")
+            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
+            completionHandler?(false)
+            return
+        }
+        
+        var options = [String: Any]()
+        
+        // if media exists overwrite using the new info, else create a new media dictionary
+        if var media = config.params["media"] as? [String: Any] {
+            media["resource"] = mediaEntry.id
+            media["title"] = mediaEntry.id
+            media["duration"] = self.player.duration
+            config.params["media"] = media
+        } else {
+            config.params["media"] = [
+                "resource" : mediaEntry.id,
+                "title" : mediaEntry.id,
+                "duration" : mediaEntry.duration
+            ]
+        }
+        options = config.params
+        
+        // if youbora manager already created just update options
+        if let youboraManager = self.youboraManager {
+            youboraManager.setOptions(options as NSObject!)
+        } else {
+            self.youboraManager = YouboraManager(options: options as NSObject!, player: player, mediaEntry: mediaEntry)
+        }
         completionHandler?(true)
     }
     

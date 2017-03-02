@@ -40,7 +40,7 @@ enum AnalyticsPluginError: PKError {
 }
 
 extension PKErrorDomain {
-    public static let AnalyticsPlugin = AnalyticsPluginError.Domain
+    @objc public static let AnalyticsPlugin = AnalyticsPluginError.Domain
 }
 
 /************************************************************/
@@ -48,7 +48,7 @@ extension PKErrorDomain {
 /************************************************************/
 
 /// class `BaseAnalyticsPlugin` is a base plugin object used for analytics plugin subclasses
-public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
+@objc public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
     var config: AnalyticsConfig?
     var isFirstPlay: Bool = true

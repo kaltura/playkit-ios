@@ -40,14 +40,14 @@ extension PKErrorKeys {
 }
 
 extension PKErrorDomain {
-    public static let IMA = IMAPluginError.Domain
+    @objc public static let IMA = IMAPluginError.Domain
 }
 
 /************************************************************/
 // MARK: - IMAPlugin
 /************************************************************/
 
-public class IMAPlugin: BasePlugin, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
+@objc public class IMAPlugin: BasePlugin, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
 
     weak var dataSource: AdsPluginDataSource? {
         didSet {
