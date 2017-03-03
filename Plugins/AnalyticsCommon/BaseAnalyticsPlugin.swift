@@ -22,8 +22,8 @@ enum AnalyticsPluginError: PKError {
     
     var code: Int {
         switch self {
-        case .missingMediaEntry: return PKErrorCode.MissingMediaEntry
-        case .missingInitObject: return PKErrorCode.MissingInitObject
+        case .missingMediaEntry: return PKErrorCode.missingMediaEntry
+        case .missingInitObject: return PKErrorCode.missingInitObject
         }
     }
     
@@ -44,8 +44,8 @@ extension PKErrorDomain {
 }
 
 extension PKErrorCode {
-    @objc public static let MissingMediaEntry = 2100
-    @objc public static let MissingInitObject = 2101
+    @objc(MissingMediaEntry) public static let missingMediaEntry = 2100
+    @objc(MissingInitObject) public static let missingInitObject = 2101
 }
 
 /************************************************************/

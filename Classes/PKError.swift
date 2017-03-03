@@ -25,10 +25,10 @@ enum PlayerError: PKError {
     
     var code: Int {
         switch self {
-        case .failedToLoadAssetFromKeys: return PKErrorCode.FailedToLoadAssetFromKeys
-        case .assetNotPlayable: return PKErrorCode.AssetNotPlayable
-        case .failedToPlayToEndTime: return PKErrorCode.FailedToPlayToEndTime
-        case .playerItemErrorLogEvent: return PKErrorCode.PlayerItemErrorLogEvent
+        case .failedToLoadAssetFromKeys: return PKErrorCode.failedToLoadAssetFromKeys
+        case .assetNotPlayable: return PKErrorCode.assetNotPlayable
+        case .failedToPlayToEndTime: return PKErrorCode.failedToPlayToEndTime
+        case .playerItemErrorLogEvent: return PKErrorCode.playerItemErrorLogEvent
         }
     }
     
@@ -73,8 +73,8 @@ enum PKPluginError: PKError {
     
     var code: Int {
         switch self {
-        case .failedToCreatePlugin: return PKErrorCode.FailedToCreatePlugin
-        case .missingPluginConfig: return PKErrorCode.MissingPluginConfig
+        case .failedToCreatePlugin: return PKErrorCode.failedToCreatePlugin
+        case .missingPluginConfig: return PKErrorCode.missingPluginConfig
         }
     }
     
@@ -219,12 +219,12 @@ struct PKErrorKeys {
 
 @objc public class PKErrorCode: NSObject {
     // PlayerError
-    @objc public static let FailedToLoadAssetFromKeys = 7000
-    @objc public static let AssetNotPlayable = 7001
-    @objc public static let FailedToPlayToEndTime = 7002
-    @objc public static let PlayerItemErrorLogEvent = 7003
+    @objc(FailedToLoadAssetFromKeys) public static let failedToLoadAssetFromKeys = 7000
+    @objc(AssetNotPlayable) public static let assetNotPlayable = 7001
+    @objc(FailedToPlayToEndTime) public static let failedToPlayToEndTime = 7002
+    @objc(PlayerItemErrorLogEvent) public static let playerItemErrorLogEvent = 7003
     // PKPluginError
-    @objc public static let FailedToCreatePlugin = 2000
-    @objc public static let MissingPluginConfig = 2001
+    @objc(FailedToCreatePlugin) public static let failedToCreatePlugin = 2000
+    @objc(MissingPluginConfig) public static let missingPluginConfig = 2001
 }
 

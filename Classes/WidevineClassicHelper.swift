@@ -27,8 +27,8 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
         
         var code: Int {
             switch self {
-            case .invalidDRMData: return 6200
-            case .missingWidevineFile: return 6201
+            case .invalidDRMData: return PKErrorCode.invalidDRMData
+            case .missingWidevineFile: return PKErrorCode.missingWidevineFile
             }
         }
         
@@ -49,6 +49,11 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
     
     extension PKErrorDomain {
         @objc public static let Widevine = WidevineClassicError.Domain
+    }
+    
+    extension PKErrorCode {
+        @objc(InvalidDRMData) public static let invalidDRMData = 6200
+        @objc(MissingWidevineFile) public static let missingWidevineFile = 6201
     }
     
     /************************************************************/

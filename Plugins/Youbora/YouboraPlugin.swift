@@ -23,7 +23,7 @@ enum YouboraPluginError: PKError {
     
     var code: Int {
         switch self {
-        case .failedToSetupYouboraManager: return PKErrorCode.FailedToSetupYouboraManager
+        case .failedToSetupYouboraManager: return PKErrorCode.failedToSetupYouboraManager
         }
     }
     
@@ -45,7 +45,7 @@ extension PKErrorDomain {
 }
 
 extension PKErrorCode {
-    @objc public static let FailedToSetupYouboraManager = 2200
+    @objc(FailedToSetupYouboraManager) public static let failedToSetupYouboraManager = 2200
 }
 
 /************************************************************/
