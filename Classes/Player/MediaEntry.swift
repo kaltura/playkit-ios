@@ -77,6 +77,7 @@ func getJson(_ json: Any) -> JSON {
         case hlsFairPlay
         case wvmWideVine
         case mp4Clear
+        case mp3Clear
         case unknown
         
         var fileExtension: String {
@@ -89,6 +90,8 @@ func getJson(_ json: Any) -> JSON {
                     return "wvm"
                 case .mp4Clear:
                     return "mp4"
+                case .mp3Clear:
+                    return "mp3"
                 case .unknown:
                     return "mp4"
                 }
