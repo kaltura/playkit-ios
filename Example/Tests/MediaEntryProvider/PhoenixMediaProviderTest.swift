@@ -20,8 +20,9 @@ class PhoenixMediaProviderTest: XCTestCase, SessionProvider {
     var partnerId: Int64 = 198
     var serverURL: String  = "http://52.210.223.65:8080/v4_0/api_v3"
     
-    public func loadKS(completion: @escaping (Result<String>) -> Void) {
-         completion(Result(data: "djJ8MTk4fLsl2jWZfTLBHh80n32POkgauZLWcLXhEEySDRL9yRtOLtr92sPWaKpnCaz4nJgsjjXIxD6PkOLXlOvpEHV3Wizc384sF3F4Kj1MfiqJRQd8", error: nil))
+    
+    public func loadKS(completion: @escaping (String?, Error?) -> Void) {
+        completion("djJ8MTk4fLsl2jWZfTLBHh80n32POkgauZLWcLXhEEySDRL9yRtOLtr92sPWaKpnCaz4nJgsjjXIxD6PkOLXlOvpEHV3Wizc384sF3F4Kj1MfiqJRQd8", nil)
     }
     
     override func setUp() {
@@ -38,17 +39,13 @@ class PhoenixMediaProviderTest: XCTestCase, SessionProvider {
         
         let provider = PhoenixMediaProvider()
         .set(sessionProvider: self)
-        .set(mediaId: mediaID)
+        .set(assetId: mediaID)
         .set(type: AssetType.media)
         .set(formats: ["Mobile_Devices_Main_HD"])
         
-        provider.loadMedia { (r:Result<MediaEntry>) in
-            print(r)
-            if (r.error != nil){
-                theExeption.fulfill()
-            }else{
-                XCTFail()
-            }
+        provider.loadMedia { (entry, error) in
+            print(entry ?? "")
+            theExeption.fulfill()
         }
         
         self.waitForExpectations(timeout: 6.0) { (_) -> Void in
