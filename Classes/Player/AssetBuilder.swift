@@ -27,7 +27,7 @@ class AssetBuilder {
         
         let defaultHandler = DefaultAssetHandler.self
         
-        // Preference: Local, HLS, FPS*, MP4, WVM*
+        // Preference: Local, HLS, FPS*, MP4, WVM*, MP3
         
         if let source = sources.first(where: {$0 is LocalMediaSource}) {
             if source.fileExt == "wvm" {
@@ -53,6 +53,10 @@ class AssetBuilder {
         
         if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt=="wvm"}) {
             return (source, DRMSupport.widevineClassicHandler!)
+        }
+        
+        if let source = sources.first(where: {$0.fileExt=="mp3"}) {
+            return (source, defaultHandler)
         }
         
         PKLog.error("no playable media sources!")
