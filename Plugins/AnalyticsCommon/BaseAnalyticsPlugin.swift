@@ -18,7 +18,7 @@ enum AnalyticsPluginError: PKError {
     case missingMediaEntry
     case missingInitObject
     
-    static let Domain = "com.kaltura.playkit.error.analyticsPlugin"
+    static let domain = "com.kaltura.playkit.error.analyticsPlugin"
     
     var code: Int {
         switch self {
@@ -40,7 +40,7 @@ enum AnalyticsPluginError: PKError {
 }
 
 extension PKErrorDomain {
-    @objc public static let AnalyticsPlugin = AnalyticsPluginError.Domain
+    @objc(AnalyticsPlugin) public static let analyticsPlugin = AnalyticsPluginError.domain
 }
 
 extension PKErrorCode {

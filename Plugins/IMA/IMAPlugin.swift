@@ -17,7 +17,7 @@ struct IMAPluginError: PKError {
     
     var adError: IMAAdError
     
-    static let Domain = "com.kaltura.playkit.error.ima"
+    static let domain = "com.kaltura.playkit.error.ima"
     
     var code: Int {
         return adError.code.rawValue
@@ -29,7 +29,7 @@ struct IMAPluginError: PKError {
     
     var userInfo: [String: Any] {
         return [
-            PKErrorKeys.ErrorTypeKey : adError.type.rawValue
+            PKErrorKeys.ErrorTypeKey: adError.type.rawValue
         ]
     }
 }
@@ -40,7 +40,7 @@ extension PKErrorKeys {
 }
 
 extension PKErrorDomain {
-    @objc public static let IMA = IMAPluginError.Domain
+    @objc(IMA) public static let ima = IMAPluginError.domain
 }
 
 /************************************************************/

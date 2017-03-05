@@ -19,7 +19,7 @@ enum YouboraPluginError: PKError {
     
     case failedToSetupYouboraManager
     
-    static let Domain = "com.kaltura.playkit.error.youbora"
+    static let domain = "com.kaltura.playkit.error.youbora"
     
     var code: Int {
         switch self {
@@ -41,7 +41,7 @@ enum YouboraPluginError: PKError {
 }
 
 extension PKErrorDomain {
-    @objc public static let Youbora = YouboraPluginError.Domain
+    @objc(Youbora) public static let youbora = YouboraPluginError.domain
 }
 
 extension PKErrorCode {
