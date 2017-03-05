@@ -178,7 +178,7 @@ import SwiftyXMLParser
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach { (source: OVPSource) in
                         //detecting the source type
-                        let sourceType = self.getSourceType(source: source)
+                        let sourceType = FormatsHelper.getSourceType(format: source.format, hasDrm: source.drm != nil)
                         //If source type is not supported source will not be created
                         guard sourceType != .unknown else { return }
                         
@@ -248,30 +248,7 @@ import SwiftyXMLParser
     }
     
     
-    // This method decding the source type base on scheck and drm data
-    private func getSourceType(source: OVPSource) -> MediaSource.SourceType {
-        
-        if let format = source.format {
-            switch format {
-            case "applehttp":
-                if source.drm == nil {
-                    return MediaSource.SourceType.hlsClear
-                } else {
-                    return MediaSource.SourceType.hlsFairPlay
-                }
-            case "url":
-                if source.drm == nil {
-                    return MediaSource.SourceType.mp4Clear
-                } else {
-                    return MediaSource.SourceType.wvmWideVine
-                }
-            default:
-                return MediaSource.SourceType.unknown
-            }
-        }
-        
-        return MediaSource.SourceType.unknown
-    }
+    
     
     // Creating the drm data based on scheme
     private func buildDRMData(drm: [OVPDRM]?) -> [DRMData]? {
@@ -304,7 +281,7 @@ import SwiftyXMLParser
     // building the url with the SourceBuilder class
     private func playbackURL(loadInfo: LoaderInfo, source: OVPSource, ks: String?) -> URL? {
         
-        let sourceType = self.getSourceType(source: source)
+        let sourceType = FormatsHelper.getSourceType(format: source.format, hasDrm: source.drm != nil)
         var playURL: URL? = nil
         if let flavors =  source.flavors,
             flavors.count > 0 {

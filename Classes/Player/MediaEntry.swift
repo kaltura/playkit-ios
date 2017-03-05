@@ -15,6 +15,7 @@ func getJson(_ json: Any) -> JSON {
 
 @objc public enum MediaType: Int {
     case live
+    case vod
     case unknown
 }
 
@@ -98,7 +99,6 @@ func getJson(_ json: Any) -> JSON {
     
     @objc public var id: String
     @objc public var contentUrl: URL?
-    @objc public var mimeType: String?
     @objc public var drmData: [DRMData]?
     @objc public var sourceType: SourceType = .unknown
     @objc public var fileExt: String {
@@ -107,7 +107,6 @@ func getJson(_ json: Any) -> JSON {
     
     private let idKey: String = "id"
     private let contentUrlKey: String = "url"
-    private let mimeTypeKey: String = "mimeType"
     private let drmDataKey: String = "drmData"
     private let sourceTypeKey: String = "sourceType"
     
@@ -115,10 +114,10 @@ func getJson(_ json: Any) -> JSON {
         self.init(id, contentUrl: nil)
     }
     
-    @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil, sourceType: SourceType = .unknown) {
+    
+    @objc public init(_ id: String, contentUrl: URL?, drmData: [DRMData]? = nil, sourceType: SourceType = .unknown) {
         self.id = id
         self.contentUrl = contentUrl
-        self.mimeType = mimeType
         self.drmData = drmData
         self.sourceType = sourceType
     }
@@ -130,8 +129,6 @@ func getJson(_ json: Any) -> JSON {
         self.id = sj[idKey].string ?? UUID().uuidString
         
         self.contentUrl = sj[contentUrlKey].url
-        
-        self.mimeType = sj[mimeTypeKey].string
         
         if let drmData = sj[drmDataKey].array {
             self.drmData = drmData.flatMap { DRMData.fromJSON($0) }

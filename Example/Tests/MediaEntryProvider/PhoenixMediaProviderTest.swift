@@ -18,11 +18,11 @@ class PhoenixMediaProviderTest: XCTestCase, SessionProvider {
     
     let mediaID = "258656"
     var partnerId: Int64 = 198
-    var serverURL: String  = "http://52.210.223.65:8080/v4_0/api_v3"
+    var serverURL: String  = "http://api-preprod.ott.kaltura.com/v4_2/api_v3"
     
     
     public func loadKS(completion: @escaping (String?, Error?) -> Void) {
-        completion("djJ8MTk4fLsl2jWZfTLBHh80n32POkgauZLWcLXhEEySDRL9yRtOLtr92sPWaKpnCaz4nJgsjjXIxD6PkOLXlOvpEHV3Wizc384sF3F4Kj1MfiqJRQd8", nil)
+        completion(nil, nil)
     }
     
     override func setUp() {
@@ -41,7 +41,8 @@ class PhoenixMediaProviderTest: XCTestCase, SessionProvider {
         .set(sessionProvider: self)
         .set(assetId: mediaID)
         .set(type: AssetType.media)
-        .set(formats: ["Mobile_Devices_Main_HD"])
+        .set(playbackContextType: PlaybackContextType.playback)
+        
         
         provider.loadMedia { (entry, error) in
             print(entry ?? "")

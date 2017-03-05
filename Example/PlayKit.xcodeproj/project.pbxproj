@@ -23,13 +23,13 @@
 		BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */; };
 		C23A62D11DF413FF00635FA2 /* MockMediaProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62C91DF412FD00635FA2 /* MockMediaProviderTest.swift */; };
 		C23A62D21DF4140B00635FA2 /* PhoenixMediaProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CA1DF412FD00635FA2 /* PhoenixMediaProviderTest.swift */; };
-		C23A62D31DF4140E00635FA2 /* OVPMediaProviederTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */; };
 		C23A62D41DF4141000635FA2 /* MediaEntryProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CF1DF4131700635FA2 /* MediaEntryProviderMock.swift */; };
 		C23A62DD1DF47D9C00635FA2 /* OTTSessionProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62DB1DF47D9800635FA2 /* OTTSessionProviderTest.swift */; };
 		C24770AD1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
 		C24770B01DEDF36900E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
+		C2D803211E6C091600A3DE15 /* OVPMediaProviederTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */; };
+		C2D803221E6C09CF00A3DE15 /* SourceSelectorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB09C99B1E28072900D3671F /* SourceSelectorTest.swift */; };
 		C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */; };
-		FB09C99C1E28072900D3671F /* SourceSelectorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB09C99B1E28072900D3671F /* SourceSelectorTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -476,13 +476,13 @@
 			files = (
 				C23A62D41DF4141000635FA2 /* MediaEntryProviderMock.swift in Sources */,
 				C23A62D11DF413FF00635FA2 /* MockMediaProviderTest.swift in Sources */,
-				C23A62D31DF4140E00635FA2 /* OVPMediaProviederTest.swift in Sources */,
+				C2D803211E6C091600A3DE15 /* OVPMediaProviederTest.swift in Sources */,
 				20CD64591E4C9697002C9401 /* PluginTestConfiguration.swift in Sources */,
 				C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */,
+				C2D803221E6C09CF00A3DE15 /* SourceSelectorTest.swift in Sources */,
 				2012AFB21E4B860B00BBA61C /* PhoenixPluginTest.swift in Sources */,
 				BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */,
 				2012AFB41E4B872300BBA61C /* PlayerCreator.swift in Sources */,
-				FB09C99C1E28072900D3671F /* SourceSelectorTest.swift in Sources */,
 				C23A62D21DF4140B00635FA2 /* PhoenixMediaProviderTest.swift in Sources */,
 				2012AFAF1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift in Sources */,
 				C23A62DD1DF47D9C00635FA2 /* OTTSessionProviderTest.swift in Sources */,

@@ -33,6 +33,10 @@ class OTTObjectMapper: NSObject {
                 return OTTAsset.self
             case "KalturaLoginSession":
                 return OTTLoginSession.self
+            case "KalturaPlaybackSource":
+                return OTTPlaybackSource.self
+            case "KalturaPlaybackContext":
+                return OTTPlaybackContext.self
             default:
                 return nil
             }

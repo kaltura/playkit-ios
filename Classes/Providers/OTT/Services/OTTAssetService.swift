@@ -9,10 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-public enum AssetType: String {
-    case media = "media"
-    case epg = "epg"
-}
+
 
 class OTTAssetService {
 
@@ -22,15 +19,48 @@ class OTTAssetService {
             request
             .setBody(key: "id", value: JSON(assetId))
             .setBody(key: "ks", value: JSON(ks))
+            .setBody(key: "type", value: JSON(type.objectType()))
             .setBody(key: "assetReferenceType", value: JSON(type.rawValue))
-            .setBody(key: "type", value: JSON(type.rawValue))
             .setBody(key: "with", value: JSON([["type":"files","objectType":"KalturaCatalogWithHolder"]]))
             return request
         } else {
             return nil
         }
     }
+    
+    internal static func getPlaybackContext(baseURL: String, ks: String,assetId: String, type: AssetType, playbackContextOptions: PlaybackContextOptions) -> KalturaRequestBuilder?  {
+        
+        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "getPlaybackContext") {
+            request
+            .setBody(key: "assetId", value: JSON(assetId))
+            .setBody(key: "ks", value: JSON(ks))
+            .setBody(key: "assetType", value: JSON(type.objectType()))
+            .setBody(key: "contextDataParams", value: JSON(playbackContextOptions.toDictionary()))
+            return request
+        }else{
+            return nil
+        }
+        
+    }
 }
 
+
+struct PlaybackContextOptions {
+    
+    internal var playbackContextType: PlaybackContextType
+    internal var protocls: [String]
+    internal var assetFileIds: [String]?
+    
+    func toDictionary() -> [String:Any] {
+        
+        var dict: [String: Any] = [:]
+        dict["context"] = playbackContextType.rawValue
+        dict["mediaProtocols"] = protocls
+        if let fileIds = self.assetFileIds {
+            dict["assetFileIds"] = fileIds.joined(separator: ",")
+        }
+        return dict
+    }
+}
 
 
