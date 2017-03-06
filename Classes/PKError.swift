@@ -7,9 +7,7 @@
 //
 
 import Foundation
-import AVFoundation
-
-
+import AVFoundation 
 
 /************************************************************/
 // MARK: - PlayerError
@@ -23,14 +21,14 @@ enum PlayerError: PKError {
     case failedToPlayToEndTime(rootError: NSError)
     case playerItemErrorLogEvent(errorLogEvent: AVPlayerItemErrorLogEvent)
     
-    static let Domain = "com.kaltura.playkit.error.player"
+    static let domain = "com.kaltura.playkit.error.player"
     
     var code: Int {
         switch self {
-        case .failedToLoadAssetFromKeys: return 7000
-        case .assetNotPlayable: return 7001
-        case .failedToPlayToEndTime: return 7002
-        case .playerItemErrorLogEvent: return 7003
+        case .failedToLoadAssetFromKeys: return PKErrorCode.failedToLoadAssetFromKeys
+        case .assetNotPlayable: return PKErrorCode.assetNotPlayable
+        case .failedToPlayToEndTime: return PKErrorCode.failedToPlayToEndTime
+        case .playerItemErrorLogEvent: return PKErrorCode.playerItemErrorLogEvent
         }
     }
     
@@ -45,13 +43,17 @@ enum PlayerError: PKError {
     
     var userInfo: [String: Any] {
         switch self {
-        case .failedToLoadAssetFromKeys(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
+        case .failedToLoadAssetFromKeys(let rootError):
+            if let rError = rootError {
+                return [PKErrorKeys.RootErrorKey: rError]
+            }
+            return [:]
         case .assetNotPlayable: return [:]
-        case .failedToPlayToEndTime(let rootError): return [PKErrorKeys.RootErrorKey : rootError]
+        case .failedToPlayToEndTime(let rootError): return [PKErrorKeys.RootErrorKey: rootError]
         case .playerItemErrorLogEvent(let errorLogEvent):
             return [
-                PKErrorKeys.RootCodeKey : errorLogEvent.errorStatusCode,
-                PKErrorKeys.RootDomainKey : errorLogEvent.errorDomain
+                PKErrorKeys.RootCodeKey: errorLogEvent.errorStatusCode,
+                PKErrorKeys.RootDomainKey: errorLogEvent.errorDomain
             ]
         }
     }
@@ -64,29 +66,29 @@ enum PlayerError: PKError {
 /// `PKPluginError` represents plugins errors.
 enum PKPluginError: PKError {
     
-    case failedToCreatePlugin
+    case failedToCreatePlugin(pluginName: String)
     case missingPluginConfig(pluginName: String)
     
-    static let Domain = "com.kaltura.playkit.error.plugins"
+    static let domain = "com.kaltura.playkit.error.plugins"
     
     var code: Int {
         switch self {
-        case .failedToCreatePlugin: return 2000
-        case .missingPluginConfig: return 2001
+        case .failedToCreatePlugin: return PKErrorCode.failedToCreatePlugin
+        case .missingPluginConfig: return PKErrorCode.missingPluginConfig
         }
     }
     
     var errorDescription: String {
         switch self {
-        case .failedToCreatePlugin: return "failed to create plugin, doesn't exist in registry"
+        case .failedToCreatePlugin(let pluginName): return "failed to create plugin (\(pluginName)), doesn't exist in registry"
         case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName)"
         }
     }
     
     var userInfo: [String: Any] {
         switch self {
-        case .failedToCreatePlugin: return [:]
-        case .missingPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey : pluginName]
+        case .failedToCreatePlugin(let pluginName): return [PKErrorKeys.PluginNameKey: pluginName]
+        case .missingPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey: pluginName]
         }
     }
 }
@@ -105,7 +107,7 @@ extension PKErrorKeys {
 protocol PKError: Error, CustomStringConvertible {
     
     /// The error domain (used for creating `NSError`)
-    static var Domain: String { get }
+    static var domain: String { get }
     
     /**
      The error code.
@@ -146,7 +148,7 @@ protocol PKError: Error, CustomStringConvertible {
      }
      ````
      */
-    var userInfo: [String : Any] { get }
+    var userInfo: [String: Any] { get }
     
     /// creates an `NSError` from the selected case.
     var asNSError: NSError { get }
@@ -159,20 +161,35 @@ protocol PKError: Error, CustomStringConvertible {
 extension PKError {
     /// description string
     var description: String {
-        return "\(type(of: self)) ,domain: \(type(of: self).Domain), errorCode: \(self.code)"
+        return "\(type(of: self)) ,domain: \(type(of: self).domain), errorCode: \(self.code)"
     }
     
     /// creates an `NSError` from the selected case.
     var asNSError: NSError {
         var userInfo = self.userInfo
         userInfo[NSLocalizedDescriptionKey] = self.errorDescription
-        return NSError(domain: Self.Domain, code: self.code, userInfo: userInfo)
+        return NSError(domain: Self.domain, code: self.code, userInfo: userInfo)
     }
 }
 
 extension PKError where Self: RawRepresentable, Self.RawValue == String {
     var description: String {
-        return "\(self.rawValue), domain: \(type(of: self).Domain), errorCode: \(self.code)"
+        return "\(self.rawValue), domain: \(type(of: self).domain), errorCode: \(self.code)"
+    }
+}
+
+/************************************************************/
+// MARK: - Error
+/************************************************************/
+// extension for easier access to domain and code properties.
+extension Error {
+    
+    public var domain: String {
+        return self._domain
+    }
+    
+    public var code: Int {
+        return self._code
     }
 }
 
@@ -182,7 +199,7 @@ extension PKError where Self: RawRepresentable, Self.RawValue == String {
 
 // general userInfo keys.
 struct PKErrorKeys {
-    static let RootErrorKey = "rootError"
+    static let RootErrorKey = NSUnderlyingErrorKey
     static let RootCodeKey = "rootCode"
     static let RootDomainKey = "rootDomain"
 }
@@ -192,7 +209,22 @@ struct PKErrorKeys {
 /************************************************************/
 
 @objc public class PKErrorDomain: NSObject {
-    @objc public static let Plugin = PKPluginError.Domain
-    @objc public static let Player = PlayerError.Domain
+    @objc(Plugin) public static let plugin = PKPluginError.domain
+    @objc(Player) public static let player = PlayerError.domain
+}
+
+/************************************************************/
+// MARK: - PlayKit Error Codes
+/************************************************************/
+
+@objc public class PKErrorCode: NSObject {
+    // PlayerError
+    @objc(FailedToLoadAssetFromKeys) public static let failedToLoadAssetFromKeys = 7000
+    @objc(AssetNotPlayable) public static let assetNotPlayable = 7001
+    @objc(FailedToPlayToEndTime) public static let failedToPlayToEndTime = 7002
+    @objc(PlayerItemErrorLogEvent) public static let playerItemErrorLogEvent = 7003
+    // PKPluginError
+    @objc(FailedToCreatePlugin) public static let failedToCreatePlugin = 2000
+    @objc(MissingPluginConfig) public static let missingPluginConfig = 2001
 }
 
