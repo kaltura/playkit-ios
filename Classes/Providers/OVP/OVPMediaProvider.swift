@@ -203,6 +203,7 @@ import SwiftyXMLParser
                         let mediaSource: MediaSource = MediaSource(id: entry.id + "_" + String(source.deliveryProfileId))
                         mediaSource.drmData = drmData
                         mediaSource.contentUrl = url
+                        mediaSource.mediaFormat = format
                         mediaSources.append(mediaSource)
                     }
                     
@@ -274,20 +275,19 @@ import SwiftyXMLParser
         
         let drmData = drm?.flatMap({ (drm: OVPDRM) -> DRMParams? in
             
-            guard let scheme = drm.scheme else {
+            guard let schemeName = drm.scheme  else {
                 return nil
             }
             
+            let scheme = self.convertScheme(name: schemeName)
             var drmData: DRMParams? = nil
+            
             switch scheme {
-            case "fairplay.FAIRPLAY":
-                guard let certifictae = drm.certificate,
-                    let licenseURL = drm.licenseURL
-                    // if the scheme is type fair play and there is no certificate or license URL
-                    else { return nil }
-                drmData = FairPlayDRMParams(licenseUri: licenseURL, base64EncodedCertificate: certifictae)
+            case .fairplay :
+                guard let certifictae = drm.certificate, let licenseURL = drm.licenseURL else { return nil }
+                drmData = FairPlayDRMParams(licenseUri: licenseURL, scheme:scheme, base64EncodedCertificate: certifictae)
             default:
-                drmData = DRMParams(licenseUri: drm.licenseURL)
+                drmData = DRMParams(licenseUri: drm.licenseURL, scheme: scheme)
                 
             }
             
@@ -327,6 +327,22 @@ import SwiftyXMLParser
     
     public func cancel(){
         
+    }
+    
+    public func convertScheme(name: String) -> DRMParams.Scheme {
+    
+        switch (name) {
+        case "drm.WIDEVINE_CENC":
+            return .widevineCenc;
+        case "drm.PLAYREADY_CENC":
+            return .playreadyCenc
+        case "widevine.WIDEVINE":
+            return .widevineClassic
+        case "fairplay.FAIRPLAY":
+            return .fairplay
+        default:
+            return .none
+        }
     }
 }
 

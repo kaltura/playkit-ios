@@ -157,13 +157,28 @@ func getJson(_ json: Any) -> JSON {
     }
 }
 
+
+
+
 @objc open class DRMParams: NSObject {
-    var licenseUri: URL?
     
-    init(licenseUri: String?) {
+    
+    public enum Scheme: Int {
+        case widevineCenc
+        case playreadyCenc
+        case widevineClassic
+        case fairplay
+        case none
+    }
+    
+    var licenseUri: URL?
+    var scheme: Scheme
+    
+    init(licenseUri: String?, scheme: Scheme) {
         if let url = licenseUri {
             self.licenseUri = URL(string: url)
         }
+        self.scheme = scheme
     }
     
     @objc public static func fromJSON(_ json: Any) -> DRMParams? {
@@ -171,11 +186,13 @@ func getJson(_ json: Any) -> JSON {
         let sj = getJson(json)
         
         guard let licenseUri = sj["licenseUri"].string else { return nil }
+        let schemeValue: Int = sj["scheme"].int ?? Scheme.none.hashValue
+        let scheme: Scheme = Scheme(rawValue: schemeValue) ?? .none
         
         if let fpsCertificate = sj["fpsCertificate"].string {
-            return FairPlayDRMParams(licenseUri: licenseUri, base64EncodedCertificate: fpsCertificate)
+            return FairPlayDRMParams(licenseUri: licenseUri, scheme: scheme,base64EncodedCertificate: fpsCertificate)
         } else {
-            return DRMParams(licenseUri: licenseUri)
+            return DRMParams(licenseUri: licenseUri,scheme: scheme)
         }
     }
 }
@@ -183,9 +200,9 @@ func getJson(_ json: Any) -> JSON {
 public class FairPlayDRMParams: DRMParams {
     var fpsCertificate: Data?
     
-    init(licenseUri: String, base64EncodedCertificate: String) {
+    init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
-        super.init(licenseUri: licenseUri)
+        super.init(licenseUri: licenseUri, scheme: scheme)
     }
 }
 
