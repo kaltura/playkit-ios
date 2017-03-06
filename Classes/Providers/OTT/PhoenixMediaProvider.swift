@@ -180,7 +180,7 @@ let defaultProtocl = "https"
                 }
                 
                 if let context = playbackContext {
-                    let media = self.createMediaEntry(loaderInfo: loaderInfo, context: playbackContext)
+                    let media = self.createMediaEntry(loaderInfo: loaderInfo, context: context)
                     callback(media, nil)
                 }
             }).build()
