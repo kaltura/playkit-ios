@@ -197,7 +197,7 @@ import SwiftyXMLParser
                             return
                         }
                         
-                        let drmData = self.buildDRMData(drm: source.drm)
+                        let drmData = self.buildDRMParams(drm: source.drm)
                         
                         //creating media source with the above data
                         let mediaSource: MediaSource = MediaSource(id: entry.id + "_" + String(source.deliveryProfileId))
@@ -270,24 +270,24 @@ import SwiftyXMLParser
     }
     
     // Creating the drm data based on scheme
-    private func buildDRMData(drm: [OVPDRM]?) -> [DRMData]? {
+    private func buildDRMParams(drm: [OVPDRM]?) -> [DRMParams]? {
         
-        let drmData = drm?.flatMap({ (drm: OVPDRM) -> DRMData? in
+        let drmData = drm?.flatMap({ (drm: OVPDRM) -> DRMParams? in
             
             guard let scheme = drm.scheme else {
                 return nil
             }
             
-            var drmData: DRMData? = nil
+            var drmData: DRMParams? = nil
             switch scheme {
             case "fairplay.FAIRPLAY":
                 guard let certifictae = drm.certificate,
                     let licenseURL = drm.licenseURL
                     // if the scheme is type fair play and there is no certificate or license URL
                     else { return nil }
-                drmData = FairPlayDRMData(licenseUri: licenseURL, base64EncodedCertificate: certifictae)
+                drmData = FairPlayDRMParams(licenseUri: licenseURL, base64EncodedCertificate: certifictae)
             default:
-                drmData = DRMData(licenseUri: drm.licenseURL)
+                drmData = DRMParams(licenseUri: drm.licenseURL)
                 
             }
             

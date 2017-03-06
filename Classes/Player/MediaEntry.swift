@@ -105,7 +105,7 @@ func getJson(_ json: Any) -> JSON {
     @objc public var id: String
     @objc public var contentUrl: URL?
     @objc public var mimeType: String?
-    @objc public var drmData: [DRMData]?
+    @objc public var drmData: [DRMParams]?
     @objc public var mediaFormat: MediaFormat = .none
     @objc public var fileExt: String {
         return contentUrl?.pathExtension ?? ""
@@ -121,7 +121,7 @@ func getJson(_ json: Any) -> JSON {
         self.init(id, contentUrl: nil)
     }
     
-    @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil, mediaFormat: MediaFormat = .none) {
+    @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMParams]? = nil, mediaFormat: MediaFormat = .none) {
         self.id = id
         self.contentUrl = contentUrl
         self.mimeType = mimeType
@@ -140,7 +140,7 @@ func getJson(_ json: Any) -> JSON {
         self.mimeType = sj[mimeTypeKey].string
         
         if let drmData = sj[drmDataKey].array {
-            self.drmData = drmData.flatMap { DRMData.fromJSON($0) }
+            self.drmData = drmData.flatMap { DRMParams.fromJSON($0) }
         }
         
         if let st = sj[formatTypeKey].int, let mediaFormat = MediaFormat(rawValue: st) {
@@ -157,7 +157,7 @@ func getJson(_ json: Any) -> JSON {
     }
 }
 
-@objc open class DRMData: NSObject {
+@objc open class DRMParams: NSObject {
     var licenseUri: URL?
     
     init(licenseUri: String?) {
@@ -166,21 +166,21 @@ func getJson(_ json: Any) -> JSON {
         }
     }
     
-    @objc public static func fromJSON(_ json: Any) -> DRMData? {
+    @objc public static func fromJSON(_ json: Any) -> DRMParams? {
         
         let sj = getJson(json)
         
         guard let licenseUri = sj["licenseUri"].string else { return nil }
         
         if let fpsCertificate = sj["fpsCertificate"].string {
-            return FairPlayDRMData(licenseUri: licenseUri, base64EncodedCertificate: fpsCertificate)
+            return FairPlayDRMParams(licenseUri: licenseUri, base64EncodedCertificate: fpsCertificate)
         } else {
-            return DRMData(licenseUri: licenseUri)
+            return DRMParams(licenseUri: licenseUri)
         }
     }
 }
 
-public class FairPlayDRMData: DRMData {
+public class FairPlayDRMParams: DRMParams {
     var fpsCertificate: Data?
     
     init(licenseUri: String, base64EncodedCertificate: String) {
