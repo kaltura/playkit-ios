@@ -30,10 +30,10 @@ import SwiftyXMLParser
         case currentlyProcessingOtherRequest
     }
     
-    private var sessionProvider: SessionProvider?
-    private var entryId: String?
-    private var executor: RequestExecutor?
-    private var uiconfId: Int64?
+    public var sessionProvider: SessionProvider?
+    public var entryId: String?
+    public var uiconfId: Int64?
+    public var executor: RequestExecutor?
     
     public override init() {}
     

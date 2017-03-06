@@ -21,13 +21,17 @@ import SwiftyJSON
         case unableToParseObject
     }
     
-    var sessionProvider: SessionProvider?
-    var mediaId: String?
-    var type: AssetType?
-    var formats: [String]?
-    var executor: RequestExecutor?
+    public var sessionProvider: SessionProvider?
+    public var mediaId: String?
+    public var type: AssetType?
+    public var formats: [String]?
+    public var executor: RequestExecutor?
     
-    public override init() { }
+    public override init() {}
+    
+    @objc public init(_ sessionProvider: SessionProvider) {
+        self.sessionProvider = sessionProvider
+    }
     
     @discardableResult
     @nonobjc public func set(sessionProvider: SessionProvider?) -> Self {
