@@ -50,8 +50,8 @@ class DefaultAssetHandler: AssetHandler {
             return
         }
 
-        // FairPlay: only looking at the first DRMData element.
-        guard let fpsData = drmData as? FairPlayDRMData else {
+        // FairPlay: only looking at the first DRMParams element.
+        guard let fpsData = drmData as? FairPlayDRMParams else {
             PKLog.error("Unsupported DRM Data:", drmData)
             readyCallback(AssetError.invalidDrmScheme, nil)
             return

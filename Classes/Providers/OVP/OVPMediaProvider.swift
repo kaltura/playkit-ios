@@ -178,9 +178,9 @@ import SwiftyXMLParser
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach { (source: OVPSource) in
                         //detecting the source type
-                        let sourceType = self.getSourceType(source: source)
+                        let format = self.getSourceFormat(source: source)
                         //If source type is not supported source will not be created
-                        guard sourceType != .unknown else { return }
+                        guard format != .none else { return }
                         
                         var ksForURL = resKS
                         
@@ -197,12 +197,13 @@ import SwiftyXMLParser
                             return
                         }
                         
-                        let drmData = self.buildDRMData(drm: source.drm)
+                        let drmData = self.buildDRMParams(drm: source.drm)
                         
                         //creating media source with the above data
                         let mediaSource: MediaSource = MediaSource(id: entry.id + "_" + String(source.deliveryProfileId))
                         mediaSource.drmData = drmData
                         mediaSource.contentUrl = url
+                        mediaSource.mediaFormat = format
                         mediaSources.append(mediaSource)
                     }
                     
@@ -249,49 +250,44 @@ import SwiftyXMLParser
     
     
     // This method decding the source type base on scheck and drm data
-    private func getSourceType(source: OVPSource) -> MediaSource.SourceType {
+    private func getSourceFormat(source: OVPSource) -> MediaSource.MediaFormat {
         
         if let format = source.format {
             switch format {
             case "applehttp":
-                if source.drm == nil {
-                    return MediaSource.SourceType.hlsClear
-                } else {
-                    return MediaSource.SourceType.hlsFairPlay
-                }
+                    return .hls
             case "url":
                 if source.drm == nil {
-                    return MediaSource.SourceType.mp4Clear
+                    return .mp4
                 } else {
-                    return MediaSource.SourceType.wvmWideVine
+                    return .wvm
                 }
             default:
-                return MediaSource.SourceType.unknown
+                return .unknown
             }
         }
         
-        return MediaSource.SourceType.unknown
+        return .unknown
     }
     
     // Creating the drm data based on scheme
-    private func buildDRMData(drm: [OVPDRM]?) -> [DRMData]? {
+    private func buildDRMParams(drm: [OVPDRM]?) -> [DRMParams]? {
         
-        let drmData = drm?.flatMap({ (drm: OVPDRM) -> DRMData? in
+        let drmData = drm?.flatMap({ (drm: OVPDRM) -> DRMParams? in
             
-            guard let scheme = drm.scheme else {
+            guard let schemeName = drm.scheme  else {
                 return nil
             }
             
-            var drmData: DRMData? = nil
+            let scheme = self.convertScheme(name: schemeName)
+            var drmData: DRMParams? = nil
+            
             switch scheme {
-            case "fairplay.FAIRPLAY":
-                guard let certifictae = drm.certificate,
-                    let licenseURL = drm.licenseURL
-                    // if the scheme is type fair play and there is no certificate or license URL
-                    else { return nil }
-                drmData = FairPlayDRMData(licenseUri: licenseURL, base64EncodedCertificate: certifictae)
+            case .fairplay :
+                guard let certifictae = drm.certificate, let licenseURL = drm.licenseURL else { return nil }
+                drmData = FairPlayDRMParams(licenseUri: licenseURL, scheme:scheme, base64EncodedCertificate: certifictae)
             default:
-                drmData = DRMData(licenseUri: drm.licenseURL)
+                drmData = DRMParams(licenseUri: drm.licenseURL, scheme: scheme)
                 
             }
             
@@ -304,7 +300,7 @@ import SwiftyXMLParser
     // building the url with the SourceBuilder class
     private func playbackURL(loadInfo: LoaderInfo, source: OVPSource, ks: String?) -> URL? {
         
-        let sourceType = self.getSourceType(source: source)
+        let formatType = self.getSourceFormat(source: source)
         var playURL: URL? = nil
         if let flavors =  source.flavors,
             flavors.count > 0 {
@@ -318,7 +314,7 @@ import SwiftyXMLParser
                 .set(partnerId: loadInfo.sessionProvider.partnerId)
                 .set(playSessionId: UUID().uuidString)
                 .set(sourceProtocol: source.protocols?.last)
-                .set(fileExtension: sourceType.fileExtension)
+                .set(fileExtension: formatType.fileExtension)
                 .set(ks: ks)
             playURL = sourceBuilder.build()
         }
@@ -331,6 +327,22 @@ import SwiftyXMLParser
     
     public func cancel(){
         
+    }
+    
+    public func convertScheme(name: String) -> DRMParams.Scheme {
+    
+        switch (name) {
+        case "drm.WIDEVINE_CENC":
+            return .widevineCenc;
+        case "drm.PLAYREADY_CENC":
+            return .playreadyCenc
+        case "widevine.WIDEVINE":
+            return .widevineClassic
+        case "fairplay.FAIRPLAY":
+            return .fairplay
+        default:
+            return .unknown
+        }
     }
 }
 
