@@ -263,11 +263,11 @@ import SwiftyXMLParser
                     return .wvm
                 }
             default:
-                return .none
+                return .unknown
             }
         }
         
-        return .none
+        return .unknown
     }
     
     // Creating the drm data based on scheme
@@ -341,7 +341,7 @@ import SwiftyXMLParser
         case "fairplay.FAIRPLAY":
             return .fairplay
         default:
-            return .none
+            return .unknown
         }
     }
 }
