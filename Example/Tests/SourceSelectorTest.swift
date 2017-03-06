@@ -12,15 +12,10 @@ import AVFoundation
 
 class SourceSelectorTest: XCTestCase {
     
-    let mp4 = MediaSource("mp4", contentUrl: URL(string: "https://example.com/a.mp4"), sourceType: .mp4Clear)
-    let hls = MediaSource("hls", contentUrl: URL(string: "https://example.com/hls.m3u8"), sourceType: .hlsClear)
-    let fps = MediaSource("fps", contentUrl: URL(string: "https://example.com/fps.m3u8"), sourceType: .hlsFairPlay)
-    let wvm = MediaSource("wvm", contentUrl: URL(string: "https://example.com/a.wvm"), sourceType: .wvmWideVine)
-    
-
-//    func entry(sources: [MediaSource]) -> MediaEntry {
-//        return MediaEntry.init("me", sources: <#T##[MediaSource]#>)
-//    }
+    let mp4 = MediaSource("mp4", contentUrl: URL(string: "https://example.com/a.mp4"), mediaFormat: .mp4)
+    let hls = MediaSource("hls", contentUrl: URL(string: "https://example.com/hls.m3u8"), mediaFormat: .hls)
+    let fps = MediaSource("fps", contentUrl: URL(string: "https://example.com/fps.m3u8"), mediaFormat: .hls)
+    let wvm = MediaSource("wvm", contentUrl: URL(string: "https://example.com/a.wvm"), mediaFormat: .wvm )
     
     func testSelectedSource() {
         

@@ -27,7 +27,7 @@ class AssetLoaderDelegate: NSObject {
     
     private let storage: LocalDataStore?
     
-    private let drmData: FairPlayDRMData?
+    private let drmData: FairPlayDRMParams?
     
     var done: ((Error?)->Void)?
     
@@ -35,7 +35,7 @@ class AssetLoaderDelegate: NSObject {
         return storage != nil
     }
     
-    private init(drmData: FairPlayDRMData? = nil, storage: LocalDataStore? = nil) {
+    private init(drmData: FairPlayDRMParams? = nil, storage: LocalDataStore? = nil) {
         
         self.drmData = drmData
         self.storage = storage
@@ -43,7 +43,7 @@ class AssetLoaderDelegate: NSObject {
         super.init()
     }
     
-    static func configureRemotePlay(asset: AVURLAsset, drmData: FairPlayDRMData) -> AssetLoaderDelegate {
+    static func configureRemotePlay(asset: AVURLAsset, drmData: FairPlayDRMParams) -> AssetLoaderDelegate {
         let delegate = AssetLoaderDelegate.init(drmData: drmData)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
@@ -52,7 +52,7 @@ class AssetLoaderDelegate: NSObject {
     }
     
     @available(iOS 10.0, *)
-    static func configureDownload(asset: AVURLAsset, drmData: FairPlayDRMData, storage: LocalDataStore) -> AssetLoaderDelegate {
+    static func configureDownload(asset: AVURLAsset, drmData: FairPlayDRMParams, storage: LocalDataStore) -> AssetLoaderDelegate {
         let delegate = AssetLoaderDelegate.init(drmData: drmData, storage: storage)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
@@ -219,7 +219,6 @@ class AssetLoaderDelegate: NSObject {
             resourceLoadingRequestOptions = [AVAssetResourceLoadingRequestStreamingContentKeyRequestRequiresPersistentKey: true as AnyObject]
         }
         
-        
         let spcData: Data!
         
         do {
@@ -248,7 +247,6 @@ class AssetLoaderDelegate: NSObject {
          in the CKC message that it returns. If the Apple device finds this type of TLLV in a CKC that delivers an FPS
          content key, it will honor the type of rental or lease specified when the key is used.
          */
-        
         
         performCKCRequest(spcData) {(result: Result<Data>) -> Void in
             if let ckcData = result.data {

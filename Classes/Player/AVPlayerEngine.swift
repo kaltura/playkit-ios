@@ -247,7 +247,7 @@ class AVPlayerEngine: AVPlayer {
                         let message = String.localizedStringWithFormat(stringFormat, key)
                         
                         PKLog.error(message)
-                        self.post(event: PlayerEvent.Error(nsError: PlayerError.failedToLoadAssetFromKeys(rootError: error).asNSError))
+                        self.post(event: PlayerEvent.Error(error: PlayerError.failedToLoadAssetFromKeys(rootError: error)))
                         
                         return
                     }
@@ -258,7 +258,7 @@ class AVPlayerEngine: AVPlayer {
                     let message = NSLocalizedString("error.asset_not_playable.description", comment: "Can't use this AVAsset because it isn't playable")
                     
                     PKLog.error(message)
-                    self.post(event: PlayerEvent.Error(nsError: PlayerError.assetNotPlayable.asNSError))
+                    self.post(event: PlayerEvent.Error(error: PlayerError.assetNotPlayable))
                     
                     return
                 }
@@ -339,7 +339,7 @@ class AVPlayerEngine: AVPlayer {
     func onErrorLogEntryNotification(notification: Notification) {
         guard let playerItem = notification.object as? AVPlayerItem, let errorLog = playerItem.errorLog(), let lastEvent = errorLog.events.last else { return }
         PKLog.error("error description: \(lastEvent.errorComment), error domain: \(lastEvent.errorDomain), error code: \(lastEvent.errorStatusCode)")
-        self.post(event: PlayerEvent.Error(nsError: PlayerError.playerItemErrorLogEvent(errorLogEvent: lastEvent).asNSError))
+        self.post(event: PlayerEvent.Error(error: PlayerError.playerItemErrorLogEvent(errorLogEvent: lastEvent)))
     }
     
     public func playerFailed(notification: NSNotification) {
@@ -348,7 +348,7 @@ class AVPlayerEngine: AVPlayer {
         self.currentState = newState
         
         if let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? NSError {
-            self.post(event: PlayerEvent.Error(nsError: PlayerError.failedToPlayToEndTime(rootError: error).asNSError))
+            self.post(event: PlayerEvent.Error(error: PlayerError.failedToPlayToEndTime(rootError: error)))
         } else {
             self.post(event: PlayerEvent.Error())
         }

@@ -9,40 +9,25 @@
 import Foundation
 
 public class FormatsHelper {
+
+   static let supportedFormats: [MediaSource.MediaFormat] = [.hls,.mp4,.wvm,.mp3]
+   static let supportedSchemes: [DRMParams.Scheme] = [.fairplay,.widevineClassic]
     
-    public enum StreamFormat: String {
+    static func getMediaFormat (format: String, hasDrm:Bool ) -> MediaSource.MediaFormat {
         
-        case mpegDash = "mpegdash"
-        case appleHttp = "applehttp"
-        case url = "url"
-        case unknown = "unknown"
-    }
-    
-    // not sure i need this
-    private static let supportedFormats: [MediaSource.SourceType] = [MediaSource.SourceType.hlsClear,MediaSource.SourceType.hlsFairPlay,MediaSource.SourceType.mp4Clear,MediaSource.SourceType.wvmWideVine]
-    
-    
-    static func getSourceType(format: String?, hasDrm: Bool) -> MediaSource.SourceType {
-        
-        if let format = format {
             switch format {
             case "applehttp":
-                if hasDrm {
-                    return MediaSource.SourceType.hlsClear
-                } else {
-                    return MediaSource.SourceType.hlsFairPlay
-                }
+                return .hls
             case "url":
                 if hasDrm {
-                    return MediaSource.SourceType.mp4Clear
+                    return .wvm
                 } else {
-                    return MediaSource.SourceType.wvmWideVine
+                    return .mp4
                 }
             default:
-                return MediaSource.SourceType.unknown
+                return .unknown
             }
-        }
-        
-        return MediaSource.SourceType.unknown
     }
+    
+
 }

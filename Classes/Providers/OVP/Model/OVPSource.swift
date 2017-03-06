@@ -12,7 +12,7 @@ import SwiftyJSON
 class OVPSource: OVPBaseObject {
     
     var deliveryProfileId: Int64
-    var format: String?
+    var format: String
     var protocols: [String]?
     var flavors: [String]?
     var url: URL?
@@ -31,12 +31,13 @@ class OVPSource: OVPBaseObject {
         
         let jsonObject = JSON(json)
         
-        guard let id =  jsonObject[deliveryProfileIdKey].int64 else {
-            return nil
+        guard let id =  jsonObject[deliveryProfileIdKey].int64,
+            let format = jsonObject[formatKey].string   else {
+                return nil
         }
         
         self.deliveryProfileId = id
-        self.format = jsonObject[formatKey].string
+        self.format = format
         if let protocols = jsonObject[protocolsKey].string{
             self.protocols = protocols.components(separatedBy: ",")
         }

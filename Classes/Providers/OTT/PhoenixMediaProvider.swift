@@ -232,30 +232,31 @@ let defaultProtocl = "https"
         var maxDuration: Float = 0.0
         let mediaSources =  sortedSources.flatMap { (source:OTTPlaybackSource) -> MediaSource? in
             
-            var drm: [DRMData]? = nil
+            var drm: [DRMParams]? = nil
             if let drmData = source.drm {
-                drm = drmData.flatMap({ (drmData:OTTDrmData) -> DRMData? in
+                drm = drmData.flatMap({ (drmData:OTTDrmData) -> DRMParams? in
                     
-                    switch drmData.scheme {
-                    case "FAIRPLAY":
+                    let scheme = self.convertScheme(scheme: drmData.scheme)
+                    switch scheme {
+                    case .fairplay:
                         // if the scheme is type fair play and there is no certificate or license URL
                         guard let certifictae = drmData.certificate
                             else { return nil }
-                        return FairPlayDRMData(licenseUri: drmData.licenseURL, base64EncodedCertificate: certifictae)
+                        return FairPlayDRMParams(licenseUri: drmData.licenseURL, scheme: scheme, base64EncodedCertificate: certifictae)
                     default:
-                        return DRMData(licenseUri: drmData.licenseURL)
+                        return DRMParams(licenseUri: drmData.licenseURL, scheme: scheme)
                     }
                })
             }
             
-            let sourceType = FormatsHelper.getSourceType(format: source.format, hasDrm: source.drm != nil)
-            guard  sourceType != .unknown else {
+            let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
+            guard  FormatsHelper.supportedFormats.contains(format) else {
                 return nil
             }
             
             let mediaSource = MediaSource(id: "\(source.id)")
             mediaSource.contentUrl = source.url
-            mediaSource.sourceType = sourceType
+            mediaSource.mediaFormat = format
             mediaSource.drmData = drm
             
             maxDuration = max(maxDuration, source.duration)
@@ -275,6 +276,22 @@ let defaultProtocl = "https"
         
        
     }
+    
+    func convertScheme(scheme: String) -> DRMParams.Scheme {
+            switch (scheme) {
+            case "WIDEVINE_CENC":
+                return .widevineCenc
+            case "PLAYREADY_CENC":
+                return .playreadyCenc
+            case "WIDEVINE":
+                return .widevineClassic
+            case "FAIRPLAY":
+                return .fairplay
+            default:
+                return .unknown;
+            }
+    }
+    
     
 }
 

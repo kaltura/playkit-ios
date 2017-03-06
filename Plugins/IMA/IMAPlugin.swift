@@ -17,7 +17,7 @@ struct IMAPluginError: PKError {
     
     var adError: IMAAdError
     
-    static let Domain = "com.kaltura.playkit.error.ima"
+    static let domain = "com.kaltura.playkit.error.ima"
     
     var code: Int {
         return adError.code.rawValue
@@ -29,7 +29,7 @@ struct IMAPluginError: PKError {
     
     var userInfo: [String: Any] {
         return [
-            PKErrorKeys.ErrorTypeKey : adError.type.rawValue
+            PKErrorKeys.ErrorTypeKey: adError.type.rawValue
         ]
     }
 }
@@ -40,7 +40,7 @@ extension PKErrorKeys {
 }
 
 extension PKErrorDomain {
-    @objc public static let IMA = IMAPluginError.Domain
+    @objc(IMA) public static let ima = IMAPluginError.domain
 }
 
 /************************************************************/
@@ -49,8 +49,6 @@ extension PKErrorDomain {
 
 @objc public class IMAPlugin: BasePlugin, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
 
-    private unowned var messageBus: MessageBus
-    
     weak var dataSource: AdsPluginDataSource? {
         didSet {
             PKLog.debug("data source set")
@@ -93,9 +91,8 @@ extension PKErrorDomain {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        self.messageBus = messageBus
-        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let adsConfig = pluginConfig as? AdsConfig {
             self.config = adsConfig
             if IMAPlugin.loader == nil {
@@ -113,6 +110,7 @@ extension PKErrorDomain {
             }
         } else {
             PKLog.error("missing plugin config")
+            throw PKPluginError.missingPluginConfig(pluginName: IMAPlugin.pluginName)
         }
         
         self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (data: Any) -> Void in
