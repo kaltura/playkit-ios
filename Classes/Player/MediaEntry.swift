@@ -72,38 +72,41 @@ func getJson(_ json: Any) -> JSON {
 
 @objc public class MediaSource: NSObject {
     
-    @objc public enum SourceType: Int {
-        case hlsClear
-        case hlsFairPlay
-        case wvmWideVine
-        case mp4Clear
-        case mp3Clear
-        case unknown
+    @objc public enum MediaFormat: Int {
+        case dash
+        case hls
+        case wvm
+        case mp4
+        case mp3
+        case none
+        
         
         var fileExtension: String {
             get {
                 switch self {
-                case .hlsClear,
-                     .hlsFairPlay:
+                case .dash:
+                    return "mpd"
+                case .hls:
                     return "m3u8"
-                case .wvmWideVine:
+                case .wvm:
                     return "wvm"
-                case .mp4Clear:
+                case .mp4:
                     return "mp4"
-                case .mp3Clear:
+                case .mp3:
                     return "mp3"
-                case .unknown:
-                    return "mp4"
+                case .none:
+                    return ""
                 }
             }
         }
+        
     }
     
     @objc public var id: String
     @objc public var contentUrl: URL?
     @objc public var mimeType: String?
     @objc public var drmData: [DRMData]?
-    @objc public var sourceType: SourceType = .unknown
+    @objc public var mediaFormat: MediaFormat = .none
     @objc public var fileExt: String {
         return contentUrl?.pathExtension ?? ""
     }
@@ -112,18 +115,18 @@ func getJson(_ json: Any) -> JSON {
     private let contentUrlKey: String = "url"
     private let mimeTypeKey: String = "mimeType"
     private let drmDataKey: String = "drmData"
-    private let sourceTypeKey: String = "sourceType"
+    private let formatTypeKey: String = "sourceType"
     
     @objc public convenience init (id: String) {
         self.init(id, contentUrl: nil)
     }
     
-    @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil, sourceType: SourceType = .unknown) {
+    @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil, mediaFormat: MediaFormat = .none) {
         self.id = id
         self.contentUrl = contentUrl
         self.mimeType = mimeType
         self.drmData = drmData
-        self.sourceType = sourceType
+        self.mediaFormat = mediaFormat
     }
     
     @objc public init(json: Any) {
@@ -140,8 +143,8 @@ func getJson(_ json: Any) -> JSON {
             self.drmData = drmData.flatMap { DRMData.fromJSON($0) }
         }
         
-        if let st = sj[sourceTypeKey].int, let sourceType = SourceType(rawValue: st) {
-            self.sourceType = sourceType
+        if let st = sj[formatTypeKey].int, let mediaFormat = MediaFormat(rawValue: st) {
+            self.mediaFormat = mediaFormat
         }
         
         super.init()

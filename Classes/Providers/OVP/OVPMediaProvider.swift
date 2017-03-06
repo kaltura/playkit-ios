@@ -178,9 +178,9 @@ import SwiftyXMLParser
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach { (source: OVPSource) in
                         //detecting the source type
-                        let sourceType = self.getSourceType(source: source)
+                        let format = self.getSourceFormat(source: source)
                         //If source type is not supported source will not be created
-                        guard sourceType != .unknown else { return }
+                        guard format != .none else { return }
                         
                         var ksForURL = resKS
                         
@@ -249,28 +249,24 @@ import SwiftyXMLParser
     
     
     // This method decding the source type base on scheck and drm data
-    private func getSourceType(source: OVPSource) -> MediaSource.SourceType {
+    private func getSourceFormat(source: OVPSource) -> MediaSource.MediaFormat {
         
         if let format = source.format {
             switch format {
             case "applehttp":
-                if source.drm == nil {
-                    return MediaSource.SourceType.hlsClear
-                } else {
-                    return MediaSource.SourceType.hlsFairPlay
-                }
+                    return .hls
             case "url":
                 if source.drm == nil {
-                    return MediaSource.SourceType.mp4Clear
+                    return .mp4
                 } else {
-                    return MediaSource.SourceType.wvmWideVine
+                    return .wvm
                 }
             default:
-                return MediaSource.SourceType.unknown
+                return .none
             }
         }
         
-        return MediaSource.SourceType.unknown
+        return .none
     }
     
     // Creating the drm data based on scheme
@@ -304,7 +300,7 @@ import SwiftyXMLParser
     // building the url with the SourceBuilder class
     private func playbackURL(loadInfo: LoaderInfo, source: OVPSource, ks: String?) -> URL? {
         
-        let sourceType = self.getSourceType(source: source)
+        let formatType = self.getSourceFormat(source: source)
         var playURL: URL? = nil
         if let flavors =  source.flavors,
             flavors.count > 0 {
@@ -318,7 +314,7 @@ import SwiftyXMLParser
                 .set(partnerId: loadInfo.sessionProvider.partnerId)
                 .set(playSessionId: UUID().uuidString)
                 .set(sourceProtocol: source.protocols?.last)
-                .set(fileExtension: sourceType.fileExtension)
+                .set(fileExtension: formatType.fileExtension)
                 .set(ks: ks)
             playURL = sourceBuilder.build()
         }
