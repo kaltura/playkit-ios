@@ -180,7 +180,7 @@ import SwiftyXMLParser
                         //detecting the source type
                         let format = self.getSourceFormat(source: source)
                         //If source type is not supported source will not be created
-                        guard format != .none else { return }
+                        guard format != .unknown else { return }
                         
                         var ksForURL = resKS
                         
