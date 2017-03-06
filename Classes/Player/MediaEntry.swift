@@ -72,36 +72,65 @@ func getJson(_ json: Any) -> JSON {
 
 @objc public class MediaSource: NSObject {
     
-    @objc public enum SourceType: Int {
-        case hlsClear
-        case hlsFairPlay
-        case wvmWideVine
-        case mp4Clear
+    @objc public enum MediaFormat: Int {
+        case dash
+        case hls
+        case wvm
+        case mp4
+        case mp3
         case unknown
+        
         
         var fileExtension: String {
             get {
                 switch self {
-                case .hlsClear,
-                     .hlsFairPlay:
+                case .dash:
+                    return "mpd"
+                case .hls:
                     return "m3u8"
-                case .wvmWideVine:
+                case .wvm:
                     return "wvm"
-                case .mp4Clear:
+                case .mp4:
                     return "mp4"
+                case .mp3:
+                    return "mp3"
                 case .unknown:
-                    return "mp4"
+                    return ""
                 }
             }
         }
+        
+        static func mediaFormat(byfileExtension ext:String) -> MediaFormat{
+            switch ext {
+            case "mpd":
+                return .dash
+            case "m3u8":
+                return .hls
+            case "wvm":
+                return .wvm
+            case "mp4":
+                return .mp4
+            case "mp3":
+                return .mp3
+            default:
+                return .unknown
+            }
+        }
+        
     }
     
     @objc public var id: String
-    @objc public var contentUrl: URL?
+    @objc public var contentUrl: URL? {
+        didSet {
+            let estimatedFormat = MediaFormat.mediaFormat(byfileExtension: self.fileExt)
+            self.mediaFormat = self.mediaFormat != .unknown ? self.mediaFormat : estimatedFormat
+        }
+    }
     @objc public var mimeType: String?
-    @objc public var drmData: [DRMData]?
-    @objc public var sourceType: SourceType = .unknown
+    @objc public var drmData: [DRMParams]?
+    @objc public var mediaFormat: MediaFormat = .unknown
     @objc public var fileExt: String {
+        
         return contentUrl?.pathExtension ?? ""
     }
     
@@ -109,18 +138,18 @@ func getJson(_ json: Any) -> JSON {
     private let contentUrlKey: String = "url"
     private let mimeTypeKey: String = "mimeType"
     private let drmDataKey: String = "drmData"
-    private let sourceTypeKey: String = "sourceType"
+    private let formatTypeKey: String = "sourceType"
     
     @objc public convenience init (id: String) {
         self.init(id, contentUrl: nil)
     }
     
-    @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMData]? = nil, sourceType: SourceType = .unknown) {
+    @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMParams]? = nil, mediaFormat: MediaFormat = .unknown) {
         self.id = id
         self.contentUrl = contentUrl
         self.mimeType = mimeType
         self.drmData = drmData
-        self.sourceType = sourceType
+        self.mediaFormat = mediaFormat
     }
     
     @objc public init(json: Any) {
@@ -134,11 +163,11 @@ func getJson(_ json: Any) -> JSON {
         self.mimeType = sj[mimeTypeKey].string
         
         if let drmData = sj[drmDataKey].array {
-            self.drmData = drmData.flatMap { DRMData.fromJSON($0) }
+            self.drmData = drmData.flatMap { DRMParams.fromJSON($0) }
         }
         
-        if let st = sj[sourceTypeKey].int, let sourceType = SourceType(rawValue: st) {
-            self.sourceType = sourceType
+        if let st = sj[formatTypeKey].int, let mediaFormat = MediaFormat(rawValue: st) {
+            self.mediaFormat = mediaFormat
         }
         
         super.init()
@@ -151,35 +180,52 @@ func getJson(_ json: Any) -> JSON {
     }
 }
 
-@objc open class DRMData: NSObject {
-    var licenseUri: URL?
+
+
+
+@objc open class DRMParams: NSObject {
     
-    init(licenseUri: String?) {
+    
+    public enum Scheme: Int {
+        case widevineCenc
+        case playreadyCenc
+        case widevineClassic
+        case fairplay
+        case unknown
+    }
+    
+    var licenseUri: URL?
+    var scheme: Scheme
+    
+    init(licenseUri: String?, scheme: Scheme) {
         if let url = licenseUri {
             self.licenseUri = URL(string: url)
         }
+        self.scheme = scheme
     }
     
-    @objc public static func fromJSON(_ json: Any) -> DRMData? {
+    @objc public static func fromJSON(_ json: Any) -> DRMParams? {
         
         let sj = getJson(json)
         
         guard let licenseUri = sj["licenseUri"].string else { return nil }
+        let schemeValue: Int = sj["scheme"].int ?? Scheme.unknown.hashValue
+        let scheme: Scheme = Scheme(rawValue: schemeValue) ?? .unknown
         
         if let fpsCertificate = sj["fpsCertificate"].string {
-            return FairPlayDRMData(licenseUri: licenseUri, base64EncodedCertificate: fpsCertificate)
+            return FairPlayDRMParams(licenseUri: licenseUri, scheme: .fairplay,base64EncodedCertificate: fpsCertificate)
         } else {
-            return DRMData(licenseUri: licenseUri)
+            return DRMParams(licenseUri: licenseUri,scheme: scheme)
         }
     }
 }
 
-public class FairPlayDRMData: DRMData {
+public class FairPlayDRMParams: DRMParams {
     var fpsCertificate: Data?
     
-    init(licenseUri: String, base64EncodedCertificate: String) {
+    init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
-        super.init(licenseUri: licenseUri)
+        super.init(licenseUri: licenseUri, scheme: scheme)
     }
 }
 

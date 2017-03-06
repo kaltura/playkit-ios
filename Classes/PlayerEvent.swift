@@ -51,42 +51,50 @@ import Foundation
     
     // MARK: - Player Basic Events
 
-    class CanPlay : PlayerEvent {}
-    class DurationChanged : PlayerEvent {
+    class CanPlay: PlayerEvent {}
+    class DurationChanged: PlayerEvent {
         convenience init(duration: TimeInterval) {
-            self.init([EventDataKeys.Duration : NSNumber(value: duration)])
+            self.init([EventDataKeys.Duration: NSNumber(value: duration)])
         }
     }
     
-    class Ended : PlayerEvent {}
-    class LoadedMetadata : PlayerEvent {}
-    class Play : PlayerEvent {}
-    class Pause : PlayerEvent {}
-    class Playing : PlayerEvent {}
-    class Seeking : PlayerEvent {}
-    class Seeked : PlayerEvent {}
+    class Ended: PlayerEvent {}
+    class LoadedMetadata: PlayerEvent {}
+    class Play: PlayerEvent {}
+    class Pause: PlayerEvent {}
+    class Playing: PlayerEvent {}
+    class Seeking: PlayerEvent {}
+    class Seeked: PlayerEvent {}
     
     class Error: PlayerEvent {
         convenience init(nsError: NSError) {
-            self.init([EventDataKeys.Error : nsError])
+            self.init([EventDataKeys.Error: nsError])
+        }
+        
+        convenience init(error: PKError) {
+            self.init([EventDataKeys.Error: error.asNSError])
         }
     }
     
     class PluginError: PlayerEvent {
         convenience init(nsError: NSError) {
-            self.init([EventDataKeys.Error : nsError])
+            self.init([EventDataKeys.Error: nsError])
+        }
+        
+        convenience init(error: PKError) {
+            self.init([EventDataKeys.Error: error.asNSError])
         }
     }
     
     // MARK: - Player Tracks Events
     
-    class TracksAvailable : PlayerEvent {
+    class TracksAvailable: PlayerEvent {
         convenience init(tracks: PKTracks) {
             self.init([EventDataKeys.Tracks : tracks])
         }
     }
     
-    class PlaybackParamsUpdated : PlayerEvent {
+    class PlaybackParamsUpdated: PlayerEvent {
         convenience init(currentBitrate: Double) {
             self.init([EventDataKeys.CurrentBitrate : NSNumber(value: currentBitrate)])
         }
@@ -94,7 +102,7 @@ import Foundation
     
     // MARK: - Player State Events
 
-    class StateChanged : PlayerEvent {
+    class StateChanged: PlayerEvent {
         convenience init(newState: PlayerState, oldState: PlayerState) {
             self.init([EventDataKeys.NewState : newState as AnyObject,
                         EventDataKeys.OldState : oldState as AnyObject])
@@ -139,50 +147,50 @@ import Foundation
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
     
-    class AdBreakReady : AdEvent {}
-    class AdBreakEnded : AdEvent {}
-    class AdBreakStarted : AdEvent {}
-    class AdAllCompleted : AdEvent {}
-    class AdComplete : AdEvent {}
-    class AdClicked : AdEvent {}
-    class AdCuepointsChanged : AdEvent {}
-    class AdFirstQuartile : AdEvent {}
-    class AdLoaded : AdEvent {}
-    class AdLog : AdEvent {}
-    class AdMidpoint : AdEvent {}
-    class AdPaused : AdEvent {}
-    class AdResumed : AdEvent {}
-    class AdSkipped : AdEvent {}
-    class AdStarted : AdEvent {}
-    class AdStreamLoaded : AdEvent {}
-    class AdTapped : AdEvent {}
-    class AdThirdQuartile : AdEvent {}
+    class AdBreakReady: AdEvent {}
+    class AdBreakEnded: AdEvent {}
+    class AdBreakStarted: AdEvent {}
+    class AdAllCompleted: AdEvent {}
+    class AdComplete: AdEvent {}
+    class AdClicked: AdEvent {}
+    class AdCuepointsChanged: AdEvent {}
+    class AdFirstQuartile: AdEvent {}
+    class AdLoaded: AdEvent {}
+    class AdLog: AdEvent {}
+    class AdMidpoint: AdEvent {}
+    class AdPaused: AdEvent {}
+    class AdResumed: AdEvent {}
+    class AdSkipped: AdEvent {}
+    class AdStarted: AdEvent {}
+    class AdStreamLoaded: AdEvent {}
+    class AdTapped: AdEvent {}
+    class AdThirdQuartile: AdEvent {}
     
     class Error: AdEvent {
         convenience init(nsError: NSError) {
-            self.init([AdEventDataKeys.Error : nsError])
+            self.init([AdEventDataKeys.Error: nsError])
         }
     }
     
-    class AdDidProgressToTime : AdEvent {
+    class AdDidProgressToTime: AdEvent {
         convenience init(mediaTime: TimeInterval, totalTime: TimeInterval) {
             self.init([AdEventDataKeys.MediaTime: NSNumber(value: mediaTime),
                         AdEventDataKeys.TotalTime: NSNumber(value: totalTime)])
         }
     }
 
-    class AdDidRequestPause : AdEvent {}
-    class AdDidRequestResume : AdEvent {}
+    class AdDidRequestPause: AdEvent {}
+    class AdDidRequestResume: AdEvent {}
     
-    class WebOpenerEvent : AdEvent {
+    class WebOpenerEvent: AdEvent {
         convenience init(webOpener: NSObject!) {
             self.init([AdEventDataKeys.WebOpener: webOpener])
         }
     }
     
-    class AdWebOpenerWillOpenExternalBrowser : WebOpenerEvent {}
-    class AdWebOpenerWillOpenInAppBrowser : WebOpenerEvent {}
-    class AdWebOpenerDidOpenInAppBrowser : WebOpenerEvent {}
-    class AdWebOpenerWillCloseInAppBrowser : WebOpenerEvent {}
-    class AdWebOpenerDidCloseInAppBrowser : WebOpenerEvent {}
+    class AdWebOpenerWillOpenExternalBrowser: WebOpenerEvent {}
+    class AdWebOpenerWillOpenInAppBrowser: WebOpenerEvent {}
+    class AdWebOpenerDidOpenInAppBrowser: WebOpenerEvent {}
+    class AdWebOpenerWillCloseInAppBrowser: WebOpenerEvent {}
+    class AdWebOpenerDidCloseInAppBrowser: WebOpenerEvent {}
 }
