@@ -15,7 +15,7 @@ import SwiftyXMLParser
     struct LoaderInfo {
         var sessionProvider: SessionProvider
         var entryId: String
-        var uiconfId: Int64?
+        var uiconfId: NSNumber?
         var executor: RequestExecutor
         var apiServerURL: String {
             return self.sessionProvider.serverURL + "/api_v3"
@@ -30,10 +30,10 @@ import SwiftyXMLParser
         case currentlyProcessingOtherRequest
     }
     
-    public var sessionProvider: SessionProvider?
-    public var entryId: String?
-    public var uiconfId: Int64?
-    public var executor: RequestExecutor?
+    @objc public var sessionProvider: SessionProvider?
+    @objc public var entryId: String?
+    @objc public var uiconfId: NSNumber?
+    public var executor: RequestExecutor? // TODO: make @objc if needed in the future
     
     public override init() {}
     
@@ -63,7 +63,7 @@ import SwiftyXMLParser
      executor - which resposible for the network, it can be set to
      */
     @discardableResult
-    @nonobjc public func set( executor: RequestExecutor?) -> Self {
+    @nonobjc public func set(executor: RequestExecutor?) -> Self {
         self.executor = executor
         return self
     }
@@ -72,7 +72,7 @@ import SwiftyXMLParser
      uiconfId - UI Configuration id
      */
     @discardableResult
-    @nonobjc public func set(uiconfId: Int64?) -> Self{
+    @nonobjc public func set(uiconfId: NSNumber?) -> Self{
         self.uiconfId = uiconfId
         return self
     }
@@ -309,7 +309,7 @@ import SwiftyXMLParser
                 .set(baseURL: loadInfo.sessionProvider.serverURL)
                 .set(format: source.format)
                 .set(entryId: loadInfo.entryId)
-                .set(uiconfId: loadInfo.uiconfId)
+                .set(uiconfId: loadInfo.uiconfId?.int64Value)
                 .set(flavors: source.flavors)
                 .set(partnerId: loadInfo.sessionProvider.partnerId)
                 .set(playSessionId: UUID().uuidString)
