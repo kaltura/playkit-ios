@@ -17,7 +17,7 @@ private struct Observation {
     private var observations = [String: [Observation]]()
     private let lock: AnyObject = UUID().uuidString as AnyObject
     
-    @objc public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void) {
+    @objc public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
         sync {
             PKLog.debug("Add observer: \(observer) for events: \(events)")
             events.forEach { (et) in

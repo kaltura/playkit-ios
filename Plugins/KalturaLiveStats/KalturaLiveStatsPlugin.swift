@@ -160,7 +160,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     
     private func calculateBuffer(isBuffering: Bool) -> Int32 {
         
-        var currTime = Date().timeIntervalSince1970.toInt32()
+        let currTime = Date().timeIntervalSince1970.toInt32()
         bufferTime = (currTime - bufferStartTime) / 1000;
         if bufferTime > 10 {
             bufferTime = 10;

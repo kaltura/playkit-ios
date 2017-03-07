@@ -110,7 +110,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                     PKLog.debug("seeked event: \(event)")
                     self.hasSeeked = true
                     self.seekPercent = Float(self.player.currentTime) / Float(self.player.duration)
-                    self.sendAnalyticsEvent(action: .SEEK);
+                    self.sendAnalyticsEvent(action: .SEEK)
                 })
             case let e where e.self == PlayerEvent.playing:
                 self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in

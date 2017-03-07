@@ -31,6 +31,3 @@ protocol OTTAnalyticsPluginProtocol: AnalyticsPluginProtocol {
     func buildRequest(ofType type: OTTAnalyticsEventType) -> Request?
     func send(request: Request)
 }
-
-
-
