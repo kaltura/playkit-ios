@@ -9,33 +9,11 @@
 import Foundation
 
 
+
+
 public enum AssetType: String {
-    case vod = "vod"
-    case channel = "channel"
-    case recording = "recording"
-    case shifted = "shifted"
-    
-    func objectType() -> String {
-        switch self {
-        case .vod, .channel:
-            return "media"
-        case .shifted, .recording :
-            return "epg"
-        default:
-            return "media"
-        }
-    }
-    
-    func mediaType() -> MediaType {
-        switch self {
-        case .vod, .recording:
-            return MediaType.vod
-        case .channel, .shifted:
-               return MediaType.live
-        default:
-            return MediaType.unknown
-        }
-    }
+    case media = "media"
+    case epg = "epg"
 }
 
 public enum PlaybackContextType: String {

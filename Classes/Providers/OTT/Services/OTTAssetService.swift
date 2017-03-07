@@ -19,7 +19,7 @@ class OTTAssetService {
             request
             .setBody(key: "id", value: JSON(assetId))
             .setBody(key: "ks", value: JSON(ks))
-            .setBody(key: "type", value: JSON(type.objectType()))
+            .setBody(key: "type", value: JSON(type.rawValue))
             .setBody(key: "assetReferenceType", value: JSON(type.rawValue))
             .setBody(key: "with", value: JSON([["type":"files","objectType":"KalturaCatalogWithHolder"]]))
             return request
@@ -34,7 +34,7 @@ class OTTAssetService {
             request
             .setBody(key: "assetId", value: JSON(assetId))
             .setBody(key: "ks", value: JSON(ks))
-            .setBody(key: "assetType", value: JSON(type.objectType()))
+            .setBody(key: "assetType", value: JSON(type.rawValue))
             .setBody(key: "contextDataParams", value: JSON(playbackContextOptions.toDictionary()))
             return request
         }else{
