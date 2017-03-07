@@ -8,6 +8,7 @@
 
 import UIKit
 
+// TODO: make @objc if needed in the future
 public protocol RequestExecutor {
     
     func send(request: Request)

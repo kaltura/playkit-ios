@@ -9,9 +9,18 @@
 import UIKit
 import SwiftyJSON
 
-public enum AssetType: String {
-    case media = "media"
-    case epg = "epg"
+@objc public enum AssetType: Int {
+    case media
+    case epg
+    case unknown
+    
+    var asString: String {
+        switch self {
+        case .media: return "media"
+        case .epg: return "epg"
+        case .unknown: return ""
+        }
+    }
 }
 
 class OTTAssetService {
@@ -22,7 +31,7 @@ class OTTAssetService {
             request
             .setBody(key: "id", value: JSON(assetId))
             .setBody(key: "ks", value: JSON(ks))
-            .setBody(key: "assetReferenceType", value: JSON(type.rawValue))
+            .setBody(key: "assetReferenceType", value: JSON(type.asString))
             .setBody(key: "type", value: JSON(type.rawValue))
             .setBody(key: "with", value: JSON([["type": "files","objectType": "KalturaCatalogWithHolder"]]))
             return request
