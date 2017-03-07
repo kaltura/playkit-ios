@@ -16,7 +16,7 @@ class OTTPlaybackContext: OTTBaseObject {
     required init?(json: Any) {
         let jsonObject = JSON(json)
         jsonObject["sources"].array?.forEach({ (source:JSON) in
-            if let source = OTTPlaybackSource(json: source) {
+            if let source = OTTPlaybackSource(json: source.object) {
                 sources.append(source)
             }
         })
