@@ -16,7 +16,7 @@ class PhoenixMediaProviderTest: XCTestCase, SessionProvider {
 
 
     
-    let mediaID = "258656"
+    let mediaID = "485293"
     var partnerId: Int64 = 198
     var serverURL: String  = "http://api-preprod.ott.kaltura.com/v4_2/api_v3"
     
@@ -40,6 +40,7 @@ class PhoenixMediaProviderTest: XCTestCase, SessionProvider {
         let provider = PhoenixMediaProvider()
         .set(sessionProvider: self)
         .set(assetId: mediaID)
+        .set(type: AssetType.media)
         .set(playbackContextType: PlaybackContextType.playback)
         
         
