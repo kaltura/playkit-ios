@@ -21,13 +21,17 @@ import SwiftyJSON
         case unableToParseObject
     }
     
-    var sessionProvider: SessionProvider?
-    var mediaId: String?
-    var type: AssetType?
-    var formats: [String]?
-    var executor: RequestExecutor?
+    @objc public var sessionProvider: SessionProvider?
+    @objc public var mediaId: String?
+    @objc public var type: AssetType = .unknown
+    @objc public var formats: [String]?
+    public var executor: RequestExecutor? // TODO: make @objc if needed in the future
     
-    public override init() { }
+    public override init() {}
+    
+    @objc public init(_ sessionProvider: SessionProvider) {
+        self.sessionProvider = sessionProvider
+    }
     
     @discardableResult
     @nonobjc public func set(sessionProvider: SessionProvider?) -> Self {
@@ -42,7 +46,7 @@ import SwiftyJSON
     }
     
     @discardableResult
-    @nonobjc public func set(type:AssetType?) -> Self {
+    @nonobjc public func set(type: AssetType) -> Self {
         self.type = type
         return self
     }
@@ -70,7 +74,7 @@ import SwiftyJSON
     @objc public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
         guard let sessionProvider = self.sessionProvider,
             let mediaId = self.mediaId,
-            let type = self.type
+            self.type != .unknown
             else {
                 callback(nil, OTTMediaProviderError.invalidInputParams)
                 return
@@ -90,11 +94,9 @@ import SwiftyJSON
         self.startLoad(loader: loaderParams, callback: callback)
     }
     
-    
     public func cancel() {
         
     }
-    
 
     func startLoad(loader: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) {
         loader.sessionProvider.loadKS { (ks, error) in
