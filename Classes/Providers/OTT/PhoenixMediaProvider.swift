@@ -23,6 +23,7 @@ let defaultProtocl = "https"
         case mediaNotFound
         case currentlyProcessingOtherRequest
         case unableToParseObject
+        case noSourcesFound
     }
     
     var sessionProvider: SessionProvider?
@@ -181,7 +182,12 @@ let defaultProtocl = "https"
                 
                 if let context = playbackContext {
                     let media = self.createMediaEntry(loaderInfo: loaderInfo, context: context)
-                    callback(media, nil)
+                    if let sources = media.sources, sources.count > 0 {
+                       callback(media, nil)
+                    }else{
+                        callback(nil, PhoenixMediaProviderError.noSourcesFound)
+                    }
+                    
                 }
             }).build()
             
@@ -232,11 +238,20 @@ let defaultProtocl = "https"
         var maxDuration: Float = 0.0
         let mediaSources =  sortedSources.flatMap { (source:OTTPlaybackSource) -> MediaSource? in
             
+            let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
+            guard  FormatsHelper.supportedFormats.contains(format) else {
+                return nil
+            }
+            
             var drm: [DRMParams]? = nil
-            if let drmData = source.drm {
+            if let drmData = source.drm, drmData.count > 0 {
                 drm = drmData.flatMap({ (drmData:OTTDrmData) -> DRMParams? in
                     
                     let scheme = self.convertScheme(scheme: drmData.scheme)
+                    guard FormatsHelper.supportedSchemes.contains(scheme) else {
+                        return nil
+                    }
+                    
                     switch scheme {
                     case .fairplay:
                         // if the scheme is type fair play and there is no certificate or license URL
@@ -247,12 +262,14 @@ let defaultProtocl = "https"
                         return DRMParams(licenseUri: drmData.licenseURL, scheme: scheme)
                     }
                })
+                
+                // checking if the source is supported with his drm data, cause if the source has drm data but from some reason the mapped drm data is empty the source is not playable
+                guard let mappedDrmData = drm , mappedDrmData.count > 0  else {
+                    return nil
+                }
             }
             
-            let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
-            guard  FormatsHelper.supportedFormats.contains(format) else {
-                return nil
-            }
+            
             
             let mediaSource = MediaSource(id: "\(source.id)")
             mediaSource.contentUrl = source.url
@@ -266,7 +283,7 @@ let defaultProtocl = "https"
         
         mediaEntry.sources = mediaSources
         mediaEntry.duration = TimeInterval(maxDuration)
-        mediaEntry.mediaType = loaderInfo.assetType.mediaType()
+        
         
         return mediaEntry
         
