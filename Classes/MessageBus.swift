@@ -10,7 +10,8 @@ import Foundation
 
 private struct Observation {
     weak var observer: AnyObject?
-    let block: (PKEvent)->Void
+    let observeOn: DispatchQueue
+    let block: (PKEvent) -> Void
 }
 
 @objc public class MessageBus: NSObject {
@@ -18,18 +19,21 @@ private struct Observation {
     private let lock: AnyObject = UUID().uuidString as AnyObject
     
     @objc public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
+        self.add(observer: observer, events: events, block: block)
+    }
+    
+    @objc public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], observeOn dispatchQueue: DispatchQueue, block: @escaping (PKEvent)->Void) {
+        self.add(observer: observer, events: events, observeOn: dispatchQueue, block: block)
+    }
+    
+    private func add(observer: AnyObject, events: [PKEvent.Type], observeOn dispatchQueue: DispatchQueue = DispatchQueue.main, block: @escaping (PKEvent)->Void) {
         sync {
             PKLog.debug("Add observer: \(observer) for events: \(events)")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
-                var array: [Observation]? = observations[typeId]
-                
-                if array == nil {
-                    array = []
-                }
-                
-                array!.append(Observation(observer: observer, block: block))
-                observations[typeId] = array
+                var observationList: [Observation] = observations[typeId] ?? []
+                observationList.append(Observation(observer: observer, observeOn: dispatchQueue, block: block))
+                observations[typeId] = observationList
             }
         }
     }
@@ -50,7 +54,7 @@ private struct Observation {
     }
     
     @objc public func post(_ event: PKEvent) {
-        DispatchQueue.main.async { [weak self] in
+        DispatchQueue.global().async { [weak self] in
             PKLog.info("Post event: \(event)")
             let typeId = NSStringFromClass(type(of: event))
             
@@ -58,7 +62,11 @@ private struct Observation {
                 // remove nil observers replace current observations with new ones, and call block with the event
                 let newObservations = array.filter { $0.observer != nil }
                 self?.observations[typeId] = newObservations
-                newObservations.forEach { $0.block(event) }
+                newObservations.forEach { observation in
+                    observation.observeOn.async {
+                        observation.block(event)
+                    }
+                }
             }
         }
     }
