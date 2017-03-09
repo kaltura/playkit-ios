@@ -43,7 +43,7 @@ class AVPlayerEngine: AVPlayer {
     
     var observerContext = 0
     
-    public var onEventBlock: ((PKEvent)->Void)?
+    public var onEventBlock: ((PKEvent) -> Void)?
     
     public var view: UIView! {
         PKLog.trace("get player view: \(_view)")
@@ -209,7 +209,7 @@ class AVPlayerEngine: AVPlayer {
     }
     
     @available(iOS 9.0, *)
-    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?{
+    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         let pip = AVPictureInPictureController(playerLayer: avPlayerLayer)
         pip?.delegate = delegate
         return pip
@@ -236,18 +236,12 @@ class AVPlayerEngine: AVPlayer {
     
     // MARK: - Non Observable Properties
     @objc func updateNonObservableProperties() {
-        if let currItem = self.currentItem {
-            if let timebase = currItem.timebase {
-                if let timebaseRate: Float64 = CMTimebaseGetRate(timebase){
-                    if timebaseRate > 0 {
-                        self.nonObservablePropertiesUpdateTimer?.invalidate()
-                        
-                        self.post(event: PlayerEvent.Playing())
-                    }
-                    PKLog.debug("timebaseRate:: \(timebaseRate)")
-                }
-            }
+        guard let timebaseRate: Float64 = CMTimebaseGetRate(self.currentItem?.timebase) else { return }
+        if timebaseRate > 0 {
+            self.nonObservablePropertiesUpdateTimer?.invalidate()
+            self.post(event: PlayerEvent.Playing())
         }
+        PKLog.debug("timebaseRate:: \(timebaseRate)")
     }
 }
 
@@ -266,5 +260,3 @@ extension AVPlayerEngine: AppStateObservable {
         ]
     }
 }
-
-
