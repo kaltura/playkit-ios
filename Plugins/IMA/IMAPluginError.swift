@@ -26,14 +26,14 @@ struct IMAPluginError: PKError {
     
     var userInfo: [String: Any] {
         return [
-            PKErrorKeys.ErrorTypeKey: adError.type.rawValue
+            PKErrorKeys.errorTypeKey: adError.type.rawValue
         ]
     }
 }
 
 // IMA plugin error userInfo keys.
 extension PKErrorKeys {
-    static let ErrorTypeKey = "errorType"
+    static let errorTypeKey = "errorType"
 }
 
 extension PKErrorDomain {

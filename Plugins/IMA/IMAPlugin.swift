@@ -11,7 +11,7 @@ import GoogleInteractiveMediaAds
 extension IMAAdsManager {
     
     func getAdCuePoints() -> AdCuePoints {
-        return AdCuePoints(cuePoints: self.adCuePoints as! [TimeInterval])
+        return AdCuePoints(cuePoints: self.adCuePoints as? [TimeInterval] ?? [])
     }
 }
 
@@ -293,7 +293,7 @@ extension IMAAdsManager {
     
     private func notifyAdCuePoints(fromAdsManager adsManager: IMAAdsManager) {
         // send ad cue points if exists and request is url type
-        let adCuePoints = AdCuePoints(cuePoints: adsManager.adCuePoints as! [TimeInterval])
+        let adCuePoints = adsManager.getAdCuePoints()
         if self.adTagUrl != nil && adCuePoints.count > 0 {
             self.notify(event: AdEvent.AdCuePointsChanged(adCuePoints: adCuePoints))
         }
@@ -378,7 +378,7 @@ extension IMAAdsManager {
         case .ALL_ADS_COMPLETED: self.notify(event: AdEvent.AdAllCompleted())
         case .CLICKED: self.notify(event: AdEvent.AdClicked())
         case .COMPLETE: self.notify(event: AdEvent.AdComplete())
-        case .CUEPOINTS_CHANGED: self.notify(event: AdEvent.AdCuePointsChanged(adCuePoints: AdCuePoints(cuePoints: adsManager.adCuePoints as! [TimeInterval])))
+        case .CUEPOINTS_CHANGED: self.notify(event: AdEvent.AdCuePointsChanged(adCuePoints: adsManager.getAdCuePoints()))
         case .FIRST_QUARTILE: self.notify(event: AdEvent.AdFirstQuartile())
         case .LOG: self.notify(event: AdEvent.AdLog())
         case .MIDPOINT: self.notify(event: AdEvent.AdMidpoint())
