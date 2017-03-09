@@ -121,7 +121,6 @@ import Foundation
     @objc public static let adAllCompleted: AdEvent.Type = AdAllCompleted.self
     @objc public static let adComplete: AdEvent.Type = AdComplete.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
-    @objc public static let adCuePointsUpdate: AdEvent.Type = AdCuePointsUpdate.self
     @objc public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
     @objc public static let adLoaded: AdEvent.Type = AdLoaded.self
     @objc public static let adLog: AdEvent.Type = AdLog.self
@@ -142,9 +141,11 @@ import Foundation
     @objc public static let adWebOpenerDidOpenInAppBrowser: AdEvent.Type = AdWebOpenerDidOpenInAppBrowser.self
     @objc public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
     @objc public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
+    @objc public static let adCuePointsUpdate: AdEvent.Type = AdCuePointsUpdate.self
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
     
+    class AdStarted: AdEvent {}
     class AdBreakReady: AdEvent {}
     class AdBreakEnded: AdEvent {}
     class AdBreakStarted: AdEvent {}
@@ -161,12 +162,6 @@ import Foundation
     class AdStreamLoaded: AdEvent {}
     class AdTapped: AdEvent {}
     class AdThirdQuartile: AdEvent {}
-    
-    class AdStarted: AdEvent {
-        convenience init(adInfo: AdInfo) {
-            self.init([AdEventDataKeys.adInfo: adInfo])
-        }
-    }
     
     // `AdCuePointsUpdate` event is received when ad cue points were updated. only sent when there is more then 0.
     class AdCuePointsUpdate: AdEvent {
@@ -244,10 +239,5 @@ extension PKEvent {
     /// Ad cue points, PKEvent Ad Data Accessor
     @objc public var adCuePoints: AdCuePoints? {
         return self.data?[AdEventDataKeys.adCuePoints] as? AdCuePoints
-    }
-    
-    /// Ad info, PKEvent Ad Data Accessor
-    @objc public var adInfo: AdInfo? {
-        return self.data?[AdEventDataKeys.adInfo] as? AdInfo
     }
 }

@@ -65,3 +65,23 @@ import GoogleInteractiveMediaAds
         self.podTimeOffset = podTimeOffset
     }
 }
+
+extension AdEvent {
+    
+    @objc public static let adInformation: AdEvent.Type = AdInfomation.self
+    
+    class AdInfomation: AdEvent {
+        convenience init(adInfo: AdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+}
+
+extension PKEvent {
+    
+    /// Ad info, PKEvent Ad Data Accessor
+    @objc public var adInfo: AdInfo? {
+        return self.data?[AdEventDataKeys.adInfo] as? AdInfo
+    }
+}
+
