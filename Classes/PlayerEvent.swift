@@ -112,7 +112,7 @@ import Foundation
 
 @objc public class AdEvent: PKEvent {
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, adBreakEnded, adBreakStarted, adAllCompleted, adComplete, adClicked, adCuePointsChanged, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
+        adBreakReady, adBreakEnded, adBreakStarted, adAllCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
@@ -121,7 +121,7 @@ import Foundation
     @objc public static let adAllCompleted: AdEvent.Type = AdAllCompleted.self
     @objc public static let adComplete: AdEvent.Type = AdComplete.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
-    @objc public static let adCuePointsChanged: AdEvent.Type = AdCuePointsChanged.self
+    @objc public static let adCuePointsUpdate: AdEvent.Type = AdCuePointsUpdate.self
     @objc public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
     @objc public static let adLoaded: AdEvent.Type = AdLoaded.self
     @objc public static let adLog: AdEvent.Type = AdLog.self
@@ -168,7 +168,8 @@ import Foundation
         }
     }
     
-    class AdCuePointsChanged: AdEvent {
+    // `AdCuePointsUpdate` event is received when ad cue points were updated. only sent when there is more then 0.
+    class AdCuePointsUpdate: AdEvent {
         convenience init(adCuePoints: AdCuePoints) {
             self.init([AdEventDataKeys.adCuePoints: adCuePoints])
         }

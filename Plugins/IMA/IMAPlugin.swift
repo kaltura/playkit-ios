@@ -295,7 +295,7 @@ extension IMAAdsManager {
         // send ad cue points if exists and request is url type
         let adCuePoints = adsManager.getAdCuePoints()
         if self.adTagUrl != nil && adCuePoints.count > 0 {
-            self.notify(event: AdEvent.AdCuePointsChanged(adCuePoints: adCuePoints))
+            self.notify(event: AdEvent.AdCuePointsUpdate(adCuePoints: adCuePoints))
         }
     }
     
@@ -378,7 +378,7 @@ extension IMAAdsManager {
         case .ALL_ADS_COMPLETED: self.notify(event: AdEvent.AdAllCompleted())
         case .CLICKED: self.notify(event: AdEvent.AdClicked())
         case .COMPLETE: self.notify(event: AdEvent.AdComplete())
-        case .CUEPOINTS_CHANGED: self.notify(event: AdEvent.AdCuePointsChanged(adCuePoints: adsManager.getAdCuePoints()))
+        case .CUEPOINTS_CHANGED: self.notify(event: AdEvent.AdCuePointsUpdate(adCuePoints: adsManager.getAdCuePoints()))
         case .FIRST_QUARTILE: self.notify(event: AdEvent.AdFirstQuartile())
         case .LOG: self.notify(event: AdEvent.AdLog())
         case .MIDPOINT: self.notify(event: AdEvent.AdMidpoint())
