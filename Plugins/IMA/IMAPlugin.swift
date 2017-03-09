@@ -72,6 +72,8 @@ extension IMAAdsManager {
     // MARK: - PKPlugin
     /************************************************************/
     
+    public override class var pluginName: String { return "IMAPlugin" }
+    
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let adsConfig = pluginConfig as? AdsConfig {
@@ -101,8 +103,6 @@ extension IMAAdsManager {
         self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
     
-    public override class var pluginName: String { return "IMAPlugin" }
-    
     public override func destroy() {
         super.destroy()
         self.destroyManager()
@@ -110,12 +110,16 @@ extension IMAAdsManager {
     }
     
     /************************************************************/
-    // MARK: - Internal
+    // MARK: - PlayerDecoratorProvider
     /************************************************************/
     
     func getPlayerDecorator() -> PlayerDecoratorBase? {
         return AdsEnabledPlayerController(adsPlugin: self)
     }
+    
+    /************************************************************/
+    // MARK: - AdsPlugin
+    /************************************************************/
     
     func requestAds() {
         if self.adTagUrl != nil && self.adTagUrl != "" {
@@ -363,6 +367,7 @@ extension IMAAdsManager {
                 let adInfo = AdInfo(ad: ad)
                 self.notify(event: AdEvent.AdStarted(adInfo: adInfo))
             }
+            self.notifyAdCuePoints(fromAdsManager: adsManager)
             self.showLoadingView(false, alpha: 0)
         case .AD_BREAK_STARTED:
             self.notify(event: AdEvent.AdBreakStarted())
