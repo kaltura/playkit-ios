@@ -367,8 +367,9 @@ extension IMAAdsManager {
         case .STARTED:
             if let ad = event.ad {
                 let adInfo = AdInfo(ad: ad)
-                self.notify(event: AdEvent.AdStarted(adInfo: adInfo))
+                self.notify(event: AdEvent.AdInfomation(adInfo: adInfo))
             }
+            self.notify(event: AdEvent.AdStarted())
             self.showLoadingView(false, alpha: 0)
         case .AD_BREAK_STARTED:
             self.notify(event: AdEvent.AdBreakStarted())
