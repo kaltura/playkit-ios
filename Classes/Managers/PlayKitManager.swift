@@ -48,6 +48,9 @@ import UIKit
     }
     
     @objc public func registerPlugin(_ pluginClass: BasePlugin.Type) {
+        if let pluginWarmUp = pluginClass as? PKPluginWarmUp.Type {
+            pluginWarmUp.warmUp()
+        }
         pluginRegistry[pluginClass.pluginName] = pluginClass
     }
     
