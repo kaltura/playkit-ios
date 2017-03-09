@@ -146,6 +146,7 @@ extension IMAAdsManager {
             
             if let adsManager = self.adsManager {
                 adsManager.initialize(with: self.renderingSettings)
+                self.notifyAdCuePoints(fromAdsManager: adsManager)
             } else {
                 self.startAdCalled = true
             }
@@ -316,6 +317,7 @@ extension IMAAdsManager {
         
         if self.startAdCalled {
             self.adsManager!.initialize(with: self.renderingSettings)
+            self.notifyAdCuePoints(fromAdsManager: self.adsManager!)
         }
         PKLog.debug("ads manager set")
     }
@@ -367,7 +369,6 @@ extension IMAAdsManager {
                 let adInfo = AdInfo(ad: ad)
                 self.notify(event: AdEvent.AdStarted(adInfo: adInfo))
             }
-            self.notifyAdCuePoints(fromAdsManager: adsManager)
             self.showLoadingView(false, alpha: 0)
         case .AD_BREAK_STARTED:
             self.notify(event: AdEvent.AdBreakStarted())
