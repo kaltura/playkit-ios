@@ -110,11 +110,9 @@ import Foundation
     }
 }
 
-// MARK: - Ad Events
-
 @objc public class AdEvent: PKEvent {
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, adBreakEnded, adBreakStarted, adAllCompleted, adComplete, adClicked, adCuepointsChanged, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
+        adBreakReady, adBreakEnded, adBreakStarted, adAllCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
@@ -123,7 +121,7 @@ import Foundation
     @objc public static let adAllCompleted: AdEvent.Type = AdAllCompleted.self
     @objc public static let adComplete: AdEvent.Type = AdComplete.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
-    @objc public static let adCuepointsChanged: AdEvent.Type = AdCuepointsChanged.self
+    @objc public static let adCuePointsUpdate: AdEvent.Type = AdCuePointsUpdate.self
     @objc public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
     @objc public static let adLoaded: AdEvent.Type = AdLoaded.self
     @objc public static let adLog: AdEvent.Type = AdLog.self
@@ -153,7 +151,6 @@ import Foundation
     class AdAllCompleted: AdEvent {}
     class AdComplete: AdEvent {}
     class AdClicked: AdEvent {}
-    class AdCuepointsChanged: AdEvent {}
     class AdFirstQuartile: AdEvent {}
     class AdLoaded: AdEvent {}
     class AdLog: AdEvent {}
@@ -161,30 +158,42 @@ import Foundation
     class AdPaused: AdEvent {}
     class AdResumed: AdEvent {}
     class AdSkipped: AdEvent {}
-    class AdStarted: AdEvent {}
     class AdStreamLoaded: AdEvent {}
     class AdTapped: AdEvent {}
     class AdThirdQuartile: AdEvent {}
     
+    class AdStarted: AdEvent {
+        convenience init(adInfo: AdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+    
+    // `AdCuePointsUpdate` event is received when ad cue points were updated. only sent when there is more then 0.
+    class AdCuePointsUpdate: AdEvent {
+        convenience init(adCuePoints: AdCuePoints) {
+            self.init([AdEventDataKeys.adCuePoints: adCuePoints])
+        }
+    }
+    
     class Error: AdEvent {
         convenience init(nsError: NSError) {
-            self.init([AdEventDataKeys.Error: nsError])
+            self.init([AdEventDataKeys.error: nsError])
         }
     }
     
     class AdDidProgressToTime: AdEvent {
         convenience init(mediaTime: TimeInterval, totalTime: TimeInterval) {
-            self.init([AdEventDataKeys.MediaTime: NSNumber(value: mediaTime),
-                        AdEventDataKeys.TotalTime: NSNumber(value: totalTime)])
+            self.init([AdEventDataKeys.mediaTime: NSNumber(value: mediaTime),
+                       AdEventDataKeys.totalTime: NSNumber(value: totalTime)])
         }
     }
-
+    
     class AdDidRequestPause: AdEvent {}
     class AdDidRequestResume: AdEvent {}
     
     class WebOpenerEvent: AdEvent {
         convenience init(webOpener: NSObject!) {
-            self.init([AdEventDataKeys.WebOpener: webOpener])
+            self.init([AdEventDataKeys.webOpener: webOpener])
         }
     }
     
@@ -193,4 +202,52 @@ import Foundation
     class AdWebOpenerDidOpenInAppBrowser: WebOpenerEvent {}
     class AdWebOpenerWillCloseInAppBrowser: WebOpenerEvent {}
     class AdWebOpenerDidCloseInAppBrowser: WebOpenerEvent {}
+}
+
+/************************************************************/
+// MARK: - PKEvent Data Accessors Extension
+/************************************************************/
+
+extension PKEvent {
+    // MARK: - Ad Data Keys
+    struct AdEventDataKeys {
+        static let mediaTime = "mediaTime"
+        static let totalTime = "totalTime"
+        static let webOpener = "webOpener"
+        static let error = "error"
+        static let adCuePoints = "adCuePoints"
+        static let adInfo = "adInfo"
+    }
+    
+    // MARK: Ad Data Accessors
+    
+    /// MediaTime, PKEvent Ad Data Accessor
+    @objc public var mediaTime: NSNumber? {
+        return self.data?[AdEventDataKeys.mediaTime] as? NSNumber
+    }
+    
+    /// TotalTime, PKEvent Ad Data Accessor
+    @objc public var totalTime: NSNumber? {
+        return self.data?[AdEventDataKeys.totalTime] as? NSNumber
+    }
+    
+    /// WebOpener, PKEvent Ad Data Accessor
+    @objc public var webOpener: NSObject? {
+        return self.data?[AdEventDataKeys.webOpener] as? NSObject
+    }
+    
+    /// Associated error from error event, PKEvent Ad Data Accessor
+    @objc public var adError: NSError? {
+        return self.data?[AdEventDataKeys.error] as? NSError
+    }
+    
+    /// Ad cue points, PKEvent Ad Data Accessor
+    @objc public var adCuePoints: AdCuePoints? {
+        return self.data?[AdEventDataKeys.adCuePoints] as? AdCuePoints
+    }
+    
+    /// Ad info, PKEvent Ad Data Accessor
+    @objc public var adInfo: AdInfo? {
+        return self.data?[AdEventDataKeys.adInfo] as? AdInfo
+    }
 }

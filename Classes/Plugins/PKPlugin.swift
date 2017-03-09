@@ -28,3 +28,6 @@ public protocol PKPlugin {
     func destroy()
 }
 
+public protocol PKPluginWarmUp {
+    static func warmUp()
+}
