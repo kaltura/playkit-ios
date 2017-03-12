@@ -10,8 +10,8 @@ import GoogleInteractiveMediaAds
 
 extension IMAAdsManager {
     
-    func getAdCuePoints() -> AdCuePoints {
-        return AdCuePoints(cuePoints: self.adCuePoints as? [TimeInterval] ?? [])
+    func getAdCuePoints() -> PKAdCuePoints {
+        return PKAdCuePoints(cuePoints: self.adCuePoints as? [TimeInterval] ?? [])
     }
 }
 
@@ -366,7 +366,7 @@ extension IMAAdsManager {
             }
         case .STARTED:
             if let ad = event.ad {
-                let adInfo = AdInfo(ad: ad)
+                let adInfo = PKAdInfo(ad: ad)
                 self.notify(event: AdEvent.AdInfomation(adInfo: adInfo))
             }
             self.notify(event: AdEvent.AdStarted())
@@ -374,7 +374,6 @@ extension IMAAdsManager {
         case .AD_BREAK_STARTED:
             self.notify(event: AdEvent.AdBreakStarted())
             self.showLoadingView(false, alpha: 0)
-            
         case .AD_BREAK_ENDED: self.notify(event: AdEvent.AdBreakEnded())
         case .ALL_ADS_COMPLETED: self.notify(event: AdEvent.AdAllCompleted())
         case .CLICKED: self.notify(event: AdEvent.AdClicked())
