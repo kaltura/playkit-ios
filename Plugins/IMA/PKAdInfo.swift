@@ -37,12 +37,12 @@ import GoogleInteractiveMediaAds
     
     /// returns the position type of the ad (pre, mid, post)
     @objc public var positionType: AdPositionType {
-        if (podTimeOffset > 0 ) {
-            return .midRoll;
-        } else if (podTimeOffset < 0) {
-            return .postRoll;
+        if podTimeOffset > 0  {
+            return .midRoll
+        } else if podTimeOffset < 0 {
+            return .postRoll
         } else {
-            return .preRoll;
+            return .preRoll
         }
     }
     
