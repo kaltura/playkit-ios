@@ -165,7 +165,7 @@ import Foundation
     
     // `AdCuePointsUpdate` event is received when ad cue points were updated. only sent when there is more then 0.
     class AdCuePointsUpdate: AdEvent {
-        convenience init(adCuePoints: AdCuePoints) {
+        convenience init(adCuePoints: PKAdCuePoints) {
             self.init([AdEventDataKeys.adCuePoints: adCuePoints])
         }
     }
@@ -237,7 +237,7 @@ extension PKEvent {
     }
     
     /// Ad cue points, PKEvent Ad Data Accessor
-    @objc public var adCuePoints: AdCuePoints? {
-        return self.data?[AdEventDataKeys.adCuePoints] as? AdCuePoints
+    @objc public var adCuePoints: PKAdCuePoints? {
+        return self.data?[AdEventDataKeys.adCuePoints] as? PKAdCuePoints
     }
 }

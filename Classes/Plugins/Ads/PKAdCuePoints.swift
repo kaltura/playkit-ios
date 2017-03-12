@@ -8,7 +8,7 @@
 
 import Foundation
 
-@objc public class AdCuePoints: NSObject {
+@objc public class PKAdCuePoints: NSObject {
     
     @objc public private(set) var cuePoints: [TimeInterval]
     
