@@ -11,10 +11,10 @@ import SwiftyJSON
 
 class OVPMultiResponseParser: NSObject {
     
-    static func parse(data:Any) -> [OVPBaseObject] {
+    static func parse(data: Any) -> [OVPBaseObject] {
         
         let jsonResponse = JSON(data)
-        if let resultArrayJSON = jsonResponse.array{
+        if let resultArrayJSON = jsonResponse.array {
             
             var resultArray: [OVPBaseObject] = [OVPBaseObject]()
             for jsonResult: JSON in resultArrayJSON{
@@ -27,7 +27,7 @@ class OVPMultiResponseParser: NSObject {
                         }
                     }
                   object = OVPList(objects: parsedObjects)
-                }else{
+                } else {
                     object = OVPMultiResponseParser.parseSingleItem(json: jsonResult)
                 }
                 
@@ -36,7 +36,7 @@ class OVPMultiResponseParser: NSObject {
                 }
             }
             return resultArray
-        }else{
+        } else {
             return [OVPBaseObject]()
         }
     }
@@ -47,7 +47,7 @@ class OVPMultiResponseParser: NSObject {
         if let type = objectType{
             let object: OVPBaseObject? = type.init(json: json.object)
             return object
-        }else{
+        } else {
             return nil
         }
     }

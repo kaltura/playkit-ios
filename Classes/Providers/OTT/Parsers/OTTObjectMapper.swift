@@ -16,14 +16,12 @@ class OTTObjectMapper: NSObject {
     static let classNameKey = "objectType"
     static let errorKey = "objectType"
     
-    static func classByJsonObject(json:Any?) -> OTTBaseObject.Type? {
-     
-        
-        let jsonObject = JSON(json)
+    static func classByJsonObject(json: Any?) -> OTTBaseObject.Type? {
+        guard let js = json else { return nil }
+        let jsonObject = JSON(js)
         let className = jsonObject[classNameKey].string
         
-        
-        if let name = className{
+        if let name = className {
             switch name {
             case "KalturaLoginResponse":
                 return OTTLoginResponse.self
@@ -39,19 +37,9 @@ class OTTObjectMapper: NSObject {
         } else {
             if jsonObject[errorKey].dictionary != nil {
                 return OTTError.self
-            }else{
+            } else {
                 return nil
             }
-            
         }
-        
-        
     }
-    
-    
-    
-    
-    
-    
-  
 }

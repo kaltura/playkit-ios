@@ -9,8 +9,6 @@
 import UIKit
 import SwiftyJSON
 
-
-
 @objc public class MockMediaEntryProvider: NSObject, MediaEntryProvider {
   
    public enum MockError: Error {
@@ -51,7 +49,7 @@ import SwiftyJSON
          var content: JSON
     }
 
-    @objc public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void){
+    @objc public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
     
         guard let id = self.id else {
             callback(nil, MockError.invalidParam(paramName: "id"))
@@ -59,8 +57,8 @@ import SwiftyJSON
         }
         
         var json: JSON? = nil
-        if self.content != nil {
-            json = JSON(self.content)
+        if let content = self.content {
+            json = JSON(content)
         } else if self.url != nil {
             guard let stringPath = self.url?.absoluteString else {
                  callback(nil, MockError.invalidParam(paramName: "url"))
@@ -73,7 +71,7 @@ import SwiftyJSON
             json = JSON(data: data as Data)
         }
         
-        guard  let jsonContent = json else {
+        guard let jsonContent = json else {
             callback(nil, MockError.unableToParseJSON)
             return
         }

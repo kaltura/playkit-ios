@@ -11,7 +11,7 @@ import Foundation
 class LoadedPlugin: NSObject {
     var plugin: PKPlugin
     var decorator: PlayerDecoratorBase?
-    init(plugin :PKPlugin, decorator: PlayerDecoratorBase?) {
+    init(plugin: PKPlugin, decorator: PlayerDecoratorBase?) {
         self.plugin = plugin
         self.decorator = decorator
     }
