@@ -63,9 +63,7 @@ extension IMAAdsManager {
         // load adsLoader in order to make IMA download the needed objects before initializing.
         // will setup the instance when first player is loaded
         let imaSettings: IMASettings = IMASettings()
-        if IMAPlugin.loader == nil {
-            IMAPlugin.loader = IMAAdsLoader(settings: imaSettings)
-        }
+        let imaLoader = IMAAdsLoader(settings: imaSettings)
     }
     
     /************************************************************/
