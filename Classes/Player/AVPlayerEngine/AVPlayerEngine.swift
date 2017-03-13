@@ -236,7 +236,8 @@ class AVPlayerEngine: AVPlayer {
     
     // MARK: - Non Observable Properties
     @objc func updateNonObservableProperties() {
-        guard let timebaseRate: Float64 = CMTimebaseGetRate(self.currentItem?.timebase) else { return }
+        guard let timebase = self.currentItem?.timebase else { return }
+        let timebaseRate = CMTimebaseGetRate(timebase)
         if timebaseRate > 0 {
             self.nonObservablePropertiesUpdateTimer?.invalidate()
             self.post(event: PlayerEvent.Playing())
