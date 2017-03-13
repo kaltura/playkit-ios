@@ -33,7 +33,7 @@ import GoogleCast
     @objc public var partnerID: String?
     @objc public var uiconfID: String?
     @objc public var adTagURL: String?
-    @objc public var streamType = GCKMediaStreamType.none
+    @objc public private(set) var streamType = GCKMediaStreamType.none
     @objc public var metaData: GCKMediaMetadata?
     
 
@@ -42,7 +42,7 @@ import GoogleCast
      - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
      */
     @discardableResult
-    @nonobjc public func set(streamType: StreamType) -> Self{
+    @objc public func set(streamType: StreamType) -> Self{
         
         switch streamType {
         case .live:
