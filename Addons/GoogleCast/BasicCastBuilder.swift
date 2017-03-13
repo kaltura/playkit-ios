@@ -19,20 +19,45 @@ import GoogleCast
 public class BasicCastBuilder: NSObject {
     
     
+    public enum StreamType {
+        case live
+        case vod
+    }
+    
     enum BasicBuilderDataError: Error {
         case missingContentId
         case missingWebPlayerURL
         case missingPartnerID
         case missingUIConfId
+        case missingStreamType
     }
     
+   
     internal var contentId: String!
     internal var webPlayerURL: String?
-    internal var partnerID: String!
-    internal var uiconfID: String!
+    internal var partnerID: String?
+    internal var uiconfID: String?
     internal var adTagURL: String?
+    internal var streamType: GCKMediaStreamType!
     internal var metaData: GCKMediaMetadata?
     
+
+    /**
+     Set - stream type
+     - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
+     */
+    @discardableResult
+    public func set(streamType: StreamType?) -> Self{
+        
+        switch streamType {
+        case .live? :
+            self.streamType = .live
+        default:
+            self.streamType = .buffered
+            
+        }
+        return self
+    }
     
     /**
      Set - contentId
@@ -40,6 +65,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(contentId: String?) -> Self{
+        
+        guard contentId != nil,
+            contentId?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to content id")
+                return self
+        }
+        
         self.contentId = contentId
         return self
     }
@@ -50,6 +83,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(adTagURL: String?) -> Self {
+        
+        guard adTagURL != nil,
+            adTagURL?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to adTagURL")
+                return self
+        }
+        
         self.adTagURL = adTagURL
         return self
     }
@@ -60,6 +101,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(webPlayerURL: String?) -> Self {
+        
+        guard webPlayerURL != nil,
+            webPlayerURL?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to webPlayerURL")
+                return self
+        }
+        
         self.webPlayerURL = webPlayerURL
         return self
     }
@@ -72,6 +121,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(partnerID: String?) -> Self {
+        
+        guard partnerID != nil,
+            partnerID?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to partnerID")
+                return self
+        }
+        
         self.partnerID = partnerID
         return self
     }
@@ -82,6 +139,14 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(uiconfID: String?) -> Self {
+        
+        guard uiconfID != nil,
+            uiconfID?.isEmpty == false
+            else {
+                PKLog.warning("Trying to set nil or empty string to uiconfID")
+                return self
+        }
+
         self.uiconfID = uiconfID
         return self
     }
@@ -93,38 +158,40 @@ public class BasicCastBuilder: NSObject {
      */
     @discardableResult
     public func set(metaData: GCKMediaMetadata?) -> Self{
+        
+        guard metaData != nil
+            else {
+                PKLog.warning("Trying to set nil to metaData")
+                return self
+        }
+        
         self.metaData = metaData
         return self
     }
     
     
-    
-
     func validate() throws {
         guard self.contentId != nil else {
             throw BasicCastBuilder.BasicBuilderDataError.missingContentId
         }
         
-        guard self.partnerID != nil else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingPartnerID
+        guard self.streamType != nil else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
         }
         
-        guard self.uiconfID != nil else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingUIConfId
-        }
         
     }
 
     
     /**
-     Build GCKMediaInformation a google-cast-sdk object to send through the load google API to play content
+     Build GCKMediaInformation a google-cast-sdk object to send through the load google-API 
      */
     public func build() throws -> GCKMediaInformation {
         
-        let data = try self.validate()
+        try self.validate()
         let customData = self.customData()
         let mediaInfo: GCKMediaInformation = GCKMediaInformation(contentID:self.contentId,
-                                                                 streamType: GCKMediaStreamType.buffered,
+                                                                 streamType: self.streamType,
                                                                  contentType: "",
                                                                  metadata: self.metaData,
                                                                  streamDuration: 0,
@@ -134,28 +201,15 @@ public class BasicCastBuilder: NSObject {
     
     
     
-    // MARK - Setup Data
     
-    internal func embedConfig() -> [String:Any]? {
-        
-        var embedConfig: [String:Any] = [:]
-        
-        if let lib = self.webPlayerURL {
-          embedConfig["lib"] = lib
-        }
-        
-        embedConfig["publisherID"] = self.partnerID
-        embedConfig["entryID"] = self.contentId
-        embedConfig["uiconfID"] = self.uiconfID
-        
-        let flashVars = self.flashVars()
-        embedConfig["flashVars"] = flashVars
-        
-        return embedConfig
-    }
+    // MARK - Setup custom data
     
+    
+    /**
+     customData - Which used by Kaltura receiver to play the content through the Kaltura Web Player
+     */
     internal func customData() -> [String:Any]? {
-
+        
         if let embedConfig = self.embedConfig() {
             let customData: [String:Any] = ["embedConfig":embedConfig]
             return customData
@@ -164,28 +218,40 @@ public class BasicCastBuilder: NSObject {
     }
     
     
-    // MARK - Build flash vars json:
+    internal func embedConfig() -> [String:Any]? {
+        
+        var embedConfig: [String:Any] = [:]
+        
+        embedConfig["entryID"] = self.contentId
+        
+        if let lib = self.webPlayerURL {
+          embedConfig["lib"] = lib
+        }
+        
+        if let publisherID = self.partnerID {
+           embedConfig["publisherID"] = publisherID
+        }
+        
+        if let confID = self.uiconfID{
+           embedConfig["uiconfID"] = confID
+        }
+        
+        let flashVars = self.flashVars()
+        embedConfig["flashVars"] = flashVars
+        
+        return embedConfig
+    }
+    
+
     internal func flashVars() -> [String: Any]{
         
         var flashVars = [String:Any]()
-        if let proxyData =  self.proxyData() {
-            PKLog.warning("proxyData is empty")
-            flashVars["proxyData"] = proxyData
-        }
         
         if let doubleClickPlugin = self.doubleClickPlugin() {
-            PKLog.warning("doubleClickPlugin is empty")
             flashVars["doubleClick"] = doubleClickPlugin
-        }
-        
+        }        
         return flashVars
     }
-    
-    internal func proxyData() ->  [String:Any]? {
-        // Can be implemented on sub classes
-        return nil
-    }
-    
     
     internal func doubleClickPlugin() -> [String:Any]? {
         

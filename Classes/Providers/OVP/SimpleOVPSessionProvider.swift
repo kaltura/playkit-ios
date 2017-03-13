@@ -19,7 +19,7 @@ import UIKit
      }
  
  */
-public class SimpleOVPSessionProvider: SessionProvider {
+@objc public class SimpleOVPSessionProvider: NSObject, SessionProvider {
     public let serverURL: String
     public let partnerId: Int64
     public var ks: String?
@@ -37,7 +37,7 @@ public class SimpleOVPSessionProvider: SessionProvider {
         self.ks = ks
     }
     
-    public func loadKS(completion: @escaping (Result<String>) -> Void) {
-        completion(Result(data: ks, error: nil))
+    public func loadKS(completion: @escaping (String?, Error?) -> Void) {
+        completion(ks, nil)
     }
 }

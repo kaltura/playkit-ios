@@ -23,11 +23,13 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
         
         guard let initObj = self.config?.params["initObj"] as? [String: Any] else {
             PKLog.error("send analytics failed due to no initObj data")
+            self.messageBus.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingInitObject))
             return nil
         }
         
-        guard let mediaEntry = self.mediaEntry else {
+        guard let mediaEntry = self.player.mediaEntry else {
             PKLog.error("send analytics failed due to nil mediaEntry")
+            self.messageBus.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingMediaEntry))
             return nil
         }
         

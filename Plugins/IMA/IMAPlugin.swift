@@ -8,17 +8,18 @@
 
 import GoogleInteractiveMediaAds
 
-public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
+extension IMAAdsManager {
     
-    public weak var mediaEntry: MediaEntry?
+    func getAdCuePoints() -> PKAdCuePoints {
+        return PKAdCuePoints(cuePoints: self.adCuePoints as? [TimeInterval] ?? [])
+    }
+}
 
-    private unowned var player: Player
-    private unowned var messageBus: MessageBus
+@objc public class IMAPlugin: BasePlugin, PKPluginWarmUp, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
     
     weak var dataSource: AdsPluginDataSource? {
         didSet {
-            PKLog.trace("data source set")
-            
+            PKLog.debug("data source set")
             self.setupMainView()
         }
     }
@@ -26,15 +27,15 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     weak var pipDelegate: AVPictureInPictureControllerDelegate?
     
     private var contentPlayhead: IMAAVPlayerContentPlayhead?
-    private var manager: IMAAdsManager?
+    private var adsManager: IMAAdsManager?
     private var companionSlot: IMACompanionAdSlot?
     private var renderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
     private static var loader: IMAAdsLoader!
     
     private var pictureInPictureProxy: IMAPictureInPictureProxy?
     private var loadingView: UIView?
-    
-    private var config: AdsConfig?
+    // we must have config error will be thrown otherwise
+    private var config: AdsConfig!
     private var adTagUrl: String?
     private var tagsTimes: [TimeInterval : String]? {
         didSet {
@@ -51,8 +52,19 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     private var timer: Timer?
     
     public var currentTime: TimeInterval {
-        get {
-            return self.currentPlaybackTime
+        return self.currentPlaybackTime
+    }
+    
+    /************************************************************/
+    // MARK: - PKWarmUpProtocol
+    /************************************************************/
+    
+    public static func warmUp() {
+        // load adsLoader in order to make IMA download the needed objects before initializing.
+        // will setup the instance when first player is loaded
+        let imaSettings: IMASettings = IMASettings()
+        if IMAPlugin.loader == nil {
+            IMAPlugin.loader = IMAAdsLoader(settings: imaSettings)
         }
     }
     
@@ -60,10 +72,10 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     // MARK: - PKPlugin
     /************************************************************/
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        self.messageBus = messageBus
-        self.player = player
-        super.init()
+    public override class var pluginName: String { return "IMAPlugin" }
+    
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let adsConfig = pluginConfig as? AdsConfig {
             self.config = adsConfig
             if IMAPlugin.loader == nil {
@@ -79,42 +91,35 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
                 self.tagsTimes = adTagsTimes
                 self.sortedTagsTimes = adTagsTimes.keys.sorted()
             }
+        } else {
+            PKLog.error("missing plugin config")
+            throw PKPluginError.missingPluginConfig(pluginName: IMAPlugin.pluginName)
         }
         
-        var events: [PKEvent.Type] = []
-        events.append(PlayerEvent.ended)
-        self.messageBus.addObserver(self, events: events, block: { (data: Any) -> Void in
+        self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (data: Any) -> Void in
             self.contentComplete()
         })
         
         self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
     
-    public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.trace("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
-        self.mediaEntry = mediaConfig.mediaEntry
-    }
-    
-    public static var pluginName = String(describing: IMAPlugin.self)
-    
-    public func destroy() {
-        PKLog.trace("destroy")
+    public override func destroy() {
+        super.destroy()
         self.destroyManager()
         self.timer?.invalidate()
     }
     
     /************************************************************/
-    // MARK: - Internal
+    // MARK: - PlayerDecoratorProvider
     /************************************************************/
     
     func getPlayerDecorator() -> PlayerDecoratorBase? {
         return AdsEnabledPlayerController(adsPlugin: self)
     }
+    
+    /************************************************************/
+    // MARK: - AdsPlugin
+    /************************************************************/
     
     func requestAds() {
         if self.adTagUrl != nil && self.adTagUrl != "" {
@@ -139,8 +144,9 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
                 self.showLoadingView(true, alpha: 1)
             }
             
-            if let manager = self.manager {
-                manager.initialize(with: self.renderingSettings)
+            if let adsManager = self.adsManager {
+                adsManager.initialize(with: self.renderingSettings)
+                self.notifyAdCuePoints(fromAdsManager: adsManager)
             } else {
                 self.startAdCalled = true
             }
@@ -150,11 +156,11 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     }
     
     func resume() {
-        self.manager?.resume()
+        self.adsManager?.resume()
     }
     
     func pause() {
-        self.manager?.pause()
+        self.adsManager?.pause()
     }
     
     func contentComplete() {
@@ -170,7 +176,6 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         imaSettings.language = config.language
         imaSettings.enableBackgroundPlayback = config.enableBackgroundPlayback
         imaSettings.autoPlayAdBreaks = config.autoPlayAdBreaks
-        
         IMAPlugin.loader = IMAAdsLoader(settings: imaSettings)
     }
 
@@ -229,7 +234,7 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     private func updateAdTag(_ adTag: String, tagTimeKeyForRemove: TimeInterval) {
         self.tagsTimes![tagTimeKeyForRemove] = nil
         self.destroyManager()
-        
+        self.contentComplete()
         self.adTagUrl = adTag
         self.requestAds()
         self.start(showLoadingView: false)
@@ -280,82 +285,54 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
 
         self.player.view?.bringSubview(toFront: self.loadingView!)
     }
-    
-    private func convertToPlayerEvent(_ event: IMAAdEventType) -> AdEvent.Type {
-        switch event {
-        case .AD_BREAK_READY:
-            return AdEvent.adBreakReady
-        case .AD_BREAK_ENDED:
-            return AdEvent.adBreakEnded
-        case .AD_BREAK_STARTED:
-            return AdEvent.adBreakStarted
-        case .ALL_ADS_COMPLETED:
-            return AdEvent.adAllCompleted
-        case .CLICKED:
-            return AdEvent.adClicked
-        case .COMPLETE:
-            return AdEvent.adComplete
-        case .CUEPOINTS_CHANGED:
-            return AdEvent.adCuepointsChanged
-        case .FIRST_QUARTILE:
-            return AdEvent.adFirstQuartile
-        case .LOADED:
-            return AdEvent.adLoaded
-        case .LOG:
-            return AdEvent.adLog
-        case .MIDPOINT:
-            return AdEvent.adMidpoint
-        case .PAUSE:
-            return AdEvent.adPaused
-        case .RESUME:
-            return AdEvent.adResumed
-        case .SKIPPED:
-            return AdEvent.adSkipped
-        case .STARTED:
-            return AdEvent.adStarted
-        case .STREAM_LOADED:
-            return AdEvent.adStreamLoaded
-        case .TAPPED:
-            return AdEvent.adTapped
-        case .THIRD_QUARTILE:
-            return AdEvent.adThirdQuartile
-        }
-    }
 
     private func notify(event: AdEvent) {
         self.delegate?.adsPlugin(self, didReceive: event)
         self.messageBus.post(event)
     }
     
-    private func destroyManager() {
-        self.manager?.destroy()
-        self.manager = nil
+    private func notifyAdCuePoints(fromAdsManager adsManager: IMAAdsManager) {
+        // send ad cue points if exists and request is url type
+        let adCuePoints = adsManager.getAdCuePoints()
+        if self.adTagUrl != nil && adCuePoints.count > 0 {
+            self.notify(event: AdEvent.AdCuePointsUpdate(adCuePoints: adCuePoints))
+        }
     }
     
-    // MARK: AdsLoaderDelegate
+    private func destroyManager() {
+        self.adsManager?.destroy()
+        self.adsManager = nil
+    }
+   
+    /************************************************************/
+    // MARK: - AdsLoaderDelegate
+    /************************************************************/
     
     public func adsLoader(_ loader: IMAAdsLoader!, adsLoadedWith adsLoadedData: IMAAdsLoadedData!) {
         self.loaderFailed = false
         
-        self.manager = adsLoadedData.adsManager
-        self.manager!.delegate = self
+        self.adsManager = adsLoadedData.adsManager
+        adsLoadedData.adsManager.delegate = self
         self.createRenderingSettings()
         
         if self.startAdCalled {
-            self.manager!.initialize(with: self.renderingSettings)
+            self.adsManager!.initialize(with: self.renderingSettings)
+            self.notifyAdCuePoints(fromAdsManager: self.adsManager!)
         }
-        
-        PKLog.trace("ads manager set")
+        PKLog.debug("ads manager set")
     }
     
     public func adsLoader(_ loader: IMAAdsLoader!, failedWith adErrorData: IMAAdLoadingErrorData!) {
         self.loaderFailed = true
         self.showLoadingView(false, alpha: 0)
-        self.delegate?.adsPlugin(self, loaderFailedWith: adErrorData.adError.message)
         PKLog.error(adErrorData.adError.message)
+        self.messageBus.post(AdEvent.Error(nsError: IMAPluginError(adError: adErrorData.adError).asNSError))
+        self.delegate?.adsPlugin(self, loaderFailedWith: adErrorData.adError.message)
     }
     
-    // MARK: AdsManagerDelegate
+    /************************************************************/
+    // MARK: - AdsManagerDelegate
+    /************************************************************/
     
     public func adsManagerAdDidStartBuffering(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(true, alpha: 0.1)
@@ -366,17 +343,19 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
-        let converted = self.convertToPlayerEvent(event.type)
-        
+        PKLog.debug("ads manager event: " + String(describing: event))
         switch event.type {
         case .AD_BREAK_READY:
+            self.notify(event: AdEvent.AdBreakReady())
             let canPlay = self.dataSource?.adsPluginShouldPlayAd(self)
             if canPlay == nil || canPlay == true {
                 adsManager.start()
             }
-            break
         case .LOADED:
-            if adsManager.adCuePoints.count == 0 { //single ad
+            self.notify(event: AdEvent.AdLoaded())
+            // single ad only fires `LOADED` without `AD_BREAK_READY`. 
+            // if we have more than one ad don't handle the event, it will be handled in `AD_BREAK_READY`
+            if adsManager.adCuePoints.count == 0 {
                 let canPlay = self.dataSource?.adsPluginShouldPlayAd(self)
                 if canPlay == nil || canPlay == true {
                     adsManager.start()
@@ -385,34 +364,49 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
                     self.adsManagerDidRequestContentResume(adsManager)
                 }
             }
-            break
-        case .AD_BREAK_STARTED, .STARTED:
+        case .STARTED:
+            if let ad = event.ad {
+                let adInfo = PKAdInfo(ad: ad)
+                self.notify(event: AdEvent.AdInfomation(adInfo: adInfo))
+            }
+            self.notify(event: AdEvent.AdStarted())
             self.showLoadingView(false, alpha: 0)
-            break
-        default:
-            break
+        case .AD_BREAK_STARTED:
+            self.notify(event: AdEvent.AdBreakStarted())
+            self.showLoadingView(false, alpha: 0)
+        case .AD_BREAK_ENDED: self.notify(event: AdEvent.AdBreakEnded())
+        case .ALL_ADS_COMPLETED: self.notify(event: AdEvent.AdAllCompleted())
+        case .CLICKED: self.notify(event: AdEvent.AdClicked())
+        case .COMPLETE: self.notify(event: AdEvent.AdComplete())
+        case .CUEPOINTS_CHANGED: self.notify(event: AdEvent.AdCuePointsUpdate(adCuePoints: adsManager.getAdCuePoints()))
+        case .FIRST_QUARTILE: self.notify(event: AdEvent.AdFirstQuartile())
+        case .LOG: self.notify(event: AdEvent.AdLog())
+        case .MIDPOINT: self.notify(event: AdEvent.AdMidpoint())
+        case .PAUSE: self.notify(event: AdEvent.AdPaused())
+        case .RESUME: self.notify(event: AdEvent.AdResumed())
+        case .SKIPPED: self.notify(event: AdEvent.AdSkipped())
+        case .STREAM_LOADED: self.notify(event: AdEvent.AdStreamLoaded())
+        case .TAPPED: self.notify(event: AdEvent.AdTapped())
+        case .THIRD_QUARTILE: self.notify(event: AdEvent.AdThirdQuartile())
         }
-        
-        let event = converted.init()
-        self.notify(event: event)
-        PKLog.trace("ads manager event: " + String(describing: converted))
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
         self.showLoadingView(false, alpha: 0)
-        self.delegate?.adsPlugin(self, managerFailedWith: error.message)
         PKLog.error(error.message)
+        self.messageBus.post(AdEvent.Error(nsError: IMAPluginError(adError: error).asNSError))
+        self.delegate?.adsPlugin(self, managerFailedWith: error.message)
     }
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
-        self.notify(event: AdEvent.AdDidRequestPause())
         self.isAdPlayback = true
+        self.notify(event: AdEvent.AdDidRequestPause())
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
+        self.isAdPlayback = false
         self.showLoadingView(false, alpha: 0)
         self.notify(event: AdEvent.AdDidRequestResume())
-        self.isAdPlayback = false
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
@@ -422,7 +416,9 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         self.notify(event: AdEvent.AdDidProgressToTime(mediaTime: mediaTime, totalTime: totalTime))
     }
     
-    // MARK: AVPictureInPictureControllerDelegate
+    /************************************************************/
+    // MARK: - AVPictureInPictureControllerDelegate
+    /************************************************************/
     
     @available(iOS 9.0, *)
     public func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
@@ -454,7 +450,9 @@ public class IMAPlugin: NSObject, AVPictureInPictureControllerDelegate, PlayerDe
         self.pipDelegate?.picture?(pictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler: completionHandler)
     }
 
-    // MARK: IMAWebOpenerDelegate
+    /************************************************************/
+    // MARK: - IMAWebOpenerDelegate
+    /************************************************************/
     
     public func webOpenerWillOpenExternalBrowser(_ webOpener: NSObject) {
         self.notify(event: AdEvent.AdWebOpenerWillOpenExternalBrowser(webOpener: webOpener))

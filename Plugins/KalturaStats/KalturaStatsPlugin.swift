@@ -102,7 +102,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                     self.sendMediaLoaded()
                 })
             case let e where e.self == PlayerEvent.ended || e.self == PlayerEvent.pause || e.self == PlayerEvent.seeking:
-                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                self.messageBus.addObserver(self, events: [e.self], block: { (event) in
                     PKLog.debug("\(e.self) event: \(event)")
                 })
             case let e where e.self == PlayerEvent.seeked:
@@ -223,7 +223,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     }
     
     @objc private func timerHit() {
-        var progress = Float(self.player.currentTime) / Float(self.player.duration)
+        let progress = Float(self.player.currentTime) / Float(self.player.duration)
         PKLog.debug("Progress is \(progress)")
         
         if progress >= 0.25 && !playReached25 && seekPercent <= 0.25 {
@@ -284,7 +284,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
             parterId = String(pId)
         }
         
-        guard let mediaEntry = self.mediaEntry else {
+        guard let mediaEntry = self.player.mediaEntry else {
             PKLog.error("send analytics failed due to nil mediaEntry")
             return
         }

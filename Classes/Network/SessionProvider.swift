@@ -8,12 +8,12 @@
 
 import UIKit
 
-public protocol SessionProvider {
+@objc public protocol SessionProvider: class {
     
     var serverURL: String { get }
     var partnerId: Int64 { get }
     
-    func loadKS(completion: @escaping (_ result :Result<String>) -> Void)
+    func loadKS(completion: @escaping (String?, Error?) -> Void)
 }
 
 

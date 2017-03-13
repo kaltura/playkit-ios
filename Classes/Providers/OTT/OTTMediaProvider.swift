@@ -9,16 +9,9 @@
 import UIKit
 import SwiftyJSON
 
-public class OTTMediaProvider: MediaEntryProvider {
+@objc public class OTTMediaProvider: NSObject, MediaEntryProvider {
     
-    
-    var sessionProvider: SessionProvider?
-    var mediaId: String?
-    var type: AssetType?
-    var formats: [String]?
-    var executor: RequestExecutor?
-    
-    public enum Err: Error {
+    public enum OTTMediaProviderError: Error {
         case invalidInputParams
         case invalidKS
         case fileIsEmptyOrNotFound
@@ -28,60 +21,62 @@ public class OTTMediaProvider: MediaEntryProvider {
         case unableToParseObject
     }
     
+    @objc public var sessionProvider: SessionProvider?
+    @objc public var mediaId: String?
+    @objc public var type: AssetType = .unknown
+    @objc public var formats: [String]?
+    public var executor: RequestExecutor? // TODO: make @objc if needed in the future
     
-    public init(){
-        
+    public override init() {}
+    
+    @objc public init(_ sessionProvider: SessionProvider) {
+        self.sessionProvider = sessionProvider
     }
     
     @discardableResult
-    public func set(sessionProvider:SessionProvider?) -> Self {
+    @nonobjc public func set(sessionProvider: SessionProvider?) -> Self {
         self.sessionProvider = sessionProvider
         return self
     }
     
     @discardableResult
-    public func set(mediaId:String?) -> Self {
+    @nonobjc public func set(mediaId:String?) -> Self {
         self.mediaId = mediaId
         return self
     }
     
     @discardableResult
-    public func set(type:AssetType?) -> Self {
+    @nonobjc public func set(type: AssetType) -> Self {
         self.type = type
         return self
     }
     
     @discardableResult
-    public func set(formats:[String]?) -> Self {
+    @nonobjc public func set(formats:[String]?) -> Self {
         self.formats = formats
         return self
     }
     
     @discardableResult
-    public func set(executor:RequestExecutor?) -> Self {
+    @nonobjc public func set(executor:RequestExecutor?) -> Self {
         self.executor = executor
         return self
     }
     
-    
     struct LoaderInfo {
-        
         var sessionProvider: SessionProvider
         var mediaId: String
         var type: AssetType
         var formats: [String]
         var executor: RequestExecutor
-        
     }
     
-    public func loadMedia(callback: @escaping (Result<MediaEntry>) -> Void) {
-        
-        
+    @objc public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
         guard let sessionProvider = self.sessionProvider,
             let mediaId = self.mediaId,
-            let type = self.type
+            self.type != .unknown
             else {
-                callback(Result(data: nil, error: Err.invalidInputParams))
+                callback(nil, OTTMediaProviderError.invalidInputParams)
                 return
         }
         
@@ -99,16 +94,14 @@ public class OTTMediaProvider: MediaEntryProvider {
         self.startLoad(loader: loaderParams, callback: callback)
     }
     
-    
     public func cancel() {
         
     }
-    
-    func startLoad(loader:LoaderInfo,callback: @escaping (Result<MediaEntry>) -> Void) {
-        loader.sessionProvider.loadKS { (r:Result<String>) in
-            
-            guard let ks = r.data else {
-                callback(Result(data: nil, error: Err.invalidKS))
+
+    func startLoad(loader: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) {
+        loader.sessionProvider.loadKS { (ks, error) in
+            guard let ks = ks else {
+                callback(nil, OTTMediaProviderError.invalidKS)
                 return
             }
             
@@ -117,15 +110,15 @@ public class OTTMediaProvider: MediaEntryProvider {
                 .set(completion: { (r:Response) in
                     
                     guard let data = r.data else {
-                        callback(Result(data: nil, error: Err.mediaNotFound))
+                        callback(nil, OTTMediaProviderError.mediaNotFound)
                         return
                     }
                     
                     var object: OTTBaseObject? = nil
                     do {
                         object = try OTTResponseParser.parse(data: data)
-                    }catch{
-                        callback(Result(data: nil, error: error))
+                    } catch {
+                        callback(nil, error)
                     }
                     
                     if let asset = object as? OTTAsset {
@@ -149,19 +142,15 @@ public class OTTMediaProvider: MediaEntryProvider {
                                 mediaEntry.sources = sources
                             }
                         }
-                        
-                        callback(Result(data: mediaEntry, error: nil))
-                    }else{
-                        callback(Result(data: nil, error: Err.mediaNotFound))
+                        callback(mediaEntry, nil)
+                    } else {
+                        callback(nil, OTTMediaProviderError.mediaNotFound)
                     }
-                    
                 })
-            
             if let assetRequest = requestBuilder?.build() {
                 loader.executor.send(request: assetRequest)
             }
         }
-        
     }
 }
 

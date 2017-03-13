@@ -9,7 +9,7 @@
 import UIKit
 
 
-public class USRExecutor: NSObject, RequestExecutor, URLSessionDelegate {
+@objc public class USRExecutor: NSObject, RequestExecutor, URLSessionDelegate {
     
     var tasks: [URLSessionDataTask] = [URLSessionDataTask]()
     var taskIdByRequestID: [String: Int] = [String: Int]()
@@ -21,7 +21,7 @@ public class USRExecutor: NSObject, RequestExecutor, URLSessionDelegate {
     
     public static let shared = USRExecutor()
     
-    public func send(request r:Request){
+    public func send(request r: Request){
         
         var request: URLRequest = URLRequest(url: r.url)
         
@@ -42,7 +42,6 @@ public class USRExecutor: NSObject, RequestExecutor, URLSessionDelegate {
                 request.setValue(headerValue, forHTTPHeaderField: headerKey)
             }
         }
-        
         
         let session: URLSession!
         

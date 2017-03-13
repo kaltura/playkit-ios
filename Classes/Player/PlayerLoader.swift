@@ -22,7 +22,7 @@ class PlayerLoader: PlayerDecoratorBase {
     var loadedPlugins = Dictionary<String, LoadedPlugin>()
     var messageBus = MessageBus()
     
-    func load(pluginConfig: PluginConfig?) {
+    func load(pluginConfig: PluginConfig?) throws {
         var playerController: PlayerController
         
         playerController = PlayerController()
@@ -30,39 +30,33 @@ class PlayerLoader: PlayerDecoratorBase {
             self.messageBus.post(event)
         }
         
-        // TODO::
-        // add event listener on player controller
-        
         var player: Player = playerController
         
         if let pluginConfigs = pluginConfig?.config {
             for pluginName in pluginConfigs.keys {
                 let pluginConfig = pluginConfigs[pluginName]
-                if let pluginObject = PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus) {
-                    // TODO::
-                    // send message bus
-                    var decorator: PlayerDecoratorBase? = nil
-                    
-                    if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
-                        d.setPlayer(player)
-                        decorator = d
-                        player = d
-                    }
-                    
-                    loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
+                let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
+                
+                var decorator: PlayerDecoratorBase? = nil
+                
+                if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
+                    d.setPlayer(player)
+                    decorator = d
+                    player = d
                 }
+                loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
             }
         }
         setPlayer(player)
     }
     
     override func prepare(_ config: MediaConfig) {
+        super.prepare(config)
         // update all loaded plugins with media config
         for (pluginName, loadedPlugin) in loadedPlugins {
             PKLog.trace("Preparing plugin", pluginName)
             loadedPlugin.plugin.onLoad(mediaConfig: config)
         }
-        super.prepare(config)
     }
     
     func destroyPlayer() {

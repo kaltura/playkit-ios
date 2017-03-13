@@ -10,6 +10,48 @@ import YouboraLib
 import YouboraPluginAVPlayer
 import AVFoundation
 
+/************************************************************/
+// MARK: - YouboraPluginError
+/************************************************************/
+
+/// `YouboraPluginError` represents youbora plugin errors.
+enum YouboraPluginError: PKError {
+    
+    case failedToSetupYouboraManager
+    
+    static let domain = "com.kaltura.playkit.error.youbora"
+    
+    var code: Int {
+        switch self {
+        case .failedToSetupYouboraManager: return PKErrorCode.failedToSetupYouboraManager
+        }
+    }
+    
+    var errorDescription: String {
+        switch self {
+        case .failedToSetupYouboraManager: return "failed to setup youbora manager, missing config/config params or mediaEntry"
+        }
+    }
+    
+    var userInfo: [String: Any] {
+        switch self {
+        case .failedToSetupYouboraManager: return [:]
+        }
+    }
+}
+
+extension PKErrorDomain {
+    @objc(Youbora) public static let youbora = YouboraPluginError.domain
+}
+
+extension PKErrorCode {
+    @objc(FailedToSetupYouboraManager) public static let failedToSetupYouboraManager = 2200
+}
+
+/************************************************************/
+// MARK: - YouboraPlugin
+/************************************************************/
+
 public class YouboraPlugin: BaseAnalyticsPlugin {
     
     public override class var pluginName: String {
@@ -21,6 +63,14 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     /************************************************************/
     // MARK: - PKPlugin
     /************************************************************/
+    
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        guard let _ = pluginConfig as? AnalyticsConfig else {
+            PKLog.error("missing plugin config")
+            throw PKPluginError.missingPluginConfig(pluginName: YouboraPlugin.pluginName)
+        }
+    }
     
     public override func onLoad(mediaConfig: MediaConfig) {
         super.onLoad(mediaConfig: mediaConfig)
@@ -123,22 +173,20 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
             case let e where e.self == PlayerEvent.stateChanged:
                 self.messageBus.addObserver(self, events: [e.self]) { [unowned self] (event) in
                     guard let youboraManager = self.youboraManager else { return }
-                    if let stateChanged = event as? PlayerEvent.StateChanged {
-                        switch event.newState {
-                        case .buffering:
-                            youboraManager.bufferingHandler()
-                            self.postEventLogWithMessage(message: "Buffering event: ֿ\(event)")
-                            break
-                        default: break
-                        }
-                        
-                        switch event.oldState {
-                        case .buffering:
-                            youboraManager.bufferedHandler()
-                            self.postEventLogWithMessage(message: "Buffered event: \(event)")
-                            break
-                        default: break
-                        }
+                    switch event.newState {
+                    case .buffering:
+                        youboraManager.bufferingHandler()
+                        self.postEventLogWithMessage(message: "Buffering event: ֿ\(event)")
+                        break
+                    default: break
+                    }
+                    
+                    switch event.oldState {
+                    case .buffering:
+                        youboraManager.bufferedHandler()
+                        self.postEventLogWithMessage(message: "Buffered event: \(event)")
+                        break
+                    default: break
                     }
                 }
             default: assertionFailure("all events must be handled")
@@ -156,17 +204,45 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     /************************************************************/
     
     private func setupYouboraManager(completionHandler: ((_ succeeded: Bool) -> Void)? = nil) {
-        if let config = self.config, var media = config.params["media"] as? [String: Any], let mediaEntry = self.mediaEntry {
+        
+        guard let mediaEntry = self.player.mediaEntry else {
+            PKLog.error("missing MediaEntry, could not setup youbora manager")
+            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
+            completionHandler?(false)
+            return
+        }
+        
+        guard let config = self.config else {
+            PKLog.error("config params doesn't exist, could not setup youbora manager")
+            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
+            completionHandler?(false)
+            return
+        }
+        
+        var options = [String: Any]()
+        
+        // if media exists overwrite using the new info, else create a new media dictionary
+        if var media = config.params["media"] as? [String: Any] {
             media["resource"] = mediaEntry.id
             media["title"] = mediaEntry.id
             media["duration"] = self.player.duration
             config.params["media"] = media
-            youboraManager = YouboraManager(options: config.params as NSObject!, player: player, mediaEntry: mediaEntry)
-            completionHandler?(true)
         } else {
-            PKLog.warning("There is no config params or MediaEntry, could not setup youbora manager")
-            completionHandler?(false)
+            config.params["media"] = [
+                "resource" : mediaEntry.id,
+                "title" : mediaEntry.id,
+                "duration" : mediaEntry.duration
+            ]
         }
+        options = config.params
+        
+        // if youbora manager already created just update options
+        if let youboraManager = self.youboraManager {
+            youboraManager.setOptions(options as NSObject!)
+        } else {
+            self.youboraManager = YouboraManager(options: options as NSObject!, player: player, mediaEntry: mediaEntry)
+        }
+        completionHandler?(true)
     }
     
     private func startMonitoring(player: Player) {

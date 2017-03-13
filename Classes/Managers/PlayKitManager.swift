@@ -13,7 +13,7 @@ import UIKit
   - creating `Player` objects.
   - creating and registering plugins.
  */
-public class PlayKitManager: NSObject {
+@objc public class PlayKitManager: NSObject {
 
     // private init to prevent initializing this singleton
     private override init() {
@@ -22,10 +22,9 @@ public class PlayKitManager: NSObject {
         }
     }
     
-    public static let versionString: String = Bundle(for: PlayKitManager.self)
-        .object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    @objc public static let versionString: String = Bundle(for: PlayKitManager.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
-    public static let clientTag = "playkit/ios-\(versionString)"
+    @objc public static let clientTag = "playkit/ios-\(versionString)"
     
     @objc(sharedInstance) public static let shared: PlayKitManager = PlayKitManager()
     
@@ -42,25 +41,25 @@ public class PlayKitManager: NSObject {
     ///
     /// - Parameter config: The configuration object to load the player with.
     /// - Returns: A player loaded using the provided configuration.
-    public func loadPlayer(pluginConfig: PluginConfig?) -> Player {
+    @objc public func loadPlayer(pluginConfig: PluginConfig?) throws -> Player {
         let loader = PlayerLoader()
-        loader.load(pluginConfig: pluginConfig)
+        try loader.load(pluginConfig: pluginConfig)
         return loader
     }
     
-    public func registerPlugin(_ pluginClass: Plugin.Type) {
-        guard let pluginType = pluginClass as? PKPlugin.Type else {
-            fatalError("plugin class must be of type PKPlugin")
+    @objc public func registerPlugin(_ pluginClass: BasePlugin.Type) {
+        if let pluginWarmUp = pluginClass as? PKPluginWarmUp.Type {
+            pluginWarmUp.warmUp()
         }
-        pluginRegistry[pluginType.pluginName] = pluginType
+        pluginRegistry[pluginClass.pluginName] = pluginClass
     }
     
-    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) -> PKPlugin? {
-        let pluginClass = pluginRegistry[name]
-        guard pluginClass != nil else {
-            return nil
+    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) throws -> PKPlugin {
+        guard let pluginClass = pluginRegistry[name] else {
+            PKLog.error("plugin with name: \(name) doesn't exist in pluginRegistry")
+            throw PKPluginError.failedToCreatePlugin(pluginName: name).asNSError
         }
-        return pluginClass?.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        return try pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
     }
     
     /// sets the logging level for our logger.

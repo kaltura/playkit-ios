@@ -8,9 +8,10 @@
 
 import UIKit
 
-public protocol RequestExecutor{
+// TODO: make @objc if needed in the future
+public protocol RequestExecutor {
     
-    func send(request:Request)
-    func cancel(request:Request)
+    func send(request: Request)
+    func cancel(request: Request)
     func clean()
 }

@@ -18,13 +18,16 @@ class AssetBuilder {
         self.mediaEntry = mediaEntry
     }
 
-    public func getPreferredMediaSource() -> (MediaSource, AssetHandler.Type)? {
+    func getPreferredMediaSource() -> (MediaSource, AssetHandler.Type)? {
         
-        guard let sources = mediaEntry.sources else {return nil}
+        guard let sources = mediaEntry.sources else {
+            PKLog.error("no media sources in mediaEntry!")
+            return nil
+        }
         
         let defaultHandler = DefaultAssetHandler.self
         
-        // Preference: Local, HLS, FPS*, MP4, WVM*
+        // Preference: Local, HLS, FPS*, MP4, WVM*, MP3
         
         if let source = sources.first(where: {$0 is LocalMediaSource}) {
             if source.fileExt == "wvm" {
@@ -52,6 +55,11 @@ class AssetBuilder {
             return (source, DRMSupport.widevineClassicHandler!)
         }
         
+        if let source = sources.first(where: {$0.fileExt=="mp3"}) {
+            return (source, defaultHandler)
+        }
+        
+        PKLog.error("no playable media sources!")
         return nil
     }
 
@@ -73,6 +81,11 @@ class AssetBuilder {
 protocol AssetHandler {
     init()
     func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?)->Void)
+}
+
+protocol RefreshableAssetHandler: AssetHandler {
+    func shouldRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping (Bool)->Void)
+    func refreshAsset(mediaSource: MediaSource)
 }
 
 enum AssetError : Error {

@@ -13,12 +13,13 @@ private struct Observation {
     let block: (PKEvent)->Void
 }
 
-public class MessageBus: NSObject {
+@objc public class MessageBus: NSObject {
     private var observations = [String: [Observation]]()
     private let lock: AnyObject = UUID().uuidString as AnyObject
     
-    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void) {
+    @objc public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void) {
         sync {
+            PKLog.debug("Add observer: \(observer) for events: \(events)")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
                 var array: [Observation]? = observations[typeId]
@@ -33,30 +34,31 @@ public class MessageBus: NSObject {
         }
     }
     
-    public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
+    @objc public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         sync {
+            PKLog.debug("Remove observer: \(observer) for events: \(events)")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
                 
                 if let array = observations[typeId] {
                     observations[typeId] = array.filter { $0.observer! !== observer }
                 } else {
-                    print("removeObserver:: array is empty")
+                    PKLog.debug("removeObserver:: array is empty")
                 }
             }
         }
     }
     
-    public func post(_ event: PKEvent) {
+    @objc public func post(_ event: PKEvent) {
         DispatchQueue.main.async { [weak self] in
-            let typeId = NSStringFromClass(type(of:event))
-            // TODO: remove nil observers
+            PKLog.info("Post event: \(event)")
+            let typeId = NSStringFromClass(type(of: event))
+            
             if let array = self?.observations[typeId] {
-                array.forEach {
-                    if $0.self.observer != nil {
-                        $0.block(event)
-                    }
-                }
+                // remove nil observers replace current observations with new ones, and call block with the event
+                let newObservations = array.filter { $0.observer != nil }
+                self?.observations[typeId] = newObservations
+                newObservations.forEach { $0.block(event) }
             }
         }
     }
