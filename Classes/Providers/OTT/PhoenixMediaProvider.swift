@@ -9,22 +9,49 @@
 import UIKit
 import SwiftyJSON
 
+public enum PhoenixMediaProviderError: PKError {
+    
+
+    case invalidInputParam(param: String)
+    case unableToParseData(data: Any)
+    case noSourcesFound
+    case serverError(info:String)
+    
+    static let domain = "com.kaltura.playkit.error.PhoenixMediaProvider"
+    
+    static let ValueKey = "ValueKey"
+    
+    var code: Int {
+        switch self {
+        case .invalidInputParam: return 0
+        case .unableToParseData: return 1
+        case .noSourcesFound: return 2
+        case .serverError: return 3
+        }
+    }
+    
+    var errorDescription: String {
+    
+        switch self {
+        case .invalidInputParam(let param): return "Invalid input param: \(param)"
+        case .unableToParseData(let data): return "Unable to parse object"
+        case .noSourcesFound: return "No source found to play content"
+        case .serverError(let info): return "Server Error: \(info)"
+        }
+    }
+    
+    var userInfo: [String: Any] {
+        return [String:Any]()
+    }
+    
+}
 
 
 let defaultProtocl = "https"
 
 @objc public class PhoenixMediaProvider: NSObject, MediaEntryProvider {
     
-    public enum PhoenixMediaProviderError: Error {
-        case invalidInputParams
-        case invalidKS
-        case fileIsEmptyOrNotFound
-        case invalidJSON
-        case mediaNotFound
-        case currentlyProcessingOtherRequest
-        case unableToParseObject
-        case noSourcesFound
-    }
+    
     
     var sessionProvider: SessionProvider?
     var assetId: String?
@@ -101,13 +128,21 @@ let defaultProtocl = "https"
     }
     
     @objc public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
-        guard let sessionProvider = self.sessionProvider,
-            let assetId = self.assetId,
-            let type = self.type,
-            let contextType = self.playbackContextType
-            else {
-                callback(nil, PhoenixMediaProviderError.invalidInputParams)
-                return
+        guard let sessionProvider = self.sessionProvider else {
+            callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "sessionProvider" ).asNSError )
+            return
+        }
+        guard let assetId = self.assetId else {
+            callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "assetId" ).asNSError)
+            return
+        }
+        guard let type = self.type else {
+            callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "type" ).asNSError)
+            return
+        }
+        guard let contextType = self.playbackContextType else {
+            callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "contextType" ).asNSError)
+            return
         }
         
         let pr = self.networkProtocol ?? defaultProtocl
@@ -160,7 +195,7 @@ let defaultProtocl = "https"
         loaderInfo.sessionProvider.loadKS { (ks, error) in
             
             guard let requestBuilder: KalturaRequestBuilder =  self.loaderRequestBuilder( ks: ks, loaderInfo: loaderInfo) else {
-                callback(nil, PhoenixMediaProviderError.invalidInputParams)
+                callback(nil, PhoenixMediaProviderError.invalidInputParam(param:"requests params"))
                 return
             }
             
@@ -168,26 +203,30 @@ let defaultProtocl = "https"
             
             let request = requestBuilder.set(completion: { (response:Response) in
                 
-                var playbackContext: OTTPlaybackContext? = nil
+                var playbackContext: OTTBaseObject? = nil
                 do {
                     if (isMultiRequest){
-                        playbackContext =  try OTTMultiResponseParser.parse(data: response.data).last as? OTTPlaybackContext
+                        playbackContext =  try OTTMultiResponseParser.parse(data: response.data).last
                     } else{
-                        playbackContext =  try OTTResponseParser.parse(data: response.data) as? OTTPlaybackContext
+                        playbackContext =  try OTTResponseParser.parse(data: response.data)
                     }
                     
                 }catch {
-                    callback(nil, PhoenixMediaProviderError.unableToParseObject)
+                    callback(nil, PhoenixMediaProviderError.unableToParseData(data:response.data).asNSError)
                 }
                 
-                if let context = playbackContext {
+                if let context = playbackContext as? OTTPlaybackContext {
                     let media = self.createMediaEntry(loaderInfo: loaderInfo, context: context)
                     if let sources = media.sources, sources.count > 0 {
                        callback(media, nil)
                     }else{
-                        callback(nil, PhoenixMediaProviderError.noSourcesFound)
+                        callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                     }
-                    
+                } else if let error = playbackContext as? OTTError{
+                        callback(nil, PhoenixMediaProviderError.serverError(info: error.message ?? "Unknown Error").asNSError)
+                }
+                else{
+                        callback(nil, PhoenixMediaProviderError.unableToParseData(data: response.data).asNSError)
                 }
             }).build()
             
