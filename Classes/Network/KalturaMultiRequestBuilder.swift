@@ -33,55 +33,46 @@ class KalturaMultiRequestBuilder: KalturaRequestBuilder {
     
     func kalturaMultiRequestData() -> Data? {
         
-        
         if self.jsonBody == nil {
-            self.jsonBody = JSON([String:Any]())
+            self.jsonBody = JSON([String: Any]())
         }
         
         for (index, request)  in self.requests.enumerated() {
-            if let body = request.jsonBody{
+            if let body = request.jsonBody {
                 var singleRequestBody: JSON = body
-                singleRequestBody["action"] = JSON(request.action)
-                singleRequestBody["service"] =  JSON(request.service)
+                singleRequestBody["action"] = JSON(request.action ?? "")
+                singleRequestBody["service"] =  JSON(request.service ?? "")
                 self.jsonBody?[String(index+1)] = singleRequestBody
             }
         }
-        
         
         let prefix = "{"
         let suffix = "}"
         var data = prefix.data(using: String.Encoding.utf8)
         
-        
         for  index in 1...self.requests.count {
-            
-                let requestBody = self.jsonBody?[String(index)].rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-                let requestBodyData = requestBody?.data(using: String.Encoding.utf8)
-                data?.append("\"\(index)\":".data(using: String.Encoding.utf8)!)
-                data?.append(requestBodyData!)
-                data?.append(",".data(using: String.Encoding.utf8)!)
-                _ = self.jsonBody?.dictionaryObject?.removeValue(forKey: String(index))
+            let requestBody = self.jsonBody?[String(index)].rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            let requestBodyData = requestBody?.data(using: String.Encoding.utf8)
+            data?.append("\"\(index)\":".data(using: String.Encoding.utf8)!)
+            data?.append(requestBodyData!)
+            data?.append(",".data(using: String.Encoding.utf8)!)
+            _ = self.jsonBody?.dictionaryObject?.removeValue(forKey: String(index))
         }
         
-            if let jsonBody = self.jsonBody{
-                let remainingJsonAsString: String? = jsonBody.rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())
-                if let jsonString = remainingJsonAsString{
-                    var jsonWithoutLastChar = String(jsonString.characters.dropLast())
-                    
-                        jsonWithoutLastChar = String(jsonWithoutLastChar.characters.dropFirst())
-                        data?.append((jsonWithoutLastChar.data(using: String.Encoding.utf8))!)
-                    
-                    
-                }
+        if let jsonBody = self.jsonBody{
+            let remainingJsonAsString: String? = jsonBody.rawString(String.Encoding.utf8, options: JSONSerialization.WritingOptions())
+            if let jsonString = remainingJsonAsString{
+                var jsonWithoutLastChar = String(jsonString.characters.dropLast())
+                
+                jsonWithoutLastChar = String(jsonWithoutLastChar.characters.dropFirst())
+                data?.append((jsonWithoutLastChar.data(using: String.Encoding.utf8))!)
             }
+        }
         
         data?.append(suffix.data(using: String.Encoding.utf8)!)
         
         return data
-        
     }
-    
-    
 }
 
 

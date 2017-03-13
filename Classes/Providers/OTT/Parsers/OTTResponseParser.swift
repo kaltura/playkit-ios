@@ -21,10 +21,10 @@ class OTTResponseParser: ResponseParser {
         let jsonResponse = JSON(data)
         let resultObjectJSON = jsonResponse["result"].dictionaryObject
         let objectType: OTTBaseObject.Type? = OTTObjectMapper.classByJsonObject(json: resultObjectJSON)
-        if let type = objectType{
-            if let object = type.init(json: resultObjectJSON) {
+        if let type = objectType, let resultJSON = resultObjectJSON {
+            if let object = type.init(json: resultJSON) {
                 return object
-            }else{
+            } else {
               throw OTTResponseParserError.invalidJsonObject
             }
         }else{
