@@ -63,7 +63,7 @@ import UIKit
     }
     
     /// sets the logging level for our logger.
-    @objc public var logLevel: PKLogLevel = .debug {
+    @objc(LogLevel) public static var logLevel: PKLogLevel = .debug {
         didSet {
             PKLog.minLevel = logLevel.toLoggerLevel
         }
