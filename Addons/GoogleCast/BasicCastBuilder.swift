@@ -28,13 +28,13 @@ import GoogleCast
         case missingStreamType
     }
    
-    internal var contentId: String!
-    internal var webPlayerURL: String?
-    internal var partnerID: String?
-    internal var uiconfID: String?
-    internal var adTagURL: String?
-    internal var streamType: GCKMediaStreamType!
-    internal var metaData: GCKMediaMetadata?
+    @objc public var contentId: String!
+    @objc public var webPlayerURL: String?
+    @objc public var partnerID: String?
+    @objc public var uiconfID: String?
+    @objc public var adTagURL: String?
+    @objc public var streamType = GCKMediaStreamType.none
+    @objc public var metaData: GCKMediaMetadata?
     
 
     /**
@@ -42,14 +42,13 @@ import GoogleCast
      - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
      */
     @discardableResult
-    @objc public func set(streamType: StreamType) -> Self{
+    @nonobjc public func set(streamType: StreamType) -> Self{
         
         switch streamType {
-        case .live :
+        case .live:
             self.streamType = .live
-        default:
+        case .vod:
             self.streamType = .buffered
-            
         }
         return self
     }
@@ -59,7 +58,7 @@ import GoogleCast
      - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
      */
     @discardableResult
-    @objc public func set(contentId: String?) -> Self{
+    @nonobjc public func set(contentId: String?) -> Self{
         
         guard contentId != nil,
             contentId?.isEmpty == false
@@ -77,7 +76,7 @@ import GoogleCast
      - Parameter adTagURL: that advertisments url to play
      */
     @discardableResult
-    @objc public func set(adTagURL: String?) -> Self {
+    @nonobjc public func set(adTagURL: String?) -> Self {
         
         guard adTagURL != nil,
             adTagURL?.isEmpty == false
@@ -95,7 +94,7 @@ import GoogleCast
      - Parameter webPlayerURL: the location of the web player the receiver will use to play content
      */
     @discardableResult
-    @objc public func set(webPlayerURL: String?) -> Self {
+    @nonobjc public func set(webPlayerURL: String?) -> Self {
         
         guard webPlayerURL != nil,
             webPlayerURL?.isEmpty == false
@@ -115,7 +114,7 @@ import GoogleCast
      - Parameter partnerID: the client partner id
      */
     @discardableResult
-    @objc public func set(partnerID: String?) -> Self {
+    @nonobjc public func set(partnerID: String?) -> Self {
         
         guard partnerID != nil,
             partnerID?.isEmpty == false
@@ -133,7 +132,7 @@ import GoogleCast
      - Parameter uiconfID: the receiver uiconf id thet has the configuration for the layout and plugins
      */
     @discardableResult
-    @objc public func set(uiconfID: String?) -> Self {
+    @nonobjc public func set(uiconfID: String?) -> Self {
         
         guard uiconfID != nil,
             uiconfID?.isEmpty == false
@@ -152,7 +151,7 @@ import GoogleCast
      - Parameter metaData: the receiver google meta data
      */
     @discardableResult
-    @objc public func set(metaData: GCKMediaMetadata?) -> Self{
+    @nonobjc public func set(metaData: GCKMediaMetadata?) -> Self{
         
         guard metaData != nil
             else {
