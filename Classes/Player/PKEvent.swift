@@ -69,34 +69,4 @@ extension PKEvent {
     @objc public var error: NSError? {
         return self.data?[EventDataKeys.Error] as? NSError
     }
-    
-    // MARK: - Ad Data Keys
-    struct AdEventDataKeys {
-        static let MediaTime = "mediaTime"
-        static let TotalTime = "totalTime"
-        static let WebOpener = "webOpener"
-        static let Error = "error"
-    }
-    
-    // MARK: Ad Data Accessors
-    
-    /// MediaTime, PKEvent Ad Data Accessor
-    @objc public var mediaTime: NSNumber? {
-        return self.data?[AdEventDataKeys.MediaTime] as? NSNumber
-    }
-    
-    /// TotalTime, PKEvent Ad Data Accessor
-    @objc public var totalTime: NSNumber? {
-        return self.data?[AdEventDataKeys.TotalTime] as? NSNumber
-    }
-    
-    /// WebOpener, PKEvent Ad Data Accessor
-    @objc public var webOpener: NSObject? {
-        return self.data?[AdEventDataKeys.WebOpener] as? NSObject
-    }
-    
-    /// Associated error from error event, PKEvent Ad Data Accessor
-    @objc public var adError: NSError? {
-        return self.data?[AdEventDataKeys.Error] as? NSError
-    }
 }
