@@ -61,4 +61,11 @@ import UIKit
         }
         return try pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
     }
+    
+    /// sets the logging level for our logger.
+    @objc public static var logLevel: PKLogLevel = .debug {
+        didSet {
+            PKLog.minLevel = logLevel.toLoggerLevel
+        }
+    }
 }
