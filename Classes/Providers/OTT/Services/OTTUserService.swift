@@ -12,25 +12,26 @@ import SwiftyJSON
 public class OTTUserService: NSObject {
 
     
-    internal static func login(baseURL:String,partnerId:Int64,username:String,password:String) -> KalturaRequestBuilder? {
+    internal static func login(baseURL:String,partnerId:Int64,username:String,password:String,udid:String ) -> KalturaRequestBuilder? {
         
         if let request = KalturaRequestBuilder(url: baseURL, service: "ottUser", action: "login") {
                 request
                     .setBody(key: "username", value: JSON(username))
                     .setBody(key: "password", value: JSON(password))
                     .setBody(key: "partnerId", value: JSON(NSNumber.init(value: partnerId)))
-            
+                    .setBody(key: "udid", value : JSON(udid))
                 return request
         }else{
             return nil
         }
     }
     
-    internal static func refreshSession(baseURL:String,refreshToken:String,ks:String) -> KalturaRequestBuilder? {
+    internal static func refreshSession(baseURL:String,refreshToken:String,ks:String, udid: String) -> KalturaRequestBuilder? {
         if let request = KalturaRequestBuilder(url: baseURL, service: "ottUser", action: "refreshSession") {
             request
                 .setBody(key: "refreshToken", value: JSON(refreshToken))
                 .setBody(key: "ks", value: JSON(ks))
+                .setBody(key: "udid", value: JSON(udid))
             return request
         } else {
             return nil
@@ -47,5 +48,7 @@ public class OTTUserService: NSObject {
         }
         
     }
+    
+    
 
 }
