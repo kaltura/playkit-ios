@@ -15,7 +15,7 @@ import SwiftyXMLParser
     struct LoaderInfo {
         var sessionProvider: SessionProvider
         var entryId: String
-        var uiconfId: Int64?
+        var uiconfId: NSNumber?
         var executor: RequestExecutor
         var apiServerURL: String {
             return self.sessionProvider.serverURL + "/api_v3"
@@ -30,10 +30,10 @@ import SwiftyXMLParser
         case currentlyProcessingOtherRequest
     }
     
-    private var sessionProvider: SessionProvider?
-    private var entryId: String?
-    private var executor: RequestExecutor?
-    private var uiconfId: Int64?
+    @objc public var sessionProvider: SessionProvider?
+    @objc public var entryId: String?
+    @objc public var uiconfId: NSNumber?
+    public var executor: RequestExecutor? // TODO: make @objc if needed in the future
     
     public override init() {}
     
@@ -63,7 +63,7 @@ import SwiftyXMLParser
      executor - which resposible for the network, it can be set to
      */
     @discardableResult
-    @nonobjc public func set( executor: RequestExecutor?) -> Self {
+    @nonobjc public func set(executor: RequestExecutor?) -> Self {
         self.executor = executor
         return self
     }
@@ -72,7 +72,7 @@ import SwiftyXMLParser
      uiconfId - UI Configuration id
      */
     @discardableResult
-    @nonobjc public func set(uiconfId: Int64?) -> Self{
+    @nonobjc public func set(uiconfId: NSNumber?) -> Self{
         self.uiconfId = uiconfId
         return self
     }
@@ -99,7 +99,7 @@ import SwiftyXMLParser
         self.startLoading(loadInfo: loaderInfo, callback: callback)
     }
     
-    func startLoading(loadInfo:LoaderInfo,callback: @escaping (MediaEntry?, Error?) -> Void) -> Void {
+    func startLoading(loadInfo: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) -> Void {
         
         loadInfo.sessionProvider.loadKS { (resKS, error) in
             
@@ -109,7 +109,7 @@ import SwiftyXMLParser
             // checking if we got ks from the session, otherwise we should work as anonymous
             if let data = resKS, data.isEmpty == false {
                 ks = data
-            } else{
+            } else {
                 // Adding "startWidgetSession" request in case we don't have ks
                 let loginRequestBuilder = OVPSessionService.startWidgetSession(baseURL: loadInfo.apiServerURL,
                                                                                partnerId: loadInfo.sessionProvider.partnerId)
@@ -150,7 +150,13 @@ import SwiftyXMLParser
                 .add(request: req3)
                 .set(completion: { (dataResponse: Response) in
                     
-                    let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: dataResponse.data)
+                    guard let data = dataResponse.data else {
+                        PKLog.debug("didn't get response data")
+                        callback(nil, OVPMediaProviderError.invalidResponse)
+                        return
+                    }
+                    
+                    let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: data)
                     
                     // At leat we need to get response of Entry and Playback, on anonymous we will have additional startWidgetSession call
                     guard responses.count >= 2 else {
@@ -192,7 +198,7 @@ import SwiftyXMLParser
                             }
                         }
 
-                        var playURL: URL? = self.playbackURL(loadInfo: loadInfo, source: source, ks: ksForURL)
+                        let playURL: URL? = self.playbackURL(loadInfo: loadInfo, source: source, ks: ksForURL)
                         guard let url = playURL else {
                             PKLog.error("failed to create play url from source, discarding source:\(entry.id),\(source.deliveryProfileId), \(source.format)")
                             return
@@ -201,7 +207,7 @@ import SwiftyXMLParser
                         let drmData = self.buildDRMParams(drm: source.drm)
                         
                         //creating media source with the above data
-                        let mediaSource: MediaSource = MediaSource(id: entry.id + "_" + String(source.deliveryProfileId))
+                        let mediaSource: MediaSource = MediaSource(id: "\(entry.id)_\(String(source.deliveryProfileId))")
                         mediaSource.drmData = drmData
                         mediaSource.contentUrl = url
                         mediaSource.mediaFormat = format
@@ -292,7 +298,7 @@ import SwiftyXMLParser
                 .set(baseURL: loadInfo.sessionProvider.serverURL)
                 .set(format: source.format)
                 .set(entryId: loadInfo.entryId)
-                .set(uiconfId: loadInfo.uiconfId)
+                .set(uiconfId: loadInfo.uiconfId?.int64Value)
                 .set(flavors: source.flavors)
                 .set(partnerId: loadInfo.sessionProvider.partnerId)
                 .set(playSessionId: UUID().uuidString)

@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-internal class OTTAsset: OTTBaseObject{
+internal class OTTAsset: OTTBaseObject {
 
     internal var id: String 
     internal var files: [OTTFile]?
