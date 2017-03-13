@@ -9,17 +9,13 @@
 import UIKit
 import GoogleCast
 
-
-
 /**
  
  TVPAPICastBuilder this component will help you to comunicate with Kaltura-custom-receiver.
  
  */
-public class BasicCastBuilder: NSObject {
-    
-    
-    public enum StreamType {
+@objc public class BasicCastBuilder: NSObject {
+    @objc public enum StreamType: Int {
         case live
         case vod
     }
@@ -31,7 +27,6 @@ public class BasicCastBuilder: NSObject {
         case missingUIConfId
         case missingStreamType
     }
-    
    
     internal var contentId: String!
     internal var webPlayerURL: String?
@@ -47,10 +42,10 @@ public class BasicCastBuilder: NSObject {
      - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
      */
     @discardableResult
-    public func set(streamType: StreamType?) -> Self{
+    @objc public func set(streamType: StreamType) -> Self{
         
         switch streamType {
-        case .live? :
+        case .live :
             self.streamType = .live
         default:
             self.streamType = .buffered
@@ -64,7 +59,7 @@ public class BasicCastBuilder: NSObject {
      - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
      */
     @discardableResult
-    public func set(contentId: String?) -> Self{
+    @objc public func set(contentId: String?) -> Self{
         
         guard contentId != nil,
             contentId?.isEmpty == false
@@ -82,7 +77,7 @@ public class BasicCastBuilder: NSObject {
      - Parameter adTagURL: that advertisments url to play
      */
     @discardableResult
-    public func set(adTagURL: String?) -> Self {
+    @objc public func set(adTagURL: String?) -> Self {
         
         guard adTagURL != nil,
             adTagURL?.isEmpty == false
@@ -100,7 +95,7 @@ public class BasicCastBuilder: NSObject {
      - Parameter webPlayerURL: the location of the web player the receiver will use to play content
      */
     @discardableResult
-    public func set(webPlayerURL: String?) -> Self {
+    @objc public func set(webPlayerURL: String?) -> Self {
         
         guard webPlayerURL != nil,
             webPlayerURL?.isEmpty == false
@@ -120,7 +115,7 @@ public class BasicCastBuilder: NSObject {
      - Parameter partnerID: the client partner id
      */
     @discardableResult
-    public func set(partnerID: String?) -> Self {
+    @objc public func set(partnerID: String?) -> Self {
         
         guard partnerID != nil,
             partnerID?.isEmpty == false
@@ -138,7 +133,7 @@ public class BasicCastBuilder: NSObject {
      - Parameter uiconfID: the receiver uiconf id thet has the configuration for the layout and plugins
      */
     @discardableResult
-    public func set(uiconfID: String?) -> Self {
+    @objc public func set(uiconfID: String?) -> Self {
         
         guard uiconfID != nil,
             uiconfID?.isEmpty == false
@@ -157,7 +152,7 @@ public class BasicCastBuilder: NSObject {
      - Parameter metaData: the receiver google meta data
      */
     @discardableResult
-    public func set(metaData: GCKMediaMetadata?) -> Self{
+    @objc public func set(metaData: GCKMediaMetadata?) -> Self{
         
         guard metaData != nil
             else {
@@ -186,7 +181,7 @@ public class BasicCastBuilder: NSObject {
     /**
      Build GCKMediaInformation a google-cast-sdk object to send through the load google-API 
      */
-    public func build() throws -> GCKMediaInformation {
+    @objc public func build() throws -> GCKMediaInformation {
         
         try self.validate()
         let customData = self.customData()
@@ -264,14 +259,3 @@ public class BasicCastBuilder: NSObject {
         return plugin
     }
 }
-
-
-
-
-
-
-
-
-
-
-
