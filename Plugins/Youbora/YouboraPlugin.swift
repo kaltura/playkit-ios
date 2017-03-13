@@ -173,22 +173,20 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
             case let e where e.self == PlayerEvent.stateChanged:
                 self.messageBus.addObserver(self, events: [e.self]) { [unowned self] (event) in
                     guard let youboraManager = self.youboraManager else { return }
-                    if let stateChanged = event as? PlayerEvent.StateChanged {
-                        switch event.newState {
-                        case .buffering:
-                            youboraManager.bufferingHandler()
-                            self.postEventLogWithMessage(message: "Buffering event: ֿ\(event)")
-                            break
-                        default: break
-                        }
-                        
-                        switch event.oldState {
-                        case .buffering:
-                            youboraManager.bufferedHandler()
-                            self.postEventLogWithMessage(message: "Buffered event: \(event)")
-                            break
-                        default: break
-                        }
+                    switch event.newState {
+                    case .buffering:
+                        youboraManager.bufferingHandler()
+                        self.postEventLogWithMessage(message: "Buffering event: ֿ\(event)")
+                        break
+                    default: break
+                    }
+                    
+                    switch event.oldState {
+                    case .buffering:
+                        youboraManager.bufferedHandler()
+                        self.postEventLogWithMessage(message: "Buffered event: \(event)")
+                        break
+                    default: break
                     }
                 }
             default: assertionFailure("all events must be handled")
