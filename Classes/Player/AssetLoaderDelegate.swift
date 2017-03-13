@@ -114,7 +114,7 @@ class AssetLoaderDelegate: NSObject {
         
         PKLog.debug("Sending SPC to server");
         let startTime: Double = Date.timeIntervalSinceReferenceDate
-        var dataTask = URLSession.shared.dataTask(with: request, completionHandler: {(data: Data?, response: URLResponse?, error: Error?) -> Void in
+        let dataTask = URLSession.shared.dataTask(with: request, completionHandler: {(data: Data?, response: URLResponse?, error: Error?) -> Void in
             do {
                 let endTime: Double = Date.timeIntervalSinceReferenceDate
                 PKLog.debug("Got response in \(endTime-startTime) sec")
@@ -248,11 +248,11 @@ class AssetLoaderDelegate: NSObject {
          content key, it will honor the type of rental or lease specified when the key is used.
          */
         
-        performCKCRequest(spcData) {(result: Result<Data>) -> Void in
+        performCKCRequest(spcData) { result in
             if let ckcData = result.data {
                 self.handleCKCData(resourceLoadingRequest, assetIDString, ckcData)
             } else {
-                PKLog.error("Error occured while loading FairPlay license:", result.error)
+                PKLog.error("Error occured while loading FairPlay license:", result.error ?? "")
             }
         }
         

@@ -37,4 +37,3 @@ import Foundation
         PKLog.info("destroying plugin \(type(of:self))")
     }
 }
-

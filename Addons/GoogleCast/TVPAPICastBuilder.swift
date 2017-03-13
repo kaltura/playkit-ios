@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 /**
  
  TVPAPICastBuilder this component will help you to comunicate with Kaltura-custom-receiver with TVPAPI Server.
@@ -16,22 +15,20 @@ import UIKit
  */
 public class TVPAPICastBuilder: BasicCastBuilder {
     
-    
     enum BasicBuilderDataError: Error {
         case missingInitObject
         case missingFormat
     }
 
-    internal var initObject: [String:Any]!
+    internal var initObject: [String: Any]!
     internal var format: String!
-    
  
     /**
      Set - initObject
      - Parameter initObject: that the receiver will use to represent the user
      */
     @discardableResult
-    public func set(initObject: [String:Any]?) -> Self {
+    public func set(initObject: [String: Any]?) -> Self {
         
         guard initObject != nil
             else {
@@ -62,7 +59,6 @@ public class TVPAPICastBuilder: BasicCastBuilder {
     
     
     /**
-     
       In order to comunicate with Kaltura receiver you should have init object and format this will throw exception if the input is not valid
      */
     override func validate() throws {
@@ -79,7 +75,6 @@ public class TVPAPICastBuilder: BasicCastBuilder {
         
     }
     
-    
     internal override func flashVars() -> [String: Any] {
         
         var flashVars = super.flashVars()
@@ -91,25 +86,22 @@ public class TVPAPICastBuilder: BasicCastBuilder {
         return flashVars
     }
     
-    
-    
     /**
         Adding the data relevent for the OTT
      */
-    internal func proxyData() -> [String:Any]? {
+    internal func proxyData() -> [String: Any]? {
         
-        let flavorAssets = ["filters":["include":["Format":[self.format!]]]]
-        var config : [String : Any] = ["flavorassets":flavorAssets]
+        let flavorAssets = ["filters": ["include": ["Format": [self.format!]]]]
+        let config: [String: Any] = ["flavorassets": flavorAssets]
         
-        var proxyData = ["MediaID":self.contentId!,
-                         "iMediaID":self.contentId!,
-                         "mediaType":0,
-                         "withDynamic":false] as [String : Any]
+        var proxyData = ["MediaID": self.contentId!,
+                         "iMediaID": self.contentId!,
+                         "mediaType": 0,
+                         "withDynamic": false] as [String: Any]
         
         proxyData["config"] = config
         proxyData["initObj"] = self.initObject!
         return proxyData
-
     }
 }
 

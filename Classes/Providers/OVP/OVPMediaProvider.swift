@@ -99,7 +99,7 @@ import SwiftyXMLParser
         self.startLoading(loadInfo: loaderInfo, callback: callback)
     }
     
-    func startLoading(loadInfo:LoaderInfo,callback: @escaping (MediaEntry?, Error?) -> Void) -> Void {
+    func startLoading(loadInfo: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) -> Void {
         
         loadInfo.sessionProvider.loadKS { (resKS, error) in
             
@@ -109,7 +109,7 @@ import SwiftyXMLParser
             // checking if we got ks from the session, otherwise we should work as anonymous
             if let data = resKS, data.isEmpty == false {
                 ks = data
-            } else{
+            } else {
                 // Adding "startWidgetSession" request in case we don't have ks
                 let loginRequestBuilder = OVPSessionService.startWidgetSession(baseURL: loadInfo.apiServerURL,
                                                                                partnerId: loadInfo.sessionProvider.partnerId)
@@ -150,7 +150,13 @@ import SwiftyXMLParser
                 .add(request: req3)
                 .set(completion: { (dataResponse: Response) in
                     
-                    let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: dataResponse.data)
+                    guard let data = dataResponse.data else {
+                        PKLog.debug("didn't get response data")
+                        callback(nil, OVPMediaProviderError.invalidResponse)
+                        return
+                    }
+                    
+                    let responses: [OVPBaseObject] = OVPMultiResponseParser.parse(data: data)
                     
                     // At leat we need to get response of Entry and Playback, on anonymous we will have additional startWidgetSession call
                     guard responses.count >= 2 else {
@@ -191,7 +197,7 @@ import SwiftyXMLParser
                             }
                         }
 
-                        var playURL: URL? = self.playbackURL(loadInfo: loadInfo, source: source, ks: ksForURL)
+                        let playURL: URL? = self.playbackURL(loadInfo: loadInfo, source: source, ks: ksForURL)
                         guard let url = playURL else {
                             PKLog.error("failed to create play url from source, discarding source:\(entry.id),\(source.deliveryProfileId), \(source.format)")
                             return
@@ -200,7 +206,7 @@ import SwiftyXMLParser
                         let drmData = self.buildDRMParams(drm: source.drm)
                         
                         //creating media source with the above data
-                        let mediaSource: MediaSource = MediaSource(id: entry.id + "_" + String(source.deliveryProfileId))
+                        let mediaSource: MediaSource = MediaSource(id: "\(entry.id)_\(String(source.deliveryProfileId))")
                         mediaSource.drmData = drmData
                         mediaSource.contentUrl = url
                         mediaSource.mediaFormat = format

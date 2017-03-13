@@ -39,6 +39,26 @@ import Log
      PKLog.error(error, terminator: "\n")
  */
 
+/// `PKLogLevel` describes the available log levels.
+@objc public enum PKLogLevel: Int {
+    case verbose, debug, info, warning, error
+    
+    var description: String {
+        return String(describing: self).uppercased()
+    }
+    
+    /// converts our levels to the levels of logger we wrap
+    var toLoggerLevel: Level {
+        switch self {
+        case .verbose: return .trace
+        case .debug: return .debug
+        case .info: return .info
+        case .warning: return .warning
+        case .error: return .error
+        }
+    }
+}
+
 public let PKLog: Logger = {
     let logger = Logger()
     logger.minLevel = .debug
