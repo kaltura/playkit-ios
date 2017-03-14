@@ -12,7 +12,7 @@ import SwiftyJSON
 @objc public enum KalturaSocialNetwork: Int {
     case facebook
     
-    func string() -> String {
+    func stringValue() -> String {
         switch self {
         case .facebook:
             return "FACEBOOK"
@@ -31,7 +31,7 @@ class OTTSocialService: NSObject {
             request
                 .setBody(key:"partnerId", value: JSON(partner))
                 .setBody(key: "token", value: JSON(token))
-                .setBody(key: "type", value: JSON(type.string))
+                .setBody(key: "type", value: JSON(type.stringValue()))
                 .setBody(key:"udid", value:JSON(udid))
             return request
         }else{
