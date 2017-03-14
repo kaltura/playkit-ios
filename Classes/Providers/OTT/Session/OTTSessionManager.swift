@@ -8,6 +8,20 @@
 
 import UIKit
 
+public struct SessionInfo {
+    
+    public private(set) var udid: String?
+    public private(set) var ks: String?
+    public private(set) var refreshToken: String?
+    public private(set) var tokenExpiration: Date?
+}
+
+
+@objc public protocol OTTSessionManagerDelegate {
+    func sessionManagerDidUpdateSession(sender:OTTSessionManager)
+}
+
+
 @objc public class OTTSessionManager: NSObject, SessionProvider {
     
     enum SessionManagerError: Error{
@@ -18,21 +32,24 @@ import UIKit
         case invalidRefreshCallResponse
         case noRefreshTokenOrTokenToRefresh
         case failedToParseResponse
+        case failedToLogout
     }
     
+    public weak var delegate: OTTSessionManagerDelegate? = nil
     public let saftyMargin = 5*60.0
     
     @objc public var serverURL: String
     @objc public var partnerId: Int64
+    
     public var executor: RequestExecutor
     
-    public private(set) var udid: String?
-    public private(set) var ks: String?
-    public private(set) var refreshToken: String?
-    public private(set) var tokenExpiration: Date?
+    public private(set) var sessionInfo: SessionInfo? {
+        didSet{
+           self.delegate?.sessionManagerDidUpdateSession(sender: self)
+        }
+    }
     
-    
-    
+
     public init(serverURL: String, partnerId: Int64, executor: RequestExecutor?) {
         self.serverURL = serverURL
         self.partnerId = partnerId
@@ -47,19 +64,41 @@ import UIKit
         self.init(serverURL: serverURL, partnerId: partnerId, executor: nil)
     }
     
-    @objc public func logout() {
+    
+    func clearSessionData() {
+        self.sessionInfo = SessionInfo(udid: nil, ks: nil, refreshToken: nil, tokenExpiration: nil)
+    }
+    
+    @objc public func logout( completion: @escaping (_ error: Error?) -> Void ) {
+        
+        guard let ks = self.sessionInfo?.ks,
+            let udid = self.sessionInfo?.udid else {
+                self.clearSessionData()
+                completion(nil)
+                return
+        }
+        
+        let logoutRequest = OTTUserService.logout(baseURL: self.serverURL, partnerId: self.partnerId, ks: ks, udid: udid)?
+        .setOTTBasicParams()
+        .set(completion: { (response) in
+            completion(response.error != nil ? SessionManagerError.failedToLogout : nil)
+           self.clearSessionData()
+        }).build()
+        
+        if let req = logoutRequest{
+            self.executor.send(request: req)
+        }else{
+            self.clearSessionData()
+            completion(SessionManagerError.failedToLogout)
+        }
+        
 
-        self.ks = nil
-        self.refreshToken = nil
-        self.tokenExpiration = nil
-        self.udid = nil
 
     }
     
     @objc public func recoverSession(ks:String?, refreshToken: String?, udid: String?, completion: @escaping (_ error: Error?) -> Void ){
-        self.ks = ks
-        self.refreshToken = refreshToken
-        self.udid = udid
+        
+        self.sessionInfo  = SessionInfo(udid: udid, ks: ks, refreshToken: refreshToken, tokenExpiration: nil)
         self.refreshKS { (ks, error) in
             completion(error)
         }
@@ -130,10 +169,7 @@ import UIKit
                         
                         if  let loginObj = loginResult as? OTTLoginResponse, let sessionObj = sessionResult as? OTTSession  {
                             
-                            self.ks = loginObj.loginSession?.ks
-                            self.refreshToken = loginObj.loginSession?.refreshToken
-                            self.tokenExpiration = sessionObj.tokenExpiration
-                            self.udid = sessionObj.udid
+                            self.sessionInfo = SessionInfo(udid: sessionObj.udid, ks: loginObj.loginSession?.ks, refreshToken: loginObj.loginSession?.refreshToken, tokenExpiration: sessionObj.tokenExpiration)
                         }
                         completion(nil)
                     } else {
@@ -172,12 +208,10 @@ import UIKit
                         completion(error)
                     }
                     
-                    if let result = result, result.count == 2, let loginSession = result[0] as? OTTLoginSession, let session = result[1] as? OTTSession{
-                        
-                        self?.ks = loginSession.ks
-                        self?.refreshToken = loginSession.refreshToken
-                        self?.tokenExpiration = session.tokenExpiration
-                        self?.udid = session.udid
+                    if let result = result, result.count == 2,
+                        let loginSession = result[0] as? OTTLoginSession,
+                        let session = result[1] as? OTTSession {
+                        self?.sessionInfo = SessionInfo(udid: session.udid, ks: loginSession.ks, refreshToken: loginSession.refreshToken, tokenExpiration: session.tokenExpiration)
                         completion(nil)
                     } else {
                         completion(SessionManagerError.failedToGetLoginResponse)
@@ -196,8 +230,8 @@ import UIKit
     @objc public func loadKS(completion: @escaping (String?, Error?) -> Void) {
         
         let now = Date()
-        if let expiration = self.tokenExpiration, expiration.timeIntervalSince(now) > saftyMargin {
-            completion(self.ks, nil)
+        if let expiration = self.sessionInfo?.tokenExpiration, expiration.timeIntervalSince(now) > saftyMargin, let ks = self.sessionInfo?.ks {
+            completion(ks,nil)
         } else {
             self.refreshKS(completion: completion)
         }
@@ -205,7 +239,7 @@ import UIKit
     
     @objc public func refreshKS(completion: @escaping (String?, Error?) -> Void) {
         
-        guard let refreshToken = self.refreshToken, let ks = self.ks , let udid = self.udid else {
+        guard let refreshToken = self.sessionInfo?.refreshToken, let ks = self.sessionInfo?.ks , let udid = self.sessionInfo?.udid else {
             completion(nil, SessionManagerError.noRefreshTokenOrTokenToRefresh)
             return
         }
@@ -235,15 +269,14 @@ import UIKit
             
             if let response = response, response.count == 2, let loginSession = response[0] as? OTTLoginSession, let session = response[1] as? OTTSession {
                 
-                self.ks = loginSession.ks
-                self.refreshToken = loginSession.refreshToken
-                self.tokenExpiration = session.tokenExpiration
-                self.udid = session.udid
-                completion(self.ks, nil)
+                self.sessionInfo = SessionInfo(udid: session.udid, ks: loginSession.ks, refreshToken: loginSession.refreshToken, tokenExpiration: session.tokenExpiration)
+                completion(self.sessionInfo?.ks, nil)
                 return
             } else {
-                self.logout()
-                completion(nil, SessionManagerError.failedToRefreshKS)
+                self.logout(completion: { (error) in
+                    completion(nil, SessionManagerError.failedToRefreshKS)
+                })
+                
                 return
             }
         })
