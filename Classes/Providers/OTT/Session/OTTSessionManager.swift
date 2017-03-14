@@ -29,7 +29,7 @@ import UIKit
     public private(set) var udid: String?
     public private(set) var ks: String?
     public private(set) var refreshToken: String?
-    private var tokenExpiration: Date?
+    public private(set) var tokenExpiration: Date?
     
     
     
@@ -56,7 +56,7 @@ import UIKit
 
     }
     
-    @objc public func recoverSession(ks:String, refreshToken: String, udid: String, completion: @escaping (_ error: Error?) -> Void ){
+    @objc public func recoverSession(ks:String?, refreshToken: String?, udid: String?, completion: @escaping (_ error: Error?) -> Void ){
         self.ks = ks
         self.refreshToken = refreshToken
         self.udid = udid
