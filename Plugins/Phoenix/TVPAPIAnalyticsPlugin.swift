@@ -52,7 +52,7 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
                                                                                     fileId: fileId) else {
             return nil
         }
-        
+        requestBuilder.set(responseSerializer: StringSerializer())
         requestBuilder.set { (response: Response) in
             PKLog.trace("Response: \(response)")
             if response.statusCode == 0 {
