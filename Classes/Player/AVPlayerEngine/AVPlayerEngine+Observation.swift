@@ -20,7 +20,8 @@ extension AVPlayerEngine {
             #keyPath(currentItem),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
-            #keyPath(currentItem.duration)
+            #keyPath(currentItem.duration),
+            #keyPath(currentItem.timedMetadata)
         ]
     }
     
@@ -128,6 +129,8 @@ extension AVPlayerEngine {
             self.handleStatusChange()
         case #keyPath(currentItem):
             self.handleItemChange()
+        case #keyPath(currentItem.timedMetadata):
+            self.handleTimedMedia()
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
@@ -194,6 +197,12 @@ extension AVPlayerEngine {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         // in case item changed reset player reached end time indicator
-        isPlayedToEndTime = false
+        self.isPlayedToEndTime = false
+    }
+    
+    private func handleTimedMedia() {
+        guard let currentItem = self.currentItem else { return }
+        guard let metadata = currentItem.timedMetadata else { return }
+        self.post(event: PlayerEvent.TimedMetadata(metadata: metadata))
     }
 }
