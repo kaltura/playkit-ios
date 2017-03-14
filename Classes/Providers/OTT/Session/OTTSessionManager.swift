@@ -273,10 +273,8 @@ public struct SessionInfo {
                 completion(self.sessionInfo?.ks, nil)
                 return
             } else {
-                self.logout(completion: { (error) in
-                    completion(nil, SessionManagerError.failedToRefreshKS)
-                })
-                
+                self.clearSessionData()
+                completion(nil, SessionManagerError.failedToRefreshKS)
                 return
             }
         })
