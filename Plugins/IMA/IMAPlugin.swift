@@ -28,7 +28,6 @@ extension IMAAdsManager {
     private var contentPlayhead: IMAAVPlayerContentPlayhead?
     private var adsManager: IMAAdsManager?
     private var renderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
-    private var adDisplayContainer: IMAAdDisplayContainer
     private static var loader: IMAAdsLoader!
     
     private var pictureInPictureProxy: IMAPictureInPictureProxy?
@@ -72,13 +71,6 @@ extension IMAAdsManager {
     public override class var pluginName: String { return "IMAPlugin" }
     
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
-        // setup ad display container and companion if exists
-        var companionAdSlot: IMACompanionAdSlot? = nil
-        if let companionView = self.config?.companionView {
-            companionAdSlot = IMACompanionAdSlot(view: companionView, width: Int32(companionView.frame.size.width), height: Int32(companionView.frame.size.height))
-        }
-        self.adDisplayContainer = IMAAdDisplayContainer(adContainer: player.view, companionSlots: [companionAdSlot] ?? [])
-        
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let adsConfig = pluginConfig as? AdsConfig {
             self.config = adsConfig
@@ -126,11 +118,23 @@ extension IMAAdsManager {
     /************************************************************/
     
     func requestAds() {
+        guard let playerView = player?.view else { return }
+        
         if self.adTagUrl != nil && self.adTagUrl != "" {
             self.startAdCalled = false
             
+            // setup ad display container and companion if exists, needs to create a new ad container for each request.
+            var companionAdSlot: IMACompanionAdSlot? = nil
+            let adDisplayContainer: IMAAdDisplayContainer
+            if let companionView = self.config?.companionView {
+                companionAdSlot = IMACompanionAdSlot(view: companionView, width: Int32(companionView.frame.size.width), height: Int32(companionView.frame.size.height))
+                adDisplayContainer = IMAAdDisplayContainer(adContainer: playerView, companionSlots: [companionAdSlot])
+            } else {
+                adDisplayContainer = IMAAdDisplayContainer(adContainer: playerView, companionSlots: [])
+            }
+            
             var request: IMAAdsRequest
-            request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.adDisplayContainer, contentPlayhead: self, userContext: nil)
+            request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: adDisplayContainer, contentPlayhead: self, userContext: nil)
             
             IMAPlugin.loader.requestAds(with: request)
             PKLog.trace("request Ads")
@@ -244,9 +248,7 @@ extension IMAAdsManager {
     
     @objc private func update() {
         if !self.isAdPlayback {
-            if let currentTime = self.player?.currentTime, currentTime.isNaN {
-                return
-            }
+            guard let currentTime = self.player?.currentTime, !currentTime.isNaN else { return }
             self.currentPlaybackTime = currentTime
             self.loadAdsIfNeeded()
         }
