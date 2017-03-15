@@ -9,18 +9,18 @@
 import UIKit
 import SwiftyJSON
 
+/************************************************************/
+// MARK: - PhoenixMediaProviderError
+/************************************************************/
 public enum PhoenixMediaProviderError: PKError {
     
-
     case invalidInputParam(param: String)
     case unableToParseData(data: Any)
     case noSourcesFound
     case serverError(info:String)
     
     static let domain = "com.kaltura.playkit.error.PhoenixMediaProvider"
-    
-    static let ValueKey = "ValueKey"
-    
+        
     var code: Int {
         switch self {
         case .invalidInputParam: return 0
@@ -47,11 +47,40 @@ public enum PhoenixMediaProviderError: PKError {
 }
 
 
-let defaultProtocl = "https"
 
+/************************************************************/
+// MARK: - PhoenixMediaProvider
+/************************************************************/
+
+
+
+/* Description
+ 
+    Using Session provider will help you create MediaEntry in order to play content with the player
+    It's requestig the asset data and creating sources with relevant information for ex' contentURL, licenseURL, fiarPlay certificate and etc'
+ 
+    #Example of code
+    ````
+    let phoenixMediaProvider = PhoenixMediaProvider()
+    .set(type: AssetType.media)
+    .set(assetId: asset.assetID)
+    .set(fileIds: [file.fileID.stringValue])
+    .set(networkProtocol: "https")
+    .set(playbackContextType: isTrailer ? PlaybackContextType.trailer : PlaybackContextType.playback)
+    .set(sessionProvider: PhoenixSessionManager.shared)
+
+    phoenixMediaProvider.loadMedia(callback: { (media, error) in
+    
+    if let mediaEntry = media, error == nil {
+        self.player?.prepare(MediaConfig.config(mediaEntry: mediaEntry, startTime: params.startOver ? 0 : asset.currentMediaPositionInSeconds))
+    }else{
+        print("error loading asset: \(error?.localizedDescription)")
+        self.delegate?.corePlayer(self, didFailWith:LS("player_error_unable_to_load_entry"))
+    }
+    ````
+})
+*/
 @objc public class PhoenixMediaProvider: NSObject, MediaEntryProvider {
-    
-    
     
     var sessionProvider: SessionProvider?
     var assetId: String?
@@ -64,57 +93,91 @@ let defaultProtocl = "https"
     
     public override init() { }
     
+    
+    
+    /// - Parameter sessionProvider: This provider provider the ks for all wroking request.
+    /// If ks is nil, the provider will load the meida with anonymous ks
+    /// - Returns: Self ( so you con continue set other parameters after it )
     @discardableResult
     @nonobjc public func set(sessionProvider: SessionProvider?) -> Self {
         self.sessionProvider = sessionProvider
         return self
     }
     
+    
+    /// Required parameter
+    ///
+    /// - Parameter assetId: asset identifier
+    /// - Returns: Self
     @discardableResult
     @nonobjc public func set(assetId:String?) -> Self {
         self.assetId = assetId
         return self
     }
     
+    
+    /// - Parameter type: Asset Object type if it is Media Or EPG
+    /// - Returns: Self
     @discardableResult
     @nonobjc public func set(type:AssetType?) -> Self {
         self.type = type
         return self
     }
     
+    
+
+    /// - Parameter playbackContextType: Trailer/Playback/StartOver/Catchup
+    /// - Returns: Self
     @discardableResult
     @nonobjc public func set(playbackContextType:PlaybackContextType?) -> Self {
         self.playbackContextType = playbackContextType
         return self
     }
 
+    
+    /// - Parameter formats: Asset's requested file formats,
+    /// According to this formats array order the sources will be ordered in the mediaEntry
+    /// According to this formats sources will be filtered when creating the mediaEntry
+    /// - Returns: Self
     @discardableResult
     @nonobjc public func set(formats:[String]?) -> Self {
         self.formats = formats
         return self
     }
-    
+
+    /// - Parameter formats: Asset's requested file ids,
+    /// According to this files array order the sources will be ordered in the mediaEntry
+    /// According to this ids sources will be filtered when creating the mediaEntry
+    /// - Returns: Self
     @discardableResult
     @nonobjc public func set(fileIds:[String]?) -> Self {
         self.fileIds = fileIds
         return self
     }
     
+    
+    /// - Parameter networkProtocol: http/https
+    /// - Returns: Self
     @discardableResult
     @nonobjc public func set(networkProtocol:String?) -> Self {
         self.networkProtocol = networkProtocol
         return self
     }
     
+
+    /// - Parameter executor: executor which will be used to send request.
+    ///    default is USRExecutor
+    /// - Returns: Self
     @discardableResult
     @nonobjc public func set(executor:RequestExecutor?) -> Self {
         self.executor = executor
         return self
     }
     
-    
+    let defaultProtocol = "https"
 
     
+    /// This  object is created before loading the media in order to make sure all required attributes are set and we are ready to load
     struct LoaderInfo {
         var sessionProvider: SessionProvider
         var assetId: String
@@ -145,7 +208,7 @@ let defaultProtocl = "https"
             return
         }
         
-        let pr = self.networkProtocol ?? defaultProtocl
+        let pr = self.networkProtocol ?? defaultProtocol
         var executor: RequestExecutor = USRExecutor.shared
         if let exe = self.executor{
             executor = exe
@@ -156,13 +219,18 @@ let defaultProtocl = "https"
         self.startLoad(loaderInfo: loaderParams, callback: callback)
     }
     
-    
+    // This is not implemened yet
     public func cancel() {
         
     }
     
 
     
+    /// This method is creating the request in order to get playback context, when ks id nil we are adding anonymous login request so some times we will have just get context request and some times we will have multi request with getContext request + anonymouse login
+    /// - Parameters:
+    ///   - ks: ks if exist
+    ///   - loaderInfo: info regarding entry to load
+    /// - Returns: request builder
     func loaderRequestBuilder(ks:String?, loaderInfo:LoaderInfo) -> KalturaRequestBuilder? {
         
        let playbackContextOptions = PlaybackContextOptions(playbackContextType: loaderInfo.playbackContextType, protocls: [loaderInfo.networkProtocol], assetFileIds: loaderInfo.fileIds)
@@ -191,6 +259,12 @@ let defaultProtocl = "https"
      
     }
     
+    
+    /// This method is called after all input is valid and we can start loading media
+    ///
+    /// - Parameters:
+    ///   - loaderInfo: load info
+    ///   - callback: completion clousor
     func startLoad(loaderInfo: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) {
         loaderInfo.sessionProvider.loadKS { (ks, error) in
             
@@ -237,6 +311,7 @@ let defaultProtocl = "https"
     
     
     
+    /// Sorting and filtering source accrding to file formats or file ids
     func sortedAndFilterSources(by fileIds:[String]?, or fileFormats:[String]?, sources:[OTTPlaybackSource]) -> [OTTPlaybackSource] {
         
         let orderedSources = sources.filter({ (source:OTTPlaybackSource) -> Bool in
@@ -333,6 +408,7 @@ let defaultProtocl = "https"
        
     }
     
+    // Mapping between server scheme and local definision of scheme
     func convertScheme(scheme: String) -> DRMParams.Scheme {
             switch (scheme) {
             case "WIDEVINE_CENC":
