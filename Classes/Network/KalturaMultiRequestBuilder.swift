@@ -26,7 +26,7 @@ class KalturaMultiRequestBuilder: KalturaRequestBuilder {
     override public func build() -> Request {
         
         let data = self.kalturaMultiRequestData()
-        let request = RequestElement(requestId: self.requestId, method: self.method, url: self.url, dataBody: data, headers: self.headers, timeout: self.timeout, configuration: self.configuration, responseSerializer:self.responseSerializer, completion: self.completion)
+        let request = RequestElement(requestId: self.requestId, method: self.method, url: self.url, dataBody: data, headers: self.headers, timeout: self.timeout, configuration: self.configuration, responseSerializer: self.responseSerializer, completion: self.completion)
         
         return request
     }

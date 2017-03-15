@@ -17,13 +17,13 @@ public protocol ResponseSerializer {
     /**
      This fuction will serialize the response data of certin request to the expected type according to the serializer type
      */
-    func serialize(data:Data) throws -> Any
+    func serialize(data: Data) throws -> Any
 }
 
 
  class JSONSerializer: ResponseSerializer {
     
-    func serialize(data:Data) throws -> Any {
+    func serialize(data: Data) throws -> Any {
         let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions())
         return json
     }
@@ -32,7 +32,7 @@ public protocol ResponseSerializer {
 
  class IntSerializer: ResponseSerializer {
     
-    func serialize(data:Data) throws -> Any {
+    func serialize(data: Data) throws -> Any {
         guard let int8 = [UInt8](data).last else {
            throw SerializerError.serializationError
         }
@@ -44,11 +44,8 @@ public protocol ResponseSerializer {
 
  class StringSerializer: ResponseSerializer {
     
-    func serialize(data:Data) throws -> Any {
+    func serialize(data: Data) throws -> Any {
         let string = String(data: data, encoding: .utf8)
         return string
     }
 }
-
-
-
