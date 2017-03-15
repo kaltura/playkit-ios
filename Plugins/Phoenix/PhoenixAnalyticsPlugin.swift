@@ -38,9 +38,14 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
             parterId = pId
         }
         
-        guard let mediaEntry = self.player.mediaEntry else {
+        guard let player = self.player else {
+            PKLog.error("send analytics failed due to nil associated player")
+            return nil
+        }
+        
+        guard let mediaEntry = player.mediaEntry else {
             PKLog.error("send analytics failed due to nil mediaEntry")
-            self.messageBus.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingMediaEntry))
+            self.messageBus?.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingMediaEntry))
             return nil
         }
         
@@ -48,7 +53,7 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
                                                                           partnerId: parterId,
                                                                           ks: ks,
                                                                           eventType: type.rawValue.uppercased(),
-                                                                          currentTime: self.player.currentTime.toInt32(),
+                                                                          currentTime: player.currentTime.toInt32(),
                                                                           assetId: mediaEntry.id,
                                                                           fileId: fileId) else {
             return nil

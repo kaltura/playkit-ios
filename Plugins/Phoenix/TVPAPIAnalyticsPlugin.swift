@@ -18,18 +18,20 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
     /************************************************************/
     
     override func buildRequest(ofType type: OTTAnalyticsEventType) -> Request? {
+        guard let player = self.player else { return nil }
+        
         var fileId = ""
         var baseUrl = ""
         
         guard let initObj = self.config?.params["initObj"] as? [String: Any] else {
             PKLog.error("send analytics failed due to no initObj data")
-            self.messageBus.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingInitObject))
+            self.messageBus?.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingInitObject))
             return nil
         }
         
-        guard let mediaEntry = self.player.mediaEntry else {
+        guard let mediaEntry = player.mediaEntry else {
             PKLog.error("send analytics failed due to nil mediaEntry")
-            self.messageBus.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingMediaEntry))
+            self.messageBus?.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingMediaEntry))
             return nil
         }
         
@@ -47,7 +49,7 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
         guard let requestBuilder: RequestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
                                                                                     initObj: initObj,
                                                                                     eventType: type.rawValue,
-                                                                                    currentTime: self.player.currentTime.toInt32(),
+                                                                                    currentTime: player.currentTime.toInt32(),
                                                                                     assetId: mediaEntry.id,
                                                                                     fileId: fileId) else {
             return nil
