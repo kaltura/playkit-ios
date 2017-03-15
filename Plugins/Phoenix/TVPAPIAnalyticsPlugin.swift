@@ -52,12 +52,12 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
                                                                                     fileId: fileId) else {
             return nil
         }
-        
+        requestBuilder.set(responseSerializer: StringSerializer())
         requestBuilder.set { (response: Response) in
             PKLog.trace("Response: \(response)")
             if response.statusCode == 0 {
                 PKLog.trace("\(response.data)")
-                guard let data = response.data as? String, data.lowercased() == "concurrent" else { return }
+                guard let data = response.data as? String, data.lowercased() == "\"concurrent\"" else { return }
                 self.reportConcurrencyEvent()
             }
         }
