@@ -18,12 +18,12 @@ enum AnalyticsPluginError: PKError {
     case missingMediaEntry
     case missingInitObject
     
-    static let Domain = "com.kaltura.playkit.error.analyticsPlugin"
+    static let domain = "com.kaltura.playkit.error.analyticsPlugin"
     
     var code: Int {
         switch self {
-        case .missingMediaEntry: return 3000
-        case .missingInitObject: return 3001
+        case .missingMediaEntry: return PKErrorCode.missingMediaEntry
+        case .missingInitObject: return PKErrorCode.missingInitObject
         }
     }
     
@@ -40,7 +40,12 @@ enum AnalyticsPluginError: PKError {
 }
 
 extension PKErrorDomain {
-    @objc public static let AnalyticsPlugin = AnalyticsPluginError.Domain
+    @objc(AnalyticsPlugin) public static let analyticsPlugin = AnalyticsPluginError.domain
+}
+
+extension PKErrorCode {
+    @objc(MissingMediaEntry) public static let missingMediaEntry = 2100
+    @objc(MissingInitObject) public static let missingInitObject = 2101
 }
 
 /************************************************************/
@@ -50,7 +55,6 @@ extension PKErrorDomain {
 /// class `BaseAnalyticsPlugin` is a base plugin object used for analytics plugin subclasses
 @objc public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
-    unowned var messageBus: MessageBus
     var config: AnalyticsConfig?
     var isFirstPlay: Bool = true
     
@@ -58,15 +62,12 @@ extension PKErrorDomain {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public override required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
-        self.messageBus = messageBus
-        super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
         } else {
-            PKLog.error("There is no Analytics Config!")
-            let error = PKPluginError.missingPluginConfig(pluginName: type(of: self).pluginName).asNSError
-            self.messageBus.post(PlayerEvent.PluginError(nsError: error))
+            PKLog.warning("There is no Analytics Config! for \(type(of: self))")
         }
         self.registerEvents()
     }

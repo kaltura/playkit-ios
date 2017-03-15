@@ -10,6 +10,7 @@ import Foundation
 
 /// A `MediaConfig` object defines behavior and info to use when preparing a `Player` object.
 @objc public class MediaConfig: NSObject {
+
     @objc public var mediaEntry: MediaEntry
     @objc public var startTime: TimeInterval = 0
     
@@ -52,6 +53,14 @@ import Foundation
     /// Private init.
     private override init() {
         fatalError("Private initializer, use `init(config:)`")
+    }
+}
+
+extension PluginConfig: NSCopying {
+    
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = PluginConfig(config: config)
+        return copy
     }
 }
 

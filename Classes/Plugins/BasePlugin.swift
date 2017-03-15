@@ -17,10 +17,12 @@ import Foundation
     }
 
     @objc public unowned var player: Player
+    @objc public unowned var messageBus: MessageBus
     
-    @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) {
+    @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         PKLog.info("initializing plugin \(type(of:self))")
         self.player = player
+        self.messageBus = messageBus
     }
     
     @objc public func onLoad(mediaConfig: MediaConfig) {
@@ -35,4 +37,3 @@ import Foundation
         PKLog.info("destroying plugin \(type(of:self))")
     }
 }
-

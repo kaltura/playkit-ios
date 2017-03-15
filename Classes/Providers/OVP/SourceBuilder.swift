@@ -147,11 +147,11 @@ class SourceBuilder {
         
         
         var isFirst = true
-        for param in params{
+        for param in params {
            
-            if ( isFirst){
+            if ( isFirst) {
               urlAsString.append("?")
-            }else{
+            } else {
               urlAsString.append("&")
             }
             urlAsString.append(param)

@@ -11,7 +11,7 @@ import Foundation
 class LoadedPlugin: NSObject {
     var plugin: PKPlugin
     var decorator: PlayerDecoratorBase?
-    init(plugin :PKPlugin, decorator: PlayerDecoratorBase?) {
+    init(plugin: PKPlugin, decorator: PlayerDecoratorBase?) {
         self.plugin = plugin
         self.decorator = decorator
     }
@@ -22,7 +22,7 @@ class PlayerLoader: PlayerDecoratorBase {
     var loadedPlugins = Dictionary<String, LoadedPlugin>()
     var messageBus = MessageBus()
     
-    func load(pluginConfig: PluginConfig?) {
+    func load(pluginConfig: PluginConfig?) throws {
         var playerController: PlayerController
         
         playerController = PlayerController()
@@ -35,23 +35,16 @@ class PlayerLoader: PlayerDecoratorBase {
         if let pluginConfigs = pluginConfig?.config {
             for pluginName in pluginConfigs.keys {
                 let pluginConfig = pluginConfigs[pluginName]
-                do {
-                    let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
-                    
-                    var decorator: PlayerDecoratorBase? = nil
-                    
-                    if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
-                        d.setPlayer(player)
-                        decorator = d
-                        player = d
-                    }
-                    
-                    loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
-                } catch let e {
-                    if case PKPluginError.failedToCreatePlugin = e {
-                        self.messageBus.post(PlayerEvent.Error(nsError: PKPluginError.failedToCreatePlugin.asNSError))
-                    }
+                let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
+                
+                var decorator: PlayerDecoratorBase? = nil
+                
+                if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
+                    d.setPlayer(player)
+                    decorator = d
+                    player = d
                 }
+                loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
             }
         }
         setPlayer(player)

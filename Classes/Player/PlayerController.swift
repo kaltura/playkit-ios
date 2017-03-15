@@ -63,20 +63,15 @@ class PlayerController: NSObject, Player {
     var shouldRefresh: Bool = false
     
     func prepare(_ config: MediaConfig) {
-        currentPlayer.startPosition = config.startTime
-        
-        if let mediaEntry: MediaEntry = config.mediaEntry {
-            self.assetBuilder = AssetBuilder(mediaEntry: mediaEntry)
-            self.assetBuilder?.build { (error: Error?, asset: AVAsset?) in
-                if let avAsset: AVAsset = asset {
-                    self.currentPlayer.asset = avAsset
-                    if DRMSupport.widevineClassicHandler != nil {
-                        self.addAssetRefreshObservers()
-                    }
+        self.currentPlayer.startPosition = config.startTime
+        self.assetBuilder = AssetBuilder(mediaEntry: config.mediaEntry)
+        self.assetBuilder?.build { (error: Error?, asset: AVAsset?) in
+            if let avAsset: AVAsset = asset {
+                self.currentPlayer.asset = avAsset
+                if DRMSupport.widevineClassicHandler != nil {
+                    self.addAssetRefreshObservers()
                 }
             }
-        } else {
-            PKLog.warning("mediaEntry is empty")
         }
     }
     
@@ -170,22 +165,19 @@ extension PlayerController {
     
     // Reachability Handling
     private func addReachabilityObserver() -> Void {
-        self.reachability?.startNotifier()
+        guard let reachability = self.reachability else { return }
+        reachability.startNotifier()
         
-        self.reachability?.onReachable = { [unowned self] reachability in
+        reachability.onUnreachable = { reachability in
+            PKLog.warning("network unreachable")
+        }
+        reachability.onReachable = { [unowned self] reachability in
             self.handleRefreshAsset()
         }
     }
     
     private func removeReachabilityObserver() -> Void {
         self.reachability?.stopNotifier()
-    }
-    
-    private func sendReachabilityErrorEvent() {
-        if let block = self.onEventBlock {
-            PKLog.error("unreachable");
-            // TODO: error handling
-        }
     }
     
     // Application States Handling

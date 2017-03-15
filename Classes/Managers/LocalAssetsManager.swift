@@ -62,7 +62,7 @@ import AVFoundation
     @objc public func prepareForDownload(asset: AVURLAsset, mediaSource: MediaSource) {
         
         // This function is a noop if no DRM data or DRM is not FairPlay.
-        guard let drmData = mediaSource.drmData?.first as? FairPlayDRMData else {return}
+        guard let drmData = mediaSource.drmData?.first as? FairPlayDRMParams else {return}
 
         PKLog.debug("Preparing asset for download; asset.url:", asset.url)
         

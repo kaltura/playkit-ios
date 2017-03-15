@@ -15,9 +15,10 @@ public protocol PKPlugin {
     static var pluginName: String { get }
 
     /// The player associated with the plugin
-    unowned var player: Player { get set }
+    unowned var player: Player { get }
+    unowned var messageBus: MessageBus { get }
     
-    init(player: Player, pluginConfig: Any?, messageBus: MessageBus)
+    init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws
     
     /// On first load. used for doing initialization for the first time with the media config.
     func onLoad(mediaConfig: MediaConfig)
@@ -27,3 +28,6 @@ public protocol PKPlugin {
     func destroy()
 }
 
+public protocol PKPluginWarmUp {
+    static func warmUp()
+}

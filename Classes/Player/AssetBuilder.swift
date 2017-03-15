@@ -27,7 +27,7 @@ class AssetBuilder {
         
         let defaultHandler = DefaultAssetHandler.self
         
-        // Preference: Local, HLS, FPS*, MP4, WVM*
+        // Preference: Local, HLS, FPS*, MP4, WVM*, MP3
         
         if let source = sources.first(where: {$0 is LocalMediaSource}) {
             if source.fileExt == "wvm" {
@@ -53,6 +53,10 @@ class AssetBuilder {
         
         if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt=="wvm"}) {
             return (source, DRMSupport.widevineClassicHandler!)
+        }
+        
+        if let source = sources.first(where: {$0.fileExt=="mp3"}) {
+            return (source, defaultHandler)
         }
         
         PKLog.error("no playable media sources!")
@@ -95,7 +99,7 @@ enum AssetError : Error {
 class DRMSupport {
     // FairPlay is not available in simulators and before iOS8
     static let fairplay: Bool = {
-        if TARGET_OS_SIMULATOR==0, #available(iOS 8, *) {
+        if Platform.isSimulator, #available(iOS 8, *) {
             return true
         } else {
             return false
@@ -104,7 +108,7 @@ class DRMSupport {
     
     // FairPlay is not available in simulators and is only downloadable in iOS10 and up.
     static let fairplayOffline: Bool = {
-        if TARGET_OS_SIMULATOR==0, #available(iOS 10, *) {
+        if Platform.isSimulator, #available(iOS 10, *) {
             return true
         } else {
             return false
@@ -116,7 +120,7 @@ class DRMSupport {
     
     // Preload the Widevine Classic Handler, if available
     static let widevineClassicHandler: AssetHandler.Type? = {
-        if TARGET_OS_SIMULATOR != 0 {
+        if Platform.isSimulator {
             return nil
         }
         return NSClassFromString("PlayKit.WidevineClassicAssetHandler") as? AssetHandler.Type

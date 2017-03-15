@@ -51,42 +51,50 @@ import Foundation
     
     // MARK: - Player Basic Events
 
-    class CanPlay : PlayerEvent {}
-    class DurationChanged : PlayerEvent {
+    class CanPlay: PlayerEvent {}
+    class DurationChanged: PlayerEvent {
         convenience init(duration: TimeInterval) {
-            self.init([EventDataKeys.Duration : NSNumber(value: duration)])
+            self.init([EventDataKeys.Duration: NSNumber(value: duration)])
         }
     }
     
-    class Ended : PlayerEvent {}
-    class LoadedMetadata : PlayerEvent {}
-    class Play : PlayerEvent {}
-    class Pause : PlayerEvent {}
-    class Playing : PlayerEvent {}
-    class Seeking : PlayerEvent {}
-    class Seeked : PlayerEvent {}
+    class Ended: PlayerEvent {}
+    class LoadedMetadata: PlayerEvent {}
+    class Play: PlayerEvent {}
+    class Pause: PlayerEvent {}
+    class Playing: PlayerEvent {}
+    class Seeking: PlayerEvent {}
+    class Seeked: PlayerEvent {}
     
     class Error: PlayerEvent {
         convenience init(nsError: NSError) {
-            self.init([EventDataKeys.Error : nsError])
+            self.init([EventDataKeys.Error: nsError])
+        }
+        
+        convenience init(error: PKError) {
+            self.init([EventDataKeys.Error: error.asNSError])
         }
     }
     
     class PluginError: PlayerEvent {
         convenience init(nsError: NSError) {
-            self.init([EventDataKeys.Error : nsError])
+            self.init([EventDataKeys.Error: nsError])
+        }
+        
+        convenience init(error: PKError) {
+            self.init([EventDataKeys.Error: error.asNSError])
         }
     }
     
     // MARK: - Player Tracks Events
     
-    class TracksAvailable : PlayerEvent {
+    class TracksAvailable: PlayerEvent {
         convenience init(tracks: PKTracks) {
             self.init([EventDataKeys.Tracks : tracks])
         }
     }
     
-    class PlaybackParamsUpdated : PlayerEvent {
+    class PlaybackParamsUpdated: PlayerEvent {
         convenience init(currentBitrate: Double) {
             self.init([EventDataKeys.CurrentBitrate : NSNumber(value: currentBitrate)])
         }
@@ -94,7 +102,7 @@ import Foundation
     
     // MARK: - Player State Events
 
-    class StateChanged : PlayerEvent {
+    class StateChanged: PlayerEvent {
         convenience init(newState: PlayerState, oldState: PlayerState) {
             self.init([EventDataKeys.NewState : newState as AnyObject,
                         EventDataKeys.OldState : oldState as AnyObject])
@@ -102,11 +110,9 @@ import Foundation
     }
 }
 
-// MARK: - Ad Events
-
 @objc public class AdEvent: PKEvent {
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, adBreakEnded, adBreakStarted, adAllCompleted, adComplete, adClicked, adCuepointsChanged, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
+        adBreakReady, adBreakEnded, adBreakStarted, adAllCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
@@ -115,7 +121,6 @@ import Foundation
     @objc public static let adAllCompleted: AdEvent.Type = AdAllCompleted.self
     @objc public static let adComplete: AdEvent.Type = AdComplete.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
-    @objc public static let adCuepointsChanged: AdEvent.Type = AdCuepointsChanged.self
     @objc public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
     @objc public static let adLoaded: AdEvent.Type = AdLoaded.self
     @objc public static let adLog: AdEvent.Type = AdLog.self
@@ -136,53 +141,103 @@ import Foundation
     @objc public static let adWebOpenerDidOpenInAppBrowser: AdEvent.Type = AdWebOpenerDidOpenInAppBrowser.self
     @objc public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
     @objc public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
+    @objc public static let adCuePointsUpdate: AdEvent.Type = AdCuePointsUpdate.self
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
     
-    class AdBreakReady : AdEvent {}
-    class AdBreakEnded : AdEvent {}
-    class AdBreakStarted : AdEvent {}
-    class AdAllCompleted : AdEvent {}
-    class AdComplete : AdEvent {}
-    class AdClicked : AdEvent {}
-    class AdCuepointsChanged : AdEvent {}
-    class AdFirstQuartile : AdEvent {}
-    class AdLoaded : AdEvent {}
-    class AdLog : AdEvent {}
-    class AdMidpoint : AdEvent {}
-    class AdPaused : AdEvent {}
-    class AdResumed : AdEvent {}
-    class AdSkipped : AdEvent {}
-    class AdStarted : AdEvent {}
-    class AdStreamLoaded : AdEvent {}
-    class AdTapped : AdEvent {}
-    class AdThirdQuartile : AdEvent {}
+    class AdStarted: AdEvent {}
+    class AdBreakReady: AdEvent {}
+    class AdBreakEnded: AdEvent {}
+    class AdBreakStarted: AdEvent {}
+    class AdAllCompleted: AdEvent {}
+    class AdComplete: AdEvent {}
+    class AdClicked: AdEvent {}
+    class AdFirstQuartile: AdEvent {}
+    class AdLoaded: AdEvent {}
+    class AdLog: AdEvent {}
+    class AdMidpoint: AdEvent {}
+    class AdPaused: AdEvent {}
+    class AdResumed: AdEvent {}
+    class AdSkipped: AdEvent {}
+    class AdStreamLoaded: AdEvent {}
+    class AdTapped: AdEvent {}
+    class AdThirdQuartile: AdEvent {}
+    
+    // `AdCuePointsUpdate` event is received when ad cue points were updated. only sent when there is more then 0.
+    class AdCuePointsUpdate: AdEvent {
+        convenience init(adCuePoints: PKAdCuePoints) {
+            self.init([AdEventDataKeys.adCuePoints: adCuePoints])
+        }
+    }
     
     class Error: AdEvent {
         convenience init(nsError: NSError) {
-            self.init([AdEventDataKeys.Error : nsError])
+            self.init([AdEventDataKeys.error: nsError])
         }
     }
     
-    class AdDidProgressToTime : AdEvent {
+    class AdDidProgressToTime: AdEvent {
         convenience init(mediaTime: TimeInterval, totalTime: TimeInterval) {
-            self.init([AdEventDataKeys.MediaTime: NSNumber(value: mediaTime),
-                        AdEventDataKeys.TotalTime: NSNumber(value: totalTime)])
+            self.init([AdEventDataKeys.mediaTime: NSNumber(value: mediaTime),
+                       AdEventDataKeys.totalTime: NSNumber(value: totalTime)])
         }
     }
-
-    class AdDidRequestPause : AdEvent {}
-    class AdDidRequestResume : AdEvent {}
     
-    class WebOpenerEvent : AdEvent {
+    class AdDidRequestPause: AdEvent {}
+    class AdDidRequestResume: AdEvent {}
+    
+    class WebOpenerEvent: AdEvent {
         convenience init(webOpener: NSObject!) {
-            self.init([AdEventDataKeys.WebOpener: webOpener])
+            self.init([AdEventDataKeys.webOpener: webOpener])
         }
     }
     
-    class AdWebOpenerWillOpenExternalBrowser : WebOpenerEvent {}
-    class AdWebOpenerWillOpenInAppBrowser : WebOpenerEvent {}
-    class AdWebOpenerDidOpenInAppBrowser : WebOpenerEvent {}
-    class AdWebOpenerWillCloseInAppBrowser : WebOpenerEvent {}
-    class AdWebOpenerDidCloseInAppBrowser : WebOpenerEvent {}
+    class AdWebOpenerWillOpenExternalBrowser: WebOpenerEvent {}
+    class AdWebOpenerWillOpenInAppBrowser: WebOpenerEvent {}
+    class AdWebOpenerDidOpenInAppBrowser: WebOpenerEvent {}
+    class AdWebOpenerWillCloseInAppBrowser: WebOpenerEvent {}
+    class AdWebOpenerDidCloseInAppBrowser: WebOpenerEvent {}
+}
+
+/************************************************************/
+// MARK: - PKEvent Data Accessors Extension
+/************************************************************/
+
+extension PKEvent {
+    // MARK: - Ad Data Keys
+    struct AdEventDataKeys {
+        static let mediaTime = "mediaTime"
+        static let totalTime = "totalTime"
+        static let webOpener = "webOpener"
+        static let error = "error"
+        static let adCuePoints = "adCuePoints"
+        static let adInfo = "adInfo"
+    }
+    
+    // MARK: Ad Data Accessors
+    
+    /// MediaTime, PKEvent Ad Data Accessor
+    @objc public var mediaTime: NSNumber? {
+        return self.data?[AdEventDataKeys.mediaTime] as? NSNumber
+    }
+    
+    /// TotalTime, PKEvent Ad Data Accessor
+    @objc public var totalTime: NSNumber? {
+        return self.data?[AdEventDataKeys.totalTime] as? NSNumber
+    }
+    
+    /// WebOpener, PKEvent Ad Data Accessor
+    @objc public var webOpener: NSObject? {
+        return self.data?[AdEventDataKeys.webOpener] as? NSObject
+    }
+    
+    /// Associated error from error event, PKEvent Ad Data Accessor
+    @objc public var adError: NSError? {
+        return self.data?[AdEventDataKeys.error] as? NSError
+    }
+    
+    /// Ad cue points, PKEvent Ad Data Accessor
+    @objc public var adCuePoints: PKAdCuePoints? {
+        return self.data?[AdEventDataKeys.adCuePoints] as? PKAdCuePoints
+    }
 }
