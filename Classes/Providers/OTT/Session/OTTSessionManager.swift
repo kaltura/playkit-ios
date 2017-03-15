@@ -25,13 +25,11 @@ public struct SessionInfo {
 @objc public class OTTSessionManager: NSObject, SessionProvider {
     
     enum SessionManagerError: Error{
-        case failedToGetKS
         case failedToGetLoginResponse
         case failedToRefreshKS
         case failedToBuildRefreshRequest
         case invalidRefreshCallResponse
         case noRefreshTokenOrTokenToRefresh
-        case failedToParseResponse
         case failedToLogout
     }
     
