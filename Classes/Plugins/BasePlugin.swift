@@ -16,8 +16,8 @@ import Foundation
         fatalError("abstract property should be overriden in subclass")
     }
 
-    @objc public unowned var player: Player
-    @objc public unowned var messageBus: MessageBus
+    @objc public weak var player: Player?
+    @objc public weak var messageBus: MessageBus?
     
     @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         PKLog.info("initializing plugin \(type(of:self))")
