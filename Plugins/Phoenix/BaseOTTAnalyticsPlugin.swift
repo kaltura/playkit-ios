@@ -72,49 +72,53 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
             
             switch event {
             case let e where e.self == PlayerEvent.ended:
-                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("ended event: \(event)")
-                    self.stopTimer()
-                    self.sendAnalyticsEvent(ofType: .finish)
-                })
+                    strongSelf.stopTimer()
+                    strongSelf.sendAnalyticsEvent(ofType: .finish)
+                }
             case let e where e.self == PlayerEvent.error:
-                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("error event: \(event)")
-                    self.sendAnalyticsEvent(ofType: .error)
-                })
+                    strongSelf.sendAnalyticsEvent(ofType: .error)
+                }
             case let e where e.self == PlayerEvent.pause:
-                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("pause event: \(event)")
                     // invalidate timer when receiving pause event only after first play
                     // and set intervalOn to false in order to start timer again on play event.
-                    if !self.isFirstPlay {
-                        self.stopTimer()
-                        self.intervalOn = false
+                    if !strongSelf.isFirstPlay {
+                        strongSelf.stopTimer()
+                        strongSelf.intervalOn = false
                     }
-                    
-                    self.sendAnalyticsEvent(ofType: .pause)
-                })
+                    strongSelf.sendAnalyticsEvent(ofType: .pause)
+                }
             case let e where e.self == PlayerEvent.loadedMetadata:
-                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("loadedMetadata event: \(event)")
-                    self.sendAnalyticsEvent(ofType: .load)
-                })
+                    strongSelf.sendAnalyticsEvent(ofType: .load)
+                }
             case let e where e.self == PlayerEvent.playing:
-                self.messageBus.addObserver(self, events: [e.self], block: { event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("play event: \(event)")
                     
-                    if !self.intervalOn {
-                        self.createTimer()
-                        self.intervalOn = true
+                    if !strongSelf.intervalOn {
+                        strongSelf.createTimer()
+                        strongSelf.intervalOn = true
                     }
                     
-                    if self.isFirstPlay {
-                        self.isFirstPlay = false
-                        self.sendAnalyticsEvent(ofType: .first_play);
+                    if strongSelf.isFirstPlay {
+                        strongSelf.isFirstPlay = false
+                        strongSelf.sendAnalyticsEvent(ofType: .first_play);
                     } else {
-                        self.sendAnalyticsEvent(ofType: .play);
+                        strongSelf.sendAnalyticsEvent(ofType: .play);
                     }
-                })
+                }
             default: assertionFailure("plugin \(type(of:self)) all events must be handled")
             }
         }
@@ -144,7 +148,7 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
     /************************************************************/
     
     func reportConcurrencyEvent() {
-        self.messageBus.post(OttEvent.Concurrency())
+        self.messageBus?.post(OttEvent.Concurrency())
     }
 }
 
@@ -179,9 +183,10 @@ extension BaseOTTAnalyticsPlugin {
     }
     
     fileprivate func sendProgressEvent() {
+        guard let player = self.player else { return }
         self.sendAnalyticsEvent(ofType: .hit);
         
-        let progress = Float(self.player.currentTime) / Float(self.player.duration)
+        let progress = Float(player.currentTime) / Float(player.duration)
         PKLog.debug("Progress is \(progress)")
         
         if progress > 0.98 {

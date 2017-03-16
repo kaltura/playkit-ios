@@ -63,38 +63,42 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
             
             switch event {
             case let e where e.self == PlayerEvent.play:
-                self.messageBus.addObserver(self, events: [e.self]){ [unowned self] event in
+                self.messageBus?.addObserver(self, events: [e.self]){ [weak self] event in
+                    guard let strongSelf = self, let player = self?.player else { return }
                     PKLog.debug("play event: \(event)")
-                    self.lastReportedStartTime = self.player.currentTime.toInt32()
-                    self.startLiveEvents()
+                    strongSelf.lastReportedStartTime = player.currentTime.toInt32()
+                    strongSelf.startLiveEvents()
                 }
             case let e where e.self == PlayerEvent.pause:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("pause event: \(event)")
-                    self.stopLiveEvents()
+                    strongSelf.stopLiveEvents()
                 }
             case let e where e.self == PlayerEvent.playbackParamsUpdated:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("playbackParamsUpdated event: \(event)")
                     if type(of: event) == PlayerEvent.playbackParamsUpdated {
-                        self.lastReportedBitrate = Int32(event.currentBitrate!)
+                        strongSelf.lastReportedBitrate = Int32(event.currentBitrate!)
                     }
                 }
             case let e where e.self == PlayerEvent.stateChanged:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("playbackParamsUpdated event: \(event)")
                     
                     if type(of: event) == PlayerEvent.stateChanged {
                         switch event.newState {
                         case .ready:
-                            self.startTimer()
-                            if self.isBuffering {
-                                self.isBuffering = false
-                                self.sendLiveEvent(theBufferTime: self.calculateBuffer(isBuffering: false))
+                            strongSelf.startTimer()
+                            if strongSelf.isBuffering {
+                                strongSelf.isBuffering = false
+                                strongSelf.sendLiveEvent(theBufferTime: strongSelf.calculateBuffer(isBuffering: false))
                             }
                         case .buffering:
-                            self.isBuffering = true
-                            self.bufferStartTime = Date().timeIntervalSince1970.toInt32()
+                            strongSelf.isBuffering = true
+                            strongSelf.bufferStartTime = Date().timeIntervalSince1970.toInt32()
                         default: break
                         }
                     }
@@ -134,7 +138,6 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
         }
         
         self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.interval), target: self, selector: #selector(KalturaLiveStatsPlugin.timerHit), userInfo: nil, repeats: true)
-        
     }
     
     @objc private func timerHit() {
@@ -176,7 +179,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     private func sendLiveEvent(theBufferTime: Int32) {
         PKLog.debug("sendLiveEvent - Buffer Time: \(bufferTime)")
         
-        guard let mediaEntry = self.player.mediaEntry else { return }
+        guard let mediaEntry = self.player?.mediaEntry else { return }
         
         var sessionId = ""
         var baseUrl = "https://stats.kaltura.com/api_v3/index.php"

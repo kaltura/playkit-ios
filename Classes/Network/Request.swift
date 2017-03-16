@@ -34,6 +34,7 @@ public protocol Request {
     var timeout: Double { get }
     var configuration: RequestConfiguration? { get }
     var completion: completionClosures? { get }
+    var responseSerializer: ResponseSerializer { get }
 }
 
 public struct RequestElement: Request {
@@ -45,6 +46,7 @@ public struct RequestElement: Request {
     public var headers: [String:String]?
     public var timeout: Double
     public var configuration: RequestConfiguration?
+    public var responseSerializer: ResponseSerializer
     public var completion: completionClosures?
 }
 
@@ -62,7 +64,7 @@ public struct RequestElement: Request {
     public var configuration: RequestConfiguration? = nil
     public var completion: completionClosures? = nil
     public var urlParams: [String: String]? = nil
-    
+    public var responseSerializer : ResponseSerializer = JSONSerializer()
     public init?(url: String){
         if let path = URL(string: url) {
             self.url = path
@@ -98,6 +100,12 @@ public struct RequestElement: Request {
     @discardableResult
     public func set(configuration:RequestConfiguration?) -> Self{
         self.configuration = configuration
+        return self
+    }
+    
+    @discardableResult
+    public func set(responseSerializer: ResponseSerializer) -> Self{
+        self.responseSerializer = responseSerializer
         return self
     }
     
@@ -170,7 +178,7 @@ public struct RequestElement: Request {
             
         }
         
-        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration, completion: self.completion)
+        return RequestElement(requestId: self.requestId, method:self.method , url: self.url, dataBody: bodyData, headers: self.headers, timeout: self.timeout, configuration: self.configuration,responseSerializer: self.responseSerializer, completion: self.completion)
     }
 }
 
