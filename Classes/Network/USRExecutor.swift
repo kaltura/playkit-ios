@@ -78,7 +78,7 @@ import UIKit
                     
                     if let d = data {
                         do {
-                            let json = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions())
+                            let json = try r.responseSerializer.serialize(data: d)
                             let result = Response(data: json, error:nil)
                             completion(result)
                         } catch {
