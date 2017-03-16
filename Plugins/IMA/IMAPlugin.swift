@@ -20,7 +20,6 @@ extension IMAAdsManager {
     weak var dataSource: AdsPluginDataSource? {
         didSet {
             PKLog.debug("data source set")
-            self.setupMainView()
         }
     }
     weak var delegate: AdsPluginDelegate?
@@ -28,7 +27,6 @@ extension IMAAdsManager {
     
     private var contentPlayhead: IMAAVPlayerContentPlayhead?
     private var adsManager: IMAAdsManager?
-    private var companionSlot: IMACompanionAdSlot?
     private var renderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
     private static var loader: IMAAdsLoader!
     
@@ -94,9 +92,9 @@ extension IMAAdsManager {
             throw PKPluginError.missingPluginConfig(pluginName: IMAPlugin.pluginName)
         }
         
-        self.messageBus.addObserver(self, events: [PlayerEvent.ended], block: { (data: Any) -> Void in
-            self.contentComplete()
-        })
+        self.messageBus?.addObserver(self, events: [PlayerEvent.ended]) { [weak self] event in
+            self?.contentComplete()
+        }
         
         self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
@@ -120,11 +118,23 @@ extension IMAAdsManager {
     /************************************************************/
     
     func requestAds() {
+        guard let playerView = player?.view else { return }
+        
         if self.adTagUrl != nil && self.adTagUrl != "" {
             self.startAdCalled = false
             
+            // setup ad display container and companion if exists, needs to create a new ad container for each request.
+            var companionAdSlot: IMACompanionAdSlot? = nil
+            let adDisplayContainer: IMAAdDisplayContainer
+            if let companionView = self.config?.companionView {
+                companionAdSlot = IMACompanionAdSlot(view: companionView, width: Int32(companionView.frame.size.width), height: Int32(companionView.frame.size.height))
+                adDisplayContainer = IMAAdDisplayContainer(adContainer: playerView, companionSlots: [companionAdSlot])
+            } else {
+                adDisplayContainer = IMAAdDisplayContainer(adContainer: playerView, companionSlots: [])
+            }
+            
             var request: IMAAdsRequest
-            request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: self.createAdDisplayContainer(), contentPlayhead: self, userContext: nil)
+            request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: adDisplayContainer, contentPlayhead: self, userContext: nil)
             
             IMAPlugin.loader.requestAds(with: request)
             PKLog.trace("request Ads")
@@ -176,16 +186,6 @@ extension IMAAdsManager {
         imaSettings.autoPlayAdBreaks = config.autoPlayAdBreaks
         IMAPlugin.loader = IMAAdsLoader(settings: imaSettings)
     }
-
-    private func setupMainView() {
-//        if let _ = self.player.playerEngine {
-//            self.pictureInPictureProxy = IMAPictureInPictureProxy(avPictureInPictureControllerDelegate: self)
-//        }
-        
-        if let companionView = self.config?.companionView {
-            self.companionSlot = IMACompanionAdSlot(view: companionView, width: Int32(companionView.frame.size.width), height: Int32(companionView.frame.size.height))
-        }
-    }
     
     private func setupLoadingView() {
         self.loadingView = UIView(frame: CGRect.zero)
@@ -202,16 +202,13 @@ extension IMAAdsManager {
         self.loadingView!.addConstraint(NSLayoutConstraint(item: self.loadingView!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: indicator, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
         self.loadingView!.addConstraint(NSLayoutConstraint(item: self.loadingView!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: indicator, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
         
-        let videoView = self.player.view
-        videoView?.addSubview(self.loadingView!)
-        videoView?.addConstraint(NSLayoutConstraint(item: videoView!, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0))
-        videoView?.addConstraint(NSLayoutConstraint(item: videoView!, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.left, multiplier: 1, constant: 0))
-        videoView?.addConstraint(NSLayoutConstraint(item: videoView!, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0))
-        videoView?.addConstraint(NSLayoutConstraint(item: videoView!, attribute: NSLayoutAttribute.right, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.right, multiplier: 1, constant: 0))
-    }
-    
-    private func createAdDisplayContainer() -> IMAAdDisplayContainer {
-        return IMAAdDisplayContainer(adContainer: self.player.view, companionSlots: self.config?.companionView != nil ? [self.companionSlot!] : nil)
+        if let videoView = self.player?.view {
+            videoView.addSubview(self.loadingView!)
+            videoView.addConstraint(NSLayoutConstraint(item: videoView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0))
+            videoView.addConstraint(NSLayoutConstraint(item: videoView, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.left, multiplier: 1, constant: 0))
+            videoView.addConstraint(NSLayoutConstraint(item: videoView, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0))
+            videoView.addConstraint(NSLayoutConstraint(item: videoView, attribute: NSLayoutAttribute.right, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.right, multiplier: 1, constant: 0))
+        }
     }
 
     private func loadAdsIfNeeded() {
@@ -251,10 +248,7 @@ extension IMAAdsManager {
     
     @objc private func update() {
         if !self.isAdPlayback {
-            let currentTime = self.player.currentTime
-            if currentTime.isNaN {
-                return
-            }
+            guard let currentTime = self.player?.currentTime, !currentTime.isNaN else { return }
             self.currentPlaybackTime = currentTime
             self.loadAdsIfNeeded()
         }
@@ -281,12 +275,12 @@ extension IMAAdsManager {
         self.loadingView!.alpha = alpha
         self.loadingView!.isHidden = !show
 
-        self.player.view?.bringSubview(toFront: self.loadingView!)
+        self.player?.view?.bringSubview(toFront: self.loadingView!)
     }
 
     private func notify(event: AdEvent) {
         self.delegate?.adsPlugin(self, didReceive: event)
-        self.messageBus.post(event)
+        self.messageBus?.post(event)
     }
     
     private func notifyAdCuePoints(fromAdsManager adsManager: IMAAdsManager) {
@@ -324,7 +318,7 @@ extension IMAAdsManager {
         self.loaderFailed = true
         self.showLoadingView(false, alpha: 0)
         PKLog.error(adErrorData.adError.message)
-        self.messageBus.post(AdEvent.Error(nsError: IMAPluginError(adError: adErrorData.adError).asNSError))
+        self.messageBus?.post(AdEvent.Error(nsError: IMAPluginError(adError: adErrorData.adError).asNSError))
         self.delegate?.adsPlugin(self, loaderFailedWith: adErrorData.adError.message)
     }
     
@@ -392,7 +386,7 @@ extension IMAAdsManager {
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
         self.showLoadingView(false, alpha: 0)
         PKLog.error(error.message)
-        self.messageBus.post(AdEvent.Error(nsError: IMAPluginError(adError: error).asNSError))
+        self.messageBus?.post(AdEvent.Error(nsError: IMAPluginError(adError: error).asNSError))
         self.delegate?.adsPlugin(self, managerFailedWith: error.message)
     }
     

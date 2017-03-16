@@ -15,8 +15,9 @@ public protocol PKPlugin {
     static var pluginName: String { get }
 
     /// The player associated with the plugin
-    unowned var player: Player { get }
-    unowned var messageBus: MessageBus { get }
+    weak var player: Player? { get }
+    /// The messageBus associated with the plugin
+    weak var messageBus: MessageBus? { get }
     
     init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws
     

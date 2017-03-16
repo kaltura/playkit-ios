@@ -14,7 +14,7 @@ class PlayerController: NSObject, Player {
     
     var onEventBlock: ((PKEvent)->Void)?
     
-    var delegate: PlayerDelegate?
+    weak var delegate: PlayerDelegate?
     
     fileprivate var currentPlayer: AVPlayerEngine
     fileprivate var assetBuilder: AssetBuilder?
