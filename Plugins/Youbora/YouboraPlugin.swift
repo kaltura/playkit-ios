@@ -75,8 +75,8 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     public override func onLoad(mediaConfig: MediaConfig) {
         super.onLoad(mediaConfig: mediaConfig)
         self.setupYouboraManager() { succeeded in
-            if succeeded {
-                self.startMonitoring(player: self.player)
+            if let player = self.player, succeeded {
+                self.startMonitoring(player: player)
             }
         }
     }
@@ -117,66 +117,75 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
             
             switch event {
             case let e where e.self == PlayerEvent.canPlay:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
-                    self.postEventLogWithMessage(message: "canPlay event: \(event)")
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    strongSelf.postEventLogWithMessage(message: "canPlay event: \(event)")
                 }
             case let e where e.self == PlayerEvent.play:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
-                    guard let youboraManager = self.youboraManager else { return }
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    guard let youboraManager = strongSelf.youboraManager else { return }
                     youboraManager.playHandler()
-                    self.postEventLogWithMessage(message: "play event: \(event)")
+                    strongSelf.postEventLogWithMessage(message: "play event: \(event)")
                 }
             case let e where e.self == PlayerEvent.pause:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
-                    guard let youboraManager = self.youboraManager else { return }
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    guard let youboraManager = strongSelf.youboraManager else { return }
                     youboraManager.pauseHandler()
-                    self.postEventLogWithMessage(message: "pause event: \(event)")
+                    strongSelf.postEventLogWithMessage(message: "pause event: \(event)")
                 }
             case let e where e.self == PlayerEvent.playing:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
-                    self.postEventLogWithMessage(message: "playing event: \(event)")
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    strongSelf.postEventLogWithMessage(message: "playing event: \(event)")
                     
-                    guard let youboraManager = self.youboraManager else { return }
+                    guard let youboraManager = strongSelf.youboraManager else { return }
                     
-                    if self.isFirstPlay {
+                    if strongSelf.isFirstPlay {
                         youboraManager.joinHandler()
                         youboraManager.bufferedHandler()
-                        self.isFirstPlay = false
+                        strongSelf.isFirstPlay = false
                     } else {
                         youboraManager.resumeHandler()
                     }
                 }
             case let e where e.self == PlayerEvent.seeking:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
-                    guard let youboraManager = self.youboraManager else { return }
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    guard let youboraManager = strongSelf.youboraManager else { return }
                     youboraManager.seekingHandler()
-                    self.postEventLogWithMessage(message: "seeking event: \(event)")
+                    strongSelf.postEventLogWithMessage(message: "seeking event: \(event)")
                 }
             case let e where e.self == PlayerEvent.seeked:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] (event) in
-                    guard let youboraManager = self.youboraManager else { return }
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    guard let youboraManager = strongSelf.youboraManager else { return }
                     youboraManager.seekedHandler()
-                    self.postEventLogWithMessage(message: "seeked event: \(event)")
+                    strongSelf.postEventLogWithMessage(message: "seeked event: \(event)")
                 }
             case let e where e.self == PlayerEvent.ended:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] (event) in
-                    guard let youboraManager = self.youboraManager else { return }
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    guard let youboraManager = strongSelf.youboraManager else { return }
                     youboraManager.endedHandler()
-                    self.postEventLogWithMessage(message: "ended event: \(event)")
+                    strongSelf.postEventLogWithMessage(message: "ended event: \(event)")
                 }
             case let e where e.self == PlayerEvent.playbackParamsUpdated:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] (event) in
-                    guard let youboraManager = self.youboraManager else { return }
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    guard let youboraManager = strongSelf.youboraManager else { return }
                     youboraManager.currentBitrate = event.currentBitrate?.doubleValue
-                    self.postEventLogWithMessage(message: "playbackParamsUpdated event: \(event)")
+                    strongSelf.postEventLogWithMessage(message: "playbackParamsUpdated event: \(event)")
                 }
             case let e where e.self == PlayerEvent.stateChanged:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] (event) in
-                    guard let youboraManager = self.youboraManager else { return }
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    guard let youboraManager = strongSelf.youboraManager else { return }
                     switch event.newState {
                     case .buffering:
                         youboraManager.bufferingHandler()
-                        self.postEventLogWithMessage(message: "Buffering event: ֿ\(event)")
+                        strongSelf.postEventLogWithMessage(message: "Buffering event: ֿ\(event)")
                         break
                     default: break
                     }
@@ -184,7 +193,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
                     switch event.oldState {
                     case .buffering:
                         youboraManager.bufferedHandler()
-                        self.postEventLogWithMessage(message: "Buffered event: \(event)")
+                        strongSelf.postEventLogWithMessage(message: "Buffered event: \(event)")
                         break
                     default: break
                     }
@@ -194,8 +203,8 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
         }
         
         PKLog.debug("register ads events")
-        self.messageBus.addObserver(self, events: AdEvent.allEventTypes) { [unowned self] (event) in
-            self.postEventLogWithMessage(message: "Ads event event: \(event)")
+        self.messageBus?.addObserver(self, events: AdEvent.allEventTypes) { [weak self] event in
+            self?.postEventLogWithMessage(message: "Ads event event: \(event)")
         }
     }
     
@@ -204,17 +213,17 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     /************************************************************/
     
     private func setupYouboraManager(completionHandler: ((_ succeeded: Bool) -> Void)? = nil) {
-        
-        guard let mediaEntry = self.player.mediaEntry else {
+        guard let player = self.player else { return }
+        guard let mediaEntry = player.mediaEntry else {
             PKLog.error("missing MediaEntry, could not setup youbora manager")
-            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
+            self.messageBus?.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
             completionHandler?(false)
             return
         }
         
         guard let config = self.config else {
             PKLog.error("config params doesn't exist, could not setup youbora manager")
-            self.messageBus.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
+            self.messageBus?.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
             completionHandler?(false)
             return
         }
@@ -225,7 +234,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
         if var media = config.params["media"] as? [String: Any] {
             media["resource"] = mediaEntry.id
             media["title"] = mediaEntry.id
-            media["duration"] = self.player.duration
+            media["duration"] = player.duration
             config.params["media"] = media
         } else {
             config.params["media"] = [
@@ -260,7 +269,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     private func postEventLogWithMessage(message: String) {
         PKLog.debug(message)
         let eventLog = YouboraEvent.YouboraReportSent(message: message as NSString)
-        self.messageBus.post(eventLog)
+        self.messageBus?.post(eventLog)
     }
 }
 
