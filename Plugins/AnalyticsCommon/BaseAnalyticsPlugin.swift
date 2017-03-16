@@ -73,8 +73,8 @@ extension PKErrorCode {
     }
     
     public override func destroy() {
+        self.messageBus?.removeObserver(self, events: playerEventsToRegister) 
         super.destroy()
-        self.messageBus.removeObserver(self, events: playerEventsToRegister)
     }
 
     /************************************************************/

@@ -97,65 +97,66 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
             
             switch event {
             case let e where e.self == PlayerEvent.canPlay:
-                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("canPlay event: \(event)")
-                    self.sendMediaLoaded()
+                    strongSelf.sendMediaLoaded()
                 })
             case let e where e.self == PlayerEvent.ended || e.self == PlayerEvent.pause || e.self == PlayerEvent.seeking:
-                self.messageBus.addObserver(self, events: [e.self], block: { (event) in
+                self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
                     PKLog.debug("\(e.self) event: \(event)")
                 })
             case let e where e.self == PlayerEvent.seeked:
-                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
+                    guard let strongSelf = self, let player = self?.player else { return }
                     PKLog.debug("seeked event: \(event)")
-                    self.hasSeeked = true
-                    self.seekPercent = Float(self.player.currentTime) / Float(self.player.duration)
-                    self.sendAnalyticsEvent(action: .SEEK)
+                    strongSelf.hasSeeked = true
+                    strongSelf.seekPercent = Float(player.currentTime) / Float(player.duration)
+                    strongSelf.sendAnalyticsEvent(action: .SEEK)
                 })
             case let e where e.self == PlayerEvent.playing:
-                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("play event: \(event)")
-                    if self.isFirstPlay {
-                        self.sendAnalyticsEvent(action: .PLAY)
-                        self.isFirstPlay = false
+                    if strongSelf.isFirstPlay {
+                        strongSelf.sendAnalyticsEvent(action: .PLAY)
+                        strongSelf.isFirstPlay = false
                     }
                 })
             case let e where e.self == PlayerEvent.error:
-                self.messageBus.addObserver(self, events: [e.self], block: { [unowned self] (event) in
+                self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("error event: \(event)")
-                    self.sendAnalyticsEvent(action: .ERROR)
+                    strongSelf.sendAnalyticsEvent(action: .ERROR)
                 })
             case let e where e.self == PlayerEvent.stateChanged:
-                self.messageBus.addObserver(self, events: [e.self]) { [unowned self] event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     PKLog.debug("state changed event: \(event)")
                     if let stateChanged = event as? PlayerEvent.StateChanged {
                         switch stateChanged.newState {
                         case .idle:
-                            self.sendWidgetLoaded()
-                            break
+                            strongSelf.sendWidgetLoaded()
                         case .loading:
-                            self.sendWidgetLoaded()
-                            if self.isBuffering {
-                                self.isBuffering = false
-                                self.sendAnalyticsEvent(action: .BUFFER_END)
+                            strongSelf.sendWidgetLoaded()
+                            if strongSelf.isBuffering {
+                                strongSelf.isBuffering = false
+                                strongSelf.sendAnalyticsEvent(action: .BUFFER_END)
                             }
-                            break
                         case .ready:
-                            if self.isBuffering {
-                                self.isBuffering = false
-                                self.sendAnalyticsEvent(action: .BUFFER_END)
+                            if strongSelf.isBuffering {
+                                strongSelf.isBuffering = false
+                                strongSelf.sendAnalyticsEvent(action: .BUFFER_END)
                             }
-                            if !self.intervalOn {
-                                self.intervalOn = true
-                                self.createTimer()
+                            if !strongSelf.intervalOn {
+                                strongSelf.intervalOn = true
+                                strongSelf.createTimer()
                             }
-                            self.sendMediaLoaded()
-                            break
+                            strongSelf.sendMediaLoaded()
                         case .buffering:
-                            self.sendWidgetLoaded()
-                            self.isBuffering = true
-                            self.sendAnalyticsEvent(action: .BUFFER_START)
-                            break
+                            strongSelf.sendWidgetLoaded()
+                            strongSelf.isBuffering = true
+                            strongSelf.sendAnalyticsEvent(action: .BUFFER_START)
                         case .error: break
                         case .unknown: break
                         }
@@ -223,7 +224,8 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     }
     
     @objc private func timerHit() {
-        let progress = Float(self.player.currentTime) / Float(self.player.duration)
+        guard let player = self.player else { return }
+        let progress = Float(player.currentTime) / Float(player.duration)
         PKLog.debug("Progress is \(progress)")
         
         if progress >= 0.25 && !playReached25 && seekPercent <= 0.25 {
@@ -239,7 +241,6 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
             playReached100 = true
             sendAnalyticsEvent(action: .PLAY_REACHED_100)
         }
-
     }
     
     private func startTimer() {
@@ -260,7 +261,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     }
     
     private func sendAnalyticsEvent(action: KStatsEventType) {
-        
+        guard let player = self.player else { return }
         PKLog.debug("Action: \(action)")
         
         var sessionId = ""
@@ -284,7 +285,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
             parterId = String(pId)
         }
         
-        guard let mediaEntry = self.player.mediaEntry else {
+        guard let mediaEntry = player.mediaEntry else {
             PKLog.error("send analytics failed due to nil mediaEntry")
             return
         }
@@ -293,9 +294,9 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                                                                  partnerId: parterId,
                                                                  eventType: action.rawValue,
                                                                  clientVer: PlayKitManager.clientTag,
-                                                                 duration: Float(self.player.duration),
+                                                                 duration: Float(player.duration),
                                                                  sessionId: sessionId,
-                                                                 position: self.player.currentTime.toInt32(),
+                                                                 position: player.currentTime.toInt32(),
                                                                  uiConfId: confId,
                                                                  entryId: mediaEntry.id,
                                                                  widgetId: "_\(parterId)",
