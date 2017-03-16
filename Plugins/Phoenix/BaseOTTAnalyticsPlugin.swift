@@ -114,7 +114,7 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
                     
                     if strongSelf.isFirstPlay {
                         strongSelf.isFirstPlay = false
-                        strongSelf.sendAnalyticsEvent(ofType: .first_play);
+                        strongSelf.sendAnalyticsEvent(ofType: .firstPlay);
                     } else {
                         strongSelf.sendAnalyticsEvent(ofType: .play);
                     }
@@ -130,6 +130,10 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
     
     func sendAnalyticsEvent(ofType type: OTTAnalyticsEventType) {
         PKLog.debug("Send analytics event of type: \(type)")
+        // post to messageBus
+        let event = OttEvent.Report(message: "\(type) event")
+        self.messageBus?.post(event)
+        
         if let request = self.buildRequest(ofType: type) {
             self.send(request: request)
         }
