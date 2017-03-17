@@ -6,11 +6,32 @@
 //
 //
 
+/// `KalturaStatsEvent` represents an event reporting from kaltura stats plugin.
+@objc public class KalturaLiveStatsEvent: PKEvent {
+    
+    static let bufferTimeKey = "bufferTime"
+    
+    class Report: KalturaLiveStatsEvent {
+        convenience init(bufferTime: Int32) {
+            self.init([Report.bufferTimeKey: NSNumber(value: bufferTime)])
+        }
+    }
+    
+    @objc public static let report: KalturaLiveStatsEvent.Type = Report.self
+}
+
+extension PKEvent {
+    /// bufferTime Value, PKEvent Data Accessor
+    @objc public var kalturaLiveStatsBufferTime: NSNumber? {
+        return self.data?[KalturaLiveStatsEvent.bufferTimeKey] as? NSNumber
+    }
+}
+
 public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
 
     enum KLiveStatsEventType : Int {
-        case LIVE = 1
-        case DVR = 2
+        case live = 1
+        case dvr = 2
     }
     
     public override class var pluginName: String {
@@ -91,10 +112,10 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
                     if type(of: event) == PlayerEvent.stateChanged {
                         switch event.newState {
                         case .ready:
-                            strongSelf.startTimer()
+                            strongSelf.createTimer()
                             if strongSelf.isBuffering {
                                 strongSelf.isBuffering = false
-                                strongSelf.sendLiveEvent(theBufferTime: strongSelf.calculateBuffer(isBuffering: false))
+                                strongSelf.sendLiveEvent(withBufferTime: strongSelf.calculateBuffer(isBuffering: false))
                             }
                         case .buffering:
                             strongSelf.isBuffering = true
@@ -114,10 +135,10 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     
     private func startLiveEvents() {
         if !self.isLive {
-            startTimer()
+            self.createTimer()
             isLive = true
             if isFirstPlay {
-                sendLiveEvent(theBufferTime: bufferTime);
+                sendLiveEvent(withBufferTime: bufferTime);
                 isFirstPlay = false
             }
         }
@@ -125,6 +146,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     
     private func stopLiveEvents(){
         self.isLive = false
+        self.timer?.invalidate()
     }
     
     private func createTimer() {
@@ -141,24 +163,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     }
     
     @objc private func timerHit() {
-        self.sendLiveEvent(theBufferTime: bufferTime);
-    }
-    
-    private func startTimer() {
-        if let t = self.timer {
-            if t.isValid {
-                t.fire()
-            } else {
-                self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.interval), target: self, selector: #selector(KalturaLiveStatsPlugin.timerHit), userInfo: nil, repeats: true)
-                self.timer!.fire()
-            }
-        }
-    }
-    
-    private func pauseTimer() {
-        if let t = self.timer {
-            t.invalidate()
-        }
+        self.sendLiveEvent(withBufferTime: bufferTime);
     }
     
     private func calculateBuffer(isBuffering: Bool) -> Int32 {
@@ -176,8 +181,11 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
         return bufferTime
     }
     
-    private func sendLiveEvent(theBufferTime: Int32) {
+    private func sendLiveEvent(withBufferTime bufferTime: Int32) {
         PKLog.debug("sendLiveEvent - Buffer Time: \(bufferTime)")
+        // post event to message bus
+        let event = KalturaLiveStatsEvent.Report(bufferTime: bufferTime)
+        self.messageBus?.post(event)
         
         guard let mediaEntry = self.player?.mediaEntry else { return }
         
@@ -201,7 +209,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
                                                                            partnerId: parterId,
                                                                            eventType: self.isLive ? 1 : 0,
                                                                            eventIndex: self.eventIdx,
-                                                                           bufferTime: theBufferTime,
+                                                                           bufferTime: bufferTime,
                                                                            bitrate: self.lastReportedBitrate,
                                                                            sessionId: sessionId,
                                                                            startTime: self.lastReportedStartTime,
