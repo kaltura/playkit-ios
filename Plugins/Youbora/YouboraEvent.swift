@@ -10,11 +10,14 @@ import UIKit
 
 @objc public class YouboraEvent: PKEvent {
     
-    class YouboraReportSent: YouboraEvent {
+    class Report: YouboraEvent {
         convenience init(message: String) {
             self.init(["message": message])
         }
     }
+    /// this event notifies when a youbora event is being sent
+    @objc public static let report: YouboraEvent.Type = Report.self
     
-    @objc public static let youboraReportSent: YouboraEvent.Type = YouboraReportSent.self
+    @available(*, unavailable, renamed: "report")
+    @objc public static let youboraReportSent: YouboraEvent.Type = Report.self
 }
