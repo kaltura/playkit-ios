@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 /// PKEvent
 @objc public class PKEvent: NSObject {
@@ -28,6 +29,7 @@ extension PKEvent {
         static let OldState = "oldState"
         static let NewState = "newState"
         static let Error = "error"
+        static let Metadata = "metadata"
     }
     
     // MARK: Player Data Accessors
@@ -68,5 +70,10 @@ extension PKEvent {
     /// Associated error from error event, PKEvent Data Accessor
     @objc public var error: NSError? {
         return self.data?[EventDataKeys.Error] as? NSError
+    }
+    
+    /// Associated metadata from the event, PKEvent Data Accessor
+    @objc public var timedMetadata: [AVMetadataItem]? {
+        return self.data?[EventDataKeys.Metadata] as? [AVMetadataItem]
     }
 }

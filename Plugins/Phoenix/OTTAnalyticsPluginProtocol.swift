@@ -13,11 +13,11 @@ enum OTTAnalyticsEventType: String {
     case play
     case stop
     case pause
-    case first_play
+    case firstPlay
     case swoosh
     case load
     case finish
-    case bitrate_change
+    case bitrateChange
     case error
 }
 

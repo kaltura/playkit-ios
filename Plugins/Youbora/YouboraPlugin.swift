@@ -268,7 +268,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     
     private func postEventLogWithMessage(message: String) {
         PKLog.debug(message)
-        let eventLog = YouboraEvent.YouboraReportSent(message: message as NSString)
+        let eventLog = YouboraEvent.Report(message: message)
         self.messageBus?.post(eventLog)
     }
 }
