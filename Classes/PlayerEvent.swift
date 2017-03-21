@@ -6,6 +6,7 @@
 //
 //
 import Foundation
+import AVFoundation
 
 /// An PlayerEvent is a class used to reflect player events.
 @objc public class PlayerEvent: PKEvent {
@@ -43,6 +44,8 @@ import Foundation
     @objc public static let playbackParamsUpdated: PlayerEvent.Type = PlaybackParamsUpdated.self
     /// Sent when player state is changed.
     @objc public static let stateChanged: PlayerEvent.Type = StateChanged.self
+    /// Sent when timed metadata is available.
+    @objc public static let timedMetadata: PlayerEvent.Type = TimedMetadata.self
     
     /// Sent when an error occurs.
     @objc public static let error: PlayerEvent.Type = Error.self
@@ -86,6 +89,12 @@ import Foundation
         }
     }
     
+    class TimedMetadata: PlayerEvent {
+        convenience init(metadata: [AVMetadataItem]) {
+            self.init([EventDataKeys.Metadata: metadata])
+        }
+    }
+    
     // MARK: - Player Tracks Events
     
     class TracksAvailable: PlayerEvent {
@@ -105,7 +114,7 @@ import Foundation
     class StateChanged: PlayerEvent {
         convenience init(newState: PlayerState, oldState: PlayerState) {
             self.init([EventDataKeys.NewState : newState as AnyObject,
-                        EventDataKeys.OldState : oldState as AnyObject])
+                       EventDataKeys.OldState : oldState as AnyObject])
         }
     }
 }

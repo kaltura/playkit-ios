@@ -18,12 +18,12 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
     // MARK: - WidevineClassicError
     /************************************************************/
     
-    enum WidevineClassicError: PKError { 
+    enum WidevineClassicError: PKError {
         
         case invalidDRMData
         case missingWidevineFile
         
-        static let Domain = "com.kaltura.playkit.error.drm.widevine"
+        static let domain = "com.kaltura.playkit.error.drm.widevine"
         
         var code: Int {
             switch self {
@@ -48,7 +48,7 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
     }
     
     extension PKErrorDomain {
-        @objc public static let Widevine = WidevineClassicError.Domain
+        @objc public static let Widevine = WidevineClassicError.domain
     }
     
     extension PKErrorCode {
