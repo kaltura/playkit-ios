@@ -32,7 +32,7 @@ public struct SessionInfo {
     }
     
     public weak var delegate: OTTSessionManagerDelegate? = nil
-    public let saftyMargin = 3*60.0
+    public var saftyMargin: TimeInterval = 0
     
     @objc public var serverURL: String
     @objc public var partnerId: Int64
@@ -165,13 +165,11 @@ public struct SessionInfo {
             throw SessionManagerError.failed
         }
     }
-
     
     /************************************************************/
     // MARK: - start session with token
     /************************************************************/
     @objc public func startSession(token:String,type:KalturaSocialNetwork,udid:String, completion: @escaping (_ error: Error?) -> Void) {
-        
         
         do {
             let startSessionRequests = try self.getStartSessionWithTokenRequestBuilder(token: token, type: type, udid: udid)
