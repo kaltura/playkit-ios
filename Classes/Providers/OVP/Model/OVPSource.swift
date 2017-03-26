@@ -32,7 +32,8 @@ class OVPSource: OVPBaseObject {
         let jsonObject = JSON(json)
         
         guard let id =  jsonObject[deliveryProfileIdKey].int64,
-            let format = jsonObject[formatKey].string   else {
+            let format = jsonObject[formatKey].string
+            else {
                 return nil
         }
         

@@ -11,14 +11,14 @@ import SwiftyJSON
 
 class OTTPlaybackContext: OTTBaseObject {
     
-    var sources:[OTTPlaybackSource] =  []
+    var sources:[OTTPlaybackSource] = []
     
     required init?(json: Any) {
         let jsonObject = JSON(json)
-        jsonObject["sources"].array?.forEach({ (source:JSON) in
+        jsonObject["sources"].array?.forEach(){ (source: JSON) in
             if let source = OTTPlaybackSource(json: source.object) {
                 sources.append(source)
             }
-        })
+        }
     }
 }

@@ -24,7 +24,7 @@ internal class OTTSessionService: NSObject {
 
     }
     
-    internal static func switchUser(baseURL:String,ks:String,userId:String) -> KalturaRequestBuilder? {
+    internal static func switchUser(baseURL:String, ks:String, userId:String) -> KalturaRequestBuilder? {
         
         if let request = KalturaRequestBuilder(url: baseURL, service: "session", action: "switchUser") {
             request

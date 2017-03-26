@@ -46,11 +46,11 @@ class OTTPlaybackSource: OTTBaseObject {
         self.externalId = jsonObject["externalId"].string
         
         var drmArray = [OTTDrmData]()
-        jsonObject["drm"].array?.forEach({ (json) in
+        jsonObject["drm"].array?.forEach(){(json) in
             if let drmObject = OTTDrmData(json: json.object) {
                 drmArray.append(drmObject)
             }
-        })
+        }
         
         if drmArray.count > 0 {
             self.drm = drmArray
