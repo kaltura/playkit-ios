@@ -96,6 +96,11 @@ extension AVPlayerEngine {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         self.isPlayedToEndTime = true
+        // In iOS 9 and below rate is 1.0 even when playback is finished.
+        // To make sure rate will be 0.0 (paused) when played to end we call pause manually.
+        // calling pause after `isPlayedToEndTime` will make sure no pause event will be sent in messageBus.
+        self.pause()
+        // pause should be called before ended to make sure our rate will be 0.0 when ended event will be observed.
         self.post(event: PlayerEvent.Ended())
     }
     
