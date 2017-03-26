@@ -11,7 +11,7 @@ import SwiftyJSON
 
 @objc public enum KalturaSocialNetwork: Int {
     case facebook
-    
+
     func stringValue() -> String {
         switch self {
         case .facebook:
@@ -23,10 +23,9 @@ import SwiftyJSON
 }
 
 class OTTSocialService: NSObject {
-    
-    
-    internal static func login(baseURL: String, partner: Int, token: String, type: KalturaSocialNetwork, udid:String) -> KalturaRequestBuilder? {
-        
+
+    internal static func login(baseURL: String, partner: Int, token: String, type: KalturaSocialNetwork, udid: String) -> KalturaRequestBuilder? {
+
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "social", action: "login") {
             request
                 .setBody(key: "partnerId", value: JSON(partner))
@@ -34,9 +33,9 @@ class OTTSocialService: NSObject {
                 .setBody(key: "type", value: JSON(type.stringValue()))
                 .setBody(key: "udid", value:JSON(udid))
             return request
-        }else {
+        } else {
             return nil
         }
     }
-    
+
 }

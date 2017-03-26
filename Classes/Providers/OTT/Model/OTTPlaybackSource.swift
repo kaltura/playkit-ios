@@ -9,10 +9,8 @@
 import Foundation
 import SwiftyJSON
 
-
-
 class OTTPlaybackSource: OTTBaseObject {
-    
+
     var assetId: Int
     var id: Int
     var type: String // file format
@@ -22,10 +20,10 @@ class OTTPlaybackSource: OTTBaseObject {
     var protocols: [String]
     var format: String
     var drm: [OTTDrmData]?
-    
+
     required init?(json: Any) {
         let jsonObject = JSON(json)
-        
+
         guard let assetId = jsonObject["assetId"].int,
         let id = jsonObject["id"].int,
         let type = jsonObject["type"].string,
@@ -35,7 +33,7 @@ class OTTPlaybackSource: OTTBaseObject {
         else {
             return nil
         }
-        
+
         self.assetId = assetId
         self.id = id
         self.type = type
@@ -44,17 +42,17 @@ class OTTPlaybackSource: OTTBaseObject {
         self.format = format
         self.duration = jsonObject["duration"].float ?? 0
         self.externalId = jsonObject["externalId"].string
-        
+
         var drmArray = [OTTDrmData]()
-        jsonObject["drm"].array?.forEach{(json) in
+        jsonObject["drm"].array?.forEach {(json) in
             if let drmObject = OTTDrmData(json: json.object) {
                 drmArray.append(drmObject)
             }
         }
-        
+
         if drmArray.count > 0 {
             self.drm = drmArray
         }
-        
+
     }
 }

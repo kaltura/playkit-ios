@@ -10,9 +10,9 @@ import Foundation
 import SwiftyJSON
 
 class OTTPlaybackContext: OTTBaseObject {
-    
-    var sources:[OTTPlaybackSource] = []
-    
+
+    var sources: [OTTPlaybackSource] = []
+
     required init?(json: Any) {
         let jsonObject = JSON(json)
         jsonObject["sources"].array?.forEach { (source: JSON) in

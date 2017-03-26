@@ -8,16 +8,13 @@
 
 import Foundation
 
-
-
-
 public enum AssetType: String {
     case media = "media"
     case epg = "epg"
 }
 
 public enum PlaybackContextType: String {
-    
+
     case trailer = "TRAILER"
     case catchup = "CATCHUP"
     case startOver = "START_OVER"
