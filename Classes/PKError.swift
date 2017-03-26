@@ -68,6 +68,7 @@ enum PKPluginError: PKError {
     
     case failedToCreatePlugin(pluginName: String)
     case missingPluginConfig(pluginName: String)
+    case wrongPluginConfig(pluginName: String)
     
     static let domain = "com.kaltura.playkit.error.plugins"
     
@@ -75,6 +76,7 @@ enum PKPluginError: PKError {
         switch self {
         case .failedToCreatePlugin: return PKErrorCode.failedToCreatePlugin
         case .missingPluginConfig: return PKErrorCode.missingPluginConfig
+        case .wrongPluginConfig: return PKErrorCode.wrongPluginConfig
         }
     }
     
@@ -82,6 +84,7 @@ enum PKPluginError: PKError {
         switch self {
         case .failedToCreatePlugin(let pluginName): return "failed to create plugin (\(pluginName)), doesn't exist in registry"
         case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName)"
+        case .wrongPluginConfig(let pluginName): return "Wrong plugin config, missing/wrong data \(pluginName)"
         }
     }
     
@@ -89,6 +92,7 @@ enum PKPluginError: PKError {
         switch self {
         case .failedToCreatePlugin(let pluginName): return [PKErrorKeys.PluginNameKey: pluginName]
         case .missingPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey: pluginName]
+        case .wrongPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey: pluginName]
         }
     }
 }
@@ -226,5 +230,6 @@ struct PKErrorKeys {
     // PKPluginError
     @objc(FailedToCreatePlugin) public static let failedToCreatePlugin = 2000
     @objc(MissingPluginConfig) public static let missingPluginConfig = 2001
+    @objc(WrongPluginConfig) public static let wrongPluginConfig = 2002
 }
 
