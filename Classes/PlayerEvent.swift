@@ -121,13 +121,13 @@ import AVFoundation
 
 @objc public class AdEvent: PKEvent {
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, adBreakEnded, adBreakStarted, adAllCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
+        adBreakReady, adBreakEnded, adBreakStarted, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
     @objc public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self
     @objc public static let adBreakStarted: AdEvent.Type = AdBreakStarted.self
-    @objc public static let adAllCompleted: AdEvent.Type = AdAllCompleted.self
+    @objc public static let allAdsCompleted: AdEvent.Type = AllAdsCompleted.self
     @objc public static let adComplete: AdEvent.Type = AdComplete.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
     @objc public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
@@ -158,7 +158,7 @@ import AVFoundation
     class AdBreakReady: AdEvent {}
     class AdBreakEnded: AdEvent {}
     class AdBreakStarted: AdEvent {}
-    class AdAllCompleted: AdEvent {}
+    class AllAdsCompleted: AdEvent {}
     class AdComplete: AdEvent {}
     class AdClicked: AdEvent {}
     class AdFirstQuartile: AdEvent {}

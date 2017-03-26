@@ -20,7 +20,6 @@ import GoogleInteractiveMediaAds
     @objc public var videoBitrate = kIMAAutodetectBitrate
     @objc public var videoMimeTypes: [Any]?
     @objc public var adTagUrl: String?
-    @objc public var tagsTimes: [TimeInterval: String]?
     @objc public var companionView: UIView?
     @objc public var webOpenerPresentingController: UIViewController?
 
@@ -46,12 +45,6 @@ import GoogleInteractiveMediaAds
     @discardableResult
     @nonobjc public func set(adTagUrl: String) -> Self {
         self.adTagUrl = adTagUrl
-        return self
-    }
-    
-    @discardableResult
-    @nonobjc public func set(tagsTimes: [TimeInterval: String]) -> Self {
-        self.tagsTimes = tagsTimes
         return self
     }
     
