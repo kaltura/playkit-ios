@@ -83,10 +83,7 @@ extension IMAAdsManager {
             
             if let adTagUrl = adsConfig.adTagUrl {
                 self.adTagUrl = adTagUrl
-            } else {
-                // we must have ad tag url to create ima plugin
-                throw PKPluginError.wrongPluginConfig(pluginName: IMAPlugin.pluginName)
-            }
+            } 
         } else {
             PKLog.error("missing plugin config")
             throw PKPluginError.missingPluginConfig(pluginName: IMAPlugin.pluginName)
