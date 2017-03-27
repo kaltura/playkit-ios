@@ -83,10 +83,7 @@ extension IMAAdsManager {
             
             if let adTagUrl = adsConfig.adTagUrl {
                 self.adTagUrl = adTagUrl
-            } else if let adTagsTimes = adsConfig.tagsTimes {
-                self.tagsTimes = adTagsTimes
-                self.sortedTagsTimes = adTagsTimes.keys.sorted()
-            }
+            } 
         } else {
             PKLog.error("missing plugin config")
             throw PKPluginError.missingPluginConfig(pluginName: IMAPlugin.pluginName)
