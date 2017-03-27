@@ -11,14 +11,15 @@ import SwiftyJSON
 
 internal class OTTGetAssetResponse: OTTBaseObject {
 
-    internal var asset: OTTAsset?
-
+    internal var asset: OTTAsset? = nil
+    
     private let resultKey = "result"
-
+    
     internal required init(json:Any) {
-
+        
         let responseJson = JSON(json)
         let assetJson = responseJson[resultKey]
         self.asset = OTTAsset(json: assetJson.object)
     }
 }
+
