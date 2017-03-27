@@ -61,6 +61,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         if isAdPlayback {
             self.adsPlugin.resume()
         } else {
+            self.adsPlugin.contentResumed()
             super.resume()
         }
     }

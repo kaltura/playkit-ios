@@ -47,6 +47,8 @@ extension IMAAdsManager {
     private var startAdCalled = false
     private var loaderFailed = false
     
+    private var contentCompleted = false
+    
     private var timer: Timer?
     
     public var currentTime: TimeInterval {
@@ -143,6 +145,8 @@ extension IMAAdsManager {
     
     @discardableResult
     func start(showLoadingView: Bool) -> Bool {
+        contentCompleted = false
+
         if self.loaderFailed {
             return false
         }
@@ -172,7 +176,13 @@ extension IMAAdsManager {
     }
     
     func contentComplete() {
+        contentCompleted = true
+
         IMAPlugin.loader.contentComplete()
+    }
+    
+    func contentResumed() {
+        contentCompleted = false
     }
     
     /************************************************************/
@@ -392,13 +402,17 @@ extension IMAAdsManager {
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
         self.isAdPlayback = true
-        self.notify(event: AdEvent.AdDidRequestPause())
+        if !contentCompleted {
+            self.notify(event: AdEvent.AdDidRequestPause())
+        }
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
         self.isAdPlayback = false
         self.showLoadingView(false, alpha: 0)
-        self.notify(event: AdEvent.AdDidRequestResume())
+        if !contentCompleted {
+            self.notify(event: AdEvent.AdDidRequestResume())
+        }
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
