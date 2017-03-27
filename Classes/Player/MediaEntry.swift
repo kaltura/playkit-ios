@@ -15,6 +15,7 @@ func getJson(_ json: Any) -> JSON {
 
 @objc public enum MediaType: Int {
     case live
+    case vod
     case unknown
 }
 
@@ -136,7 +137,6 @@ func getJson(_ json: Any) -> JSON {
     
     private let idKey: String = "id"
     private let contentUrlKey: String = "url"
-    private let mimeTypeKey: String = "mimeType"
     private let drmDataKey: String = "drmData"
     private let formatTypeKey: String = "sourceType"
     
@@ -147,7 +147,6 @@ func getJson(_ json: Any) -> JSON {
     @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMParams]? = nil, mediaFormat: MediaFormat = .unknown) {
         self.id = id
         self.contentUrl = contentUrl
-        self.mimeType = mimeType
         self.drmData = drmData
         self.mediaFormat = mediaFormat
     }
@@ -159,8 +158,6 @@ func getJson(_ json: Any) -> JSON {
         self.id = sj[idKey].string ?? UUID().uuidString
         
         self.contentUrl = sj[contentUrlKey].url
-        
-        self.mimeType = sj[mimeTypeKey].string
         
         if let drmData = sj[drmDataKey].array {
             self.drmData = drmData.flatMap { DRMParams.fromJSON($0) }
