@@ -9,53 +9,37 @@
 import UIKit
 import SwiftyJSON
 
+@objc public enum AssetType: Int {
+    case media
+    case epg
+    case unknown
+    
+    var asString: String {
+        switch self {
+        case .media: return "media"
+        case .epg: return "epg"
+        case .unknown: return ""
+        }
+    }
+}
+
 class OTTAssetService {
 
-    internal static func get(baseURL: String, ks: String, assetId: String, type: AssetType) -> KalturaRequestBuilder? {
-
+    static func get(baseURL: String, ks: String, assetId: String, type: AssetType) -> KalturaRequestBuilder? {
+        
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "get") {
             request
             .setBody(key: "id", value: JSON(assetId))
             .setBody(key: "ks", value: JSON(ks))
+            .setBody(key: "assetReferenceType", value: JSON(type.asString))
             .setBody(key: "type", value: JSON(type.rawValue))
-            .setBody(key: "assetReferenceType", value: JSON(type.rawValue))
-            .setBody(key: "with", value: JSON([["type": "files", "objectType": "KalturaCatalogWithHolder"]]))
+            .setBody(key: "with", value: JSON([["type": "files","objectType": "KalturaCatalogWithHolder"]]))
             return request
         } else {
             return nil
         }
     }
-
-    internal static func getPlaybackContext(baseURL: String, ks: String, assetId: String, type: AssetType, playbackContextOptions: PlaybackContextOptions) -> KalturaRequestBuilder? {
-
-        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "getPlaybackContext") {
-            request
-            .setBody(key: "assetId", value: JSON(assetId))
-            .setBody(key: "ks", value: JSON(ks))
-            .setBody(key: "assetType", value: JSON(type.rawValue))
-            .setBody(key: "contextDataParams", value: JSON(playbackContextOptions.toDictionary()))
-            return request
-        } else {
-            return nil
-        }
-
-    }
 }
 
-struct PlaybackContextOptions {
 
-    internal var playbackContextType: PlaybackContextType
-    internal var protocls: [String]
-    internal var assetFileIds: [String]?
 
-    func toDictionary() -> [String: Any] {
-
-        var dict: [String: Any] = [:]
-        dict["context"] = playbackContextType.rawValue
-        dict["mediaProtocols"] = protocls
-        if let fileIds = self.assetFileIds {
-            dict["assetFileIds"] = fileIds.joined(separator: ",")
-        }
-        return dict
-    }
-}

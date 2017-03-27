@@ -41,28 +41,20 @@ extension PlayerCreator where Self: QuickSpec {
         entry["id"] = "test"
         entry["sources"] = sources
         let mediaConfig = MediaConfig(mediaEntry: MediaEntry(json: entry))
-        do{
+        
         let pluginConfig: PluginConfig?
         if let pluginConfigDict = pluginConfigDict {
             let pluginConfig = PluginConfig(config: pluginConfigDict)
-            
-            
-            player = try PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
+            player = PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
         } else {
             pluginConfig = nil
-            player = try PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
-        }
-            
-            if shouldStartPreparing {
-                player.prepare(mediaConfig)
-            }
-            return player
-        }catch{
-            
+            player = PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
         }
         
-        return PlayerLoader()
-        
+        if shouldStartPreparing {
+            player.prepare(mediaConfig)
+        }
+        return player
     }
 }
 

@@ -42,8 +42,9 @@ class MockMediaProviderTest: XCTestCase {
             .set(url: self.filePath!)
             .set(id: "m001")
         
-        mediaProvider1.loadMedia { (media, error) in
-            if media != nil {
+        mediaProvider1.loadMedia { (r:Result<MediaEntry>) in
+            print(r)
+            if r.data != nil {
                 theExeption.fulfill()
             }
             else{
@@ -63,8 +64,8 @@ class MockMediaProviderTest: XCTestCase {
         let theExeption = expectation(description: "test")
         let mediaProvider2 : MediaEntryProvider = MockMediaEntryProvider().set(url: self.filePath!).set(id: "sdf")
         
-        mediaProvider2.loadMedia { (media, error) in
-            if  error != nil {
+        mediaProvider2.loadMedia { (r:Result<MediaEntry>) in
+            if  r.error != nil {
                 theExeption.fulfill()
             }else{
                 XCTFail()
@@ -83,8 +84,8 @@ class MockMediaProviderTest: XCTestCase {
         let theExeption = expectation(description: "test")
         let mediaProvider2 : MediaEntryProvider = MockMediaEntryProvider().set(url: URL(string:"asdd")).set(id: "sdf")
         
-        mediaProvider2.loadMedia { (media, error) in
-            if error != nil {
+        mediaProvider2.loadMedia { (r:Result<MediaEntry>) in
+            if r.error != nil {
                 theExeption.fulfill()
             }else{
                 XCTFail()
@@ -105,8 +106,8 @@ class MockMediaProviderTest: XCTestCase {
             .set(content: self.fileContent)
             .set(id: "m001")
         
-        mediaProvider1.loadMedia { (media, error) in
-            if let mediaEntry = media {
+        mediaProvider1.loadMedia { (r:Result<MediaEntry>) in
+            if let mediaEntry = r.data {
                 if let sources = mediaEntry.sources, sources.count > 0{
                     
                     let source = sources[0]
