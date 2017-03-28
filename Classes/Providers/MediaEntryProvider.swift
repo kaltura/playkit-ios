@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 @objc public protocol MediaEntryProvider {
     /**
      This method is triggering the creation of media base on custom parameters and actions.
@@ -32,12 +31,7 @@ import UIKit
      
      */
     func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void)
-    
-    
+
     func cancel()
-    
+
 }
-
-
-
-
