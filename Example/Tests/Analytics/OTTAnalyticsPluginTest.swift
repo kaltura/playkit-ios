@@ -123,8 +123,8 @@ class OTTAnalyticsPluginTest: QuickSpec {
                     var analyticsPluginMock = analyticsPluginMock
                     print("received analytics event: \(eventType.rawValue)")
                     switch eventType {
-                    case .first_play, .play:
-                        if eventType == .first_play {
+                    case .firstPlay, .play:
+                        if eventType == .firstPlay {
                             analyticsPluginMock.invocationCount.firstPlayCount += 1
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                 player.pause()
@@ -149,9 +149,9 @@ class OTTAnalyticsPluginTest: QuickSpec {
                                 analyticsPluginMock.finishedHandling = true
                             }
                         }
-                        if eventType == .first_play || eventType == .play {
+                        if eventType == .firstPlay || eventType == .play {
                             switch analyticsPluginMock.invocationCount.playCount {
-                            case 0: expect(eventType).to(equal(OTTAnalyticsEventType.first_play))
+                            case 0: expect(eventType).to(equal(OTTAnalyticsEventType.firstPlay))
                             default: expect(eventType).to(equal(OTTAnalyticsEventType.play))
                             }
                             analyticsPluginMock.invocationCount.playCount += 1

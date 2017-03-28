@@ -160,7 +160,7 @@ protocol PKError: Error, CustomStringConvertible {
 
 extension PKError {
     /// description string
-    var description: String {
+    public var description: String {
         return "\(type(of: self)) ,domain: \(type(of: self).domain), errorCode: \(self.code)"
     }
     

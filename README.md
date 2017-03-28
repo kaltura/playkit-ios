@@ -4,7 +4,7 @@
 [![Platform](https://img.shields.io/cocoapods/p/PlayKit.svg?style=flat)](https://cocoapods.org/pods/PlayKit)
 
 # Kaltura Player SDK
-## Note: The Kaltura SDK v3 is in beta
+
 ### Demo: [Demo repo](https://github.com/kaltura/playkit-ios-samples).
 
 *If you are a Kaltura customer, please contact your Kaltura Customer Success Manager to help facilitate use of this component.*

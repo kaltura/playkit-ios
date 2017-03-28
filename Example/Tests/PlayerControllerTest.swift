@@ -32,7 +32,11 @@ class PlayerControllerTest: XCTestCase {
         entry["sources"] = sources
         let mediaConfig = MediaConfig(mediaEntry: MediaEntry(json: entry))
         
-        self.player = PlayKitManager.shared.loadPlayer(pluginConfig: nil)
+        do{
+        self.player = try PlayKitManager.shared.loadPlayer(pluginConfig: nil)
+        } catch {
+            
+        }
         self.player.prepare(mediaConfig)
     }
     

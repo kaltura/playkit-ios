@@ -9,7 +9,6 @@
 import GoogleInteractiveMediaAds
 
 extension IMAAdsManager {
-    
     func getAdCuePoints() -> PKAdCuePoints {
         return PKAdCuePoints(cuePoints: self.adCuePoints as? [TimeInterval] ?? [])
     }
@@ -25,7 +24,6 @@ extension IMAAdsManager {
     weak var delegate: AdsPluginDelegate?
     weak var pipDelegate: AVPictureInPictureControllerDelegate?
     
-    private var contentPlayhead: IMAAVPlayerContentPlayhead?
     private var adsManager: IMAAdsManager?
     private var renderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
     private static var loader: IMAAdsLoader!
@@ -34,23 +32,14 @@ extension IMAAdsManager {
     private var loadingView: UIView?
     // we must have config error will be thrown otherwise
     private var config: AdsConfig!
-    private var adTagUrl: String?
-    private var tagsTimes: [TimeInterval : String]? {
-        didSet {
-            sortedTagsTimes = tagsTimes!.keys.sorted()
-        }
-    }
-    private var sortedTagsTimes: [TimeInterval]?
+    private var adTagUrl: String!
     
-    private var currentPlaybackTime: TimeInterval! = 0 //in seconds
     private var isAdPlayback = false
     private var startAdCalled = false
     private var loaderFailed = false
     
-    private var timer: Timer?
-    
     public var currentTime: TimeInterval {
-        return self.currentPlaybackTime
+        return self.player?.currentTime ?? 0
     }
     
     /************************************************************/
@@ -83,9 +72,6 @@ extension IMAAdsManager {
             
             if let adTagUrl = adsConfig.adTagUrl {
                 self.adTagUrl = adTagUrl
-            } else if let adTagsTimes = adsConfig.tagsTimes {
-                self.tagsTimes = adTagsTimes
-                self.sortedTagsTimes = adTagsTimes.keys.sorted()
             }
         } else {
             PKLog.error("missing plugin config")
@@ -95,14 +81,11 @@ extension IMAAdsManager {
         self.messageBus?.addObserver(self, events: [PlayerEvent.ended]) { [weak self] event in
             self?.contentComplete()
         }
-        
-        self.timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(IMAPlugin.update), userInfo: nil, repeats: true)
     }
     
     public override func destroy() {
         super.destroy()
         self.destroyManager()
-        self.timer?.invalidate()
     }
     
     /************************************************************/
@@ -210,49 +193,6 @@ extension IMAAdsManager {
             videoView.addConstraint(NSLayoutConstraint(item: videoView, attribute: NSLayoutAttribute.right, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.right, multiplier: 1, constant: 0))
         }
     }
-
-    private func loadAdsIfNeeded() {
-        if self.tagsTimes != nil {
-            let key = floor(self.currentPlaybackTime)
-            if self.sortedTagsTimes!.count > 0 && key >= self.sortedTagsTimes![0] {
-                if let adTag = self.tagsTimes![key] {
-                    self.updateAdTag(adTag, tagTimeKeyForRemove: key)
-                } else {
-                    let closestKey = self.findClosestTimeInterval(for: key)
-                    let adTag = self.tagsTimes![closestKey]
-                    self.updateAdTag(adTag!, tagTimeKeyForRemove: closestKey)
-                }
-            }
-        }
-    }
-    
-    private func updateAdTag(_ adTag: String, tagTimeKeyForRemove: TimeInterval) {
-        self.tagsTimes![tagTimeKeyForRemove] = nil
-        self.destroyManager()
-        self.contentComplete()
-        self.adTagUrl = adTag
-        self.requestAds()
-        self.start(showLoadingView: false)
-    }
-    
-    private func findClosestTimeInterval(for searchItem: TimeInterval) -> TimeInterval {
-        var result = self.sortedTagsTimes![0]
-        for item in self.sortedTagsTimes! {
-            if item > searchItem {
-                break
-            }
-            result = item
-        }
-        return result
-    }
-    
-    @objc private func update() {
-        if !self.isAdPlayback {
-            guard let currentTime = self.player?.currentTime, !currentTime.isNaN else { return }
-            self.currentPlaybackTime = currentTime
-            self.loadAdsIfNeeded()
-        }
-    }
     
     private func createRenderingSettings() {
         self.renderingSettings.webOpenerDelegate = self
@@ -292,6 +232,7 @@ extension IMAAdsManager {
     }
     
     private func destroyManager() {
+        self.adsManager?.delegate = nil
         self.adsManager?.destroy()
         self.adsManager = nil
     }
@@ -337,6 +278,7 @@ extension IMAAdsManager {
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
         PKLog.debug("ads manager event: " + String(describing: event))
         switch event.type {
+        // Ad break, will be called before each scheduled ad break. Ad breaks may contain more than 1 ad.
         case .AD_BREAK_READY:
             self.notify(event: AdEvent.AdBreakReady())
             let canPlay = self.dataSource?.adsPluginShouldPlayAd(self)
@@ -359,7 +301,7 @@ extension IMAAdsManager {
         case .STARTED:
             if let ad = event.ad {
                 let adInfo = PKAdInfo(ad: ad)
-                self.notify(event: AdEvent.AdInfomation(adInfo: adInfo))
+                self.notify(event: AdEvent.AdInformation(adInfo: adInfo))
             }
             self.notify(event: AdEvent.AdStarted())
             self.showLoadingView(false, alpha: 0)
@@ -367,7 +309,11 @@ extension IMAAdsManager {
             self.notify(event: AdEvent.AdBreakStarted())
             self.showLoadingView(false, alpha: 0)
         case .AD_BREAK_ENDED: self.notify(event: AdEvent.AdBreakEnded())
-        case .ALL_ADS_COMPLETED: self.notify(event: AdEvent.AdAllCompleted())
+        case .ALL_ADS_COMPLETED:
+            // detaching the delegate and destroying the adsManager. 
+            // means all ads have been played so we can destroy the adsManager.
+            self.destroyManager()
+            self.notify(event: AdEvent.AllAdsCompleted())
         case .CLICKED: self.notify(event: AdEvent.AdClicked())
         case .COMPLETE: self.notify(event: AdEvent.AdComplete())
         case .CUEPOINTS_CHANGED: self.notify(event: AdEvent.AdCuePointsUpdate(adCuePoints: adsManager.getAdCuePoints()))
@@ -402,9 +348,6 @@ extension IMAAdsManager {
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
-        var data = [String: TimeInterval]()
-        data["mediaTime"] = mediaTime
-        data["totalTime"] = totalTime
         self.notify(event: AdEvent.AdDidProgressToTime(mediaTime: mediaTime, totalTime: totalTime))
     }
     

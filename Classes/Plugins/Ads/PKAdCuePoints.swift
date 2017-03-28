@@ -16,19 +16,19 @@ import Foundation
         self.cuePoints = cuePoints.sorted() // makes sure array is sorted
     }
     
-    @objc var count: Int {
+    @objc public var count: Int {
         return self.cuePoints.count
     }
     
-    @objc var hasPreRoll: Bool {
+    @objc public var hasPreRoll: Bool {
         return self.cuePoints.filter { $0 == 0 }.count > 0 // pre-roll ads values = 0
     }
     
-    @objc var hasMidRoll: Bool {
+    @objc public var hasMidRoll: Bool {
         return self.cuePoints.filter { $0 > 0 }.count > 0
     }
     
-    @objc var hasPostRoll: Bool {
+    @objc public var hasPostRoll: Bool {
         return self.cuePoints.filter { $0 < 0 }.count > 0 // post-roll ads values = -1
     }
 }

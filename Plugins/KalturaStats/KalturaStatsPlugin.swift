@@ -6,50 +6,72 @@
 //
 //
 
-public class KalturaStatsPlugin: BaseAnalyticsPlugin {
+/// `KalturaStatsEvent` represents an event reporting from kaltura stats plugin.
+@objc public class KalturaStatsEvent: PKEvent {
+    
+    static let messageKey = "message"
+    
+    class Report: KalturaStatsEvent {
+        convenience init(message: String) {
+            self.init([KalturaStatsEvent.messageKey: message])
+        }
+    }
+    
+    @objc public static let report: KalturaStatsEvent.Type = Report.self
+}
 
-    enum KStatsEventType : Int {
-        case WIDGET_LOADED = 1
-        case MEDIA_LOADED = 2
-        case PLAY = 3
-        case PLAY_REACHED_25 = 4
-        case PLAY_REACHED_50 = 5
-        case PLAY_REACHED_75 = 6
-        case PLAY_REACHED_100 = 7
-        case OPEN_EDIT = 8
-        case OPEN_VIRAL = 9
-        case OPEN_DOWNLOAD = 10
-        case OPEN_REPORT = 11
-        case BUFFER_START = 12
-        case BUFFER_END = 13
-        case OPEN_FULL_SCREEN = 14
-        case CLOSE_FULL_SCREEN = 15
-        case REPLAY = 16
-        case SEEK = 17
-        case OPEN_UPLOAD = 18
-        case SAVE_PUBLISH = 19
-        case CLOSE_EDITOR = 20
-        case PRE_BUMPER_PLAYED = 21
-        case POST_BUMPER_PLAYED = 22
-        case BUMPER_CLICKED = 23
-        case PREROLL_STARTED = 24
-        case MIDROLL_STARTED = 25
-        case POSTROLL_STARTED = 26
-        case OVERLAY_STARTED = 27
-        case PREROLL_CLICKED = 28
-        case MIDROLL_CLICKED = 29
-        case POSTROLL_CLICKED = 30
-        case OVERLAY_CLICKED = 31
-        case PREROLL_25 = 32
-        case PREROLL_50 = 33
-        case PREROLL_75 = 34
-        case MIDROLL_25 = 35
-        case MIDROLL_50 = 36
-        case MIDROLL_75 = 37
-        case POSTROLL_25 = 38
-        case POSTROLL_50 = 39
-        case POSTROLL_75 = 40
-        case ERROR = 99
+extension PKEvent {
+    /// bufferTime Value, PKEvent Data Accessor
+    @objc public var kalturaStatsMessage: String? {
+        return self.data?[KalturaStatsEvent.messageKey] as? String
+    }
+}
+
+public class KalturaStatsPlugin: BaseAnalyticsPlugin {
+    
+    // stats event types
+    enum KalturaStatsEventType : Int {
+        case widgetLoaded = 1
+        case mediaLoaded = 2
+        case play = 3
+        case playReached25 = 4
+        case playReached50 = 5
+        case playReached75 = 6
+        case playReached100 = 7
+        case openEdit = 8
+        case openViral = 9
+        case openDownload = 10
+        case openReport = 11
+        case bufferStart = 12
+        case bufferEnd = 13
+        case openFullScreen = 14
+        case closeFullScreen = 15
+        case replay = 16
+        case seek = 17
+        case openUpload = 18
+        case savePublish = 19
+        case closeEditor = 20
+        case preBumperPlayed = 21
+        case postBumperPlayed = 22
+        case bumperClicked = 23
+        case prerollStarted = 24
+        case midrollStarted = 25
+        case postRollStarted = 26
+        case overlayStarted = 27
+        case prerollClicked = 28
+        case midrollClicked = 29
+        case postRollClicked = 30
+        case overlayClicked = 31
+        case preRoll25 = 32
+        case preRoll50 = 33
+        case preRoll75 = 34
+        case midRoll25 = 35
+        case midRoll50 = 36
+        case midRoll75 = 37
+        case postRoll25 = 38
+        case postRoll50 = 39
+        case postRoll75 = 40
+        case error = 99
     }
     
     public override class var pluginName: String {
@@ -70,7 +92,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     private var hasSeeked = false
     
     private var timer: Timer?
-    private var interval = 30
+    private var interval: TimeInterval = 30
     
     /************************************************************/
     // MARK: - AnalyticsPluginProtocol
@@ -112,14 +134,14 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                     PKLog.debug("seeked event: \(event)")
                     strongSelf.hasSeeked = true
                     strongSelf.seekPercent = Float(player.currentTime) / Float(player.duration)
-                    strongSelf.sendAnalyticsEvent(action: .SEEK)
+                    strongSelf.sendAnalyticsEvent(action: .seek)
                 })
             case let e where e.self == PlayerEvent.playing:
                 self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
                     guard let strongSelf = self else { return }
                     PKLog.debug("play event: \(event)")
                     if strongSelf.isFirstPlay {
-                        strongSelf.sendAnalyticsEvent(action: .PLAY)
+                        strongSelf.sendEvent(ofType: .play, withMessage: "Play event")
                         strongSelf.isFirstPlay = false
                     }
                 })
@@ -127,7 +149,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                 self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
                     guard let strongSelf = self else { return }
                     PKLog.debug("error event: \(event)")
-                    strongSelf.sendAnalyticsEvent(action: .ERROR)
+                    strongSelf.sendEvent(ofType: .error, withMessage: "Error event")
                 })
             case let e where e.self == PlayerEvent.stateChanged:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
@@ -141,12 +163,12 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                             strongSelf.sendWidgetLoaded()
                             if strongSelf.isBuffering {
                                 strongSelf.isBuffering = false
-                                strongSelf.sendAnalyticsEvent(action: .BUFFER_END)
+                                strongSelf.sendEvent(ofType: .bufferEnd, withMessage: "Buffer end event")
                             }
                         case .ready:
                             if strongSelf.isBuffering {
                                 strongSelf.isBuffering = false
-                                strongSelf.sendAnalyticsEvent(action: .BUFFER_END)
+                                strongSelf.sendEvent(ofType: .bufferEnd, withMessage: "Buffer end event")
                             }
                             if !strongSelf.intervalOn {
                                 strongSelf.intervalOn = true
@@ -156,7 +178,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                         case .buffering:
                             strongSelf.sendWidgetLoaded()
                             strongSelf.isBuffering = true
-                            strongSelf.sendAnalyticsEvent(action: .BUFFER_START)
+                            strongSelf.sendEvent(ofType: .bufferStart, withMessage: "Buffer start event")
                         case .error: break
                         case .unknown: break
                         }
@@ -184,18 +206,25 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     
     private func sendWidgetLoaded() {
         if !self.isWidgetLoaded {
-            sendAnalyticsEvent(action: .WIDGET_LOADED)
+            sendAnalyticsEvent(action: .widgetLoaded)
             self.isWidgetLoaded = true
         }
     }
     
     private func sendMediaLoaded(){
         if !self.isMediaLoaded {
-            sendAnalyticsEvent(action: .MEDIA_LOADED)
+            sendAnalyticsEvent(action: .mediaLoaded)
             self.isMediaLoaded = true
         }
     }
     
+    private func sendEvent(ofType type: KalturaStatsEventType, withMessage message: String) {
+        // send event to messageBus
+        let event = KalturaStatsEvent.Report(message: message)
+        self.messageBus?.post(event)
+        // send event to analytics entity
+        self.sendAnalyticsEvent(action: type)
+    }
     
     private func resetPlayerFlags() {
         isFirstPlay = true
@@ -211,7 +240,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     
     private func createTimer() {
         
-        if let intr = self.config?.params["timerInterval"] as? Int {
+        if let intr = self.config?.params["timerInterval"] as? TimeInterval {
             self.interval = intr
         }
 
@@ -219,37 +248,23 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
             t.invalidate()
         }
         
-        self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.interval), target: self, selector: #selector(KalturaStatsPlugin.timerHit), userInfo: nil, repeats: true)
-        
-    }
-    
-    @objc private func timerHit() {
-        guard let player = self.player else { return }
-        let progress = Float(player.currentTime) / Float(player.duration)
-        PKLog.debug("Progress is \(progress)")
-        
-        if progress >= 0.25 && !playReached25 && seekPercent <= 0.25 {
-            playReached25 = true
-            sendAnalyticsEvent(action: .PLAY_REACHED_25);
-        } else if progress >= 0.5 && !playReached50 && seekPercent < 0.5 {
-            playReached50 = true
-            sendAnalyticsEvent(action: .PLAY_REACHED_50);
-        } else if progress >= 0.75 && !playReached75 && seekPercent <= 0.75 {
-            playReached75 = true
-            sendAnalyticsEvent(action: .PLAY_REACHED_75);
-        } else if progress >= 0.98 && !playReached100 && seekPercent < 1 {
-            playReached100 = true
-            sendAnalyticsEvent(action: .PLAY_REACHED_100)
-        }
-    }
-    
-    private func startTimer() {
-        if let t = self.timer {
-            if t.isValid {
-                t.fire()
-            } else {
-                self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.interval), target: self, selector: #selector(KalturaStatsPlugin.timerHit), userInfo: nil, repeats: true)
-                self.timer!.fire()
+        self.timer = Timer.every(self.interval) {
+            guard let player = self.player else { return }
+            let progress = Float(player.currentTime) / Float(player.duration)
+            PKLog.debug("Progress is \(progress)")
+            
+            if progress >= 0.25 && !self.playReached25 && self.seekPercent <= 0.25 {
+                self.playReached25 = true
+                self.sendAnalyticsEvent(action: .playReached25)
+            } else if progress >= 0.5 && !self.playReached50 && self.seekPercent < 0.5 {
+                self.playReached50 = true
+                self.sendAnalyticsEvent(action: .playReached50)
+            } else if progress >= 0.75 && !self.playReached75 && self.seekPercent <= 0.75 {
+                self.playReached75 = true
+                self.sendAnalyticsEvent(action: .playReached75)
+            } else if progress >= 0.98 && !self.playReached100 && self.seekPercent < 1 {
+                self.playReached100 = true
+                self.sendAnalyticsEvent(action: .playReached100)
             }
         }
     }
@@ -260,7 +275,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
         }
     }
     
-    private func sendAnalyticsEvent(action: KStatsEventType) {
+    private func sendAnalyticsEvent(action: KalturaStatsEventType) {
         guard let player = self.player else { return }
         PKLog.debug("Action: \(action)")
         
@@ -290,7 +305,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
             return
         }
         
-        let builder: KalturaRequestBuilder = OVPStatsService.get(baseURL: baseUrl,
+        guard let builder: KalturaRequestBuilder = OVPStatsService.get(baseURL: baseUrl,
                                                                  partnerId: parterId,
                                                                  eventType: action.rawValue,
                                                                  clientVer: PlayKitManager.clientTag,
@@ -300,12 +315,10 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                                                                  uiConfId: confId,
                                                                  entryId: mediaEntry.id,
                                                                  widgetId: "_\(parterId)",
-                                                                 isSeek: hasSeeked)!
+                                                                 isSeek: hasSeeked) else { return }
         
         builder.set { (response: Response) in
-            
             PKLog.debug("Response: \(response)")
-            
         }
         
         USRExecutor.shared.send(request: builder.build())

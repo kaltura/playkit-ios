@@ -20,7 +20,8 @@ extension AVPlayerEngine {
             #keyPath(currentItem),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
-            #keyPath(currentItem.duration)
+            #keyPath(currentItem.duration),
+            #keyPath(currentItem.timedMetadata)
         ]
     }
     
@@ -95,6 +96,11 @@ extension AVPlayerEngine {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         self.isPlayedToEndTime = true
+        // In iOS 9 and below rate is 1.0 even when playback is finished.
+        // To make sure rate will be 0.0 (paused) when played to end we call pause manually.
+        // calling pause after `isPlayedToEndTime` will make sure no pause event will be sent in messageBus.
+        self.pause()
+        // pause should be called before ended to make sure our rate will be 0.0 when ended event will be observed.
         self.post(event: PlayerEvent.Ended())
     }
     
@@ -128,6 +134,8 @@ extension AVPlayerEngine {
             self.handleStatusChange()
         case #keyPath(currentItem):
             self.handleItemChange()
+        case #keyPath(currentItem.timedMetadata):
+            self.handleTimedMedia()
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
@@ -194,6 +202,12 @@ extension AVPlayerEngine {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         // in case item changed reset player reached end time indicator
-        isPlayedToEndTime = false
+        self.isPlayedToEndTime = false
+    }
+    
+    private func handleTimedMedia() {
+        guard let currentItem = self.currentItem else { return }
+        guard let metadata = currentItem.timedMetadata else { return }
+        self.post(event: PlayerEvent.TimedMetadata(metadata: metadata))
     }
 }
