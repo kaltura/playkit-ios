@@ -78,14 +78,15 @@ public enum PhoenixMediaProviderError: PKError {
 */
 @objc public class PhoenixMediaProvider: NSObject, MediaEntryProvider {
 
-    var sessionProvider: SessionProvider?
-    var assetId: String?
-    var type: AssetType?
-    var formats: [String]?
-    var fileIds: [String]?
-    var playbackContextType: PlaybackContextType?
-    var executor: RequestExecutor?
-    var networkProtocol: String?
+    @objc public var sessionProvider: SessionProvider?
+    @objc public var assetId: String?
+    @objc public var type: AssetType = .unknown
+    @objc public var formats: [String]?
+    @objc public var fileIds: [String]?
+    @objc public var playbackContextType: PlaybackContextType = .unknown
+    @objc public var networkProtocol: String?
+    
+    public var executor: RequestExecutor?
 
     public override init() { }
 
@@ -111,7 +112,7 @@ public enum PhoenixMediaProviderError: PKError {
     /// - Parameter type: Asset Object type if it is Media Or EPG
     /// - Returns: Self
     @discardableResult
-    @nonobjc public func set(type: AssetType?) -> Self {
+    @nonobjc public func set(type: AssetType) -> Self {
         self.type = type
         return self
     }
@@ -119,7 +120,7 @@ public enum PhoenixMediaProviderError: PKError {
     /// - Parameter playbackContextType: Trailer/Playback/StartOver/Catchup
     /// - Returns: Self
     @discardableResult
-    @nonobjc public func set(playbackContextType: PlaybackContextType?) -> Self {
+    @nonobjc public func set(playbackContextType: PlaybackContextType) -> Self {
         self.playbackContextType = playbackContextType
         return self
     }
@@ -185,22 +186,19 @@ public enum PhoenixMediaProviderError: PKError {
             callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "assetId" ).asNSError)
             return
         }
-        guard let type = self.type else {
+        guard self.type != .unknown else {
             callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "type" ).asNSError)
             return
         }
-        guard let contextType = self.playbackContextType else {
+        guard self.playbackContextType != .unknown  else {
             callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "contextType" ).asNSError)
             return
         }
 
         let pr = self.networkProtocol ?? defaultProtocol
-        var executor: RequestExecutor = USRExecutor.shared
-        if let exe = self.executor {
-            executor = exe
-        }
+        let executor = self.executor ?? USRExecutor.shared
 
-        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, assetId: assetId, assetType: type, formats: self.formats, fileIds: self.fileIds, playbackContextType: contextType, networkProtocol:pr, executor: executor)
+        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, assetId: assetId, assetType: self.type, formats: self.formats, fileIds: self.fileIds, playbackContextType: self.playbackContextType, networkProtocol:pr, executor: executor)
 
         self.startLoad(loaderInfo: loaderParams, callback: callback)
     }

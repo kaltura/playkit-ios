@@ -8,15 +8,37 @@
 
 import Foundation
 
-public enum AssetType: String {
-    case media = "media"
-    case epg = "epg"
+
+@objc public enum AssetType: Int {
+    case media
+    case epg
+    case unknown
+    
+    var asString: String {
+        switch self {
+        case .media: return "media"
+        case .epg: return "epg"
+        case .unknown: return ""
+        }
+    }
 }
 
-public enum PlaybackContextType: String {
 
-    case trailer = "TRAILER"
-    case catchup = "CATCHUP"
-    case startOver = "START_OVER"
-    case playback = "PLAYBACK"
+@objc public enum PlaybackContextType: Int {
+    
+    case trailer
+    case catchup
+    case startOver
+    case playback
+    case unknown
+    
+    var asString: String {
+        switch self {
+        case .trailer: return "TRAILER"
+        case .catchup: return "CATCHUP"
+        case .startOver: return "START_OVER"
+        case .playback: return "PLAYBACK"
+        case .unknown: return ""
+        }
+    }
 }
