@@ -197,7 +197,7 @@ class AVPlayerEngine: AVPlayer {
     func destroy() {
         PKLog.trace("destory player")
         self.nonObservablePropertiesUpdateTimer?.invalidate()
-        self.nonObservablePropertiesUpdateTimer == nil
+        self.nonObservablePropertiesUpdateTimer = nil
         self.removeObservers()
         self.avPlayerLayer = nil
         self._view = nil
