@@ -232,6 +232,7 @@ extension IMAAdsManager {
     }
     
     private func destroyManager() {
+        self.adsManager?.delegate = nil
         self.adsManager?.destroy()
         self.adsManager = nil
     }
@@ -311,7 +312,6 @@ extension IMAAdsManager {
         case .ALL_ADS_COMPLETED:
             // detaching the delegate and destroying the adsManager. 
             // means all ads have been played so we can destroy the adsManager.
-            adsManager.delegate = nil
             self.destroyManager()
             self.notify(event: AdEvent.AllAdsCompleted())
         case .CLICKED: self.notify(event: AdEvent.AdClicked())
