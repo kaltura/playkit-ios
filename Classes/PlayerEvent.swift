@@ -51,6 +51,8 @@ import AVFoundation
     @objc public static let error: PlayerEvent.Type = Error.self
     /// Sent when an plugin error occurs.
     @objc public static let pluginError: PlayerEvent.Type = PluginError.self
+    /// Sent when an error log event received from player.
+    @objc public static let errorLog: PlayerEvent.Type = ErrorLog.self
     
     // MARK: - Player Basic Events
 
@@ -80,6 +82,16 @@ import AVFoundation
     }
     
     class PluginError: PlayerEvent {
+        convenience init(nsError: NSError) {
+            self.init([EventDataKeys.Error: nsError])
+        }
+        
+        convenience init(error: PKError) {
+            self.init([EventDataKeys.Error: error.asNSError])
+        }
+    }
+    
+    class ErrorLog: PlayerEvent {
         convenience init(nsError: NSError) {
             self.init([EventDataKeys.Error: nsError])
         }
