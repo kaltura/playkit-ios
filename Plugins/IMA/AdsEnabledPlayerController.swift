@@ -15,6 +15,11 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     
     var isAdPlayback = false
     var isPlayEnabled = false
+    
+    /// when playing post roll google sends content resume when finished.
+    /// In our case we need to prevent sending play/resume to the player because the content already ended.
+    var shouldPreventContentResume = false
+    
     var adsPlugin: AdsPlugin!
     weak var messageBus: MessageBus?
     
@@ -89,13 +94,21 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
         if event is AdEvent.AdDidRequestPause {
-            super.pause()
             self.isAdPlayback = true
+            super.pause()
         } else if event is AdEvent.AdDidRequestResume {
-            super.play()
             self.isAdPlayback = false
+            if !self.shouldPreventContentResume {
+                super.resume()
+            }
         } else if event is AdEvent.AdResumed {
             self.isPlayEnabled = true
+        } else if event is AdEvent.AdInformation {
+            if event.adInfo?.positionType == .postRoll {
+                self.shouldPreventContentResume = true
+            }
+        } else if event is AdEvent.AllAdsCompleted {
+            self.shouldPreventContentResume = false
         }
     }
 }

@@ -13,15 +13,15 @@ class OTTLoginSession: OTTBaseObject {
 
     internal var ks: String?
     internal var refreshToken: String?
-    
+
     private let ksKey = "ks"
     private let refreshTokenKey = "refreshToken"
-    
+
     required init(json:Any) {
-        
+
         let jsonObject = JSON(json)
         self.ks = jsonObject[ksKey].string
         self.refreshToken = jsonObject[refreshTokenKey].string
-        
+
     }
 }

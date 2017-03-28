@@ -184,7 +184,8 @@ import SwiftyXMLParser
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach { (source: OVPSource) in
                         //detecting the source type
-                        let format = self.getSourceFormat(source: source)
+                        
+                        let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
                         //If source type is not supported source will not be created
                         guard format != .unknown else { return }
                         
@@ -255,26 +256,8 @@ import SwiftyXMLParser
     }
     
     
-    // This method decding the source type base on scheck and drm data
-    private func getSourceFormat(source: OVPSource) -> MediaSource.MediaFormat {
-        
-        if let format = source.format {
-            switch format {
-            case "applehttp":
-                    return .hls
-            case "url":
-                if source.drm == nil {
-                    return .mp4
-                } else {
-                    return .wvm
-                }
-            default:
-                return .unknown
-            }
-        }
-        
-        return .unknown
-    }
+
+    
     
     // Creating the drm data based on scheme
     private func buildDRMParams(drm: [OVPDRM]?) -> [DRMParams]? {
@@ -306,7 +289,7 @@ import SwiftyXMLParser
     // building the url with the SourceBuilder class
     private func playbackURL(loadInfo: LoaderInfo, source: OVPSource, ks: String?) -> URL? {
         
-        let formatType = self.getSourceFormat(source: source)
+        let formatType = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
         var playURL: URL? = nil
         if let flavors =  source.flavors,
             flavors.count > 0 {
