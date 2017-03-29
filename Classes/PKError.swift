@@ -237,7 +237,8 @@ struct PKErrorKeys {
     @objc(FailedToLoadAssetFromKeys) public static let failedToLoadAssetFromKeys = 7000
     @objc(AssetNotPlayable) public static let assetNotPlayable = 7001
     @objc(FailedToPlayToEndTime) public static let failedToPlayToEndTime = 7002
-    @objc(PlayerItemErrorLogEvent) public static let playerItemErrorLogEvent = 7003
+    // PlayerErrorLog
+    @objc(PlayerItemErrorLogEvent) public static let playerItemErrorLogEvent = 7100
     // PKPluginError
     @objc(FailedToCreatePlugin) public static let failedToCreatePlugin = 2000
     @objc(MissingPluginConfig) public static let missingPluginConfig = 2001
