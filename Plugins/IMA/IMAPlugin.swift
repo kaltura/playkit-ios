@@ -38,8 +38,17 @@ extension IMAAdsManager {
     private var startAdCalled = false
     private var loaderFailed = false
     
+    /************************************************************/
+    // MARK: - IMAContentPlayhead
+    /************************************************************/
+    
     public var currentTime: TimeInterval {
-        return self.player?.currentTime ?? 0
+        // IMA must receive a number value so we must check `isNaN` on any value we send.
+        // Before returning `player.currentTime` we need to check `!player.currentTime.isNaN`.
+        if let currentTime = self.player?.currentTime, !currentTime.isNaN {
+            return currentTime
+        }
+        return 0
     }
     
     /************************************************************/
