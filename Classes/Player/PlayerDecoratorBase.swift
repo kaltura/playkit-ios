@@ -59,14 +59,6 @@ import AVKit
     public func prepare(_ config: MediaConfig) {
         return self.player.prepare(config)
     }
-
-    public func prepareNext(_ config: MediaConfig) -> Bool {
-        return self.player.prepareNext(config)
-    }
-    
-    public func loadNext() -> Bool {
-        return self.player.loadNext()
-    }
     
     public func setPlayer(_ player: Player!) {
         self.player = player
