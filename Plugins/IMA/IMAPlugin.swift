@@ -14,6 +14,25 @@ extension IMAAdsManager {
     }
 }
 
+extension PKAdInfo {
+    convenience init(ad: IMAAd) {
+        self.init(
+            adDescription: ad.adDescription,
+            adDuration: ad.duration,
+            title: ad.adTitle,
+            isSkippable: ad.isSkippable,
+            contentType: ad.contentType,
+            adId: ad.adId,
+            adSystem: ad.adSystem,
+            height: Int(ad.height),
+            width: Int(ad.width),
+            podCount: Int(ad.adPodInfo.totalAds),
+            podPosition: Int(ad.adPodInfo.adPosition),
+            podTimeOffset: ad.adPodInfo.timeOffset
+        )
+    }
+}
+
 @objc public class IMAPlugin: BasePlugin, PKPluginWarmUp, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
     
     weak var dataSource: AdsPluginDataSource? {
