@@ -299,11 +299,8 @@ extension IMAAdsManager {
                 }
             }
         case .STARTED:
-            if let ad = event.ad {
-                let adInfo = PKAdInfo(ad: ad)
-                self.notify(event: AdEvent.AdInformation(adInfo: adInfo))
-            }
-            self.notify(event: AdEvent.AdStarted())
+            let event = event.ad != nil ? AdEvent.AdStarted(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdStarted()
+            self.notify(event: event)
             self.showLoadingView(false, alpha: 0)
         case .AD_BREAK_STARTED:
             self.notify(event: AdEvent.AdBreakStarted())

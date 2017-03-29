@@ -89,19 +89,7 @@ import GoogleInteractiveMediaAds
     }
 }
 
-extension AdEvent {
-    
-    @objc public static let adInformation: AdEvent.Type = AdInformation.self
-    
-    class AdInformation: AdEvent {
-        convenience init(adInfo: PKAdInfo) {
-            self.init([AdEventDataKeys.adInfo: adInfo])
-        }
-    }
-}
-
 extension PKEvent {
-    
     /// Ad info, PKEvent Ad Data Accessor
     @objc public var adInfo: PKAdInfo? {
         return self.data?[AdEventDataKeys.adInfo] as? PKAdInfo
