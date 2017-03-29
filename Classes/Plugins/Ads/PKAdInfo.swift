@@ -7,14 +7,15 @@
 //
 
 import Foundation
-import GoogleInteractiveMediaAds
 
+/// The position type of the ad according to the content timeline.
 @objc public enum AdPositionType: Int {
     case preRoll
     case midRoll
     case postRoll
 }
 
+/// `PKAdInfo` represents ad information.
 @objc public class PKAdInfo: NSObject {
     
     @objc public var adDescription: String
@@ -46,21 +47,6 @@ import GoogleInteractiveMediaAds
         }
     }
     
-    init(ad: IMAAd) {
-        self.adDescription = ad.adDescription
-        self.duration = ad.duration
-        self.title = ad.adTitle
-        self.isSkippable = ad.isSkippable
-        self.contentType = ad.contentType
-        self.adId = ad.adId
-        self.adSystem = ad.adSystem
-        self.height = Int(ad.height)
-        self.width = Int(ad.width)
-        self.podCount = Int(ad.adPodInfo.totalAds)
-        self.podPosition = Int(ad.adPodInfo.adPosition)
-        self.podTimeOffset = ad.adPodInfo.timeOffset
-    }
-    
     init(adDescription: String,
          adDuration: TimeInterval,
          title: String,
@@ -89,19 +75,7 @@ import GoogleInteractiveMediaAds
     }
 }
 
-extension AdEvent {
-    
-    @objc public static let adInformation: AdEvent.Type = AdInformation.self
-    
-    class AdInformation: AdEvent {
-        convenience init(adInfo: PKAdInfo) {
-            self.init([AdEventDataKeys.adInfo: adInfo])
-        }
-    }
-}
-
 extension PKEvent {
-    
     /// Ad info, PKEvent Ad Data Accessor
     @objc public var adInfo: PKAdInfo? {
         return self.data?[AdEventDataKeys.adInfo] as? PKAdInfo

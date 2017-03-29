@@ -14,6 +14,25 @@ extension IMAAdsManager {
     }
 }
 
+extension PKAdInfo {
+    convenience init(ad: IMAAd) {
+        self.init(
+            adDescription: ad.adDescription,
+            adDuration: ad.duration,
+            title: ad.adTitle,
+            isSkippable: ad.isSkippable,
+            contentType: ad.contentType,
+            adId: ad.adId,
+            adSystem: ad.adSystem,
+            height: Int(ad.height),
+            width: Int(ad.width),
+            podCount: Int(ad.adPodInfo.totalAds),
+            podPosition: Int(ad.adPodInfo.adPosition),
+            podTimeOffset: ad.adPodInfo.timeOffset
+        )
+    }
+}
+
 @objc public class IMAPlugin: BasePlugin, PKPluginWarmUp, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
     
     weak var dataSource: AdsPluginDataSource? {
@@ -308,11 +327,8 @@ extension IMAAdsManager {
                 }
             }
         case .STARTED:
-            if let ad = event.ad {
-                let adInfo = PKAdInfo(ad: ad)
-                self.notify(event: AdEvent.AdInformation(adInfo: adInfo))
-            }
-            self.notify(event: AdEvent.AdStarted())
+            let event = event.ad != nil ? AdEvent.AdStarted(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdStarted()
+            self.notify(event: event)
             self.showLoadingView(false, alpha: 0)
         case .AD_BREAK_STARTED:
             self.notify(event: AdEvent.AdBreakStarted())

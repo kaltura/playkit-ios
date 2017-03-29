@@ -154,7 +154,12 @@ import AVFoundation
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
     
-    class AdStarted: AdEvent {}
+    class AdStarted: AdEvent {
+        convenience init(adInfo: PKAdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+    
     class AdBreakReady: AdEvent {}
     class AdBreakEnded: AdEvent {}
     class AdBreakStarted: AdEvent {}
