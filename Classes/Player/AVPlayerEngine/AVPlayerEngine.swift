@@ -46,7 +46,7 @@ class AVPlayerEngine: AVPlayer {
     public var onEventBlock: ((PKEvent) -> Void)?
     
     public var view: UIView! {
-        PKLog.trace("get player view: \(_view)")
+        PKLog.debug("get player view: \(_view)")
         return _view
     }
     
@@ -59,11 +59,11 @@ class AVPlayerEngine: AVPlayer {
     
     public var currentPosition: Double {
         get {
-            PKLog.trace("get currentPosition: \(self.currentTime())")
+            PKLog.debug("get currentPosition: \(self.currentTime())")
             return CMTimeGetSeconds(self.currentTime() - rangeStart)
         }
         set {
-            PKLog.trace("set currentPosition: \(currentPosition)")
+            PKLog.debug("set currentPosition: \(currentPosition)")
 
             let newTime = rangeStart + CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [unowned self] (isSeeked: Bool) in
@@ -100,7 +100,7 @@ class AVPlayerEngine: AVPlayer {
             }
         }
         
-        PKLog.trace("get duration: \(result)")
+        PKLog.debug("get duration: \(result)")
         return result
     }
     
@@ -179,7 +179,7 @@ class AVPlayerEngine: AVPlayer {
     }
     
     func stop() {
-        PKLog.trace("stop player")
+        PKLog.debug("stop player")
         self.pause()
         self.seek(to: kCMTimeZero)
         self.replaceCurrentItem(with: nil)
@@ -188,21 +188,21 @@ class AVPlayerEngine: AVPlayer {
     public override func pause() {
         if self.rate > 0 {
             // Playing, so pause.
-            PKLog.trace("pause player")
+            PKLog.debug("pause player")
             super.pause()
         }
     }
     
     public override func play() {
         if self.rate == 0 {
-            PKLog.trace("play player")
+            PKLog.debug("play player")
             self.post(event: PlayerEvent.Play())
             super.play()
         }
     }
     
     func destroy() {
-        PKLog.trace("destory player")
+        PKLog.info("destory player")
         self.nonObservablePropertiesUpdateTimer?.invalidate()
         self.nonObservablePropertiesUpdateTimer = nil
         self.removeObservers()
