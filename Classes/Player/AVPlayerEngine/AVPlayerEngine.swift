@@ -38,9 +38,6 @@ class AVPlayerEngine: AVPlayer {
     /// - note: Used for preventing 'pause' events to be sent after 'ended' event.
     var isPlayedToEndTime: Bool = false
     
-    //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
-    var nonObservablePropertiesUpdateTimer: Timer?
-    
     var observerContext = 0
     
     public var onEventBlock: ((PKEvent) -> Void)?
@@ -162,7 +159,6 @@ class AVPlayerEngine: AVPlayer {
         _view = PlayerView(playerLayer: avPlayerLayer)
         
         self.onEventBlock = nil
-        self.nonObservablePropertiesUpdateTimer = nil
         
         AppStateSubject.shared.add(observer: self)
     }
@@ -171,11 +167,6 @@ class AVPlayerEngine: AVPlayer {
         if !isDestroyed {
             self.destroy()
         }
-    }
-    
-    func startOrResumeNonObservablePropertiesUpdateTimer() {
-        PKLog.debug("setupNonObservablePropertiesUpdateTimer")
-        self.nonObservablePropertiesUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateNonObservableProperties), userInfo: nil, repeats: true)
     }
     
     public override func pause() {
@@ -196,8 +187,6 @@ class AVPlayerEngine: AVPlayer {
     
     func destroy() {
         PKLog.trace("destory player")
-        self.nonObservablePropertiesUpdateTimer?.invalidate()
-        self.nonObservablePropertiesUpdateTimer = nil
         self.removeObservers()
         self.avPlayerLayer = nil
         self._view = nil
@@ -232,17 +221,6 @@ class AVPlayerEngine: AVPlayer {
         PKLog.debug("stateChanged:: new:\(newState) old:\(oldState)")
         let stateChangedEvent: PKEvent = PlayerEvent.StateChanged(newState: newState, oldState: oldState)
         self.post(event: stateChangedEvent)
-    }
-    
-    // MARK: - Non Observable Properties
-    @objc func updateNonObservableProperties() {
-        guard let timebase = self.currentItem?.timebase else { return }
-        let timebaseRate = CMTimebaseGetRate(timebase)
-        if timebaseRate > 0 {
-            self.nonObservablePropertiesUpdateTimer?.invalidate()
-            self.post(event: PlayerEvent.Playing())
-        }
-        PKLog.debug("timebaseRate:: \(timebaseRate)")
     }
 }
 

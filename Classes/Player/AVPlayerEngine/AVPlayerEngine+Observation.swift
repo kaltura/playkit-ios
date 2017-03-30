@@ -39,6 +39,7 @@ extension AVPlayerEngine {
         NotificationCenter.default.addObserver(self, selector: #selector(self.playerPlayedToEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: self.currentItem?.timebase)
     }
     
     func removeObservers() {
@@ -57,6 +58,7 @@ extension AVPlayerEngine {
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
     func onAccessLogEntryNotification(notification: Notification) {
@@ -157,18 +159,20 @@ extension AVPlayerEngine {
         }
     }
     
-    /// Handles change in player rate
-    ///
-    /// - Returns: The event to post, rate <= 0 means pause event.
+    /// Handles changes in player timebase
+    func timebaseChanged(notification: Notification) {
+        let timebase = notification.object as! CMTimebase
+        PKLog.debug("timebase changed, current timebase: \(String(describing: timebase))")
+        let timebaseRate = CMTimebaseGetRate(timebase)
+        if timebaseRate > 0 {
+            self.post(event: PlayerEvent.Playing())
+        }
+    }
+    
+    /// Handles changes in player rate
     private func handleRate() {
-        if rate > 0 {
-            self.startOrResumeNonObservablePropertiesUpdateTimer()
-        } else {
-            self.nonObservablePropertiesUpdateTimer?.invalidate()
-            // we don't want pause events to be sent when current item reached end.
-            if !isPlayedToEndTime {
-                self.post(event: PlayerEvent.Pause())
-            }
+        if rate == 0 && !isPlayedToEndTime {
+            self.post(event: PlayerEvent.Pause())
         }
     }
     
