@@ -51,7 +51,7 @@ enum PlayerError: PKError {
     }
 }
 
-/// `PlayerErrorLog` represents an error log emited from AVPlayer (usually non-fatal).
+/// `PlayerErrorLog` represents an error log emitted from AVPlayer (usually non-fatal).
 struct PlayerErrorLog: PKError {
     
     static var domain = PlayerError.domain
@@ -66,7 +66,7 @@ struct PlayerErrorLog: PKError {
         return errorLogEvent.errorComment ?? ""
     }
     
-    var userInfo: [String : Any] {
+    var userInfo: [String: Any] {
         return [
             PKErrorKeys.RootCodeKey: errorLogEvent.errorStatusCode,
             PKErrorKeys.RootDomainKey: errorLogEvent.errorDomain
