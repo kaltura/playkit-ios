@@ -95,14 +95,6 @@ class PlayerController: NSObject, Player {
         self.currentPlayer.currentPosition = CMTimeGetSeconds(time)
     }
     
-    func prepareNext(_ config: MediaConfig) -> Bool {
-        return false
-    }
-    
-    func loadNext() -> Bool {
-        return false
-    }
-    
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         return self.currentPlayer.createPiPController(with: delegate)
