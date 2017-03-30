@@ -71,17 +71,10 @@ import AVKit
      */
     func stop()
     
-    func seek(to time: CMTime)
-    
     /**
-     Prepare for playing the next entry.      
-    */
-    func prepareNext(_ config: MediaConfig) -> Bool
-
-    /**
-     Load the entry that was prepared with prepareNext(), without waiting for the current entry to end.
+     send seek action for the player.
      */
-    func loadNext() -> Bool
+    func seek(to time: CMTime)
     
     /**
      Release player resources.

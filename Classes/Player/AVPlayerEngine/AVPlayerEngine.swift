@@ -185,7 +185,7 @@ class AVPlayerEngine: AVPlayer {
         self.replaceCurrentItem(with: nil)
     }
     
-    public override func pause() {
+    override func pause() {
         if self.rate > 0 {
             // Playing, so pause.
             PKLog.debug("pause player")
@@ -193,7 +193,7 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    public override func play() {
+    override func play() {
         if self.rate == 0 {
             PKLog.debug("play player")
             self.post(event: PlayerEvent.Play())
