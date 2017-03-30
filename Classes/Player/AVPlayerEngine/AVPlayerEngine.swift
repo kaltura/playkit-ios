@@ -178,6 +178,13 @@ class AVPlayerEngine: AVPlayer {
         self.nonObservablePropertiesUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateNonObservableProperties), userInfo: nil, repeats: true)
     }
     
+    func stop() {
+        PKLog.trace("stop player")
+        self.pause()
+        self.seek(to: kCMTimeZero)
+        self.replaceCurrentItem(with: nil)
+    }
+    
     public override func pause() {
         if self.rate > 0 {
             // Playing, so pause.

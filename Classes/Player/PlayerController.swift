@@ -90,6 +90,11 @@ class PlayerController: NSObject, Player {
         self.currentPlayer.play()
     }
     
+    func stop() {
+        PKLog.trace("stop::")
+        self.currentPlayer.stop()
+    }
+    
     func seek(to time: CMTime) {
         PKLog.trace("seek::\(time)")
         self.currentPlayer.currentPosition = CMTimeGetSeconds(time)

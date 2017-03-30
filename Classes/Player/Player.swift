@@ -66,6 +66,11 @@ import AVKit
      */
     func resume()
     
+    /**
+     send stop action for the player.
+     */
+    func stop()
+    
     func seek(to time: CMTime)
     
     /**
