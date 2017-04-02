@@ -77,7 +77,7 @@ extension AVPlayerEngine {
     
     func onErrorLogEntryNotification(notification: Notification) {
         guard let playerItem = notification.object as? AVPlayerItem, let errorLog = playerItem.errorLog(), let lastEvent = errorLog.events.last else { return }
-        PKLog.error("error description: \(lastEvent.errorComment), error domain: \(lastEvent.errorDomain), error code: \(lastEvent.errorStatusCode)")
+        PKLog.error("error description: \(String(describing: lastEvent.errorComment)), error domain: \(lastEvent.errorDomain), error code: \(lastEvent.errorStatusCode)")
         self.post(event: PlayerEvent.Error(error: PlayerError.playerItemErrorLogEvent(errorLogEvent: lastEvent)))
     }
     
@@ -97,10 +97,8 @@ extension AVPlayerEngine {
         let newState = PlayerState.idle
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
-        self.isPlayedToEndTime = true
         // In iOS 9 and below rate is 1.0 even when playback is finished.
         // To make sure rate will be 0.0 (paused) when played to end we call pause manually.
-        // calling pause after `isPlayedToEndTime` will make sure no pause event will be sent in messageBus.
         self.pause()
         // pause should be called before ended to make sure our rate will be 0.0 when ended event will be observed.
         self.post(event: PlayerEvent.Ended())
@@ -166,14 +164,14 @@ extension AVPlayerEngine {
         let timebaseRate = CMTimebaseGetRate(timebase)
         if timebaseRate > 0 {
             self.post(event: PlayerEvent.Playing())
+        } else if timebaseRate == 0 {
+            self.post(event: PlayerEvent.Pause())
         }
     }
     
     /// Handles changes in player rate
     private func handleRate() {
-        if rate == 0 && !isPlayedToEndTime {
-            self.post(event: PlayerEvent.Pause())
-        }
+        PKLog.debug("player rate was changed")
     }
     
     private func handleStatusChange() {
@@ -205,8 +203,6 @@ extension AVPlayerEngine {
         let newState = PlayerState.idle
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
-        // in case item changed reset player reached end time indicator
-        self.isPlayedToEndTime = false
     }
     
     private func handleTimedMedia() {

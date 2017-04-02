@@ -32,12 +32,6 @@ class AVPlayerEngine: AVPlayer {
     var isObserved: Bool = false
     var currentState: PlayerState = PlayerState.idle
     var tracksManager = TracksManager()
-    
-    /// Indicates whether the current items was played until the end.
-    ///
-    /// - note: Used for preventing 'pause' events to be sent after 'ended' event.
-    var isPlayedToEndTime: Bool = false
-    
     var observerContext = 0
     
     public var onEventBlock: ((PKEvent) -> Void)?
@@ -56,24 +50,20 @@ class AVPlayerEngine: AVPlayer {
     
     public var currentPosition: Double {
         get {
-            PKLog.debug("get currentPosition: \(self.currentTime())")
+            PKLog.trace("get currentPosition: \(self.currentTime())")
             return CMTimeGetSeconds(self.currentTime() - rangeStart)
         }
         set {
             PKLog.debug("set currentPosition: \(currentPosition)")
-
             let newTime = rangeStart + CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [unowned self] (isSeeked: Bool) in
                 if isSeeked {
-                    // when seeked successfully reset player reached end time indicator
-                    self.isPlayedToEndTime = false
                     self.post(event: PlayerEvent.Seeked())
                     PKLog.debug("seeked")
                 } else {
                     PKLog.error("seek faild")
                 }
             }
-            
             self.post(event: PlayerEvent.Seeking())
         }
     }
@@ -97,7 +87,7 @@ class AVPlayerEngine: AVPlayer {
             }
         }
         
-        PKLog.debug("get duration: \(result)")
+        PKLog.trace("get duration: \(result)")
         return result
     }
     
@@ -220,7 +210,7 @@ class AVPlayerEngine: AVPlayer {
     }
     
     func post(event: PKEvent) {
-        PKLog.debug("onEvent:: \(event)")
+        PKLog.trace("onEvent:: \(event)")
         onEventBlock?(event)
     }
     
