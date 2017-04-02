@@ -88,6 +88,10 @@ import AVKit
         self.player.resume()
     }
     
+    public func stop() {
+        self.player.stop()
+    }
+    
     @available(iOS 9.0, *)
     public func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         return self.player.createPiPController(with: delegate)

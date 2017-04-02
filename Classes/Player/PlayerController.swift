@@ -76,22 +76,22 @@ class PlayerController: NSObject, Player {
     }
     
     func play() {
-        PKLog.trace("play::")
         self.currentPlayer.play()
     }
     
     func pause() {
-        PKLog.trace("pause::")
         self.currentPlayer.pause()
     }
     
     func resume() {
-        PKLog.trace("resume::")
         self.currentPlayer.play()
     }
     
+    func stop() {
+        self.currentPlayer.stop()
+    }
+    
     func seek(to time: CMTime) {
-        PKLog.trace("seek::\(time)")
         self.currentPlayer.currentPosition = CMTimeGetSeconds(time)
     }
     
