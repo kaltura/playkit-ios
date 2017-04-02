@@ -18,12 +18,7 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
     /************************************************************/
     // MARK: - PKPlugin
     /************************************************************/
-    
-    public override func onLoad(mediaConfig: MediaConfig) {
-        super.onLoad(mediaConfig: mediaConfig)
-        AppStateSubject.shared.add(observer: self)
-    }
-    
+
     public override func onUpdateMedia(mediaConfig: MediaConfig) {
         super.onUpdateMedia(mediaConfig: mediaConfig)
         AppStateSubject.shared.add(observer: self)
