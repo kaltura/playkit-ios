@@ -55,7 +55,7 @@ class PlayerLoader: PlayerDecoratorBase {
         // update all loaded plugins with media config
         for (pluginName, loadedPlugin) in loadedPlugins {
             PKLog.trace("Preparing plugin", pluginName)
-            loadedPlugin.plugin.onLoad(mediaConfig: config)
+            loadedPlugin.plugin.onUpdateMedia(mediaConfig: config)
         }
     }
     
