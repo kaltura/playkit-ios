@@ -77,8 +77,8 @@ extension AVPlayerEngine {
     
     func onErrorLogEntryNotification(notification: Notification) {
         guard let playerItem = notification.object as? AVPlayerItem, let errorLog = playerItem.errorLog(), let lastEvent = errorLog.events.last else { return }
-        PKLog.error("error description: \(String(describing: lastEvent.errorComment)), error domain: \(lastEvent.errorDomain), error code: \(lastEvent.errorStatusCode)")
-        self.post(event: PlayerEvent.Error(error: PlayerError.playerItemErrorLogEvent(errorLogEvent: lastEvent)))
+        PKLog.warning("error description: \(String(describing: lastEvent.errorComment)), error domain: \(lastEvent.errorDomain), error code: \(lastEvent.errorStatusCode)")
+        self.post(event: PlayerEvent.ErrorLog(error: PlayerErrorLog(errorLogEvent: lastEvent)))
     }
     
     public func playerFailed(notification: NSNotification) {

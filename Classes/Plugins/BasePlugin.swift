@@ -25,10 +25,6 @@ import Foundation
         self.messageBus = messageBus
     }
     
-    @objc public func onLoad(mediaConfig: MediaConfig) {
-        PKLog.info("plugin \(type(of:self)) onLoad with media config: \(mediaConfig)")
-    }
-    
     @objc public func onUpdateMedia(mediaConfig: MediaConfig) {
         PKLog.info("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
     }

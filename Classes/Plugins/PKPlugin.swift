@@ -18,14 +18,11 @@ public protocol PKPlugin {
     weak var player: Player? { get }
     /// The messageBus associated with the plugin
     weak var messageBus: MessageBus? { get }
-    
-    init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws
-    
     /// On first load. used for doing initialization for the first time with the media config.
-    func onLoad(mediaConfig: MediaConfig)
-    /// On update media. used to update the plugin with new media config when available
+    init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws
+    /// On update media. used to update the plugin with new media config when available.
     func onUpdateMedia(mediaConfig: MediaConfig)
-    
+    /// Called on player destroy.
     func destroy()
 }
 
