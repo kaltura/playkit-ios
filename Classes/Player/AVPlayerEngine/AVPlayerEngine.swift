@@ -28,6 +28,7 @@ class AVPlayerEngine: AVPlayer {
     private var _view: PlayerView!
     private var isDestroyed = false
     
+    var lastTimebaseRate: Float64 = 0
     var lastBitrate: Double = 0
     var isObserved: Bool = false
     var currentState: PlayerState = PlayerState.idle
