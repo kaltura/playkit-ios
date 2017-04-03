@@ -55,7 +55,7 @@ private struct Observation {
     
     @objc public func post(_ event: PKEvent) {
         DispatchQueue.global().async { [weak self] in
-            PKLog.info("Post event: \(event)")
+            PKLog.info("Post event: \(String(describing: type(of: event)))")
             let typeId = NSStringFromClass(type(of: event))
             
             if let array = self?.observations[typeId] {

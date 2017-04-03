@@ -32,15 +32,6 @@ class AVPlayerEngine: AVPlayer {
     var isObserved: Bool = false
     var currentState: PlayerState = PlayerState.idle
     var tracksManager = TracksManager()
-    
-    /// Indicates whether the current items was played until the end.
-    ///
-    /// - note: Used for preventing 'pause' events to be sent after 'ended' event.
-    var isPlayedToEndTime: Bool = false
-    
-    //  AVPlayerItem.currentTime() and the AVPlayerItem.timebase's rate are not KVO observable. We check their values regularly using this timer.
-    var nonObservablePropertiesUpdateTimer: Timer?
-    
     var observerContext = 0
     
     public var onEventBlock: ((PKEvent) -> Void)?
@@ -59,24 +50,20 @@ class AVPlayerEngine: AVPlayer {
     
     public var currentPosition: Double {
         get {
-            PKLog.debug("get currentPosition: \(self.currentTime())")
+            PKLog.trace("get currentPosition: \(self.currentTime())")
             return CMTimeGetSeconds(self.currentTime() - rangeStart)
         }
         set {
             PKLog.debug("set currentPosition: \(currentPosition)")
-
             let newTime = rangeStart + CMTimeMakeWithSeconds(newValue, 1)
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [unowned self] (isSeeked: Bool) in
                 if isSeeked {
-                    // when seeked successfully reset player reached end time indicator
-                    self.isPlayedToEndTime = false
                     self.post(event: PlayerEvent.Seeked())
                     PKLog.debug("seeked")
                 } else {
                     PKLog.error("seek faild")
                 }
             }
-            
             self.post(event: PlayerEvent.Seeking())
         }
     }
@@ -100,7 +87,7 @@ class AVPlayerEngine: AVPlayer {
             }
         }
         
-        PKLog.debug("get duration: \(result)")
+        PKLog.trace("get duration: \(result)")
         return result
     }
     
@@ -162,7 +149,6 @@ class AVPlayerEngine: AVPlayer {
         _view = PlayerView(playerLayer: avPlayerLayer)
         
         self.onEventBlock = nil
-        self.nonObservablePropertiesUpdateTimer = nil
         
         AppStateSubject.shared.add(observer: self)
     }
@@ -173,13 +159,8 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    func startOrResumeNonObservablePropertiesUpdateTimer() {
-        PKLog.debug("setupNonObservablePropertiesUpdateTimer")
-        self.nonObservablePropertiesUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(self.updateNonObservableProperties), userInfo: nil, repeats: true)
-    }
-    
     func stop() {
-        PKLog.debug("stop player")
+        PKLog.info("stop player")
         self.pause()
         self.seek(to: kCMTimeZero)
         self.replaceCurrentItem(with: nil)
@@ -202,9 +183,7 @@ class AVPlayerEngine: AVPlayer {
     }
     
     func destroy() {
-        PKLog.info("destory player")
-        self.nonObservablePropertiesUpdateTimer?.invalidate()
-        self.nonObservablePropertiesUpdateTimer = nil
+        PKLog.info("destroy player")
         self.removeObservers()
         self.avPlayerLayer = nil
         self._view = nil
@@ -231,7 +210,7 @@ class AVPlayerEngine: AVPlayer {
     }
     
     func post(event: PKEvent) {
-        PKLog.debug("onEvent:: \(event)")
+        PKLog.trace("onEvent:: \(event)")
         onEventBlock?(event)
     }
     
@@ -239,17 +218,6 @@ class AVPlayerEngine: AVPlayer {
         PKLog.debug("stateChanged:: new:\(newState) old:\(oldState)")
         let stateChangedEvent: PKEvent = PlayerEvent.StateChanged(newState: newState, oldState: oldState)
         self.post(event: stateChangedEvent)
-    }
-    
-    // MARK: - Non Observable Properties
-    @objc func updateNonObservableProperties() {
-        guard let timebase = self.currentItem?.timebase else { return }
-        let timebaseRate = CMTimebaseGetRate(timebase)
-        if timebaseRate > 0 {
-            self.nonObservablePropertiesUpdateTimer?.invalidate()
-            self.post(event: PlayerEvent.Playing())
-        }
-        PKLog.debug("timebaseRate:: \(timebaseRate)")
     }
 }
 
