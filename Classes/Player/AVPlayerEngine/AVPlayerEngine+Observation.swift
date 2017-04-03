@@ -161,15 +161,17 @@ extension AVPlayerEngine {
     func timebaseChanged(notification: Notification) {
         // for some reason timebase rate changed is received on a background thread.
         // in order to check self.rate we must make sure we are on the main thread.
-        DispatchQueue.main.sync {
+        DispatchQueue.main.async {
             guard let timebase = self.currentItem?.timebase else { return }
-            PKLog.debug("timebase changed, current timebase: \(String(describing: timebase))")
+            PKLog.trace("timebase changed, current timebase: \(String(describing: timebase))")
             let timebaseRate = CMTimebaseGetRate(timebase)
-            if timebaseRate > 0 {
+            if timebaseRate > 0 && self.lastTimebaseRate != timebaseRate {
                 self.post(event: PlayerEvent.Playing())
-            } else if timebaseRate == 0 && self.rate == 0 {
+            } else if timebaseRate == 0 && self.rate == 0 && self.lastTimebaseRate != timebaseRate {
                 self.post(event: PlayerEvent.Pause())
             }
+            // make sure to save the last value so we could only post events only when currentTimebase != lastTimebase
+            self.lastTimebaseRate = timebaseRate
         }
     }
     
