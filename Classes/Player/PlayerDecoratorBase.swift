@@ -97,6 +97,10 @@ import AVKit
         return self.player.createPiPController(with: delegate)
     }
     
+    public func updatePluginConfig(pluginName: String, config: PluginConfig) {
+        self.player.updatePluginConfig(pluginName: pluginName, config: config)
+    }
+    
     public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
         //Assert.shouldNeverHappen();
     }
