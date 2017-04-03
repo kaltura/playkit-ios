@@ -124,7 +124,7 @@ class PlayerController: NSObject, Player {
 extension PlayerController {
     private func shouldRefreshAsset() {
         if let handler = self.assetBuilder?.assetHandler as? RefreshableAssetHandler {
-            if let (source, handlerClass) = self.assetBuilder!.getPreferredMediaSource() {
+            if let (source, _) = self.assetBuilder!.getPreferredMediaSource() {
                 handler.shouldRefreshAsset(mediaSource: source) { [unowned self] (shouldRefresh) in
                     if shouldRefresh {
                         self.shouldRefresh = true
@@ -137,7 +137,7 @@ extension PlayerController {
     private func refreshAsset() {
         if let handler = self.assetBuilder?.assetHandler as? RefreshableAssetHandler {
             
-            if let (source, handlerClass) = self.assetBuilder!.getPreferredMediaSource() {
+            if let (source, _) = self.assetBuilder!.getPreferredMediaSource() {
                 self.currentPlayer.startPosition = self.currentPlayer.currentPosition
                 handler.refreshAsset(mediaSource: source)
             }
