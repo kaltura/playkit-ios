@@ -8,6 +8,7 @@
 
 import XCTest
 import PlayKit
+import KalturaNetKit
 
 
 

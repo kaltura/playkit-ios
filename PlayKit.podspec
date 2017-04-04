@@ -16,6 +16,7 @@ s.subspec 'Core' do |sp|
     sp.dependency 'SwiftyJSON'
     sp.dependency 'Log'
     sp.dependency 'SwiftyXMLParser'
+    sp.dependency 'KalturaNetKit'
 end
 
 s.subspec 'IMAPlugin' do |ssp|

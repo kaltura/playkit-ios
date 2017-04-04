@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KalturaNetKit
 
 /// class `BaseOTTAnalyticsPlugin` is a base plugin object used for OTT analytics plugin subclasses
 public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProtocol, AppStateObservable {

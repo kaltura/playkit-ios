@@ -27,8 +27,6 @@ class OVPObjectMapper: NSObject {
                 return OVPPlaybackContext.self
             case "KalturaAPIException":
                 return OVPError.self
-            case "KalturaStartWidgetSessionResponse":
-                return OVPStartWidgetSessionResponse.self
             case "KalturaMetadata":
                 return OVPMetadata.self
             default:

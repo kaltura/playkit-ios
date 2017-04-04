@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import KalturaNetKit
 
 public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
     

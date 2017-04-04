@@ -9,7 +9,7 @@
 import UIKit
 import SwiftyJSON
 
-class OVPResponseParser: ResponseParser {
+class OVPResponseParser: NSObject {
     
     enum error: Error {
         case typeNotFound
