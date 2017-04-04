@@ -51,7 +51,6 @@ extension PKAdInfo {
     private var loadingView: UIView?
     // we must have config error will be thrown otherwise
     private var config: AdsConfig!
-    private var adTagUrl: String!
     
     private var isAdPlayback = false
     private var startAdCalled = false
@@ -97,10 +96,6 @@ extension PKAdInfo {
             
             IMAPlugin.loader.contentComplete()
             IMAPlugin.loader.delegate = self
-            
-            if let adTagUrl = adsConfig.adTagUrl {
-                self.adTagUrl = adTagUrl
-            }
         } else {
             PKLog.error("missing plugin config")
             throw PKPluginError.missingPluginConfig(pluginName: IMAPlugin.pluginName)
@@ -109,6 +104,22 @@ extension PKAdInfo {
         self.messageBus?.addObserver(self, events: [PlayerEvent.ended]) { [weak self] event in
             self?.contentComplete()
         }
+    }
+    
+    public override func onUpdateConfig(pluginConfig: Any) {
+        PKLog.debug("pluginConfig: " + String(describing: pluginConfig))
+        
+        super.onUpdateConfig(pluginConfig: pluginConfig)
+        
+        if let adsConfig = pluginConfig as? AdsConfig {
+            self.config = adsConfig
+        }
+    }
+    
+    // TODO:: finilize update config & updateMedia logic
+    public override func onUpdateMedia(mediaConfig: MediaConfig) {
+        PKLog.debug("mediaConfig: " + String(describing: mediaConfig))
+        super.onUpdateMedia(mediaConfig: mediaConfig)
     }
     
     public override func destroy() {
@@ -120,7 +131,7 @@ extension PKAdInfo {
     // MARK: - PlayerDecoratorProvider
     /************************************************************/
     
-    func getPlayerDecorator() -> PlayerDecoratorBase? {
+    public func getPlayerDecorator() -> PlayerDecoratorBase? {
         return AdsEnabledPlayerController(adsPlugin: self)
     }
     
@@ -131,7 +142,7 @@ extension PKAdInfo {
     func requestAds() {
         guard let playerView = player?.view else { return }
         
-        if self.adTagUrl != nil && self.adTagUrl != "" {
+        if self.config.adTagUrl != nil && self.config.adTagUrl != "" {
             self.startAdCalled = false
             
             // setup ad display container and companion if exists, needs to create a new ad container for each request.
@@ -139,13 +150,13 @@ extension PKAdInfo {
             let adDisplayContainer: IMAAdDisplayContainer
             if let companionView = self.config?.companionView {
                 companionAdSlot = IMACompanionAdSlot(view: companionView, width: Int32(companionView.frame.size.width), height: Int32(companionView.frame.size.height))
-                adDisplayContainer = IMAAdDisplayContainer(adContainer: playerView, companionSlots: [companionAdSlot])
+                adDisplayContainer = IMAAdDisplayContainer(adContainer: playerView, companionSlots: [companionAdSlot!])
             } else {
                 adDisplayContainer = IMAAdDisplayContainer(adContainer: playerView, companionSlots: [])
             }
             
             var request: IMAAdsRequest
-            request = IMAAdsRequest(adTagUrl: self.adTagUrl, adDisplayContainer: adDisplayContainer, contentPlayhead: self, userContext: nil)
+            request = IMAAdsRequest(adTagUrl: self.config.adTagUrl, adDisplayContainer: adDisplayContainer, contentPlayhead: self, userContext: nil)
             
             IMAPlugin.loader.requestAds(with: request)
             PKLog.trace("request Ads")
@@ -158,7 +169,7 @@ extension PKAdInfo {
             return false
         }
         
-        if self.adTagUrl != nil && self.adTagUrl != "" {
+        if self.config.adTagUrl != nil && self.config.adTagUrl != "" {
             if showLoadingView {
                 self.showLoadingView(true, alpha: 1)
             }
@@ -254,14 +265,20 @@ extension PKAdInfo {
     private func notifyAdCuePoints(fromAdsManager adsManager: IMAAdsManager) {
         // send ad cue points if exists and request is url type
         let adCuePoints = adsManager.getAdCuePoints()
-        if self.adTagUrl != nil && adCuePoints.count > 0 {
+        if self.config.adTagUrl != nil && adCuePoints.count > 0 {
             self.notify(event: AdEvent.AdCuePointsUpdate(adCuePoints: adCuePoints))
         }
     }
     
-    private func destroyManager() {
+    func destroyManager() {
+        self.isAdPlayback = false
+        self.startAdCalled = false
+        self.loaderFailed = false
         self.adsManager?.delegate = nil
         self.adsManager?.destroy()
+        // In order to make multiple ad requests, AdsManager instance should be destroyed, and then contentComplete() should be called on AdsLoader.  
+        // This will "reset" the SDK.
+        self.contentComplete()
         self.adsManager = nil
     }
    

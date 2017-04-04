@@ -71,7 +71,7 @@ import AVKit
     @objc func selectTrack(trackId: String)
     
     /// Update Plugin Config
-    @objc func updatePluginConfig(pluginName: String, config: PluginConfig)
+    @objc func updatePluginConfig(pluginName: String, config: Any)
     
     /// Create PiP Controller
     @available(iOS 9.0, *)

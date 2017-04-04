@@ -97,7 +97,7 @@ import AVKit
         return self.player.createPiPController(with: delegate)
     }
     
-    public func updatePluginConfig(pluginName: String, config: PluginConfig) {
+    public func updatePluginConfig(pluginName: String, config: Any) {
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
     }
     

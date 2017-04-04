@@ -117,7 +117,7 @@ class PlayerController: NSObject, Player {
         self.currentPlayer.selectTrack(trackId: trackId)
     }
     
-    public func updatePluginConfig(pluginName: String, config: PluginConfig) {
+    public func updatePluginConfig(pluginName: String, config: Any) {
         //Assert.shouldNeverHappen();
     }
 }
