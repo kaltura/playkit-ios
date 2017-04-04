@@ -121,7 +121,9 @@ class PlayerController: NSObject, Player {
 /************************************************************/
 // MARK: - Reachability & Application States Handling
 /************************************************************/
+
 extension PlayerController {
+    
     private func shouldRefreshAsset() {
         if let handler = self.assetBuilder?.assetHandler as? RefreshableAssetHandler {
             if let (source, _) = self.assetBuilder!.getPreferredMediaSource() {

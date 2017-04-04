@@ -26,7 +26,6 @@ class AVPlayerEngine: AVPlayer {
     
     private var avPlayerLayer: AVPlayerLayer!
     private var _view: PlayerView!
-    private var isDestroyed = false
     
     var lastTimebaseRate: Float64 = 0
     var lastBitrate: Double = 0
@@ -155,9 +154,7 @@ class AVPlayerEngine: AVPlayer {
     }
     
     deinit {
-        if !isDestroyed {
-            self.destroy()
-        }
+        PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
     }
     
     func stop() {
@@ -201,7 +198,6 @@ class AVPlayerEngine: AVPlayer {
             // removes app state observer
             AppStateSubject.shared.remove(observer: self)
             self.replaceCurrentItem(with: nil)
-            self.isDestroyed = true
         }
     }
     
@@ -221,7 +217,7 @@ class AVPlayerEngine: AVPlayer {
     }
     
     func post(event: PKEvent) {
-        PKLog.trace("onEvent:: \(event)")
+        PKLog.trace("onEvent:: \(String(describing: event))")
         onEventBlock?(event)
     }
     

@@ -9,11 +9,15 @@
 import Foundation
 
 private struct Observation {
+    /// the observer of the event
     weak var observer: AnyObject?
+    /// the dispatchQueue to observe the events on.
     let observeOn: DispatchQueue
+    /// the block of code to be performed when event fires.
     let block: (PKEvent) -> Void
 }
 
+/// `MessageBus` object handles all event message observing and posting
 @objc public class MessageBus: NSObject {
     private var observations = [String: [Observation]]()
     private let lock: AnyObject = UUID().uuidString as AnyObject
@@ -28,7 +32,7 @@ private struct Observation {
     
     private func add(observer: AnyObject, events: [PKEvent.Type], observeOn dispatchQueue: DispatchQueue = DispatchQueue.main, block: @escaping (PKEvent)->Void) {
         sync {
-            PKLog.debug("Add observer: \(observer) for events: \(events)")
+            PKLog.debug("Add observer: \(String(describing: observer)) for events: \(String(describing: events))")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
                 var observationList: [Observation] = observations[typeId] ?? []
@@ -40,7 +44,7 @@ private struct Observation {
     
     @objc public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         sync {
-            PKLog.debug("Remove observer: \(observer) for events: \(events)")
+            PKLog.debug("Remove observer: \(String(describing: observer)) for events: \(String(describing: events))")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
                 
