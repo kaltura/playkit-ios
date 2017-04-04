@@ -10,7 +10,7 @@ import UIKit
 import SwiftyJSON
 import KalturaNetKit
 
-public class OTTUserService: NSObject {
+class OTTUserService: NSObject {
 
     internal static func login(baseURL: String, partnerId: Int64, username: String, password: String, udid: String? = nil) -> KalturaRequestBuilder? {
 

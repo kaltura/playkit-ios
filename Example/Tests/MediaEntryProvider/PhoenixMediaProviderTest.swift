@@ -41,8 +41,8 @@ class PhoenixMediaProviderTest: XCTestCase, SessionProvider {
         let provider = PhoenixMediaProvider()
         .set(sessionProvider: self)
         .set(assetId: mediaID)
-        .set(type: AssetType.media)
-        .set(playbackContextType: PlaybackContextType.playback)
+        .set(type: .media)
+        .set(playbackContextType: .playback)
         
         
         provider.loadMedia { (entry, error) in

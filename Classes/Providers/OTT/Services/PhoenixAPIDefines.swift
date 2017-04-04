@@ -9,7 +9,7 @@
 import Foundation
 
 
-@objc public enum AssetType: Int {
+enum AssetObjectType: Int {
     case media
     case epg
     case unknown
@@ -24,7 +24,7 @@ import Foundation
 }
 
 
-@objc public enum PlaybackContextType: Int {
+enum PlaybackType: Int {
     
     case trailer
     case catchup
