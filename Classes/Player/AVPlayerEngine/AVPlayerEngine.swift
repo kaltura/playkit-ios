@@ -27,10 +27,13 @@ class AVPlayerEngine: AVPlayer {
     private var avPlayerLayer: AVPlayerLayer!
     private var _view: PlayerView!
     private var isDestroyed = false
-    
+    /// Keeps reference on the last timebase rate in order to post events accuratly.
     var lastTimebaseRate: Float64 = 0
     var lastBitrate: Double = 0
     var isObserved: Bool = false
+    /// Indicates if player item was changed to state: `readyToPlay` at least once.
+    /// Used to post `CanPlay` event once on first `readyToPlay`.
+    var isFirstReady = true
     var currentState: PlayerState = PlayerState.idle
     var tracksManager = TracksManager()
     var observerContext = 0

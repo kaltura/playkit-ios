@@ -183,7 +183,6 @@ extension AVPlayerEngine {
     private func handleStatusChange() {
         if currentItem?.status == .readyToPlay {
             let newState = PlayerState.ready
-            self.post(event: PlayerEvent.LoadedMetadata())
             
             if self.startPosition > 0 {
                 self.currentPosition = self.startPosition
@@ -197,7 +196,11 @@ extension AVPlayerEngine {
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
-            self.post(event: PlayerEvent.CanPlay())
+            if self.isFirstReady {
+                self.isFirstReady = false
+                self.post(event: PlayerEvent.LoadedMetadata())
+                self.post(event: PlayerEvent.CanPlay())
+            }
         } else if currentItem?.status == .failed {
             let newState = PlayerState.error
             self.postStateChange(newState: newState, oldState: self.currentState)
