@@ -78,7 +78,7 @@ import AVKit
     @objc func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
 }
 
-public protocol PlayerDecoratorProvider: NSObjectProtocol {
+public protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
 
