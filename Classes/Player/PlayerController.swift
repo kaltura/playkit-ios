@@ -116,6 +116,10 @@ class PlayerController: NSObject, Player {
     public func selectTrack(trackId: String) {
         self.currentPlayer.selectTrack(trackId: trackId)
     }
+    
+    public func updatePluginConfig(pluginName: String, config: Any) {
+        //Assert.shouldNeverHappen();
+    }
 }
 
 /************************************************************/

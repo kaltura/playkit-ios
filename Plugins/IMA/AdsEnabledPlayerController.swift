@@ -32,7 +32,6 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         didSet {
             self.adsPlugin.delegate = self
             self.adsPlugin.dataSource = self
-            self.adsPlugin.requestAds()
         }
     }
 
@@ -68,6 +67,20 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         } else {
             super.resume()
         }
+    }
+    
+    override func stop() {
+        self.adsPlugin.destroyManager()
+        super.stop()
+        self.isAdPlayback = false
+        self.isPlayEnabled = false
+        self.shouldPreventContentResume = false
+    }
+    
+    // TODO:: finilize prepare
+    override func prepare(_ config: MediaConfig) {
+        super.prepare(config)
+        self.adsPlugin.requestAds()
     }
     
     @available(iOS 9.0, *)

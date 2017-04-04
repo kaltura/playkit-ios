@@ -29,5 +29,6 @@ protocol AdsPlugin: PKPlugin, AVPictureInPictureControllerDelegate {
     func resume()
     func pause()
     func contentComplete()
+    func destroyManager()
 }
 

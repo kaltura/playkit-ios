@@ -26,7 +26,11 @@ import Foundation
     }
     
     @objc public func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.info("plugin \(type(of:self)) onUpdateMedia with media config: \(mediaConfig)")
+        PKLog.info("plugin \(type(of:self)) onUpdateMedia with media config: \(String(describing: mediaConfig))")
+    }
+    
+    @objc public func onUpdateConfig(pluginConfig: Any) {
+        PKLog.info("plugin \(type(of:self)) onUpdateConfig with media config: \(String(describing: pluginConfig))")
     }
     
     @objc public func destroy() {
