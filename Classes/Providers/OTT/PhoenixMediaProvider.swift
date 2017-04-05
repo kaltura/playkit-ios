@@ -237,7 +237,7 @@ public enum PhoenixMediaProviderError: PKError {
 
         let assetType = self.convertAssetTyp(type: self.type)
         let contextPlaybackContextType = self.convertPlaybackContextType(type: self.playbackContextType)
-        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, assetId: assetId, assetType: assetType, formats: self.formats, fileIds: self.fileIds, playbackContextType: contextPlaybackContextType, networkProtocol:pr, executor: executor)
+        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, assetId: assetId, assetType: assetType, formats: self.formats, fileIds: self.fileIds, playbackContextType: contextPlaybackContextType, networkProtocol: pr, executor: executor)
 
         self.startLoad(loaderInfo: loaderParams, callback: callback)
     }
@@ -429,7 +429,7 @@ public enum PhoenixMediaProviderError: PKError {
             }
     }
     
-    func convertAssetTyp(type: AssetType) -> AssetObjectType{
+    func convertAssetTyp(type: AssetType) -> AssetObjectType {
         
         switch type {
         case .epg:
@@ -441,7 +441,7 @@ public enum PhoenixMediaProviderError: PKError {
         }
     }
     
-    func convertPlaybackContextType( type: PlaybackContextType) -> PlaybackType{
+    func convertPlaybackContextType(type: PlaybackContextType) -> PlaybackType {
         switch type {
         case .catchup:
             return .catchup
