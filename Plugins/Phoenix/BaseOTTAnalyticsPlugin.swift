@@ -24,6 +24,12 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
         AppStateSubject.shared.add(observer: self)
     }
     
+    public override func onUpdateConfig(pluginConfig: Any) {
+        super.onUpdateConfig(pluginConfig: pluginConfig)
+        self.intervalOn = false
+        self.stopTimer()
+    }
+    
     public override func destroy() {
         super.destroy()
         self.sendAnalyticsEvent(ofType: .stop)

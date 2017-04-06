@@ -72,11 +72,28 @@ extension PKErrorCode {
         self.registerEvents()
     }
     
+    public override func onUpdateMedia(mediaConfig: MediaConfig) {
+        super.onUpdateMedia(mediaConfig: mediaConfig)
+        self.isFirstPlay = true
+    }
+    
+    public override func onUpdateConfig(pluginConfig: Any) {
+        super.onUpdateConfig(pluginConfig: pluginConfig)
+        
+        guard let config = pluginConfig as? AnalyticsConfig else {
+            PKLog.error("plugin configis wrong")
+            return
+        }
+        
+        PKLog.debug("new config::\(String(describing: config))")
+        self.config = config
+    }
+    
     public override func destroy() {
-        self.messageBus?.removeObserver(self, events: playerEventsToRegister) 
+        self.messageBus?.removeObserver(self, events: playerEventsToRegister)
         super.destroy()
     }
-
+    
     /************************************************************/
     // MARK: - AnalyticsPluginProtocol
     /************************************************************/
