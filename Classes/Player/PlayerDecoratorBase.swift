@@ -11,8 +11,8 @@ import AVFoundation
 import AVKit
 
 @objc public class PlayerDecoratorBase: NSObject, Player {
-
-    private var player: Player!
+    
+    fileprivate var player: Player!
     
     public var delegate: PlayerDelegate? {
         get {
@@ -25,6 +25,10 @@ import AVKit
 
     weak public var mediaEntry: MediaEntry? {
         return self.player.mediaEntry
+    }
+    
+    public var settings: PlayerSettings {
+        return self.player.settings
     }
     
     public var currentTime: TimeInterval {
@@ -54,6 +58,10 @@ import AVKit
     
     public var view: UIView! {
         return self.player.view
+    }
+    
+    public var sessionId: UUID {
+        return self.player.sessionId
     }
     
     public func prepare(_ config: MediaConfig) {
@@ -113,3 +121,15 @@ import AVKit
         self.player.selectTrack(trackId: trackId)
     }
 }
+
+/************************************************************/
+// MARK: - PlayerSettings
+/************************************************************/
+
+extension PlayerDecoratorBase: PlayerSettings {
+    
+    public func set(contentRequestAdapter: PKRequestParamsAdapter) {
+        self.player.set(contentRequestAdapter: contentRequestAdapter)
+    }
+}
+

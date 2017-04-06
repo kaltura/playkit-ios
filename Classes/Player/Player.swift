@@ -14,23 +14,31 @@ import AVKit
     func playerShouldPlayAd(_ player: Player) -> Bool
 }
 
-@objc public protocol Player: NSObjectProtocol {
+/// `PlayerSettings` used for optional `Player` settings.
+@objc public protocol PlayerSettings {
+    func set(contentRequestAdapter: PKRequestParamsAdapter)
+}
+
+@objc public protocol Player: PlayerSettings {
     
     @objc weak var delegate: PlayerDelegate? { get set }
     
     /// The player's associated media entry.
     @objc weak var mediaEntry: MediaEntry? { get }
     
-    /// Get the player's layer component.
+    /// the player's settings
+    @objc var settings: PlayerSettings { get }
+    
+    /// The player's layer component.
     @objc var view: UIView! { get }
     
-    /// Get/set the current player position.
+    /// The current player position.
     @objc var currentTime: TimeInterval { get set }
-
-    /// Get the player's duration.
+    
+    /// The player's duration.
     @objc var isPlaying: Bool { get }
-
-    /// Get the player's duration.
+    
+    /// The player's duration.
     @objc var duration: TimeInterval { get }
     
     /// Get the player's current audio track.
@@ -39,8 +47,10 @@ import AVKit
     /// Get the player's current text track.
     @objc var currentTextTrack: String? { get }
     
-    /// Prepare for playing an entry.
-    /// play when it's ready.
+    /// The player's session id. the `sessionId` is initialized when the player loads.
+    @objc var sessionId: UUID { get }
+
+    /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
     @objc func prepare(_ config: MediaConfig)
     
     /// send play action for the player.
@@ -62,7 +72,7 @@ import AVKit
     @objc func destroy()
     
     /// Add Observation to relevant event.
-    @objc func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void)
+    @objc func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void)
     
     /// Remove Observation.
     @objc func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
