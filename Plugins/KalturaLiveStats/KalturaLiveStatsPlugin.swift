@@ -182,20 +182,17 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     }
     
     private func sendLiveEvent(withBufferTime bufferTime: Int32) {
+        guard let player = self.player, let mediaEntry = player.mediaEntry else { return }
+        
         PKLog.debug("sendLiveEvent - Buffer Time: \(bufferTime)")
         // post event to message bus
         let event = KalturaLiveStatsEvent.Report(bufferTime: bufferTime)
         self.messageBus?.post(event)
         
-        guard let mediaEntry = self.player?.mediaEntry else { return }
-        
-        var sessionId = ""
+        let entryId: String
+        let sessionId = player.sessionId.uuidString
         var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
         var parterId = ""
-        
-        if let sId = self.config?.params["sessionId"] as? String {
-            sessionId = sId
-        }
         
         if let url = self.config?.params["baseUrl"] as? String {
             baseUrl = url
@@ -203,6 +200,12 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
         
         if let pId = self.config?.params["partnerId"] as? Int {
             parterId = String(pId)
+        }
+        
+        if let eId = self.config?.params["entryId"] as? String {
+            entryId = eId
+        } else {
+            entryId = mediaEntry.id
         }
         
         if let builder: RequestBuilder = LiveStatsService.sendLiveStatsEvent(baseURL: baseUrl,
@@ -213,7 +216,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
                                                                            bitrate: self.lastReportedBitrate,
                                                                            sessionId: sessionId,
                                                                            startTime: self.lastReportedStartTime,
-                                                                           entryId: mediaEntry.id,
+                                                                           entryId: entryId,
                                                                            isLive: isLive,
                                                                            clientVer: PlayKitManager.clientTag,
                                                                            deliveryType: "hls") {
@@ -226,5 +229,4 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
             USRExecutor.shared.send(request: builder.build())
         }
     }
-
 }
