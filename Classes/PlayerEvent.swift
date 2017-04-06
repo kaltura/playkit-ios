@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 
-/// An PlayerEvent is a class used to reflect player events.
+/// PlayerEvent is a class used to reflect player events.
 @objc public class PlayerEvent: PKEvent {
     
     // All events EXCLUDING error. Assuming error events are treated differently.
