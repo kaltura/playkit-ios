@@ -193,6 +193,24 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     // MARK: - PKPlugin
     /************************************************************/
     
+    public override func onUpdateMedia(mediaConfig: MediaConfig) {
+        super.onUpdateMedia(mediaConfig: mediaConfig)
+        self.isWidgetLoaded = false
+        self.isMediaLoaded = false
+        self.isBuffering = false
+        
+        self.seekPercent = 0.0
+        
+        self.playReached25 = false
+        self.playReached50 = false
+        self.playReached75 = false
+        self.playReached100 = false
+        self.intervalOn = false
+        self.hasSeeked = false
+        
+        self.timer?.invalidate()
+    }
+    
     public override func destroy() {
         super.destroy()
         if let t = self.timer {

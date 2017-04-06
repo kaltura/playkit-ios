@@ -18,22 +18,22 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
     /************************************************************/
     // MARK: - PKPlugin
     /************************************************************/
+    
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        AppStateSubject.shared.add(observer: self)
+    }
 
     public override func onUpdateMedia(mediaConfig: MediaConfig) {
         super.onUpdateMedia(mediaConfig: mediaConfig)
-        AppStateSubject.shared.add(observer: self)
-    }
-    
-    public override func onUpdateConfig(pluginConfig: Any) {
-        super.onUpdateConfig(pluginConfig: pluginConfig)
         self.intervalOn = false
-        self.stopTimer()
+        self.timer?.invalidate()
     }
     
     public override func destroy() {
         super.destroy()
         self.sendAnalyticsEvent(ofType: .stop)
-        self.stopTimer()
+        self.timer?.invalidate()
         AppStateSubject.shared.remove(observer: self)
     }
     
@@ -76,7 +76,7 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     PKLog.debug("ended event: \(event)")
-                    strongSelf.stopTimer()
+                    strongSelf.timer?.invalidate()
                     strongSelf.sendAnalyticsEvent(ofType: .finish)
                 }
             case let e where e.self == PlayerEvent.error:
@@ -92,7 +92,7 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
                     // invalidate timer when receiving pause event only after first play
                     // and set intervalOn to false in order to start timer again on play event.
                     if !strongSelf.isFirstPlay {
-                        strongSelf.stopTimer()
+                        strongSelf.timer?.invalidate()
                         strongSelf.intervalOn = false
                     }
                     strongSelf.sendAnalyticsEvent(ofType: .pause)
@@ -178,12 +178,6 @@ extension BaseOTTAnalyticsPlugin {
         self.timer = Timer.every(self.interval) { [unowned self] in
             PKLog.debug("timerHit")
             self.sendProgressEvent()
-        }
-    }
-    
-    fileprivate func stopTimer() {
-        if let t = self.timer {
-            t.invalidate()
         }
     }
     
