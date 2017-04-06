@@ -14,71 +14,58 @@ import AVKit
     func playerShouldPlayAd(_ player: Player) -> Bool
 }
 
-@objc public protocol Player: NSObjectProtocol {
+/// `PlayerSettings` used for optional `Player` settings.
+@objc public protocol PlayerSettings {
+    func set(contentRequestAdapter: PKRequestParamsAdapter)
+}
+
+@objc public protocol Player: PlayerSettings {
     
     @objc weak var delegate: PlayerDelegate? { get set }
     
     /// The player's associated media entry.
     weak var mediaEntry: MediaEntry? { get }
     
-    /**
-     Get the player's layer component.
-     */
+    var settings: PlayerSettings { get }
+    
+    /// The player's layer component.
     var view: UIView! { get }
     
-    /**
-     Get/set the current player position.
-     */
+    /// The current player position.
     var currentTime: TimeInterval { get set }
     
-    /**
-     Get the player's duration.
-     */
+    /// The player's duration.
     var isPlaying: Bool { get }
     
-    /**
-     Get the player's duration.
-     */
+    /// The player's duration.
     var duration: TimeInterval { get }
     
     var currentAudioTrack: String? { get }
     
     var currentTextTrack: String? { get }
     
-    /**
-     Prepare for playing an entry.
-     play when it's ready.
-     */
+    /// The player's session id. the `sessionId` is initialized when the player loads.
+    var sessionId: UUID { get }
+    
+    /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
     func prepare(_ config: MediaConfig)
     
-    /**
-     send play action for the player.
-     */
+    /// Send play action for the player.
     func play()
     
-    /**
-     send pause action for the player.
-     */
+    /// Send pause action for the player.
     func pause()
     
-    /**
-     send resume action for the player.
-     */
+    /// Send resume action for the player.
     func resume()
     
-    /**
-     send stop action for the player.
-     */
+    /// Send stop action for the player.
     func stop()
     
-    /**
-     send seek action for the player.
-     */
+    /// Send seek action for the player.
     func seek(to time: CMTime)
     
-    /**
-     Release player resources.
-    */
+    /// Release player resources.
     func destroy()
     
     func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void)

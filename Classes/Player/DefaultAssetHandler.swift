@@ -18,9 +18,9 @@ class DefaultAssetHandler: AssetHandler {
         
     }
     
-    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?)->Void) {
+    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?) -> Void) {
 
-        guard let contentUrl = mediaSource.contentUrl else {
+        guard let contentUrl = mediaSource.contentUrl, let playbackUrl = mediaSource.playbackUrl else {
             PKLog.error("Invalid media: no url")
             readyCallback(AssetError.invalidContentUrl(nil), nil)
             return
@@ -46,7 +46,7 @@ class DefaultAssetHandler: AssetHandler {
         
         guard let drmData = mediaSource.drmData?.first else {
             PKLog.debug("Creating clear AVURLAsset")
-            readyCallback(nil, AVURLAsset(url: contentUrl))
+            readyCallback(nil, AVURLAsset(url: playbackUrl))
             return
         }
 
@@ -63,7 +63,7 @@ class DefaultAssetHandler: AssetHandler {
             return
         }
 
-        let asset = AVURLAsset(url: contentUrl)
+        let asset = AVURLAsset(url: playbackUrl)
         
         self.assetLoaderDelegate = AssetLoaderDelegate.configureRemotePlay(asset: asset, drmData: fpsData)
         
