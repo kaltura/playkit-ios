@@ -26,7 +26,7 @@ class AVPlayerEngine: AVPlayer {
     
     private var avPlayerLayer: AVPlayerLayer!
     private var _view: PlayerView!
-    private var isDestroyed = false
+
     /// Keeps reference on the last timebase rate in order to post events accuratly.
     var lastTimebaseRate: Float64 = 0
     var lastBitrate: Double = 0
@@ -158,9 +158,7 @@ class AVPlayerEngine: AVPlayer {
     }
     
     deinit {
-        if !isDestroyed {
-            self.destroy()
-        }
+        PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
     }
     
     func stop() {
@@ -171,31 +169,40 @@ class AVPlayerEngine: AVPlayer {
     }
     
     override func pause() {
-        if self.rate > 0 {
-            // Playing, so pause.
-            PKLog.debug("pause player")
-            super.pause()
+        // makes sure play/pause call is made on the main thread (calling on background thread has unpredictable behaviours)
+        DispatchQueue.main.async {
+            if self.rate > 0 {
+                // Playing, so pause.
+                PKLog.debug("pause player")
+                super.pause()
+            }
         }
     }
     
     override func play() {
-        if self.rate == 0 {
-            PKLog.debug("play player")
-            self.post(event: PlayerEvent.Play())
-            super.play()
+        // makes sure play/pause call is made on the main thread (calling on background thread has unpredictable behaviours)
+        DispatchQueue.main.async {
+            if self.rate == 0 {
+                PKLog.debug("play player")
+                self.post(event: PlayerEvent.Play())
+                super.play()
+            }
         }
     }
     
     func destroy() {
-        PKLog.info("destroy player")
-        self.removeObservers()
-        self.avPlayerLayer = nil
-        self._view = nil
-        self.onEventBlock = nil
-        // removes app state observer
-        AppStateSubject.shared.remove(observer: self)
-        self.replaceCurrentItem(with: nil)
-        self.isDestroyed = true
+        // make sure to call destroy on main thread synchronously. 
+        // this make sure everything will be cleared without any race conditions
+        DispatchQueue.main.async {
+            PKLog.info("destroy player")
+            self.removeObservers()
+            self.avPlayerLayer = nil
+            self._view = nil
+            self.onEventBlock = nil
+            // removes app state observer
+            AppStateSubject.shared.remove(observer: self)
+            self.replaceCurrentItem(with: nil)
+        }
     }
     
     @available(iOS 9.0, *)
@@ -214,7 +221,7 @@ class AVPlayerEngine: AVPlayer {
     }
     
     func post(event: PKEvent) {
-        PKLog.trace("onEvent:: \(event)")
+        PKLog.trace("onEvent:: \(String(describing: event))")
         onEventBlock?(event)
     }
     

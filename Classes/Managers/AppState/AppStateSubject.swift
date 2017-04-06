@@ -17,7 +17,7 @@ protocol AppStateSubjectProtocol: class, AppStateProviderDelegate {
     /// The app state events provider.
     var appStateProvider: AppStateProvider { get }
     /// The current app state observers.
-    var observers: [AppStateObservable] { get set }
+    var observers: [AppStateObserver] { get set }
     /// States whether currently observing.
     /// - note: when mocking set initial value to false.
     var isObserving: Bool { get set }
@@ -50,20 +50,23 @@ extension AppStateSubjectProtocol {
     /// Adds an observer to inform when state events are posted.
     func add(observer: AppStateObservable) {
         sync {
+            cleanObservers()
             PKLog.trace("add observer, \(observer)")
             // if no observers were available start observing now
             if observers.count == 0 && !isObserving {
                 startObservingAppState()
             }
-            observers.append(observer)
+            observers.append(AppStateObserver(observer))
         }
     }
     
     /// Removes an observer to stop being inform when state events are posted.
     func remove(observer: AppStateObservable) {
         sync {
+            cleanObservers()
+            // search for the observer to remove
             for i in 0..<observers.count {
-                if observers[i] === observer {
+                if observers[i].observer === observer {
                     let removedObserver = observers.remove(at: i)
                     PKLog.trace("removed observer, \(removedObserver)")
                     // if no more observers available stop observing
@@ -94,10 +97,11 @@ extension AppStateSubjectProtocol {
     func appStateEventPosted(name: ObservationName) {
         sync {
             PKLog.trace("app state event posted with name: \(name.rawValue)")
-            for observer in self.observers {
-                let filteredObservations = observer.observations.filter { $0.name == name }
-                for observation in filteredObservations {
-                    observation.onObserve()
+            for appStateObserver in self.observers {
+                if let filteredObservations = appStateObserver.observer?.observations.filter({ $0.name == name }) {
+                    for observation in filteredObservations {
+                        observation.onObserve()
+                    }
                 }
             }
         }
@@ -111,6 +115,10 @@ extension AppStateSubjectProtocol {
         objc_sync_exit(lock)
     }
     
+    /// remove nil observers from our list
+    private func cleanObservers() {
+        self.observers = self.observers.filter { $0.observer != nil }
+    }
 }
 
 /************************************************************/
@@ -135,7 +143,7 @@ final class AppStateSubject: AppStateSubjectProtocol {
     
     let lock: AnyObject = UUID().uuidString as AnyObject
     
-    var observers = [AppStateObservable]()
+    var observers = [AppStateObserver]()
     var appStateProvider: AppStateProvider
     var isObserving = false
 }
@@ -159,6 +167,13 @@ struct NotificationObservation: Hashable {
 
 func == (lhs: NotificationObservation, rhs: NotificationObservation) -> Bool {
     return lhs.name.rawValue == rhs.name.rawValue
+}
+
+class AppStateObserver: AnyObject {
+    weak var observer: AppStateObservable?
+    init(_ observer: AppStateObservable) {
+        self.observer = observer
+    }
 }
 
 /// A type that provides a set of NotificationObservation to observe.
