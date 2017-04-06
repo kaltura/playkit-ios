@@ -140,7 +140,7 @@ class PlayerController: NSObject, Player {
 
 extension PlayerController: PlayerSettings {
     
-    func set(contentRequestAdapter: PKRequestParamsAdapter) {
+    func set(contentRequestAdapter: PKRequestParamsAdapter?) {
         self.contentRequestAdapter = contentRequestAdapter
     }
 }
