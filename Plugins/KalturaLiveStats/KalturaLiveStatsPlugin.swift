@@ -55,6 +55,20 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     // MARK: - PKPlugin
     /************************************************************/
     
+    public override func onUpdateMedia(mediaConfig: MediaConfig) {
+        self.isLive = false
+        self.eventIdx = 0
+        self.currentBitrate = -1
+        self.bufferTime = 0
+        self.bufferStartTime = 0
+        self.lastReportedBitrate = -1
+        self.lastReportedStartTime = 0
+        
+        self.isBuffering = false
+        
+        self.timer?.invalidate()
+    }
+    
     public override func destroy() {
         super.destroy()
         eventIdx = 0
