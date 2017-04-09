@@ -32,7 +32,6 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         didSet {
             self.adsPlugin.delegate = self
             self.adsPlugin.dataSource = self
-            self.adsPlugin.requestAds()
         }
     }
 
@@ -70,6 +69,20 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         }
     }
     
+    override func stop() {
+        self.adsPlugin.destroyManager()
+        super.stop()
+        self.isAdPlayback = false
+        self.isPlayEnabled = false
+        self.shouldPreventContentResume = false
+    }
+    
+    // TODO:: finilize prepare
+    override func prepare(_ config: MediaConfig) {
+        super.prepare(config)
+        self.adsPlugin.requestAds()
+    }
+    
     @available(iOS 9.0, *)
     override func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         self.adsPlugin.pipDelegate = delegate
@@ -93,22 +106,22 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
-        if event is AdEvent.AdDidRequestPause {
+        switch event {
+        case let e where type(of: e) == AdEvent.adDidRequestPause:
             self.isAdPlayback = true
             super.pause()
-        } else if event is AdEvent.AdDidRequestResume {
+        case let e where type(of: e) == AdEvent.adDidRequestResume:
             self.isAdPlayback = false
             if !self.shouldPreventContentResume {
                 super.resume()
             }
-        } else if event is AdEvent.AdResumed {
-            self.isPlayEnabled = true
-        } else if event is AdEvent.AdInformation {
+        case let e where type(of: e) == AdEvent.adResumed: self.isPlayEnabled = true
+        case let e where type(of: e) == AdEvent.adStarted:
             if event.adInfo?.positionType == .postRoll {
                 self.shouldPreventContentResume = true
             }
-        } else if event is AdEvent.AllAdsCompleted {
-            self.shouldPreventContentResume = false
+        case let e where type(of: e) == AdEvent.allAdsCompleted: self.shouldPreventContentResume = false
+        default: break
         }
     }
 }

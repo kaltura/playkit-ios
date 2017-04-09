@@ -55,7 +55,7 @@ class PlayerLoader: PlayerDecoratorBase {
         // update all loaded plugins with media config
         for (pluginName, loadedPlugin) in loadedPlugins {
             PKLog.trace("Preparing plugin", pluginName)
-            loadedPlugin.plugin.onLoad(mediaConfig: config)
+            loadedPlugin.plugin.onUpdateMedia(mediaConfig: config)
         }
     }
     
@@ -96,6 +96,15 @@ class PlayerLoader: PlayerDecoratorBase {
     public override func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         // TODO:: finilizing + object validation
         messageBus.removeObserver(observer, events: events)
+    }
+    
+    public override func updatePluginConfig(pluginName: String, config: Any) {
+        guard let loadedPlugin: LoadedPlugin = loadedPlugins[pluginName] else {
+            PKLog.debug("There is no such plugin: \(pluginName)");
+            return
+        }
+        
+        loadedPlugin.plugin.onUpdateConfig(pluginConfig: config)
     }
     
 }

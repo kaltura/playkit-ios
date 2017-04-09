@@ -18,6 +18,11 @@ class PlayerController: NSObject, Player {
     
     fileprivate var currentPlayer: AVPlayerEngine
     fileprivate var assetBuilder: AssetBuilder?
+    fileprivate var contentRequestAdapter: PKRequestParamsAdapter?
+    
+    var settings: PlayerSettings {
+        return self
+    }
     
     public var mediaEntry: MediaEntry? {
         return self.assetBuilder?.mediaEntry
@@ -48,8 +53,11 @@ class PlayerController: NSObject, Player {
         return self.currentPlayer.view
     }
     
+    public let sessionId = UUID()
+    
     public override init() {
         self.currentPlayer = AVPlayerEngine()
+        self.contentRequestAdapter = KalturaPlaybackRequestAdapter(playSessionId: self.sessionId)
         super.init()
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.trace("postEvent:: \(event)")
@@ -63,6 +71,10 @@ class PlayerController: NSObject, Player {
     var shouldRefresh: Bool = false
     
     func prepare(_ config: MediaConfig) {
+        // configure media sources content request adapter
+        if let contentRequestAdapter = self.contentRequestAdapter {
+            config.mediaEntry.configureMediaSource(withContentRequestAdapter: contentRequestAdapter)
+        }
         self.currentPlayer.startPosition = config.startTime
         self.assetBuilder = AssetBuilder(mediaEntry: config.mediaEntry)
         self.assetBuilder?.build { (error: Error?, asset: AVAsset?) in
@@ -76,31 +88,23 @@ class PlayerController: NSObject, Player {
     }
     
     func play() {
-        PKLog.trace("play::")
         self.currentPlayer.play()
     }
     
     func pause() {
-        PKLog.trace("pause::")
         self.currentPlayer.pause()
     }
     
     func resume() {
-        PKLog.trace("resume::")
         self.currentPlayer.play()
     }
     
+    func stop() {
+        self.currentPlayer.stop()
+    }
+    
     func seek(to time: CMTime) {
-        PKLog.trace("seek::\(time)")
         self.currentPlayer.currentPosition = CMTimeGetSeconds(time)
-    }
-    
-    func prepareNext(_ config: MediaConfig) -> Bool {
-        return false
-    }
-    
-    func loadNext() -> Bool {
-        return false
     }
     
     @available(iOS 9.0, *)
@@ -124,15 +128,32 @@ class PlayerController: NSObject, Player {
     public func selectTrack(trackId: String) {
         self.currentPlayer.selectTrack(trackId: trackId)
     }
+    
+    public func updatePluginConfig(pluginName: String, config: Any) {
+        //Assert.shouldNeverHappen();
+    }
+}
+
+/************************************************************/
+// MARK: - PlayerSettings
+/************************************************************/
+
+extension PlayerController: PlayerSettings {
+    
+    func set(contentRequestAdapter: PKRequestParamsAdapter?) {
+        self.contentRequestAdapter = contentRequestAdapter
+    }
 }
 
 /************************************************************/
 // MARK: - Reachability & Application States Handling
 /************************************************************/
+
 extension PlayerController {
+    
     private func shouldRefreshAsset() {
         if let handler = self.assetBuilder?.assetHandler as? RefreshableAssetHandler {
-            if let (source, handlerClass) = self.assetBuilder!.getPreferredMediaSource() {
+            if let (source, _) = self.assetBuilder!.getPreferredMediaSource() {
                 handler.shouldRefreshAsset(mediaSource: source) { [unowned self] (shouldRefresh) in
                     if shouldRefresh {
                         self.shouldRefresh = true
@@ -145,7 +166,7 @@ extension PlayerController {
     private func refreshAsset() {
         if let handler = self.assetBuilder?.assetHandler as? RefreshableAssetHandler {
             
-            if let (source, handlerClass) = self.assetBuilder!.getPreferredMediaSource() {
+            if let (source, _) = self.assetBuilder!.getPreferredMediaSource() {
                 self.currentPlayer.startPosition = self.currentPlayer.currentPosition
                 handler.refreshAsset(mediaSource: source)
             }

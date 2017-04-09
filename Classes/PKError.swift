@@ -19,7 +19,6 @@ enum PlayerError: PKError {
     case failedToLoadAssetFromKeys(rootError: NSError?)
     case assetNotPlayable
     case failedToPlayToEndTime(rootError: NSError)
-    case playerItemErrorLogEvent(errorLogEvent: AVPlayerItemErrorLogEvent)
     
     static let domain = "com.kaltura.playkit.error.player"
     
@@ -28,7 +27,6 @@ enum PlayerError: PKError {
         case .failedToLoadAssetFromKeys: return PKErrorCode.failedToLoadAssetFromKeys
         case .assetNotPlayable: return PKErrorCode.assetNotPlayable
         case .failedToPlayToEndTime: return PKErrorCode.failedToPlayToEndTime
-        case .playerItemErrorLogEvent: return PKErrorCode.playerItemErrorLogEvent
         }
     }
     
@@ -37,7 +35,6 @@ enum PlayerError: PKError {
         case .failedToLoadAssetFromKeys: return "Can't use this AVAsset because one of it's keys failed to load"
         case .assetNotPlayable: return "Can't use this AVAsset because it isn't playable"
         case .failedToPlayToEndTime: return "Item failed to play to its end time"
-        case .playerItemErrorLogEvent(let errorLogEvent): return errorLogEvent.errorComment ?? ""
         }
     }
     
@@ -50,12 +47,30 @@ enum PlayerError: PKError {
             return [:]
         case .assetNotPlayable: return [:]
         case .failedToPlayToEndTime(let rootError): return [PKErrorKeys.RootErrorKey: rootError]
-        case .playerItemErrorLogEvent(let errorLogEvent):
-            return [
-                PKErrorKeys.RootCodeKey: errorLogEvent.errorStatusCode,
-                PKErrorKeys.RootDomainKey: errorLogEvent.errorDomain
-            ]
         }
+    }
+}
+
+/// `PlayerErrorLog` represents an error log emitted from AVPlayer (usually non-fatal).
+struct PlayerErrorLog: PKError {
+    
+    static var domain = PlayerError.domain
+    
+    let errorLogEvent: AVPlayerItemErrorLogEvent
+    
+    var code: Int {
+        return PKErrorCode.playerItemErrorLogEvent
+    }
+    
+    var errorDescription: String {
+        return errorLogEvent.errorComment ?? ""
+    }
+    
+    var userInfo: [String: Any] {
+        return [
+            PKErrorKeys.RootCodeKey: errorLogEvent.errorStatusCode,
+            PKErrorKeys.RootDomainKey: errorLogEvent.errorDomain
+        ]
     }
 }
 
@@ -111,7 +126,7 @@ protocol PKError: Error, CustomStringConvertible {
     
     /**
      The error code.
-     use `switch self` to retrive the value in **enums**.
+     use `switch self` to retrieve the value in **enums**.
      
      ````
      var code: Int {
@@ -222,7 +237,8 @@ struct PKErrorKeys {
     @objc(FailedToLoadAssetFromKeys) public static let failedToLoadAssetFromKeys = 7000
     @objc(AssetNotPlayable) public static let assetNotPlayable = 7001
     @objc(FailedToPlayToEndTime) public static let failedToPlayToEndTime = 7002
-    @objc(PlayerItemErrorLogEvent) public static let playerItemErrorLogEvent = 7003
+    // PlayerErrorLog
+    @objc(PlayerItemErrorLogEvent) public static let playerItemErrorLogEvent = 7100
     // PKPluginError
     @objc(FailedToCreatePlugin) public static let failedToCreatePlugin = 2000
     @objc(MissingPluginConfig) public static let missingPluginConfig = 2001

@@ -72,8 +72,8 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
         }
     }
     
-    public override func onLoad(mediaConfig: MediaConfig) {
-        super.onLoad(mediaConfig: mediaConfig)
+    public override func onUpdateMedia(mediaConfig: MediaConfig) {
+        super.onUpdateMedia(mediaConfig: mediaConfig)
         self.setupYouboraManager() { succeeded in
             if let player = self.player, succeeded {
                 self.startMonitoring(player: player)
@@ -81,8 +81,8 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
         }
     }
     
-    public override func onUpdateMedia(mediaConfig: MediaConfig) {
-        super.onUpdateMedia(mediaConfig: mediaConfig)
+    public override func onUpdateConfig(pluginConfig: Any) {
+        super.onUpdateConfig(pluginConfig: pluginConfig)
         self.setupYouboraManager()
     }
     
@@ -272,4 +272,3 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
         self.messageBus?.post(eventLog)
     }
 }
-
