@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 
-/// An PlayerEvent is a class used to reflect player events.
+/// PlayerEvent is a class used to reflect player events.
 @objc public class PlayerEvent: PKEvent {
     
     // All events EXCLUDING error. Assuming error events are treated differently.
@@ -51,6 +51,8 @@ import AVFoundation
     @objc public static let error: PlayerEvent.Type = Error.self
     /// Sent when an plugin error occurs.
     @objc public static let pluginError: PlayerEvent.Type = PluginError.self
+    /// Sent when an error log event received from player.
+    @objc public static let errorLog: PlayerEvent.Type = ErrorLog.self
     
     // MARK: - Player Basic Events
 
@@ -80,6 +82,16 @@ import AVFoundation
     }
     
     class PluginError: PlayerEvent {
+        convenience init(nsError: NSError) {
+            self.init([EventDataKeys.Error: nsError])
+        }
+        
+        convenience init(error: PKError) {
+            self.init([EventDataKeys.Error: error.asNSError])
+        }
+    }
+    
+    class ErrorLog: PlayerEvent {
         convenience init(nsError: NSError) {
             self.init([EventDataKeys.Error: nsError])
         }
@@ -154,7 +166,12 @@ import AVFoundation
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
     
-    class AdStarted: AdEvent {}
+    class AdStarted: AdEvent {
+        convenience init(adInfo: PKAdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+    
     class AdBreakReady: AdEvent {}
     class AdBreakEnded: AdEvent {}
     class AdBreakStarted: AdEvent {}

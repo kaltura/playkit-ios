@@ -11,8 +11,8 @@ import AVFoundation
 import AVKit
 
 @objc public class PlayerDecoratorBase: NSObject, Player {
-
-    private var player: Player!
+    
+    fileprivate var player: Player!
     
     public var delegate: PlayerDelegate? {
         get {
@@ -25,6 +25,10 @@ import AVKit
 
     weak public var mediaEntry: MediaEntry? {
         return self.player.mediaEntry
+    }
+    
+    public var settings: PlayerSettings {
+        return self.player.settings
     }
     
     public var currentTime: TimeInterval {
@@ -56,16 +60,12 @@ import AVKit
         return self.player.view
     }
     
-    public func prepare(_ config: MediaConfig) {
-        return self.player.prepare(config)
-    }
-
-    public func prepareNext(_ config: MediaConfig) -> Bool {
-        return self.player.prepareNext(config)
+    public var sessionId: UUID {
+        return self.player.sessionId
     }
     
-    public func loadNext() -> Bool {
-        return self.player.loadNext()
+    public func prepare(_ config: MediaConfig) {
+        return self.player.prepare(config)
     }
     
     public func setPlayer(_ player: Player!) {
@@ -96,9 +96,17 @@ import AVKit
         self.player.resume()
     }
     
+    public func stop() {
+        self.player.stop()
+    }
+    
     @available(iOS 9.0, *)
     public func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         return self.player.createPiPController(with: delegate)
+    }
+    
+    public func updatePluginConfig(pluginName: String, config: Any) {
+        self.player.updatePluginConfig(pluginName: pluginName, config: config)
     }
     
     public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
@@ -113,3 +121,15 @@ import AVKit
         self.player.selectTrack(trackId: trackId)
     }
 }
+
+/************************************************************/
+// MARK: - PlayerSettings
+/************************************************************/
+
+extension PlayerDecoratorBase: PlayerSettings {
+    
+    public func set(contentRequestAdapter: PKRequestParamsAdapter) {
+        self.player.set(contentRequestAdapter: contentRequestAdapter)
+    }
+}
+
