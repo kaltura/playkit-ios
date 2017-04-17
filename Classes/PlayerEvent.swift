@@ -180,12 +180,7 @@ import AVFoundation
         }
     }
     
-    class AdBreakReady: AdEvent {
-        convenience init(adInfo: PKAdInfo) {
-            self.init([AdEventDataKeys.adInfo: adInfo])
-        }
-    }
-    
+    class AdBreakReady: AdEvent {}
     class AdBreakEnded: AdEvent {}
     class AdBreakStarted: AdEvent {}
     class AllAdsCompleted: AdEvent {}

@@ -28,9 +28,9 @@ extension PKAdInfo {
             adSystem: ad.adSystem,
             height: Int(ad.height),
             width: Int(ad.width),
-            podCount: Int(ad.adPodInfo.totalAds),
-            podPosition: Int(ad.adPodInfo.adPosition),
-            podTimeOffset: ad.adPodInfo.timeOffset
+            totalAds: Int(ad.adPodInfo.totalAds),
+            adPosition: Int(ad.adPodInfo.adPosition),
+            timeOffset: ad.adPodInfo.timeOffset
         )
     }
 }

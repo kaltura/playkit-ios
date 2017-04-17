@@ -24,14 +24,12 @@ protocol AdsPluginDelegate : class {
 }
 
 protocol AdsPlugin: PKPlugin, AVPictureInPictureControllerDelegate {
-    var dataSource: AdsPluginDataSource? { get set }
-    var delegate: AdsPluginDelegate? { get set }
+    weak var dataSource: AdsPluginDataSource? { get set }
+    weak var delegate: AdsPluginDelegate? { get set }
     var pipDelegate: AVPictureInPictureControllerDelegate? { get set }
     var isAdPlaying: Bool { get }
     
     func requestAds()
-    /// called when plugin need to start the ad playback on first ad play only
-    func startAd()
     func resume()
     func pause()
     func contentComplete()

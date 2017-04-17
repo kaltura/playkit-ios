@@ -40,7 +40,8 @@ enum IMAState: Int, StateProtocol {
     weak var delegate: AdsPluginDelegate?
     weak var pipDelegate: AVPictureInPictureControllerDelegate?
     
-    var stateMachine = BasicStateMachine(initialState: IMAState.start, allowTransitionToInitialState: false)
+    /// The IMA plugin state machine
+    private var stateMachine = BasicStateMachine(initialState: IMAState.start, allowTransitionToInitialState: false)
     
     private var adsManager: IMAAdsManager?
     private var renderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
@@ -174,15 +175,6 @@ enum IMAState: Int, StateProtocol {
         PKLog.trace("request Ads")
     }
     
-    func startAd() {
-        self.stateMachine.set(state: .adsLoadedAndPlay)
-        if self.adsManager == nil {
-            self.adsManager!.initialize(with: self.renderingSettings)
-            PKLog.debug("ads manager set")
-            self.notifyAdCuePoints(fromAdsManager: self.adsManager!)
-        }
-    }
-    
     func resume() {
         self.adsManager?.resume()
     }
@@ -271,23 +263,23 @@ enum IMAState: Int, StateProtocol {
         
         switch event.type {
         // Ad break, will be called before each scheduled ad break. Ad breaks may contain more than 1 ad.
+        // `event.ad` is not available at this point do not use it here.
         case .AD_BREAK_READY:
-            if let ad = event.ad, PKAdInfo(ad: ad).positionType == .preRoll, currentState == .adsRequestTimedOut || currentState == .contentPlaying  {
+            self.notify(event: AdEvent.AdBreakReady())
+            guard canPlayAd(forState: currentState) else { return }
+            self.start(adsManager: adsManager)
+        case .LOADED:
+            if shouldDiscard(ad: event.ad, currentState: currentState) {
                 adsManager.discardAdBreak()
             } else {
-                let event = event.ad != nil ? AdEvent.AdBreakReady(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdBreakReady()
-                self.notify(event: event)
-                guard currentState == .adsLoadedAndPlay || currentState == .contentPlaying else { return }
+                let adEvent = event.ad != nil ? AdEvent.AdLoaded(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdLoaded()
+                self.notify(event: adEvent)
+                // single ad only fires `LOADED` without `AD_BREAK_READY`.
+                // if we have more than one ad don't start the manager, it will be handled in `AD_BREAK_READY`
+                guard adsManager.adCuePoints.count == 0 else { return }
+                guard canPlayAd(forState: currentState) else { return }
                 self.start(adsManager: adsManager)
             }
-        case .LOADED:
-            let event = event.ad != nil ? AdEvent.AdLoaded(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdLoaded()
-            self.notify(event: event)
-            // single ad only fires `LOADED` without `AD_BREAK_READY`. 
-            // if we have more than one ad don't handle the event, it will be handled in `AD_BREAK_READY`
-            guard adsManager.adCuePoints.count == 0 else { return }
-            guard self.stateMachine.getState() == .adsLoadedAndPlay || currentState == .contentPlaying else { return }
-            self.start(adsManager: adsManager)
         case .STARTED:
             self.stateMachine.set(state: .adsPlaying)
             let event = event.ad != nil ? AdEvent.AdStarted(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdStarted()
@@ -438,6 +430,30 @@ enum IMAState: Int, StateProtocol {
     private func invalidateRequestTimer() {
         self.requestTimeoutTimer?.invalidate()
         self.requestTimeoutTimer = nil
+    }
+    
+    /// called when plugin need to start the ad playback on first ad play only
+    private func startAd() {
+        self.stateMachine.set(state: .adsLoadedAndPlay)
+        self.initAdsManager()
+    }
+    
+    /// protects against cases where the ads manager will load after timeout.
+    /// this way we will only start ads when ads loaded and play() was used or when we came from content playing.
+    private func canPlayAd(forState state: IMAState) -> Bool {
+        if state == .adsLoadedAndPlay || state == .contentPlaying {
+            return true
+        }
+        return false
+    }
+    
+    private func shouldDiscard(ad: IMAAd, currentState: IMAState) -> Bool {
+        let adInfo = PKAdInfo(ad: ad)
+        let isPreRollInvalid = adInfo.positionType == .preRoll && (currentState == .adsRequestTimedOut || currentState == .contentPlaying)
+        if isPreRollInvalid {
+            return true
+        }
+        return false
     }
     
     /************************************************************/
