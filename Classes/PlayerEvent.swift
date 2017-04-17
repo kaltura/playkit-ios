@@ -133,7 +133,7 @@ import AVFoundation
 
 @objc public class AdEvent: PKEvent {
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, adBreakEnded, adBreakStarted, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
+        adBreakReady, adBreakEnded, adBreakStarted, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, requestTimedOut
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
@@ -163,6 +163,8 @@ import AVFoundation
     @objc public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
     @objc public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
     @objc public static let adCuePointsUpdate: AdEvent.Type = AdCuePointsUpdate.self
+    /// Sent when the ads request timed out.
+    @objc public static let requestTimedOut: AdEvent.Type = RequestTimedOut.self
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
     
@@ -172,14 +174,24 @@ import AVFoundation
         }
     }
     
-    class AdBreakReady: AdEvent {}
+    class AdLoaded: AdEvent {
+        convenience init(adInfo: PKAdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+    
+    class AdBreakReady: AdEvent {
+        convenience init(adInfo: PKAdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+    
     class AdBreakEnded: AdEvent {}
     class AdBreakStarted: AdEvent {}
     class AllAdsCompleted: AdEvent {}
     class AdComplete: AdEvent {}
     class AdClicked: AdEvent {}
     class AdFirstQuartile: AdEvent {}
-    class AdLoaded: AdEvent {}
     class AdLog: AdEvent {}
     class AdMidpoint: AdEvent {}
     class AdPaused: AdEvent {}
@@ -211,6 +223,9 @@ import AVFoundation
     
     class AdDidRequestPause: AdEvent {}
     class AdDidRequestResume: AdEvent {}
+    
+    /// Sent when the ads request timed out.
+    class RequestTimedOut: AdEvent {}
     
     class WebOpenerEvent: AdEvent {
         convenience init(webOpener: NSObject!) {
