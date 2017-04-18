@@ -11,22 +11,20 @@ import GoogleInteractiveMediaAds
 
 @objc public class IMAConfig: NSObject {
     
-    @objc public var language: String = "en"
-    @objc public var enableBackgroundPlayback: Bool {
-        return true
-    }
+    @objc public let enableBackgroundPlayback = true
     // defaulted to false, because otherwise ad breaks events will not happen.
     // we need to have control on whether ad break will start playing or not using `Loaded` event is not enough. 
-    // (will also need more safety checks because loaded will happen more than once).
-    @objc public var autoPlayAdBreaks: Bool {
-        return false
-    }
+    // (will also need more safety checks for loaded because loaded will happen more than once).
+    @objc public let autoPlayAdBreaks = false
+    
+    @objc public var language: String = "en"
     @objc public var videoBitrate = kIMAAutodetectBitrate
     @objc public var videoMimeTypes: [Any]?
     @objc public var adTagUrl: String = ""
     @objc public var companionView: UIView?
     @objc public var webOpenerPresentingController: UIViewController?
-    @objc public var requestTimeoutInterval: TimeInterval = 5
+    /// ads request timeout interval, when ads request will take more then this time will resume content.
+    @objc public var requestTimeoutInterval: TimeInterval = IMAPlugin.defaultTimeoutInterval
     /// enables debug mode on IMA SDK which will output detailed log information to the console. 
     /// The default value is false.
     @objc public var enableDebugMode: Bool = false
