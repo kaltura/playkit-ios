@@ -81,6 +81,11 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
         }
     }
     
+    public override func onUpdateConfig(pluginConfig: Any) {
+        super.onUpdateConfig(pluginConfig: pluginConfig)
+        self.setupYouboraManager()
+    }
+    
     public override func destroy() {
         super.destroy()
         self.stopMonitoring()
@@ -267,4 +272,3 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
         self.messageBus?.post(eventLog)
     }
 }
-

@@ -102,12 +102,9 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     
     override var playerEventsToRegister: [PlayerEvent.Type] {
         return [
-            PlayerEvent.ended,
             PlayerEvent.error,
-            PlayerEvent.pause,
             PlayerEvent.canPlay,
             PlayerEvent.playing,
-            PlayerEvent.seeking,
             PlayerEvent.seeked,
             PlayerEvent.stateChanged
         ]
@@ -125,10 +122,6 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                     guard let strongSelf = self else { return }
                     PKLog.debug("canPlay event: \(event)")
                     strongSelf.sendMediaLoaded()
-                })
-            case let e where e.self == PlayerEvent.ended || e.self == PlayerEvent.pause || e.self == PlayerEvent.seeking:
-                self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
-                    PKLog.debug("\(e.self) event: \(event)")
                 })
             case let e where e.self == PlayerEvent.seeked:
                 self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
@@ -194,6 +187,24 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     /************************************************************/
     // MARK: - PKPlugin
     /************************************************************/
+    
+    public override func onUpdateMedia(mediaConfig: MediaConfig) {
+        super.onUpdateMedia(mediaConfig: mediaConfig)
+        self.isWidgetLoaded = false
+        self.isMediaLoaded = false
+        self.isBuffering = false
+        
+        self.seekPercent = 0.0
+        
+        self.playReached25 = false
+        self.playReached50 = false
+        self.playReached75 = false
+        self.playReached100 = false
+        self.intervalOn = false
+        self.hasSeeked = false
+        
+        self.timer?.invalidate()
+    }
     
     public override func destroy() {
         super.destroy()
@@ -279,16 +290,19 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     
     private func sendAnalyticsEvent(action: KalturaStatsEventType) {
         guard let player = self.player else { return }
+        
+        guard let mediaEntry = player.mediaEntry else {
+            PKLog.error("send analytics failed due to nil mediaEntry")
+            return
+        }
+        
         PKLog.debug("Action: \(action)")
         
-        var sessionId = ""
+        let entryId: String
+        let sessionId = player.sessionId.uuidString
         var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
         var confId = 0
         var parterId = ""
-        
-        if let sId = self.config?.params["sessionId"] as? String {
-            sessionId = sId
-        }
         
         if let cId = self.config?.params["uiconfId"] as? Int {
             confId = cId
@@ -302,9 +316,10 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
             parterId = String(pId)
         }
         
-        guard let mediaEntry = player.mediaEntry else {
-            PKLog.error("send analytics failed due to nil mediaEntry")
-            return
+        if let eId = self.config?.params["entryId"] as? String {
+            entryId = eId
+        } else {
+            entryId = mediaEntry.id
         }
         
         guard let builder: KalturaRequestBuilder = OVPStatsService.get(baseURL: baseUrl,
@@ -315,7 +330,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                                                                  sessionId: sessionId,
                                                                  position: player.currentTime.toInt32(),
                                                                  uiConfId: confId,
-                                                                 entryId: mediaEntry.id,
+                                                                 entryId: entryId,
                                                                  widgetId: "_\(parterId)",
                                                                  isSeek: hasSeeked) else { return }
         

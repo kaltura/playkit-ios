@@ -98,4 +98,13 @@ class PlayerLoader: PlayerDecoratorBase {
         messageBus.removeObserver(observer, events: events)
     }
     
+    public override func updatePluginConfig(pluginName: String, config: Any) {
+        guard let loadedPlugin: LoadedPlugin = loadedPlugins[pluginName] else {
+            PKLog.debug("There is no such plugin: \(pluginName)");
+            return
+        }
+        
+        loadedPlugin.plugin.onUpdateConfig(pluginConfig: config)
+    }
+    
 }

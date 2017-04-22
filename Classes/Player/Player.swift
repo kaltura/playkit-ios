@@ -14,84 +14,81 @@ import AVKit
     func playerShouldPlayAd(_ player: Player) -> Bool
 }
 
-@objc public protocol Player: NSObjectProtocol {
+/// `PlayerSettings` used for optional `Player` settings.
+@objc public protocol PlayerSettings {
+    func set(contentRequestAdapter: PKRequestParamsAdapter)
+}
+
+@objc public protocol Player: PlayerSettings {
     
     @objc weak var delegate: PlayerDelegate? { get set }
     
     /// The player's associated media entry.
-    weak var mediaEntry: MediaEntry? { get }
+    @objc weak var mediaEntry: MediaEntry? { get }
     
-    /**
-     Get the player's layer component.
-     */
-    var view: UIView! { get }
+    /// the player's settings
+    @objc var settings: PlayerSettings { get }
     
-    /**
-     Get/set the current player position.
-     */
-    var currentTime: TimeInterval { get set }
+    /// The player's layer component.
+    @objc var view: UIView! { get }
     
-    /**
-     Get the player's duration.
-     */
-    var isPlaying: Bool { get }
+    /// The current player position.
+    @objc var currentTime: TimeInterval { get set }
     
-    /**
-     Get the player's duration.
-     */
-    var duration: TimeInterval { get }
+    /// The player's duration.
+    @objc var isPlaying: Bool { get }
     
-    var currentAudioTrack: String? { get }
+    /// The player's duration.
+    @objc var duration: TimeInterval { get }
     
-    var currentTextTrack: String? { get }
+    /// Get the player's current audio track.
+    @objc var currentAudioTrack: String? { get }
     
-    /**
-     Prepare for playing an entry.
-     play when it's ready.
-     */
-    func prepare(_ config: MediaConfig)
+    /// Get the player's current text track.
+    @objc var currentTextTrack: String? { get }
     
-    /**
-     send play action for the player.
-     */
-    func play()
+    /// The player's session id. the `sessionId` is initialized when the player loads.
+    @objc var sessionId: UUID { get }
+
+    /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
+    @objc func prepare(_ config: MediaConfig)
     
-    /**
-     send pause action for the player.
-     */
-    func pause()
+    /// send play action for the player.
+    @objc func play()
     
-    /**
-     send resume action for the player.
-     */
-    func resume()
+    /// send pause action for the player.
+    @objc func pause()
     
-    /**
-     send stop action for the player.
-     */
-    func stop()
+    /// send resume action for the player.
+    @objc func resume()
     
-    /**
-     send seek action for the player.
-     */
-    func seek(to time: CMTime)
+    /// send stop action for the player.
+    @objc func stop()
     
-    /**
-     Release player resources.
-    */
-    func destroy()
+    /// send seek action for the player.
+    @objc func seek(to time: CMTime)
+
+    /// Release player resources.
+    @objc func destroy()
     
-    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void)
+    /// Add Observation to relevant event.
+    @objc func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void)
     
-    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
+    /// Remove Observation.
+    @objc func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
     
-    func selectTrack(trackId: String)
+    /// Select Track
+    @objc func selectTrack(trackId: String)
     
+    /// Update Plugin Config
+    @objc func updatePluginConfig(pluginName: String, config: Any)
+    
+    /// Create PiP Controller
     @available(iOS 9.0, *)
-    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
+    @objc func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
 }
 
-protocol PlayerDecoratorProvider: NSObjectProtocol {
+public protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
 

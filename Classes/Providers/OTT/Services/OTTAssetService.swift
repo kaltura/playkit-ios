@@ -18,7 +18,7 @@ class OTTAssetService {
             request
             .setBody(key: "assetId", value: JSON(assetId))
             .setBody(key: "ks", value: JSON(ks))
-            .setBody(key: "assetType", value: JSON(type.rawValue))
+            .setBody(key: "assetType", value: JSON(type.asString))
             .setBody(key: "contextDataParams", value: JSON(playbackContextOptions.toDictionary()))
             return request
         } else {
@@ -36,7 +36,7 @@ struct PlaybackContextOptions {
     func toDictionary() -> [String: Any] {
 
         var dict: [String: Any] = [:]
-        dict["context"] = playbackContextType.rawValue
+        dict["context"] = playbackContextType.asString
         dict["mediaProtocols"] = protocls
         if let fileIds = self.assetFileIds {
             dict["assetFileIds"] = fileIds.joined(separator: ",")
