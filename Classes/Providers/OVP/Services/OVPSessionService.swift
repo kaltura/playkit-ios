@@ -11,20 +11,7 @@ import SwiftyJSON
 import KalturaNetKit
 
 class OVPSessionService {
-    
-    internal static func get(baseURL: String,
-                             ks: String) -> KalturaRequestBuilder? {
         
-        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL,
-                                                                      service: "session",
-                                                                      action: "get") {
-            request.setBody(key: "ks", value: JSON(ks))
-            return request
-        }else{
-            return nil
-        }
-    }
-    
     internal static func startWidgetSession(baseURL: String,
                                             partnerId: Int64 )  -> KalturaRequestBuilder? {
         
@@ -39,14 +26,4 @@ class OVPSessionService {
         }
         
     }
-                                            
-    
-    
-    
-//    .service("session")
-//    .action("startWidgetSession")
-//    .method("POST")
-//    .url(baseUrl)
-//    .tag("session-startWidget")
-//    .params(params);
 }
