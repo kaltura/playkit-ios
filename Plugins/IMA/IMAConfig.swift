@@ -16,8 +16,8 @@ import GoogleInteractiveMediaAds
     // we need to have control on whether ad break will start playing or not using `Loaded` event is not enough. 
     // (will also need more safety checks for loaded because loaded will happen more than once).
     @objc public let autoPlayAdBreaks = false
-    
     @objc public var language: String = "en"
+
     @objc public var videoBitrate = kIMAAutodetectBitrate
     @objc public var videoMimeTypes: [Any]?
     @objc public var adTagUrl: String = ""
