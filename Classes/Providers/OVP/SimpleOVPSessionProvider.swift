@@ -4,6 +4,7 @@
 //
 
 import UIKit
+import KalturaNetKit
 
 /**
  A SessionProvider that just reflects its input parameters -- baseUrl, partnerId, ks. 

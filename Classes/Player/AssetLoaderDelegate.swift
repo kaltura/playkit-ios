@@ -103,7 +103,7 @@ class AssetLoaderDelegate: NSObject {
         return ckc
     }
     
-    func performCKCRequest(_ spcData: Data, _ callback: @escaping (Result<Data>)->Void) {
+    func performCKCRequest(_ spcData: Data, _ callback: @escaping (_ data:Data?, _ error:Error?)->Void) {
         
         guard let licenseUri = drmData?.licenseUri else { return }
         
@@ -119,9 +119,9 @@ class AssetLoaderDelegate: NSObject {
                 let endTime: Double = Date.timeIntervalSinceReferenceDate
                 PKLog.debug("Got response in \(endTime-startTime) sec")
                 let ckc = try self.parseServerResponse(data: data, error: error)
-                callback(Result(data: ckc))
+                callback(ckc,nil)
             } catch let e {
-                callback(Result(error: e))
+                callback(nil,e)
             }
         })
         dataTask.resume()
@@ -248,11 +248,11 @@ class AssetLoaderDelegate: NSObject {
          content key, it will honor the type of rental or lease specified when the key is used.
          */
         
-        performCKCRequest(spcData) { result in
-            if let ckcData = result.data {
+        performCKCRequest(spcData) { (data,error) in
+            if let ckcData = data {
                 self.handleCKCData(resourceLoadingRequest, assetIDString, ckcData)
             } else {
-                PKLog.error("Error occured while loading FairPlay license:", result.error ?? "")
+                PKLog.error("Error occured while loading FairPlay license:", error ?? "")
             }
         }
         

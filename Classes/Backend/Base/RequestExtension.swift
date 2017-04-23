@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftyJSON
+import KalturaNetKit
 
 
 extension KalturaRequestBuilder {
@@ -25,8 +26,9 @@ extension KalturaRequestBuilder {
     }
     
     @discardableResult
-    internal func setFormat(format: Int){
+    internal func setFormat(format: Int) -> Self {
         self.setBody(key: "format", value: JSON(format))
+        return self
     }
     
 
