@@ -13,7 +13,11 @@ import AVKit
 
 class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPluginDataSource {
     
-    var isAdPlayback = false
+    enum PlayType {
+        case play, resume
+    }
+    
+    /// indicates if play was used, if `play()` or `resume()` was called we set this to true.
     var isPlayEnabled = false
     
     /// when playing post roll google sends content resume when finished.
@@ -37,50 +41,44 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
 
     override var isPlaying: Bool {
         get {
-            if isAdPlayback {
+            if self.adsPlugin.isAdPlaying {
                 return isPlayEnabled
             }
             return super.isPlaying
         }
     }
 
+    // TODO:: finilize prepare
+    override func prepare(_ config: MediaConfig) {
+        super.prepare(config)
+        
+        self.adsPlugin.requestAds()
+    }
+    
     override func play() {
         self.isPlayEnabled = true
-        if !self.adsPlugin.start(showLoadingView: true) {
-            super.play()
-        }
+        self.adsPlugin.didRequestPlay(ofType: .play)
+    }
+    
+    override func resume() {
+        self.isPlayEnabled = true
+        self.adsPlugin.didRequestPlay(ofType: .resume)
     }
     
     override func pause() {
         self.isPlayEnabled = false
-        if isAdPlayback {
+        if self.adsPlugin.isAdPlaying {
             self.adsPlugin.pause()
         } else {
             super.pause()
         }
     }
     
-    override func resume() {
-        self.isPlayEnabled = true
-        if isAdPlayback {
-            self.adsPlugin.resume()
-        } else {
-            super.resume()
-        }
-    }
-    
     override func stop() {
         self.adsPlugin.destroyManager()
         super.stop()
-        self.isAdPlayback = false
         self.isPlayEnabled = false
         self.shouldPreventContentResume = false
-    }
-    
-    // TODO:: finilize prepare
-    override func prepare(_ config: MediaConfig) {
-        super.prepare(config)
-        self.adsPlugin.requestAds()
     }
     
     @available(iOS 9.0, *)
@@ -89,39 +87,57 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         return super.createPiPController(with: self.adsPlugin)
     }
     
+    /************************************************************/
+    // MARK: - AdsPluginDataSource
+    /************************************************************/
         
     func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
         return self.delegate!.playerShouldPlayAd(self)
     }
     
+    /************************************************************/
+    // MARK: - AdsPluginDelegate
+    /************************************************************/
+    
     func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String) {
         if self.isPlayEnabled {
             super.play()
+            self.adsPlugin.didPlay()
         }
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String) {
         super.play()
-        self.isAdPlayback = false
+        self.adsPlugin.didPlay()
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
         switch event {
         case let e where type(of: e) == AdEvent.adDidRequestPause:
-            self.isAdPlayback = true
             super.pause()
         case let e where type(of: e) == AdEvent.adDidRequestResume:
-            self.isAdPlayback = false
             if !self.shouldPreventContentResume {
                 super.resume()
             }
         case let e where type(of: e) == AdEvent.adResumed: self.isPlayEnabled = true
-        case let e where type(of: e) == AdEvent.adStarted:
+        case let e where type(of: e) == AdEvent.adLoaded || type(of: e) == AdEvent.adBreakReady:
+            if self.shouldPreventContentResume == true { return } // no need to handle twice if already true
             if event.adInfo?.positionType == .postRoll {
                 self.shouldPreventContentResume = true
             }
         case let e where type(of: e) == AdEvent.allAdsCompleted: self.shouldPreventContentResume = false
         default: break
         }
+    }
+    
+    func adsRequestTimedOut(shouldPlay: Bool) {
+        if shouldPlay {
+            self.play()
+        }
+    }
+    
+    func play(_ playType: PlayType) {
+        playType == .play ? super.play() : super.resume()
+        self.adsPlugin.didPlay()
     }
 }
