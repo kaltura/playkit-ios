@@ -14,8 +14,8 @@ import PlayKit
 
 class OVPMediaProviederTest: XCTestCase, SessionProvider {
     
-    public func loadKS(completion: @escaping (Result<String>) -> Void) {
-         completion(Result(data: "djJ8MjIyMjQwMXwdcXO1uXvBNZYxpUCxIGfEN120AWUJGJYCTt2qbhE3hCXa62-TGAOrxUtA0WwBGCqRreBaAzd2Dnejy9bYmcqtC1SxtCkZjw_jwoFd4Y3Cl-9hYgSCTcLRdqiePConBm8=", error: nil))
+    public func loadKS(completion: @escaping (String?, Error?) -> Void) {
+        completion("", nil)
     }
 
     let entryID = "1_ytsd86sc"
@@ -40,13 +40,13 @@ class OVPMediaProviederTest: XCTestCase, SessionProvider {
         .set(entryId: self.entryID)
         .set(executor: MediaEntryProviderMockExecutor(entryID: entryID, domain: "ovp"))
         
-        provider.loadMedia { (r:Result<MediaEntry>) in
-            if (r.error != nil){
+        provider.loadMedia { (media, error) in
+            if (error != nil){
                 XCTFail()
             }else{
                 theExeption.fulfill()
             }
-            print(r)
+           
         }
         
         
@@ -65,13 +65,12 @@ class OVPMediaProviederTest: XCTestCase, SessionProvider {
             .set(executor: USRExecutor.shared )
         
         
-        provider.loadMedia { (r:Result<MediaEntry>) in
-            if (r.error != nil){
+        provider.loadMedia { (media, error) in
+            if (error != nil){
                 XCTFail()
             }else{
                 theExeption.fulfill()
             }
-            print(r)
         }
         
         

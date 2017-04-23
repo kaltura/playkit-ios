@@ -15,6 +15,11 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     
     var isAdPlayback = false
     var isPlayEnabled = false
+    
+    /// when playing post roll google sends content resume when finished.
+    /// In our case we need to prevent sending play/resume to the player because the content already ended.
+    var shouldPreventContentResume = false
+    
     var adsPlugin: AdsPlugin!
     weak var messageBus: MessageBus?
     
@@ -27,7 +32,6 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         didSet {
             self.adsPlugin.delegate = self
             self.adsPlugin.dataSource = self
-            self.adsPlugin.requestAds()
         }
     }
 
@@ -65,6 +69,20 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         }
     }
     
+    override func stop() {
+        self.adsPlugin.destroyManager()
+        super.stop()
+        self.isAdPlayback = false
+        self.isPlayEnabled = false
+        self.shouldPreventContentResume = false
+    }
+    
+    // TODO:: finilize prepare
+    override func prepare(_ config: MediaConfig) {
+        super.prepare(config)
+        self.adsPlugin.requestAds()
+    }
+    
     @available(iOS 9.0, *)
     override func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         self.adsPlugin.pipDelegate = delegate
@@ -88,14 +106,22 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
-        if event is AdEvent.AdDidRequestPause {
-            super.pause()
+        switch event {
+        case let e where type(of: e) == AdEvent.adDidRequestPause:
             self.isAdPlayback = true
-        } else if event is AdEvent.AdDidRequestResume {
-            super.play()
+            super.pause()
+        case let e where type(of: e) == AdEvent.adDidRequestResume:
             self.isAdPlayback = false
-        } else if event is AdEvent.AdResumed {
-            self.isPlayEnabled = true
+            if !self.shouldPreventContentResume {
+                super.resume()
+            }
+        case let e where type(of: e) == AdEvent.adResumed: self.isPlayEnabled = true
+        case let e where type(of: e) == AdEvent.adStarted:
+            if event.adInfo?.positionType == .postRoll {
+                self.shouldPreventContentResume = true
+            }
+        case let e where type(of: e) == AdEvent.allAdsCompleted: self.shouldPreventContentResume = false
+        default: break
         }
     }
 }

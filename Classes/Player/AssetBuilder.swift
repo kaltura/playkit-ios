@@ -63,7 +63,7 @@ class AssetBuilder {
         return nil
     }
 
-    func build(readyCallback: @escaping (Error?, AVAsset?)->Void) -> Void {
+    func build(readyCallback: @escaping (Error?, AVAsset?) -> Void) -> Void {
         
         guard let (source, handlerClass) = getPreferredMediaSource() else {
             PKLog.error("No playable sources")
@@ -80,11 +80,11 @@ class AssetBuilder {
 
 protocol AssetHandler {
     init()
-    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?)->Void)
+    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?) -> Void)
 }
 
 protocol RefreshableAssetHandler: AssetHandler {
-    func shouldRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping (Bool)->Void)
+    func shouldRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping (Bool) -> Void)
     func refreshAsset(mediaSource: MediaSource)
 }
 
@@ -99,7 +99,7 @@ enum AssetError : Error {
 class DRMSupport {
     // FairPlay is not available in simulators and before iOS8
     static let fairplay: Bool = {
-        if Platform.isSimulator, #available(iOS 8, *) {
+        if !Platform.isSimulator, #available(iOS 8, *) {
             return true
         } else {
             return false
@@ -108,7 +108,7 @@ class DRMSupport {
     
     // FairPlay is not available in simulators and is only downloadable in iOS10 and up.
     static let fairplayOffline: Bool = {
-        if Platform.isSimulator, #available(iOS 10, *) {
+        if !Platform.isSimulator, #available(iOS 10, *) {
             return true
         } else {
             return false

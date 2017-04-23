@@ -9,12 +9,9 @@
 import UIKit
 import SwiftyJSON
 
-func getJson(_ json: Any) -> JSON {
-    return json as? JSON ?? JSON(json)
-}
-
 @objc public enum MediaType: Int {
     case live
+    case vod
     case unknown
 }
 
@@ -23,7 +20,7 @@ func getJson(_ json: Any) -> JSON {
     @objc public var sources: [MediaSource]?
     @objc public var duration: TimeInterval = 0
     @objc public var mediaType: MediaType = .unknown
-    @objc public var metadata:[String:String]?
+    @objc public var metadata:[String: String]?
     
     private let idKey = "id"
     private let sourcesKey = "sources"
@@ -42,9 +39,9 @@ func getJson(_ json: Any) -> JSON {
         super.init()
     }
     
-    public init(json: Any?) {
+    public init(json: Any) {
         
-        let jsonObject = getJson(json)
+        let jsonObject = json as? JSON ?? JSON(json)
         
         self.id = jsonObject[idKey].string ?? ""
         
@@ -65,7 +62,13 @@ func getJson(_ json: Any) -> JSON {
     
     override public var description: String {
         get {
-            return "id : \(self.id), sources: \(self.sources)"
+            return "id : \(self.id), sources: \(String(describing: self.sources))"
+        }
+    }
+    
+    func configureMediaSource(withContentRequestAdapter contentRequestAdapter: PKRequestParamsAdapter) {
+        self.sources?.forEach { mediaSource in
+            mediaSource.contentRequestAdapter = contentRequestAdapter
         }
     }
 }
@@ -80,43 +83,29 @@ func getJson(_ json: Any) -> JSON {
         case mp3
         case unknown
         
-        
         var fileExtension: String {
             get {
                 switch self {
-                case .dash:
-                    return "mpd"
-                case .hls:
-                    return "m3u8"
-                case .wvm:
-                    return "wvm"
-                case .mp4:
-                    return "mp4"
-                case .mp3:
-                    return "mp3"
-                case .unknown:
-                    return ""
+                case .dash: return "mpd"
+                case .hls: return "m3u8"
+                case .wvm: return "wvm"
+                case .mp4: return "mp4"
+                case .mp3: return "mp3"
+                case .unknown: return ""
                 }
             }
         }
         
         static func mediaFormat(byfileExtension ext:String) -> MediaFormat{
             switch ext {
-            case "mpd":
-                return .dash
-            case "m3u8":
-                return .hls
-            case "wvm":
-                return .wvm
-            case "mp4":
-                return .mp4
-            case "mp3":
-                return .mp3
-            default:
-                return .unknown
+            case "mpd": return .dash
+            case "m3u8": return .hls
+            case "wvm": return .wvm
+            case "mp4": return .mp4
+            case "mp3": return .mp3
+            default: return .unknown
             }
         }
-        
     }
     
     @objc public var id: String
@@ -130,13 +119,22 @@ func getJson(_ json: Any) -> JSON {
     @objc public var drmData: [DRMParams]?
     @objc public var mediaFormat: MediaFormat = .unknown
     @objc public var fileExt: String {
-        
         return contentUrl?.pathExtension ?? ""
+    }
+    
+    /// request params adapter, used to adapt the url.
+    var contentRequestAdapter: PKRequestParamsAdapter?
+    /// the playback url, if adapter exists uses it adapt otherwise uses the contentUrl.
+    var playbackUrl: URL? {
+        guard let contentUrl = self.contentUrl else { return nil }
+        if let contentRequestAdapter = self.contentRequestAdapter {
+            return contentRequestAdapter.adapt(requestParams: PKRequestParams(url: contentUrl, headers: nil)).url
+        }
+        return contentUrl
     }
     
     private let idKey: String = "id"
     private let contentUrlKey: String = "url"
-    private let mimeTypeKey: String = "mimeType"
     private let drmDataKey: String = "drmData"
     private let formatTypeKey: String = "sourceType"
     
@@ -147,20 +145,17 @@ func getJson(_ json: Any) -> JSON {
     @objc public init(_ id: String, contentUrl: URL?, mimeType: String? = nil, drmData: [DRMParams]? = nil, mediaFormat: MediaFormat = .unknown) {
         self.id = id
         self.contentUrl = contentUrl
-        self.mimeType = mimeType
         self.drmData = drmData
         self.mediaFormat = mediaFormat
     }
     
     @objc public init(json: Any) {
         
-        let sj = getJson(json)
+        let sj = json as? JSON ?? JSON(json)
         
         self.id = sj[idKey].string ?? UUID().uuidString
         
         self.contentUrl = sj[contentUrlKey].url
-        
-        self.mimeType = sj[mimeTypeKey].string
         
         if let drmData = sj[drmDataKey].array {
             self.drmData = drmData.flatMap { DRMParams.fromJSON($0) }
@@ -175,16 +170,12 @@ func getJson(_ json: Any) -> JSON {
     
     override public var description: String {
         get {
-            return "id : \(self.id), url: \(self.contentUrl)"
+            return "id : \(self.id), url: \(String(describing: self.contentUrl))"
         }
     }
 }
 
-
-
-
 @objc open class DRMParams: NSObject {
-    
     
     public enum Scheme: Int {
         case widevineCenc
@@ -206,7 +197,7 @@ func getJson(_ json: Any) -> JSON {
     
     @objc public static func fromJSON(_ json: Any) -> DRMParams? {
         
-        let sj = getJson(json)
+        let sj = json as? JSON ?? JSON(json)
         
         guard let licenseUri = sj["licenseUri"].string else { return nil }
         let schemeValue: Int = sj["scheme"].int ?? Scheme.unknown.hashValue

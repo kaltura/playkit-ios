@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.1.26'
+s.version          = '0.1.30'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 
 
@@ -38,7 +38,7 @@ s.subspec 'GoogleCastAddon' do |ssp|
         'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
         'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
     }
-    ssp.dependency 'google-cast-sdk'
+    ssp.dependency 'google-cast-sdk', '3.3.0'
     ssp.dependency 'PlayKit/Core'
 end
 
