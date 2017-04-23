@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftyJSON
+import KalturaNetKit
 
 
 class OVPBaseEntryService {

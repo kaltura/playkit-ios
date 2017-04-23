@@ -8,25 +8,11 @@
 
 import UIKit
 import SwiftyJSON
+import KalturaNetKit
 
 class OTTAssetService {
 
-    internal static func get(baseURL: String, ks: String, assetId: String, type: AssetType) -> KalturaRequestBuilder? {
-
-        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "get") {
-            request
-            .setBody(key: "id", value: JSON(assetId))
-            .setBody(key: "ks", value: JSON(ks))
-            .setBody(key: "type", value: JSON(type.asString))
-            .setBody(key: "assetReferenceType", value: JSON(type.asString))
-            .setBody(key: "with", value: JSON([["type": "files", "objectType": "KalturaCatalogWithHolder"]]))
-            return request
-        } else {
-            return nil
-        }
-    }
-
-    internal static func getPlaybackContext(baseURL: String, ks: String, assetId: String, type: AssetType, playbackContextOptions: PlaybackContextOptions) -> KalturaRequestBuilder? {
+    internal static func getPlaybackContext(baseURL: String, ks: String, assetId: String, type: AssetObjectType, playbackContextOptions: PlaybackContextOptions) -> KalturaRequestBuilder? {
 
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "getPlaybackContext") {
             request
@@ -38,13 +24,12 @@ class OTTAssetService {
         } else {
             return nil
         }
-
     }
 }
 
 struct PlaybackContextOptions {
 
-    internal var playbackContextType: PlaybackContextType
+    internal var playbackContextType: PlaybackType
     internal var protocls: [String]
     internal var assetFileIds: [String]?
 

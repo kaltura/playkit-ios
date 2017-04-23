@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftyXMLParser
+import KalturaNetKit
 
 @objc public class OVPMediaProvider: NSObject, MediaEntryProvider {
 

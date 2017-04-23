@@ -8,6 +8,43 @@
 
 import UIKit
 import SwiftyJSON
+import KalturaNetKit
+
+
+@objc public enum AssetType: Int {
+    case media
+    case epg
+    case unknown
+    
+    var asString: String {
+        switch self {
+        case .media: return "media"
+        case .epg: return "epg"
+        case .unknown: return ""
+        }
+    }
+}
+
+
+@objc public enum PlaybackContextType: Int {
+    
+    case trailer
+    case catchup
+    case startOver
+    case playback
+    case unknown
+    
+    var asString: String {
+        switch self {
+        case .trailer: return "TRAILER"
+        case .catchup: return "CATCHUP"
+        case .startOver: return "START_OVER"
+        case .playback: return "PLAYBACK"
+        case .unknown: return ""
+        }
+    }
+}
+
 
 /************************************************************/
 // MARK: - PhoenixMediaProviderError
@@ -168,10 +205,10 @@ public enum PhoenixMediaProviderError: PKError {
     struct LoaderInfo {
         var sessionProvider: SessionProvider
         var assetId: String
-        var assetType: AssetType
+        var assetType: AssetObjectType
         var formats: [String]?
         var fileIds: [String]?
-        var playbackContextType: PlaybackContextType
+        var playbackContextType: PlaybackType
         var networkProtocol: String
         var executor: RequestExecutor
 
@@ -198,7 +235,9 @@ public enum PhoenixMediaProviderError: PKError {
         let pr = self.networkProtocol ?? defaultProtocol
         let executor = self.executor ?? USRExecutor.shared
 
-        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, assetId: assetId, assetType: self.type, formats: self.formats, fileIds: self.fileIds, playbackContextType: self.playbackContextType, networkProtocol:pr, executor: executor)
+        let assetType = self.convertAssetTyp(type: self.type)
+        let contextPlaybackContextType = self.convertPlaybackContextType(type: self.playbackContextType)
+        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, assetId: assetId, assetType: assetType, formats: self.formats, fileIds: self.fileIds, playbackContextType: contextPlaybackContextType, networkProtocol: pr, executor: executor)
 
         self.startLoad(loaderInfo: loaderParams, callback: callback)
     }
@@ -388,6 +427,33 @@ public enum PhoenixMediaProviderError: PKError {
             default:
                 return .unknown
             }
+    }
+    
+    func convertAssetTyp(type: AssetType) -> AssetObjectType {
+        
+        switch type {
+        case .epg:
+            return .epg
+        case .media:
+            return .media
+        default:
+            return .unknown
+        }
+    }
+    
+    func convertPlaybackContextType(type: PlaybackContextType) -> PlaybackType {
+        switch type {
+        case .catchup:
+            return .catchup
+        case .playback:
+            return .playback
+        case .startOver:
+            return .startOver
+        case .trailer:
+            return .trailer
+        default:
+            return .unknown
+        }
     }
 
 }

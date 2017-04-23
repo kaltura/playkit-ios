@@ -17,7 +17,11 @@ class OVPObjectMapper: NSObject {
     
     static func classByJsonObject(json:Any?) -> OVPBaseObject.Type? {
         
-        let jsonObject = JSON(json)
+        guard let js = json else {
+            return nil
+        }
+        
+        let jsonObject = JSON(js)
         let className = jsonObject[classNameKey].string
         if let name = className{
             switch name {
@@ -27,8 +31,6 @@ class OVPObjectMapper: NSObject {
                 return OVPPlaybackContext.self
             case "KalturaAPIException":
                 return OVPError.self
-            case "KalturaStartWidgetSessionResponse":
-                return OVPStartWidgetSessionResponse.self
             case "KalturaMetadata":
                 return OVPMetadata.self
             default:

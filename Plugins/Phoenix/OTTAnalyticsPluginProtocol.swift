@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import KalturaNetKit
 
 enum OTTAnalyticsEventType: String {
     case hit

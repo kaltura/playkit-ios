@@ -3,6 +3,10 @@ PODS:
     - google-cast-sdk/Core (= 3.3.0)
   - google-cast-sdk/Core (3.3.0)
   - GoogleAds-IMA-iOS-SDK (3.4.1)
+  - KalturaNetKit (0.0.11):
+    - KalturaNetKit/Core (= 0.0.11)
+  - KalturaNetKit/Core (0.0.11):
+    - SwiftyJSON
   - Log (1.0)
   - Nimble (6.0.1)
   - PlayKit (0.1.x-dev):
@@ -10,6 +14,7 @@ PODS:
   - PlayKit/AnalyticsCommon (0.1.x-dev):
     - PlayKit/Core
   - PlayKit/Core (0.1.x-dev):
+    - KalturaNetKit
     - Log
     - SwiftyJSON
     - SwiftyXMLParser
@@ -58,9 +63,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   google-cast-sdk: da1989cbc1b9ff7b50ddb9dae5b1969d95a65a0f
   GoogleAds-IMA-iOS-SDK: 7355db22ce69be4607ed0cc5112847b2b0c5e89d
+  KalturaNetKit: b6bc21d1ffb6957192c33afc12f5c2203d5208b2
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
   Nimble: 1527fd1bd2b4cf0636251a36bc8ab37e81da8347
-  PlayKit: 7b8c3120a642ceda0193a3ec8f14247d20562e39
+  PlayKit: c50b4b7582aa7bef031bb34e15b6ca2303093525
   Quick: dafc587e21eed9f4cab3249b9f9015b0b7a7f71d
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
   SwiftyXMLParser: 8d2295fb4fbc6e2ff241e7c8d7717e159be35969
@@ -69,4 +75,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 8702b84cf4a02b3d2de2ccf0fe915659f256d0e6
 
-COCOAPODS: 1.2.0.beta.1
+COCOAPODS: 1.2.0
