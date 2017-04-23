@@ -52,43 +52,60 @@ extension PKErrorCode {
 // MARK: - YouboraPlugin
 /************************************************************/
 
-public class YouboraPlugin: BaseAnalyticsPlugin {
+public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
     
     public override class var pluginName: String {
         return "YouboraPlugin"
     }
     
-    private var youboraManager : YouboraManager?
+    private var youboraManager: YouboraManager
+    /// Smart Ads plugin, `YouboraAdnalyzerManager` inherits from `YBAdnalyzerGeneric`
+    /// Will only be used when configured enableAdnalyzer == true.
+    private var adnalyzerManager: YouboraAdnalyzerManager?
     
     /************************************************************/
     // MARK: - PKPlugin
     /************************************************************/
     
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
-        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-        guard let _ = pluginConfig as? AnalyticsConfig else {
+        guard let config = pluginConfig as? AnalyticsConfig else {
             PKLog.error("missing plugin config")
             throw PKPluginError.missingPluginConfig(pluginName: YouboraPlugin.pluginName)
         }
+        /// initialize youbora manager
+        let options = config.params
+        let optionsObject = NSDictionary(dictionary: options)
+        self.youboraManager = YouboraManager(options: optionsObject, player: player)
+        
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        
+        // if adnalyzer is enabled initialize it only once when youbora manager is initialized
+        if let enableAdnalyzer = self.config?.params["enableAdnalyzer"] as? Bool, enableAdnalyzer == true {
+            self.adnalyzerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
+        }
+        // start monitoring for events
+        self.startMonitoring()
+        
+        AppStateSubject.shared.add(observer: self)
     }
     
     public override func onUpdateMedia(mediaConfig: MediaConfig) {
+        // play handler to start when asset starts loading.
+        // this point is the closest point to prepare call.
+        self.youboraManager.playHandler()
+        
         super.onUpdateMedia(mediaConfig: mediaConfig)
-        self.setupYouboraManager() { succeeded in
-            if let player = self.player, succeeded {
-                self.startMonitoring(player: player)
-            }
-        }
+        self.setupYoubora()
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {
         super.onUpdateConfig(pluginConfig: pluginConfig)
-        self.setupYouboraManager()
+        self.setupYoubora()
     }
     
     public override func destroy() {
-        super.destroy()
         self.stopMonitoring()
+        super.destroy()
     }
     
     /************************************************************/
@@ -97,8 +114,6 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
     
     override var playerEventsToRegister: [PlayerEvent.Type] {
         return [
-            PlayerEvent.canPlay,
-            PlayerEvent.play,
             PlayerEvent.pause,
             PlayerEvent.playing,
             PlayerEvent.seeking,
@@ -116,158 +131,138 @@ public class YouboraPlugin: BaseAnalyticsPlugin {
             PKLog.debug("Register event: \(event.self)")
             
             switch event {
-            case let e where e.self == PlayerEvent.canPlay:
-                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
-                    guard let strongSelf = self else { return }
-                    strongSelf.postEventLogWithMessage(message: "canPlay event: \(event)")
-                }
-            case let e where e.self == PlayerEvent.play:
-                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
-                    guard let strongSelf = self else { return }
-                    guard let youboraManager = strongSelf.youboraManager else { return }
-                    youboraManager.playHandler()
-                    strongSelf.postEventLogWithMessage(message: "play event: \(event)")
-                }
             case let e where e.self == PlayerEvent.pause:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    guard let youboraManager = strongSelf.youboraManager else { return }
-                    youboraManager.pauseHandler()
-                    strongSelf.postEventLogWithMessage(message: "pause event: \(event)")
+                    strongSelf.youboraManager.pauseHandler()
+                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
             case let e where e.self == PlayerEvent.playing:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    strongSelf.postEventLogWithMessage(message: "playing event: \(event)")
-                    
-                    guard let youboraManager = strongSelf.youboraManager else { return }
-                    
+                    strongSelf.postEventLogWithMessage(message: "\(String(describing: type(of: event)))")
                     if strongSelf.isFirstPlay {
-                        youboraManager.joinHandler()
-                        youboraManager.bufferedHandler()
                         strongSelf.isFirstPlay = false
+                        strongSelf.youboraManager.joinHandler()
+                        strongSelf.youboraManager.bufferedHandler()
                     } else {
-                        youboraManager.resumeHandler()
+                        strongSelf.youboraManager.resumeHandler()
                     }
                 }
             case let e where e.self == PlayerEvent.seeking:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    guard let youboraManager = strongSelf.youboraManager else { return }
-                    youboraManager.seekingHandler()
-                    strongSelf.postEventLogWithMessage(message: "seeking event: \(event)")
+                    strongSelf.youboraManager.seekingHandler()
+                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
             case let e where e.self == PlayerEvent.seeked:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    guard let youboraManager = strongSelf.youboraManager else { return }
-                    youboraManager.seekedHandler()
-                    strongSelf.postEventLogWithMessage(message: "seeked event: \(event)")
+                    strongSelf.youboraManager.seekedHandler()
+                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
             case let e where e.self == PlayerEvent.ended:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    guard let youboraManager = strongSelf.youboraManager else { return }
-                    youboraManager.endedHandler()
-                    strongSelf.postEventLogWithMessage(message: "ended event: \(event)")
+                    strongSelf.youboraManager.endedHandler()
+                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
             case let e where e.self == PlayerEvent.playbackParamsUpdated:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    guard let youboraManager = strongSelf.youboraManager else { return }
-                    youboraManager.currentBitrate = event.currentBitrate?.doubleValue
-                    strongSelf.postEventLogWithMessage(message: "playbackParamsUpdated event: \(event)")
+                    strongSelf.youboraManager.currentBitrate = event.currentBitrate?.doubleValue
+                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
             case let e where e.self == PlayerEvent.stateChanged:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    guard let youboraManager = strongSelf.youboraManager else { return }
-                    switch event.newState {
-                    case .buffering:
-                        youboraManager.bufferingHandler()
-                        strongSelf.postEventLogWithMessage(message: "Buffering event: ֿ\(event)")
-                        break
-                    default: break
-                    }
-                    
-                    switch event.oldState {
-                    case .buffering:
-                        youboraManager.bufferedHandler()
-                        strongSelf.postEventLogWithMessage(message: "Buffered event: \(event)")
-                        break
-                    default: break
+                    if event.newState == .buffering {
+                        strongSelf.youboraManager.bufferingHandler()
+                        strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                    } else if event.oldState == .buffering {
+                        strongSelf.youboraManager.bufferedHandler()
+                        strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                     }
                 }
             default: assertionFailure("all events must be handled")
             }
         }
-        
-        PKLog.debug("register ads events")
-        self.messageBus?.addObserver(self, events: AdEvent.allEventTypes) { [weak self] event in
-            self?.postEventLogWithMessage(message: "Ads event event: \(event)")
-        }
+    }
+    
+    /************************************************************/
+    // MARK: - App State Handling
+    /************************************************************/
+    
+    var observations: Set<NotificationObservation> {
+        return [
+            NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
+                PKLog.debug("youbora plugin will terminate event received, sending analytics pause event")
+                self.youboraManager.pauseHandler()
+                AppStateSubject.shared.remove(observer: self)
+            }
+        ]
     }
     
     /************************************************************/
     // MARK: - Private
     /************************************************************/
     
-    private func setupYouboraManager(completionHandler: ((_ succeeded: Bool) -> Void)? = nil) {
+    private func setupYoubora() {
         guard let player = self.player else { return }
         guard let mediaEntry = player.mediaEntry else {
             PKLog.error("missing MediaEntry, could not setup youbora manager")
             self.messageBus?.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
-            completionHandler?(false)
             return
         }
         
         guard let config = self.config else {
             PKLog.error("config params doesn't exist, could not setup youbora manager")
             self.messageBus?.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
-            completionHandler?(false)
             return
         }
         
-        var options = [String: Any]()
+        var options = config.params
         
         // if media exists overwrite using the new info, else create a new media dictionary
-        if var media = config.params["media"] as? [String: Any] {
+        if var media = options["media"] as? [String: Any] {
             media["resource"] = mediaEntry.id
             media["title"] = mediaEntry.id
             media["duration"] = player.duration
-            config.params["media"] = media
+            options["media"] = media
         } else {
-            config.params["media"] = [
+            options["media"] = [
                 "resource" : mediaEntry.id,
                 "title" : mediaEntry.id,
                 "duration" : mediaEntry.duration
             ]
         }
-        options = config.params
+        
+        let optionsObject = NSDictionary(dictionary: options)
         
         // if youbora manager already created just update options
-        if let youboraManager = self.youboraManager {
-            youboraManager.setOptions(options as NSObject!)
-        } else {
-            self.youboraManager = YouboraManager(options: options as NSObject!, player: player, mediaEntry: mediaEntry)
-        }
-        completionHandler?(true)
+        self.youboraManager.setOptions(optionsObject)
     }
     
-    private func startMonitoring(player: Player) {
-        guard let youboraManager = self.youboraManager else { return }
-        PKLog.debug("Start monitoring using Youbora")
-        youboraManager.startMonitoring(withPlayer: youboraManager)
+    private func startMonitoring() {
+        PKLog.debug("Start monitoring Youbora")
+        youboraManager.startMonitoring(withPlayer: nil)
+        if let adnalyzerManager = self.adnalyzerManager {
+            PKLog.debug("Start monitoring Youbora Adnalyzer")
+            // we start monitoring using messageBus object because he is the one handling our events not the player
+            adnalyzerManager.startMonitoring(withPlayer: self.messageBus)
+        }
     }
     
     private func stopMonitoring() {
-        guard let youboraManager = self.youboraManager else { return }
         PKLog.debug("Stop monitoring using Youbora")
         youboraManager.stopMonitoring()
+        if let adnalyzerManager = self.adnalyzerManager {
+            PKLog.debug("Stop monitoring using Youbora")
+            adnalyzerManager.stopMonitoring()
+        }
     }
     
     private func postEventLogWithMessage(message: String) {
-        PKLog.debug(message)
         let eventLog = YouboraEvent.Report(message: message)
         self.messageBus?.post(eventLog)
     }

@@ -163,6 +163,10 @@ import AVFoundation
     @objc public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
     @objc public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
     @objc public static let adCuePointsUpdate: AdEvent.Type = AdCuePointsUpdate.self
+    /// Sent when an ad started buffering
+    @objc public static let adStartedBuffering: AdEvent.Type = AdStartedBuffering.self
+    /// Sent when ad finished buffering and ready for playback
+    @objc public static let adPlaybackReady: AdEvent.Type = AdPlaybackReady.self
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
     
@@ -188,6 +192,9 @@ import AVFoundation
     class AdStreamLoaded: AdEvent {}
     class AdTapped: AdEvent {}
     class AdThirdQuartile: AdEvent {}
+    
+    class AdStartedBuffering: AdEvent {}
+    class AdPlaybackReady: AdEvent {}
     
     // `AdCuePointsUpdate` event is received when ad cue points were updated. only sent when there is more then 0.
     class AdCuePointsUpdate: AdEvent {
@@ -243,17 +250,17 @@ extension PKEvent {
     // MARK: Ad Data Accessors
     
     /// MediaTime, PKEvent Ad Data Accessor
-    @objc public var mediaTime: NSNumber? {
+    @objc public var adMediaTime: NSNumber? {
         return self.data?[AdEventDataKeys.mediaTime] as? NSNumber
     }
     
     /// TotalTime, PKEvent Ad Data Accessor
-    @objc public var totalTime: NSNumber? {
+    @objc public var adTotalTime: NSNumber? {
         return self.data?[AdEventDataKeys.totalTime] as? NSNumber
     }
     
     /// WebOpener, PKEvent Ad Data Accessor
-    @objc public var webOpener: NSObject? {
+    @objc public var adWebOpener: NSObject? {
         return self.data?[AdEventDataKeys.webOpener] as? NSObject
     }
     
