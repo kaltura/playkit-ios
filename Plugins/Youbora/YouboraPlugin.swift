@@ -75,7 +75,8 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         /// initialize youbora manager
         let options = config.params
         let optionsObject = NSDictionary(dictionary: options)
-        self.youboraManager = YouboraManager(options: optionsObject, player: player)
+        let ybManager = YouboraManager(options: optionsObject, player: player)
+        self.youboraManager = ybManager
         
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         
@@ -244,6 +245,8 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
     }
     
     private func startMonitoring() {
+        // make sure to first stop monitoring in case we of uneven call to start/stop
+        self.stopMonitoring()
         PKLog.debug("Start monitoring Youbora")
         youboraManager.startMonitoring(withPlayer: nil)
         if let adnalyzerManager = self.adnalyzerManager {

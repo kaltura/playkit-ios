@@ -21,6 +21,11 @@ class YouboraAdnalyzerManager: YBAdnalyzerGeneric {
         super.init(pluginInstance: plugin)
         self.adnalyzerVersion = PlayKitManager.versionString // TODO: put plugin version when we will seperate
     }
+    
+    // we must override this init in order to override the `pluginInstance` init
+    private override init() {
+        super.init()
+    }
 }
 
 /************************************************************/
@@ -111,8 +116,8 @@ extension YouboraAdnalyzerManager {
             AdEvent.adDidProgressToTime,
             AdEvent.adSkipped,
             AdEvent.adStartedBuffering,
-            AdEvent.adPlaybackReady
-            // TODO: add ad tag event
+            AdEvent.adPlaybackReady,
+            AdEvent.adsRequested
         ]
     }
     
@@ -164,7 +169,10 @@ extension YouboraAdnalyzerManager {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     self?.bufferedAdHandler()
                 }
-                // TODO: add ad tag event
+            case let e where e.self == AdEvent.adsRequested:
+                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
+                    self?.lastReportedResource = event.adTagUrl
+                }
             default: assertionFailure("all events must be handled")
             }
         }

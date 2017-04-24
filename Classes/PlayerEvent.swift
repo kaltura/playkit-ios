@@ -169,6 +169,8 @@ import AVFoundation
     @objc public static let adPlaybackReady: AdEvent.Type = AdPlaybackReady.self
     /// Sent when the ads request timed out.
     @objc public static let requestTimedOut: AdEvent.Type = RequestTimedOut.self
+    /// delivered when ads request was sent.
+    @objc public static let adsRequested: AdEvent.Type = AdsRequested.self
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
     
@@ -228,6 +230,12 @@ import AVFoundation
     
     /// Sent when the ads request timed out.
     class RequestTimedOut: AdEvent {}
+    /// delivered when ads request was sent.
+    class AdsRequested: AdEvent {
+        convenience init(adTagUrl: String) {
+            self.init([AdEventDataKeys.adTagUrl: adTagUrl])
+        }
+    }
     
     class WebOpenerEvent: AdEvent {
         convenience init(webOpener: NSObject!) {
@@ -255,6 +263,7 @@ extension PKEvent {
         static let error = "error"
         static let adCuePoints = "adCuePoints"
         static let adInfo = "adInfo"
+        static let adTagUrl = "adTagUrl"
     }
     
     // MARK: Ad Data Accessors
@@ -282,5 +291,10 @@ extension PKEvent {
     /// Ad cue points, PKEvent Ad Data Accessor
     @objc public var adCuePoints: PKAdCuePoints? {
         return self.data?[AdEventDataKeys.adCuePoints] as? PKAdCuePoints
+    }
+    
+    /// TotalTime, PKEvent Ad Data Accessor
+    @objc public var adTagUrl: String? {
+        return self.data?[AdEventDataKeys.adTagUrl] as? String
     }
 }

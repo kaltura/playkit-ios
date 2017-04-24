@@ -18,12 +18,14 @@ class YouboraManager: YBPluginGeneric {
     private weak var pkPlayer: Player?
     var currentBitrate: Double?
     
-    // for some reason we must implement the initializer this way because the way youbora implemented the init.
-    // this means player and media entry are defined as optionals but they must have values when initialized.
-    // All the checks for optionals in this class are just because we defined them as optionals but they are not so the checks are irrelevant.
-    convenience init!(options: NSObject!, player: Player) {
-        self.init(options: options)
+    init(options: NSObject!, player: Player) {
+        super.init(options: options)
         self.pkPlayer = player
+    }
+    
+    // we must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift). 
+    private override init() {
+        super.init()
     }
     
     /************************************************************/
