@@ -53,9 +53,12 @@ class BasicStateMachine<T: StateProtocol> {
                 PKLog.error("\(String(describing: type(of: self))) was set to initial state, this is not allowed")
                 return
             }
-            self.state = state
-            DispatchQueue.main.async {
-                self.onStateChange?(state)
+            // only set state when changed
+            if self.state != state {
+                self.state = state
+                DispatchQueue.main.async {
+                    self.onStateChange?(state)
+                }
             }
         }
     }

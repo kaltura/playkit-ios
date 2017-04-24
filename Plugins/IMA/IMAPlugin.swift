@@ -32,6 +32,9 @@ enum IMAState: Int, StateProtocol {
 
 @objc public class IMAPlugin: BasePlugin, PKPluginWarmUp, PlayerDecoratorProvider, AdsPlugin, IMAAdsLoaderDelegate, IMAAdsManagerDelegate, IMAWebOpenerDelegate, IMAContentPlayhead {
     
+    /// the default timeout interval for ads request.
+    static let defaultTimeoutInterval: TimeInterval = 5
+    
     weak var dataSource: AdsPluginDataSource? {
         didSet {
             PKLog.debug("data source set")
@@ -43,20 +46,19 @@ enum IMAState: Int, StateProtocol {
     /// The IMA plugin state machine
     private var stateMachine = BasicStateMachine(initialState: IMAState.start, allowTransitionToInitialState: false)
     
+    private static var loader: IMAAdsLoader!
     private var adsManager: IMAAdsManager?
     private var renderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
-    private static var loader: IMAAdsLoader!
-    
     private var pictureInPictureProxy: IMAPictureInPictureProxy?
     private var loadingView: UIView?
+    
     // we must have config error will be thrown otherwise
     private var config: IMAConfig!
     
-    private var timer: Timer?
     /// timer for checking IMA requests timeout.
     private var requestTimeoutTimer: Timer?
     /// the request timeout interval
-    private var requestTimeoutInterval: TimeInterval = 5
+    private var requestTimeoutInterval: TimeInterval = IMAPlugin.defaultTimeoutInterval
 
     /************************************************************/
     // MARK: - IMAContentPlayhead
@@ -91,6 +93,7 @@ enum IMAState: Int, StateProtocol {
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         if let adsConfig = pluginConfig as? IMAConfig {
             self.config = adsConfig
+            self.requestTimeoutInterval = adsConfig.requestTimeoutInterval
             if IMAPlugin.loader == nil {
                 self.setupLoader(with: adsConfig)
             }
@@ -118,7 +121,6 @@ enum IMAState: Int, StateProtocol {
     
     // TODO:: finilize update config & updateMedia logic
     public override func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.debug("mediaConfig: " + String(describing: mediaConfig))
         super.onUpdateMedia(mediaConfig: mediaConfig)
     }
     
@@ -269,16 +271,20 @@ enum IMAState: Int, StateProtocol {
         // Ad break, will be called before each scheduled ad break. Ad breaks may contain more than 1 ad.
         // `event.ad` is not available at this point do not use it here.
         case .AD_BREAK_READY:
-            self.notify(event: AdEvent.AdBreakReady())
-            guard canPlayAd(forState: currentState) else { return }
-            self.start(adsManager: adsManager)
+            if shouldDiscardAd() {
+                PKLog.debug("discard Ad Break")
+            } else {
+                self.notify(event: AdEvent.AdBreakReady())
+                guard canPlayAd(forState: currentState) else { return }
+                self.start(adsManager: adsManager)
+            }
+        // single ad only fires `LOADED` without `AD_BREAK_READY`.
         case .LOADED:
             if shouldDiscard(ad: event.ad, currentState: currentState) {
-                adsManager.discardAdBreak()
+                self.discardAdBreak(adsManager: adsManager)
             } else {
                 let adEvent = event.ad != nil ? AdEvent.AdLoaded(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdLoaded()
                 self.notify(event: adEvent)
-                // single ad only fires `LOADED` without `AD_BREAK_READY`.
                 // if we have more than one ad don't start the manager, it will be handled in `AD_BREAK_READY`
                 guard adsManager.adCuePoints.count == 0 else { return }
                 guard canPlayAd(forState: currentState) else { return }
@@ -451,13 +457,27 @@ enum IMAState: Int, StateProtocol {
         return false
     }
     
-    private func shouldDiscard(ad: IMAAd, currentState: IMAState) -> Bool {
-        let adInfo = PKAdInfo(ad: ad)
-        let isPreRollInvalid = adInfo.positionType == .preRoll && (currentState == .adsRequestTimedOut || currentState == .contentPlaying)
-        if isPreRollInvalid {
+    private func shouldDiscardAd() -> Bool {
+        if currentTime < self.dataSource?.adsPluginStartTime ?? 0 {
             return true
         }
         return false
+    }
+    
+    private func shouldDiscard(ad: IMAAd, currentState: IMAState) -> Bool {
+        let adInfo = PKAdInfo(ad: ad)
+        let isStartTimeInvalid = adInfo.positionType != .postRoll && adInfo.timeOffset < self.dataSource?.adsPluginStartTime ?? 0
+        let isPreRollInvalid = adInfo.positionType == .preRoll && (currentState == .adsRequestTimedOut || currentState == .contentPlaying)
+        if isStartTimeInvalid || isPreRollInvalid {
+            return true
+        }
+        return false
+    }
+    
+    private func discardAdBreak(adsManager: IMAAdsManager) {
+        PKLog.debug("discard Ad Break")
+        adsManager.discardAdBreak()
+        self.adsManagerDidRequestContentResume(adsManager)
     }
     
     /************************************************************/

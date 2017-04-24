@@ -11,6 +11,8 @@ import AVKit
 
 protocol AdsPluginDataSource : class {
     func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool
+    /// the player's media config start time.
+    var adsPluginStartTime: TimeInterval { get }
 }
 
 protocol AdsPluginDelegate : class {
@@ -27,12 +29,18 @@ protocol AdsPlugin: PKPlugin, AVPictureInPictureControllerDelegate {
     weak var dataSource: AdsPluginDataSource? { get set }
     weak var delegate: AdsPluginDelegate? { get set }
     var pipDelegate: AVPictureInPictureControllerDelegate? { get set }
+    /// is ad playing currently.
     var isAdPlaying: Bool { get }
     
+    /// request ads from the server.
     func requestAds()
+    /// resume ad
     func resume()
+    /// pause ad
     func pause()
+    /// ad content complete
     func contentComplete()
+    /// destroy the ads manager
     func destroyManager()
     /// called after player called `super.play()`
     func didPlay()

@@ -116,7 +116,7 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
                     
                     if strongSelf.isFirstPlay {
                         strongSelf.isFirstPlay = false
-                        strongSelf.sendAnalyticsEvent(ofType: .firstPlay);
+                        strongSelf.sendAnalyticsEvent(ofType: .first_play);
                     } else {
                         strongSelf.sendAnalyticsEvent(ofType: .play);
                     }

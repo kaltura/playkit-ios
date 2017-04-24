@@ -11,14 +11,36 @@ import UIKit
 import AVFoundation
 import AVKit
 
+/// `AdsPlayerState` represents `AdsEnabledPlayerController` state machine states.
+enum AdsPlayerState: Int, StateProtocol {
+    /// initial state.
+    case start = 0
+    /// when prepare was requested for the first time and it is stalled until ad started (preroll) / faliure or content resume
+    case waitingForPrepare
+    /// a moment before we called prepare until prepare() was finished (the sychornos code only not async tasks)
+    case preparing
+    /// Indicates when prepare() was finished (the sychornos code only not async tasks)
+    case prepared
+}
+
 class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPluginDataSource {
     
     enum PlayType {
         case play, resume
     }
     
+    /// The ads player state machine.
+    private var stateMachine = BasicStateMachine(initialState: AdsPlayerState.start, allowTransitionToInitialState: true)
+    
+    /// The media config to prepare the player with.
+    /// Uses @NSCopying in order to make a copy whenever set with new value.
+    @NSCopying private var prepareMediaConfig: MediaConfig!
+    
     /// indicates if play was used, if `play()` or `resume()` was called we set this to true.
-    var isPlayEnabled = false
+    private var isPlayEnabled = false
+    
+    /// a semaphore to make sure prepare calling will not be reached from 2 threads by mistake.
+    private let prepareSemaphore = DispatchSemaphore(value: 1)
     
     /// when playing post roll google sends content resume when finished.
     /// In our case we need to prevent sending play/resume to the player because the content already ended.
@@ -48,10 +70,10 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         }
     }
 
-    // TODO:: finilize prepare
     override func prepare(_ config: MediaConfig) {
-        super.prepare(config)
-        
+        self.stop()
+        self.stateMachine.set(state: .waitingForPrepare)
+        self.prepareMediaConfig = config
         self.adsPlugin.requestAds()
     }
     
@@ -75,8 +97,9 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     }
     
     override func stop() {
-        self.adsPlugin.destroyManager()
+        self.stateMachine.set(state: .start)
         super.stop()
+        self.adsPlugin.destroyManager()
         self.isPlayEnabled = false
         self.shouldPreventContentResume = false
     }
@@ -95,18 +118,24 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         return self.delegate!.playerShouldPlayAd(self)
     }
     
+    var adsPluginStartTime: TimeInterval {
+        return self.prepareMediaConfig?.startTime ?? 0
+    }
+    
     /************************************************************/
     // MARK: - AdsPluginDelegate
     /************************************************************/
     
     func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String) {
         if self.isPlayEnabled {
+            self.preparePlayerIfNeeded()
             super.play()
             self.adsPlugin.didPlay()
         }
     }
     
     func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String) {
+        self.preparePlayerIfNeeded()
         super.play()
         self.adsPlugin.didPlay()
     }
@@ -117,9 +146,15 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
             super.pause()
         case let e where type(of: e) == AdEvent.adDidRequestResume:
             if !self.shouldPreventContentResume {
+                self.preparePlayerIfNeeded()
                 super.resume()
             }
         case let e where type(of: e) == AdEvent.adResumed: self.isPlayEnabled = true
+        case let e where type(of: e) == AdEvent.adStarted:
+            // when starting to play pre roll start preparing the player.
+            if event.adInfo?.positionType == .preRoll {
+                self.preparePlayerIfNeeded()
+            }
         case let e where type(of: e) == AdEvent.adLoaded || type(of: e) == AdEvent.adBreakReady:
             if self.shouldPreventContentResume == true { return } // no need to handle twice if already true
             if event.adInfo?.positionType == .postRoll {
@@ -132,12 +167,30 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     
     func adsRequestTimedOut(shouldPlay: Bool) {
         if shouldPlay {
+            self.preparePlayerIfNeeded()
             self.play()
         }
     }
     
     func play(_ playType: PlayType) {
+        self.preparePlayerIfNeeded()
         playType == .play ? super.play() : super.resume()
         self.adsPlugin.didPlay()
+    }
+    
+    /************************************************************/
+    // MARK: - Private
+    /************************************************************/
+    
+    /// prepare the player only if wasn't prepared yet.
+    private func preparePlayerIfNeeded() {
+        self.prepareSemaphore.wait() // use semaphore to make sure will not be called from more than one thread by mistake.
+        if self.stateMachine.getState() == .waitingForPrepare {
+            self.stateMachine.set(state: .preparing)
+            PKLog.debug("will prepare player")
+            super.prepare(self.prepareMediaConfig)
+            self.stateMachine.set(state: .prepared)
+        }
+        self.prepareSemaphore.signal()
     }
 }
