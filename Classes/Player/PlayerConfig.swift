@@ -37,6 +37,14 @@ import Foundation
     }
 }
 
+extension MediaConfig: NSCopying {
+    
+    public func copy(with zone: NSZone? = nil) -> Any {
+        let copy = MediaConfig(mediaEntry: self.mediaEntry, startTime: self.startTime)
+        return copy
+    }
+}
+
 /// A `PluginConfig` object defines config to use when loading a plugin object.
 @objc public class PluginConfig: NSObject {
     /// Plugins config dictionary holds [plugin name : plugin config]
@@ -59,7 +67,7 @@ import Foundation
 extension PluginConfig: NSCopying {
     
     public func copy(with zone: NSZone? = nil) -> Any {
-        let copy = PluginConfig(config: config)
+        let copy = PluginConfig(config: self.config)
         return copy
     }
 }

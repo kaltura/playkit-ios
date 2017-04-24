@@ -5,6 +5,7 @@
 //  Created by Oded Klein on 01/12/2016.
 //
 //
+import KalturaNetKit
 
 /// `KalturaStatsEvent` represents an event reporting from kaltura stats plugin.
 @objc public class KalturaLiveStatsEvent: PKEvent {

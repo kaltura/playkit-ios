@@ -28,19 +28,17 @@ import Foundation
     @objc public var adSystem: String
     @objc public var height: Int
     @objc public var width: Int
-    @objc public var podCount: Int
-    @objc public var podPosition: Int
-    /**
-     The position of the pod in the content in seconds. Pre-roll returns 0,
-     post-roll returns -1 and mid-rolls return the scheduled time of the pod.
-     */
-    @objc public var podTimeOffset: TimeInterval
+    @objc public var totalAds: Int
+    @objc public var adPosition: Int
+    /// The position of the pod in the content in seconds. Pre-roll returns 0,
+    /// post-roll returns -1 and mid-rolls return the scheduled time of the pod.
+    @objc public var timeOffset: TimeInterval
     
     /// returns the position type of the ad (pre, mid, post)
     @objc public var positionType: AdPositionType {
-        if podTimeOffset > 0 {
+        if timeOffset > 0 {
             return .midRoll
-        } else if podTimeOffset < 0 {
+        } else if timeOffset < 0 {
             return .postRoll
         } else {
             return .preRoll
@@ -56,9 +54,9 @@ import Foundation
          adSystem: String,
          height: Int,
          width: Int,
-         podCount: Int,
-         podPosition: Int,
-         podTimeOffset: TimeInterval) {
+         totalAds: Int,
+         adPosition: Int,
+         timeOffset: TimeInterval) {
         
         self.adDescription = adDescription
         self.duration = adDuration
@@ -69,9 +67,9 @@ import Foundation
         self.adSystem = adSystem
         self.height = height
         self.width = width
-        self.podCount = podCount
-        self.podPosition = podPosition
-        self.podTimeOffset = podTimeOffset
+        self.totalAds = totalAds
+        self.adPosition = adPosition
+        self.timeOffset = timeOffset
     }
 }
 
