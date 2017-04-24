@@ -48,6 +48,7 @@ class AVPlayerEngine: AVPlayer {
     public var asset: AVAsset? {
         didSet {
             guard let newAsset = asset else { return }
+            self.post(event: PlayerEvent.LoadingAsset()) // TODO: in future add asset content url to the event
             self.asynchronouslyLoadURLAsset(newAsset)
         }
     }
@@ -166,6 +167,7 @@ class AVPlayerEngine: AVPlayer {
         self.pause()
         self.seek(to: kCMTimeZero)
         self.replaceCurrentItem(with: nil)
+        self.post(event: PlayerEvent.Stopped())
     }
     
     override func pause() {

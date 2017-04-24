@@ -24,8 +24,12 @@ import AVFoundation
     @objc public static let canPlay: PlayerEvent.Type = CanPlay.self
     /// The metadata has loaded or changed, indicating a change in duration of the media. This is sent, for example, when the media has loaded enough that the duration is known.
     @objc public static let durationChanged: PlayerEvent.Type = DurationChanged.self
+    /// Sent when playback stopped.
+    @objc public static let stopped: PlayerEvent.Type = Stopped.self
     /// Sent when playback completes.
     @objc public static let ended: PlayerEvent.Type = Ended.self
+    /// Sent when the media starts loading the asset.
+    @objc public static let loadingAsset: PlayerEvent.Type = LoadingAsset.self
     /// The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
     @objc public static let loadedMetadata: PlayerEvent.Type = LoadedMetadata.self
     /// Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior pause event.
@@ -63,7 +67,9 @@ import AVFoundation
         }
     }
     
+    class Stopped: PlayerEvent {}
     class Ended: PlayerEvent {}
+    class LoadingAsset: PlayerEvent {}
     class LoadedMetadata: PlayerEvent {}
     class Play: PlayerEvent {}
     class Pause: PlayerEvent {}
