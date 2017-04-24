@@ -28,8 +28,6 @@ class OTTMultiResponseParser: NSObject {
                 let objectType: OTTBaseObject.Type? = OTTObjectMapper.classByJsonObject(json: jsonObject.dictionaryObject)
                 if let type = objectType {
                      object = type.init(json: jsonObject.object)
-                } else {
-                    throw OTTMultiResponseParserError.typeNotFound
                 }
 
                 if let obj = object {
