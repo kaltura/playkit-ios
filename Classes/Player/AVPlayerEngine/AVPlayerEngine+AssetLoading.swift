@@ -11,6 +11,12 @@ import AVFoundation
 
 extension AVPlayerEngine {
     
+    override func replaceCurrentItem(with item: AVPlayerItem?) {
+        // when changing asset reset last timebase
+        self.lastTimebaseRate = 0
+        super.replaceCurrentItem(with: item)
+    }
+    
     func asynchronouslyLoadURLAsset(_ newAsset: AVAsset) {
         /*
          Using AVAsset now runs the risk of blocking the current thread (the

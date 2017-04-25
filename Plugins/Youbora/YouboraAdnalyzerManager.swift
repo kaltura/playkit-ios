@@ -132,6 +132,10 @@ extension YouboraAdnalyzerManager {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     // update ad info with the new loaded event
                     self?.adInfo = event.adInfo
+                    // if ad is preroll make sure to call /start event before /adStart
+                    if let positionType = event.adInfo?.positionType, positionType == .preRoll {
+                        self?.plugin.playHandler()
+                    }
                     self?.playAdHandler()
                 }
             case let e where e.self == AdEvent.adStarted:
