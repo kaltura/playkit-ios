@@ -12,7 +12,7 @@ import YouboraLib
 class YouboraAdnalyzerManager: YBAdnalyzerGeneric {
     
     weak var adInfo: PKAdInfo?
-    var adPlayhead: TimeInterval = -1
+    var adPlayhead: TimeInterval?
     var lastReportedResource: String?
     
     fileprivate weak var messageBus: MessageBus?
@@ -60,8 +60,8 @@ extension YouboraAdnalyzerManager {
 extension YouboraAdnalyzerManager {
     
     override func getAdPlayhead() -> NSNumber! {
-        if self.adPlayhead > 0 {
-            return NSNumber(value: self.adPlayhead)
+        if let adPlayhead = self.adPlayhead, adPlayhead > 0 {
+            return NSNumber(value: adPlayhead)
         } else {
             return super.getAdPlayhead()
         }
@@ -106,7 +106,7 @@ extension YouboraAdnalyzerManager {
 
 extension YouboraAdnalyzerManager {
     
-    var adEventsToRegister: [AdEvent.Type] {
+    private var adEventsToRegister: [AdEvent.Type] {
         return [
             AdEvent.adLoaded,
             AdEvent.adStarted,
@@ -121,11 +121,11 @@ extension YouboraAdnalyzerManager {
         ]
     }
     
-    func registerAdEvents(onMessageBus messageBus: MessageBus) {
-        PKLog.debug("register player events")
+    fileprivate func registerAdEvents(onMessageBus messageBus: MessageBus) {
+        PKLog.debug("register ad events")
         
         self.adEventsToRegister.forEach { event in
-            PKLog.debug("Register event: \(event.self)")
+            PKLog.debug("\(String(describing: type(of: self))) will register event: \(event.self)")
             
             switch event {
             case let e where e.self == AdEvent.adLoaded:
@@ -153,9 +153,8 @@ extension YouboraAdnalyzerManager {
                 }
             case let e where e.self == AdEvent.adDidProgressToTime:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    guard let progress = event.adMediaTime?.doubleValue else { return }
                     // update ad playhead with new data
-                    self?.adPlayhead = progress
+                    self?.adPlayhead = event.adMediaTime?.doubleValue
                 }
             case let e where e.self == AdEvent.adSkipped:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
