@@ -20,10 +20,8 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         return "YouboraPlugin"
     }
     
+    /// The youbora plugin inheriting from `YBPluginGeneric`
     private var youboraManager: YouboraManager
-    /// Smart Ads plugin, `YouboraAdnalyzerManager` inherits from `YBAdnalyzerGeneric`
-    /// Will only be used when configured enableAdnalyzer == true.
-    private var adnalyzerManager: YouboraAdnalyzerManager?
     
     /************************************************************/
     // MARK: - PKPlugin
@@ -37,18 +35,14 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         /// initialize youbora manager
         let options = config.params
         let optionsObject = NSDictionary(dictionary: options)
-        let ybManager = YouboraManager(options: optionsObject, player: player)
-        self.youboraManager = ybManager
+        self.youboraManager = YouboraManager(options: optionsObject, player: player)
+        self.youboraManager.adnalyzer = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
         
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         
-        // if adnalyzer is enabled initialize it only once when youbora manager is initialized
-        if let enableAdnalyzer = self.config?.params["enableAdnalyzer"] as? Bool, enableAdnalyzer == true {
-            self.adnalyzerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
-        }
         // start monitoring for events
         self.startMonitoring()
-        
+        // monitor app state changes
         AppStateSubject.shared.add(observer: self)
     }
     
@@ -66,7 +60,11 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
     
     public override func destroy() {
         self.stopMonitoring()
-        self.messageBus?.removeObserver(self, events: [AdEvent.adStarted])
+        
+        // we must call `endedHandler()` when destroyed so youbora will know player stopped playing content.
+        self.youboraManager.endedHandler()
+        self.youboraManager.adnalyzer.endedAdHandler()
+        
         AppStateSubject.shared.remove(observer: self)
         super.destroy()
     }
@@ -107,8 +105,9 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
             case let e where e.self == PlayerEvent.stopped:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
+                    // we must call `endedHandler()` when stopped so youbora will know player stopped playing content.
                     strongSelf.youboraManager.endedHandler()
-                    strongSelf.adnalyzerManager?.endedAdHandler()
+                    strongSelf.youboraManager.adnalyzer.endedAdHandler()
                     strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
             case let e where e.self == PlayerEvent.pause:
@@ -126,9 +125,6 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
                         strongSelf.youboraManager.joinHandler()
                         strongSelf.youboraManager.bufferedHandler()
                     } else {
-                        if strongSelf.adnalyzerManager == nil {
-                            strongSelf.youboraManager.ignoredAdHandler() // in case we played ads
-                        }
                         strongSelf.youboraManager.resumeHandler()
                     }
                 }
@@ -170,13 +166,6 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
             default: assertionFailure("all events must be handled")
             }
         }
-        
-        // ad events
-        self.messageBus?.addObserver(self, events: [AdEvent.adStarted]) { [weak self] event in
-            if self?.adnalyzerManager == nil {
-                self?.youboraManager.ignoringAdHandler()
-            }
-        }
     }
     
     /************************************************************/
@@ -187,8 +176,10 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         return [
             NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
                 PKLog.debug("youbora plugin will terminate event received")
+                // we must call `endedHandler()` when stopped so youbora will know player stopped playing content.
                 self.youboraManager.endedHandler()
-                self.adnalyzerManager?.endedAdHandler()
+                self.youboraManager.adnalyzer.endedAdHandler()
+                
                 AppStateSubject.shared.remove(observer: self)
             }
         ]
@@ -246,20 +237,16 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         self.stopMonitoring()
         PKLog.debug("Start monitoring Youbora")
         youboraManager.startMonitoring(withPlayer: nil)
-        if let adnalyzerManager = self.adnalyzerManager {
-            PKLog.debug("Start monitoring Youbora Adnalyzer")
-            // we start monitoring using messageBus object because he is the one handling our events not the player
-            adnalyzerManager.startMonitoring(withPlayer: self.messageBus)
-        }
+        PKLog.debug("Start monitoring Youbora Adnalyzer")
+        // we start monitoring using messageBus object because he is the one handling our events not the player
+        youboraManager.adnalyzer.startMonitoring(withPlayer: self.messageBus)
     }
     
     private func stopMonitoring() {
         PKLog.debug("Stop monitoring using Youbora")
         youboraManager.stopMonitoring()
-        if let adnalyzerManager = self.adnalyzerManager {
-            PKLog.debug("Stop monitoring using Youbora")
-            adnalyzerManager.stopMonitoring()
-        }
+        PKLog.debug("Stop monitoring using Youbora")
+        youboraManager.adnalyzer.stopMonitoring()
     }
     
     private func postEventLogWithMessage(message: String) {
