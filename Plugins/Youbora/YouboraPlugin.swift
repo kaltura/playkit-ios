@@ -20,6 +20,9 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         return "YouboraPlugin"
     }
     
+    /// The key for enabling adnalyzer in the config dictionary
+    private let adnalyzerEnabledKey = "enableAdnalyzer"
+    
     /// The youbora plugin inheriting from `YBPluginGeneric`
     /// - important: Make sure to call `playHandler()` at the start of any flow before everying
     /// (for example before pre-roll in ads) also make sure to call `endedHandler() at the end of every flow
@@ -27,7 +30,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
     /// In addition, when content ends in the middle also make sure to call `endedHandler()`
     /// otherwise youbora will wait for /stop event and you could not start new content events until /stop is received.
     private var youboraManager: YouboraManager
-    private var adnalyerManager: YouboraAdnalyzerManager
+    private var adnalyerManager: YouboraAdnalyzerManager?
     
     /// Indicates if we have to delay the endedHandler() (for example when we have post-roll).
     private var shouldDelayEndedHandler = false
@@ -41,11 +44,13 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
             PKLog.error("missing plugin config")
             throw PKPluginError.missingPluginConfig(pluginName: YouboraPlugin.pluginName)
         }
-        /// initialize youbora manager
+        /// initialize youbora components
         let options = config.params
         let optionsObject = NSDictionary(dictionary: options)
         self.youboraManager = YouboraManager(options: optionsObject, player: player)
-        self.adnalyerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
+        if let enableAdnalyzer = config.params[adnalyzerEnabledKey] as? Bool, enableAdnalyzer == true {
+            self.adnalyerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
+        }
         
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         
@@ -61,7 +66,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         super.onUpdateMedia(mediaConfig: mediaConfig)
         // in case we stopped playback in the middle call eneded handlers and reset state.
         self.endedHandler()
-        self.adnalyerManager.reset()
+        self.adnalyerManager?.reset()
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {
@@ -72,6 +77,16 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
             return
         }
         self.setupYoubora(withConfig: config)
+        // make sure to create or destroy adnalyzer based on config
+        if let enableAdnalyzer = config.params[adnalyzerEnabledKey] as? Bool {
+            if enableAdnalyzer == true && self.adnalyerManager == nil {
+                self.adnalyerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
+                self.startMonitoringAdnalyzer()
+            } else if enableAdnalyzer == false && self.adnalyerManager != nil {
+                self.stopMonitoringAdnalyzer()
+                self.adnalyerManager = nil
+            }
+        }
     }
     
     public override func destroy() {
@@ -226,14 +241,11 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         self.stopMonitoring()
         PKLog.debug("Start monitoring Youbora")
         self.youboraManager.startMonitoring(withPlayer: nil)
-        PKLog.debug("Start monitoring Youbora Adnalyzer")
-        // we start monitoring using messageBus object because he is the one handling our events not the player
-        self.adnalyerManager.startMonitoring(withPlayer: self.messageBus)
+        self.startMonitoringAdnalyzer()
     }
     
     private func stopMonitoring() {
-        PKLog.debug("Stop monitoring using Youbora Adnalyzer")
-        self.adnalyerManager.stopMonitoring()
+        self.stopMonitoringAdnalyzer()
         PKLog.debug("Stop monitoring using Youbora")
         self.youboraManager.stopMonitoring()
     }
@@ -244,7 +256,22 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
     }
     
     private func endedHandler() {
-        self.adnalyerManager.endedAdHandler()
+        self.adnalyerManager?.endedAdHandler()
         self.youboraManager.endedHandler()
+    }
+    
+    private func startMonitoringAdnalyzer() {
+        if let adnalyerManager = self.adnalyerManager {
+            PKLog.debug("Start monitoring Youbora Adnalyzer")
+            // we start monitoring using messageBus object because he is the one handling our events not the player
+            adnalyerManager.startMonitoring(withPlayer: self.messageBus)
+        }
+    }
+    
+    private func stopMonitoringAdnalyzer() {
+        if let adnalyerManager = self.adnalyerManager {
+            PKLog.debug("Stop monitoring using Youbora Adnalyzer")
+            adnalyerManager.stopMonitoring()
+        }
     }
 }
