@@ -48,7 +48,6 @@ class AVPlayerEngine: AVPlayer {
     public var asset: AVAsset? {
         didSet {
             guard let newAsset = asset else { return }
-            self.post(event: PlayerEvent.LoadingAsset()) // TODO: in future add asset content url to the event
             self.asynchronouslyLoadURLAsset(newAsset)
         }
     }

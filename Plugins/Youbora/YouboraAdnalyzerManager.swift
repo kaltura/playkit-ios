@@ -187,13 +187,13 @@ extension YouboraAdnalyzerManager {
 }
 
 /************************************************************/
-// MARK: - Private
+// MARK: - Internal
 /************************************************************/
 
 extension YouboraAdnalyzerManager {
     
     /// resets the plugin's state.
-    fileprivate func reset() {
+    func reset() {
         self.adInfo = nil
         self.adPlayhead = -1
         self.lastReportedResource = nil

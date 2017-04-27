@@ -29,7 +29,7 @@ class YouboraManager: YBPluginGeneric {
     }
     
     /************************************************************/
-    // MARK: - Overrides
+    // MARK: - Youbora Info Methods
     /************************************************************/
     
     override func getMediaDuration() -> NSNumber! {
@@ -38,7 +38,11 @@ class YouboraManager: YBPluginGeneric {
     }
     
     override func getResource() -> String! {
-        return self.pkPlayer?.mediaEntry?.id ?? "" // FIXME: create new content url property or event id is not correct here.
+        return self.pkPlayer?.mediaEntry?.id ?? "" // FIXME: make sure to expose player content url and use it here instead of id
+    }
+    
+    override func getTitle() -> String! {
+        return self.pkPlayer?.mediaEntry?.id ?? ""
     }
     
     override func getPlayhead() -> NSNumber! {
