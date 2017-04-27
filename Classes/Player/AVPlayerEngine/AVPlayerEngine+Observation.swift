@@ -20,7 +20,6 @@ extension AVPlayerEngine {
             #keyPath(currentItem),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
-            #keyPath(currentItem.duration),
             #keyPath(currentItem.timedMetadata)
         ]
     }
@@ -124,10 +123,6 @@ extension AVPlayerEngine {
             self.handleLikelyToKeepUp()
         case #keyPath(currentItem.playbackBufferEmpty):
             self.handleBufferEmptyChange()
-        case #keyPath(currentItem.duration):
-            if let currentItem = self.currentItem {
-                self.post(event: PlayerEvent.DurationChanged(duration: CMTimeGetSeconds(currentItem.duration)))
-            }
         case #keyPath(rate):
             self.handleRate()
         case #keyPath(currentItem.status):
@@ -198,6 +193,11 @@ extension AVPlayerEngine {
             
             if self.isFirstReady {
                 self.isFirstReady = false
+                // when player item is readyToPlay for the first time it is safe to assume we have a valid duration.
+                if let duration = self.currentItem?.duration, duration != kCMTimeIndefinite {
+                    PKLog.debug("duration in seconds: \(CMTimeGetSeconds(duration))")
+                    self.post(event: PlayerEvent.DurationChanged(duration: CMTimeGetSeconds(duration)))
+                }
                 self.post(event: PlayerEvent.LoadedMetadata())
                 self.post(event: PlayerEvent.CanPlay())
             }

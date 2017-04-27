@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.1.x-dev'
+s.version          = '0.2.x-dev'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 
 
@@ -13,10 +13,10 @@ s.ios.deployment_target = '8.0'
 
 s.subspec 'Core' do |sp|
     sp.source_files = 'Classes/**/*'
-    sp.dependency 'SwiftyJSON'
-    sp.dependency 'Log'
-    sp.dependency 'SwiftyXMLParser'
-    sp.dependency 'KalturaNetKit'
+    sp.dependency 'SwiftyJSON', '3.1.4'
+    sp.dependency 'Log', '1.0'
+    sp.dependency 'SwiftyXMLParser', '3.0.0'
+    sp.dependency 'KalturaNetKit', '0.0.12'
 end
 
 s.subspec 'IMAPlugin' do |ssp|
@@ -51,7 +51,7 @@ s.subspec 'YouboraPlugin' do |ssp|
         'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
         'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
     }
-    ssp.dependency 'Youbora-AVPlayer/dynamic'
+    ssp.dependency 'Youbora-AVPlayer/dynamic', '5.3.5'
     ssp.dependency 'PlayKit/Core'
     ssp.dependency 'PlayKit/AnalyticsCommon'
 end
