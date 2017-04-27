@@ -33,7 +33,10 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
     
     public override func destroy() {
         super.destroy()
-        self.sendAnalyticsEvent(ofType: .stop)
+        // only send stop event if content started playing already
+        if !self.isFirstPlay {
+            self.sendAnalyticsEvent(ofType: .stop)
+        }
         self.timer?.invalidate()
         AppStateSubject.shared.remove(observer: self)
     }
