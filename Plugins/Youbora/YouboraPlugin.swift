@@ -50,6 +50,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         self.youboraManager = YouboraManager(options: optionsObject, player: player)
         if let enableAdnalyzer = config.params[adnalyzerEnabledKey] as? Bool, enableAdnalyzer == true {
             self.adnalyerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
+            self.youboraManager.adnalyzer = self.adnalyerManager
         }
         
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
@@ -81,6 +82,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         if let enableAdnalyzer = config.params[adnalyzerEnabledKey] as? Bool {
             if enableAdnalyzer == true && self.adnalyerManager == nil {
                 self.adnalyerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
+                self.youboraManager.adnalyzer = self.adnalyerManager
                 self.startMonitoringAdnalyzer()
             } else if enableAdnalyzer == false && self.adnalyerManager != nil {
                 self.stopMonitoringAdnalyzer()
