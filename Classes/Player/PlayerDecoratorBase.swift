@@ -60,7 +60,7 @@ import AVKit
         return self.player.view
     }
     
-    public var sessionId: String {
+    public var sessionId: UUID {
         return self.player.sessionId
     }
     

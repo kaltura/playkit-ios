@@ -205,7 +205,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
         self.messageBus?.post(event)
         
         let entryId: String
-        let sessionId = player.sessionId
+        let sessionId = player.sessionId.uuidString
         var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
         var parterId = ""
         
