@@ -56,6 +56,7 @@ extension PKErrorCode {
 @objc public class BaseAnalyticsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
     var config: AnalyticsConfig?
+    /// indicates whether we played for the first time or not.
     var isFirstPlay: Bool = true
     
     /************************************************************/
