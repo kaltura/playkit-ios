@@ -21,7 +21,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
     }
     
     /// The key for enabling adnalyzer in the config dictionary
-    private let adnalyzerEnabledKey = "enableAdnalyzer"
+    public static let adnalyzerEnabledKey = "enableAdnalyzer"
     
     /// The youbora plugin inheriting from `YBPluginGeneric`
     /// - important: Make sure to call `playHandler()` at the start of any flow before everying
@@ -48,7 +48,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         let options = config.params
         let optionsObject = NSDictionary(dictionary: options)
         self.youboraManager = YouboraManager(options: optionsObject, player: player)
-        if let enableAdnalyzer = config.params[adnalyzerEnabledKey] as? Bool, enableAdnalyzer == true {
+        if let enableAdnalyzer = config.params[YouboraPlugin.adnalyzerEnabledKey] as? Bool, enableAdnalyzer == true {
             self.adnalyerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
             self.youboraManager.adnalyzer = self.adnalyerManager
         }
@@ -68,6 +68,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         // in case we stopped playback in the middle call eneded handlers and reset state.
         self.endedHandler()
         self.adnalyerManager?.reset()
+        self.youboraManager.reset()
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {
@@ -79,7 +80,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
         }
         self.setupYoubora(withConfig: config)
         // make sure to create or destroy adnalyzer based on config
-        if let enableAdnalyzer = config.params[adnalyzerEnabledKey] as? Bool {
+        if let enableAdnalyzer = config.params[YouboraPlugin.adnalyzerEnabledKey] as? Bool {
             if enableAdnalyzer == true && self.adnalyerManager == nil {
                 self.adnalyerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
                 self.youboraManager.adnalyzer = self.adnalyerManager
@@ -182,7 +183,7 @@ public class YouboraPlugin: BaseAnalyticsPlugin, AppStateObservable {
             case let e where e.self == PlayerEvent.playbackParamsUpdated:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    strongSelf.youboraManager.currentBitrate = event.currentBitrate?.doubleValue
+                    strongSelf.youboraManager.lastReportedBitrate = event.currentBitrate?.doubleValue
                     strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
             case let e where e.self == PlayerEvent.stateChanged:

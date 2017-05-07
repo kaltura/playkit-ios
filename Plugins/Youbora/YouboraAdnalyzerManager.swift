@@ -117,7 +117,8 @@ extension YouboraAdnalyzerManager {
             AdEvent.adSkipped,
             AdEvent.adStartedBuffering,
             AdEvent.adPlaybackReady,
-            AdEvent.adsRequested
+            AdEvent.adsRequested,
+            AdEvent.adDidRequestContentResume
         ]
     }
     
@@ -175,6 +176,13 @@ extension YouboraAdnalyzerManager {
             case let e where e.self == AdEvent.adsRequested:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     self?.lastReportedResource = event.adTagUrl
+                }
+            // when ad request the content to resume (finished or error) 
+            // make sure to send /adStop event and clear the info.
+            case let e where e.self == AdEvent.adDidRequestContentResume:
+                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
+                    self?.endedAdHandler()
+                    self?.adInfo = nil
                 }
             default: assertionFailure("all events must be handled")
             }

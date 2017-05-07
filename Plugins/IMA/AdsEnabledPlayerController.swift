@@ -142,9 +142,9 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
         switch event {
-        case let e where type(of: e) == AdEvent.adDidRequestPause:
+        case let e where type(of: e) == AdEvent.adDidRequestContentPause:
             super.pause()
-        case let e where type(of: e) == AdEvent.adDidRequestResume:
+        case let e where type(of: e) == AdEvent.adDidRequestContentResume:
             if !self.shouldPreventContentResume {
                 self.preparePlayerIfNeeded()
                 super.resume()

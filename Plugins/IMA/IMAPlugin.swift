@@ -328,13 +328,13 @@ enum IMAState: Int, StateProtocol {
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
         self.stateMachine.set(state: .adsPlaying)
-        self.notify(event: AdEvent.AdDidRequestPause())
+        self.notify(event: AdEvent.AdDidRequestContentPause())
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
         self.stateMachine.set(state: .contentPlaying)
         self.showLoadingView(false, alpha: 0)
-        self.notify(event: AdEvent.AdDidRequestResume())
+        self.notify(event: AdEvent.AdDidRequestContentResume())
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {

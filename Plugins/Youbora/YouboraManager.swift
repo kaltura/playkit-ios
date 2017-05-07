@@ -15,8 +15,9 @@ import AVKit
 
 class YouboraManager: YBPluginGeneric {
 
-    private weak var pkPlayer: Player?
-    var currentBitrate: Double?
+    fileprivate weak var pkPlayer: Player?
+    var lastReportedBitrate: Double?
+    var lastReportedResource: String?
     
     init(options: NSObject!, player: Player) {
         super.init(options: options)
@@ -27,10 +28,13 @@ class YouboraManager: YBPluginGeneric {
     private override init() {
         super.init()
     }
-    
-    /************************************************************/
-    // MARK: - Youbora Info Methods
-    /************************************************************/
+}
+
+/************************************************************/
+// MARK: - Youbora Info Methods
+/************************************************************/
+
+extension YouboraManager {
     
     override func getMediaDuration() -> NSNumber! {
         let duration = self.pkPlayer?.duration
@@ -38,11 +42,11 @@ class YouboraManager: YBPluginGeneric {
     }
     
     override func getResource() -> String! {
-        return self.pkPlayer?.mediaEntry?.id ?? "" // FIXME: make sure to expose player content url and use it here instead of id
+        return self.lastReportedResource ?? super.getResource() // FIXME: make sure to expose player content url and use it here instead of id
     }
     
     override func getTitle() -> String! {
-        return self.pkPlayer?.mediaEntry?.id ?? ""
+        return self.pkPlayer?.mediaEntry?.id ?? super.getTitle()
     }
     
     override func getPlayhead() -> NSNumber! {
@@ -55,9 +59,21 @@ class YouboraManager: YBPluginGeneric {
     }
     
     override func getBitrate() -> NSNumber! {
-        if let bitrate = currentBitrate {
+        if let bitrate = lastReportedBitrate {
             return NSNumber(value: bitrate)
         }
         return super.getBitrate()
+    }
+}
+
+/************************************************************/
+// MARK: - Internal
+/************************************************************/
+
+extension YouboraManager {
+    
+    func reset() {
+        self.lastReportedBitrate = nil
+        self.lastReportedResource = nil
     }
 }

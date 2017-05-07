@@ -136,7 +136,7 @@ import AVFoundation
 
 @objc public class AdEvent: PKEvent {
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, adBreakEnded, adBreakStarted, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, requestTimedOut
+        adBreakReady, adBreakEnded, adBreakStarted, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestContentPause, adDidRequestContentResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, requestTimedOut
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
@@ -157,8 +157,10 @@ import AVFoundation
     @objc public static let adTapped: AdEvent.Type = AdTapped.self
     @objc public static let adThirdQuartile: AdEvent.Type = AdThirdQuartile.self
     @objc public static let adDidProgressToTime: AdEvent.Type = AdDidProgressToTime.self
-    @objc public static let adDidRequestPause: AdEvent.Type = AdDidRequestPause.self
-    @objc public static let adDidRequestResume: AdEvent.Type = AdDidRequestResume.self
+    /// Ad requested the content to pause (before ad starts playing)
+    @objc public static let adDidRequestContentPause: AdEvent.Type = AdDidRequestContentPause.self
+    /// Ad requested content resume (when finished playing ads or when error occurs and playback needs to continue)
+    @objc public static let adDidRequestContentResume: AdEvent.Type = AdDidRequestContentResume.self
     @objc public static let webOpenerEvent: AdEvent.Type = WebOpenerEvent.self
     @objc public static let adWebOpenerWillOpenExternalBrowser: AdEvent.Type = AdWebOpenerWillOpenExternalBrowser.self
     @objc public static let adWebOpenerWillOpenInAppBrowser: AdEvent.Type = AdWebOpenerWillOpenInAppBrowser.self
@@ -228,8 +230,8 @@ import AVFoundation
         }
     }
     
-    class AdDidRequestPause: AdEvent {}
-    class AdDidRequestResume: AdEvent {}
+    class AdDidRequestContentPause: AdEvent {}
+    class AdDidRequestContentResume: AdEvent {}
     
     /// Sent when the ads request timed out.
     class RequestTimedOut: AdEvent {}
