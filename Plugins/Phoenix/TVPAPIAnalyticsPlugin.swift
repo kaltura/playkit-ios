@@ -47,19 +47,19 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
 
         baseUrl = "\(baseUrl)m=\(method)"
         
-        guard let requestBuilder: RequestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
-                                                                                    initObj: initObj,
-                                                                                    eventType: type.rawValue,
-                                                                                    currentTime: player.currentTime.toInt32(),
-                                                                                    assetId: mediaEntry.id,
-                                                                                    fileId: fileId) else {
-            return nil
+        guard let requestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
+                                                                    initObj: initObj,
+                                                                    eventType: type.rawValue,
+                                                                    currentTime: player.currentTime.epoch,
+                                                                    assetId: mediaEntry.id,
+                                                                    fileId: fileId) else {
+                                                                        return nil
         }
         requestBuilder.set(responseSerializer: StringSerializer())
         requestBuilder.set { (response: Response) in
             PKLog.trace("Response: \(response)")
             if response.statusCode == 0 {
-                PKLog.trace("\(response.data)")
+                PKLog.trace("\(String(describing: response.data))")
                 guard let data = response.data as? String, data.lowercased() == "\"concurrent\"" else { return }
                 self.reportConcurrencyEvent()
             }

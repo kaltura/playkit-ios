@@ -50,20 +50,20 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
             return nil
         }
         
-        guard let requestBuilder: KalturaRequestBuilder = BookmarkService.actionAdd(baseURL: baseUrl,
-                                                                          partnerId: parterId,
-                                                                          ks: ks,
-                                                                          eventType: type.rawValue.uppercased(),
-                                                                          currentTime: player.currentTime.toInt32(),
-                                                                          assetId: mediaEntry.id,
-                                                                          fileId: fileId) else {
-            return nil
+        guard let requestBuilder = BookmarkService.actionAdd(baseURL: baseUrl,
+                                                             partnerId: parterId,
+                                                             ks: ks,
+                                                             eventType: type.rawValue.uppercased(),
+                                                             currentTime: player.currentTime.epoch,
+                                                             assetId: mediaEntry.id, // position should be sent in ms.
+                                                             fileId: fileId) else {
+                                                                return nil
         }
         
         requestBuilder.set { (response: Response) in
             PKLog.trace("Response: \(response)")
             if response.statusCode == 0 {
-                PKLog.trace("\(response.data)")
+                PKLog.trace("\(String(describing: response.data))")
                 guard let data = response.data as? [String: Any] else { return }
                 guard let result = data["result"] as? [String: Any] else { return }
                 guard let errorData = result["error"] as? [String: Any] else { return }

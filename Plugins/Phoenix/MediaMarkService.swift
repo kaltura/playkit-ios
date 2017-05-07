@@ -15,7 +15,7 @@ internal class MediaMarkService {
     internal static func sendTVPAPIEVent(baseURL: String,
                                          initObj: [String: Any],
                                          eventType: String,
-                                         currentTime: Int32,
+                                         currentTime: Int64,
                                          assetId: String,
                                          fileId: String) -> RequestBuilder? {
         
@@ -35,16 +35,5 @@ internal class MediaMarkService {
             return nil
         }
 
-    }
-
-    private static func createBookmark(eventType: String, position: Int32, assetId: String, fileId: String) -> JSON {
-        var json: JSON = JSON.init(["objectType": "KalturaBookmark"])
-        json["type"] = JSON("media")
-        json["id"] = JSON(assetId)
-        json["position"] = JSON(position)
-        json["playerData"] = JSON.init(["action": JSON(eventType), "objectType": JSON("KalturaBookmarkPlayerData"), "fileId": JSON(fileId)])
-
-        
-        return json
     }
 }
