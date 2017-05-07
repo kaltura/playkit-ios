@@ -53,12 +53,18 @@ class PlayerController: NSObject, Player {
         return self.currentPlayer.view
     }
     
-    public let sessionId = UUID()
+    public var sessionId: String {
+        return self.sessionUUID.uuidString + ":" + (self.mediaSessionUUID?.uuidString ?? "")
+    }
+    
+    let sessionUUID = UUID()
+    var mediaSessionUUID: UUID?
     
     public override init() {
         self.currentPlayer = AVPlayerEngine()
-        self.contentRequestAdapter = KalturaPlaybackRequestAdapter(playSessionId: self.sessionId)
         super.init()
+        // initial creation of play session id adapter
+        self.contentRequestAdapter = KalturaPlaybackRequestAdapter(playSessionId: self.sessionId)
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.trace("postEvent:: \(event)")
             self?.onEventBlock?(event)
@@ -71,9 +77,14 @@ class PlayerController: NSObject, Player {
     var shouldRefresh: Bool = false
     
     func prepare(_ config: MediaConfig) {
-        // configure media sources content request adapter
-        if let contentRequestAdapter = self.contentRequestAdapter {
-            config.mediaEntry.configureMediaSource(withContentRequestAdapter: contentRequestAdapter)
+        // configure media sources content request adapter if request adapter exists
+        if let _ = self.contentRequestAdapter {
+            // create new media session uuid
+            self.mediaSessionUUID = UUID()
+            // create new request adapter with the updated session id
+            self.contentRequestAdapter = KalturaPlaybackRequestAdapter(playSessionId: self.sessionId)
+            // configure media source with the adapter
+            config.mediaEntry.configureMediaSource(withContentRequestAdapter: self.contentRequestAdapter!)
         }
         self.currentPlayer.startPosition = config.startTime
         self.assetBuilder = AssetBuilder(mediaEntry: config.mediaEntry)

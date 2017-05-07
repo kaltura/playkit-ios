@@ -10,22 +10,17 @@ import Foundation
 
 class KalturaPlaybackRequestAdapter: PKRequestParamsAdapter {
     
-    private var playSessionId: UUID
+    private var playSessionId: String
     
-    init(playSessionId: UUID) {
+    init(playSessionId: String) {
         self.playSessionId = playSessionId
-    }
-    
-    public static func setup(player: Player) {
-        let adapter = KalturaPlaybackRequestAdapter(playSessionId: player.sessionId)
-        player.settings.set(contentRequestAdapter: adapter)
     }
     
     public func adapt(requestParams: PKRequestParams) -> PKRequestParams {
         guard requestParams.url.path.contains("/playManifest/") else { return requestParams }
         guard var urlComponents = URLComponents(url: requestParams.url, resolvingAgainstBaseURL: false) else { return requestParams }
         // add query items to the request
-        let queryItems = [URLQueryItem(name: "playSessionId", value: self.playSessionId.uuidString), URLQueryItem(name: "clientTag", value: PlayKitManager.clientTag)]
+        let queryItems = [URLQueryItem(name: "playSessionId", value: self.playSessionId), URLQueryItem(name: "clientTag", value: PlayKitManager.clientTag)]
         if var urlQueryItems = urlComponents.queryItems {
             urlQueryItems += queryItems
             urlComponents.queryItems = urlQueryItems
