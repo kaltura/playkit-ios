@@ -128,7 +128,7 @@ import AVKit
 
 extension PlayerDecoratorBase: PlayerSettings {
     
-    public func set(contentRequestAdapter: PKRequestParamsAdapter) {
+    public func set(contentRequestAdapter: PKRequestParamsAdapter?) {
         self.player.set(contentRequestAdapter: contentRequestAdapter)
     }
 }

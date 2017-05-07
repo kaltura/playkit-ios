@@ -15,9 +15,11 @@ import GoogleCast
  
  */
 @objc public class BasicCastBuilder: NSObject {
+    
     @objc public enum StreamType: Int {
         case live
         case vod
+        case unknown
     }
     
     enum BasicBuilderDataError: Error {
@@ -33,23 +35,26 @@ import GoogleCast
     @objc public var partnerID: String?
     @objc public var uiconfID: String?
     @objc public var adTagURL: String?
-    @objc public private(set) var streamType = GCKMediaStreamType.none
     @objc public var metaData: GCKMediaMetadata?
     
+    @objc public var streamType = StreamType.unknown {
+        didSet {
+            switch streamType {
+            case .live: self.gckMediaStreamType = .live
+            case .vod: self.gckMediaStreamType = .buffered
+            case .unknown: self.gckMediaStreamType = .unknown
+            }
+        }
+    }
+    private var gckMediaStreamType = GCKMediaStreamType.unknown
 
     /**
      Set - stream type
      - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
      */
     @discardableResult
-    @objc public func set(streamType: StreamType) -> Self{
-        
-        switch streamType {
-        case .live:
-            self.streamType = .live
-        case .vod:
-            self.streamType = .buffered
-        }
+    @nonobjc public func set(streamType: StreamType) -> Self {
+        self.streamType = streamType
         return self
     }
     
@@ -58,7 +63,7 @@ import GoogleCast
      - Parameter contentId: receiver contentId to play ( Entry id, or Asset id )
      */
     @discardableResult
-    @nonobjc public func set(contentId: String?) -> Self{
+    @nonobjc public func set(contentId: String?) -> Self {
         
         guard contentId != nil,
             contentId?.isEmpty == false
@@ -169,11 +174,9 @@ import GoogleCast
             throw BasicCastBuilder.BasicBuilderDataError.missingContentId
         }
         
-        guard self.streamType != nil else {
+        guard self.streamType != .unknown else {
             throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
         }
-        
-        
     }
 
     
@@ -185,7 +188,7 @@ import GoogleCast
         try self.validate()
         let customData = self.customData()
         let mediaInfo: GCKMediaInformation = GCKMediaInformation(contentID:self.contentId,
-                                                                 streamType: self.streamType,
+                                                                 streamType: self.gckMediaStreamType,
                                                                  contentType: "",
                                                                  metadata: self.metaData,
                                                                  streamDuration: 0,

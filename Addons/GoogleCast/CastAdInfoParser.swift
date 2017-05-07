@@ -27,15 +27,13 @@ public class CastAdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegat
      */
     public func remoteMediaClient(_ client: GCKRemoteMediaClient, shouldSetPlayingAdIn mediaStatus: GCKMediaStatus) -> Bool {
         
-         guard let customData = mediaStatus.customData as? [String:Any],
-            let adsInfo = customData["adsInfo"] as? [String:Any],
-            let metaData : AdsMetadata = AdsMetadata(dict: adsInfo) else {
-                PKLog.warning("No Ads info from receiver")
-                return false
+        guard let customData = mediaStatus.customData as? [String: Any], let adsInfo = customData["adsInfo"] as? [String: Any] else {
+            PKLog.warning("No Ads info from receiver")
+            return false
         }
+        let metadata = AdsMetadata(dict: adsInfo)
         
-        return metaData.isPlayingAd
-        
+        return metadata.isPlayingAd
     }
     
     /**
@@ -43,15 +41,15 @@ public class CastAdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegat
      */
     public func remoteMediaClient(_ client: GCKRemoteMediaClient, shouldSetAdBreaksIn mediaStatus: GCKMediaStatus) -> [GCKAdBreakInfo]? {
         
-        guard let customData = mediaStatus.customData as? [String:Any],
-            let adsInfo = customData["adsInfo"] as? [String:Any],
-            let adsData : AdsMetadata = AdsMetadata(dict: adsInfo),
-            let adsBreakInfo = adsData.adsBreakInfo else {
-                PKLog.warning("No Ads info from receiver")
-                return nil
+        guard let customData = mediaStatus.customData as? [String: Any], let adsInfo = customData["adsInfo"] as? [String: Any] else {
+            PKLog.warning("No Ads info from receiver")
+            return nil
         }
         
+        let metadata = AdsMetadata(dict: adsInfo)
+        let adsBreakInfo = metadata.adsBreakInfo ?? []
         let adsBreakInfoArray = adsBreakInfo.map({ GCKAdBreakInfo(playbackPosition: TimeInterval($0)) })
+        
         return adsBreakInfoArray
     }
 }
@@ -71,7 +69,7 @@ private class AdsMetadata: NSObject {
         
         if let isPlaying = dict["isPlayingAd"] as? Bool {
             self.isPlayingAd = isPlaying
-        }else{
+        } else {
             self.isPlayingAd = false
         }
         
@@ -79,10 +77,8 @@ private class AdsMetadata: NSObject {
             self.adsBreakInfo = adBreaksInfo.map({ (number:NSNumber) -> Int in
                 return number.intValue
             })
-        }else{
+        } else {
             self.adsBreakInfo  = nil
         }
-        
-        
     }
 }
