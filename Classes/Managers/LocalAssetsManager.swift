@@ -109,7 +109,7 @@ import AVFoundation
                 return source
             }
         } else {
-            if let source = sources.first(where: {$0.fileExt=="m3u8" && $0.drmData==nil}) {
+            if let source = sources.first(where: {$0.fileExt=="m3u8" && ($0.drmData == nil || $0.drmData!.isEmpty)}) {
                 return source
             }
         }

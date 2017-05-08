@@ -16,7 +16,7 @@ import AVKit
 
 /// `PlayerSettings` used for optional `Player` settings.
 @objc public protocol PlayerSettings {
-    func set(contentRequestAdapter: PKRequestParamsAdapter)
+    func set(contentRequestAdapter: PKRequestParamsAdapter?)
 }
 
 @objc public protocol Player: PlayerSettings {

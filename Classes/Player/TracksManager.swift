@@ -31,7 +31,7 @@ class TracksManager: NSObject {
         
         
         if self.audioTracks != nil || self.textTracks != nil {
-            PKLog.debug("audio tracks:: \(self.audioTracks), text tracks:: \(self.textTracks)")
+            PKLog.debug("audio tracks:: \(String(describing: self.audioTracks)), text tracks:: \(String(describing: self.textTracks))")
             block(PKTracks(audioTracks: self.audioTracks, textTracks: self.textTracks))
         } else {
             PKLog.debug("no audio/ text tracks")

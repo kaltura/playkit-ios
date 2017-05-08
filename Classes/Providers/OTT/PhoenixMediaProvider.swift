@@ -49,12 +49,15 @@ import KalturaNetKit
 /************************************************************/
 // MARK: - PhoenixMediaProviderError
 /************************************************************/
+
 public enum PhoenixMediaProviderError: PKError {
 
     case invalidInputParam(param: String)
     case unableToParseData(data: Any)
     case noSourcesFound
     case serverError(info:String)
+    /// in case the response data is empty
+    case emptyResponse
 
     static let domain = "com.kaltura.playkit.error.PhoenixMediaProvider"
 
@@ -64,6 +67,7 @@ public enum PhoenixMediaProviderError: PKError {
         case .unableToParseData: return 1
         case .noSourcesFound: return 2
         case .serverError: return 3
+        case .emptyResponse: return 4
         }
     }
 
@@ -71,9 +75,10 @@ public enum PhoenixMediaProviderError: PKError {
 
         switch self {
         case .invalidInputParam(let param): return "Invalid input param: \(param)"
-        case .unableToParseData(let data): return "Unable to parse object"
+        case .unableToParseData(let data): return "Unable to parse object (data: \(String(describing: data)))"
         case .noSourcesFound: return "No source found to play content"
         case .serverError(let info): return "Server Error: \(info)"
+        case .emptyResponse: return "Response data is empty"
         }
     }
 
@@ -290,21 +295,31 @@ public enum PhoenixMediaProviderError: PKError {
                 callback(nil, PhoenixMediaProviderError.invalidInputParam(param:"requests params"))
                 return
             }
-
+            
             let isMultiRequest = requestBuilder is KalturaMultiRequestBuilder
 
             let request = requestBuilder.set(completion: { (response: Response) in
 
+                if let error = response.error {
+                    // if error is of type `PKError` pass it as `NSError` else pass the `Error` object.
+                    callback(nil, (error as? PKError)?.asNSError ?? error)
+                }
+                
+                guard let responseData = response.data else {
+                    callback(nil, PhoenixMediaProviderError.emptyResponse.asNSError)
+                    return
+                }
+                
                 var playbackContext: OTTBaseObject? = nil
                 do {
                     if (isMultiRequest) {
-                        playbackContext =  try OTTMultiResponseParser.parse(data: response.data).last
+                        playbackContext =  try OTTMultiResponseParser.parse(data: responseData).last
                     } else {
-                        playbackContext =  try OTTResponseParser.parse(data: response.data)
+                        playbackContext =  try OTTResponseParser.parse(data: responseData)
                     }
 
                 } catch {
-                    callback(nil, PhoenixMediaProviderError.unableToParseData(data:response.data).asNSError)
+                    callback(nil, PhoenixMediaProviderError.unableToParseData(data: responseData).asNSError)
                 }
 
                 if let context = playbackContext as? OTTPlaybackContext {
@@ -315,9 +330,9 @@ public enum PhoenixMediaProviderError: PKError {
                         callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                     }
                 } else if let error = playbackContext as? OTTError {
-                        callback(nil, PhoenixMediaProviderError.serverError(info: error.message ?? "Unknown Error").asNSError)
+                    callback(nil, PhoenixMediaProviderError.serverError(info: error.message ?? "Unknown Error").asNSError)
                 } else {
-                        callback(nil, PhoenixMediaProviderError.unableToParseData(data: response.data).asNSError)
+                    callback(nil, PhoenixMediaProviderError.unableToParseData(data: responseData).asNSError)
                 }
             }).build()
 
