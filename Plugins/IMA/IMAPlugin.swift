@@ -312,6 +312,7 @@ enum IMAState: Int, StateProtocol {
         case .STREAM_LOADED: self.notify(event: AdEvent.AdStreamLoaded())
         case .TAPPED: self.notify(event: AdEvent.AdTapped())
         case .THIRD_QUARTILE: self.notify(event: AdEvent.AdThirdQuartile())
+        default: break 
         }
     }
     
@@ -454,7 +455,7 @@ enum IMAState: Int, StateProtocol {
     }
     
     private func shouldDiscardAd() -> Bool {
-        if currentTime < self.dataSource?.adsPluginStartTime ?? 0 {
+        if self.currentTime < self.dataSource?.adsPluginStartTime ?? 0 {
             return true
         }
         return false
