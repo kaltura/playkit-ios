@@ -10,6 +10,7 @@ import Foundation
 
 /// `PKRequestParamsDecorator` used for getting updated request info
 @objc public protocol PKRequestParamsAdapter {
+    var sessionId: String { get set }
     func adapt(requestParams: PKRequestParams) -> PKRequestParams
 }
 
