@@ -66,11 +66,7 @@ extension AVPlayerEngine {
                 PKLog.debug("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
             }
             
-            if lastEvent.indicatedBitrate != self.lastBitrate {
-                self.lastBitrate = lastEvent.indicatedBitrate
-                PKLog.trace("currentBitrate:: \(self.lastBitrate)")
-                self.post(event: PlayerEvent.PlaybackParamsUpdated(currentBitrate: self.lastBitrate))
-            }
+            self.post(event: PlayerEvent.PlaybackInfo(playbackInfo: PKPlaybackInfo(logEvent: lastEvent)))
         }
     }
     

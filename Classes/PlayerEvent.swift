@@ -8,6 +8,32 @@
 import Foundation
 import AVFoundation
 
+@objc public class PKPlaybackInfo: NSObject {
+    let bitrate: Double
+    let indicatedBitrate: Double
+    let observedBitrate: Double
+    
+    init(bitrate: Double, indicatedBitrate: Double, observedBitrate: Double) {
+        self.bitrate = bitrate
+        self.indicatedBitrate = indicatedBitrate
+        self.observedBitrate = observedBitrate
+    }
+    
+    convenience init(logEvent: AVPlayerItemAccessLogEvent) {
+        let bitrate: Double
+        if logEvent.segmentsDownloadedDuration > 0 {
+            // bitrate is equal to:
+            // (amount of bytes transfered) * 8 (bits in byte) / (amount of time took to download the transfered bytes)
+            bitrate = Double(logEvent.numberOfBytesTransferred * 8) / logEvent.segmentsDownloadedDuration;
+        } else {
+            bitrate = logEvent.indicatedBitrate;
+        }
+        let indicatedBitrate = logEvent.indicatedBitrate
+        let observedBitrate = logEvent.observedBitrate
+        self.init(bitrate: bitrate, indicatedBitrate: indicatedBitrate, observedBitrate: observedBitrate)
+    }
+}
+
 /// PlayerEvent is a class used to reflect player events.
 @objc public class PlayerEvent: PKEvent {
     
@@ -15,7 +41,7 @@ import AVFoundation
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, ended, loadedMetadata,
         play, pause, playing, seeking, seeked, stateChanged,
-        tracksAvailable, playbackParamsUpdated, error
+        tracksAvailable, playbackInfo, error
     ]
     
     // MARK: - Player Events Static Reference
@@ -43,7 +69,7 @@ import AVFoundation
     /// Sent when tracks available.
     @objc public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
     /// Sent when Playback Params Updated.
-    @objc public static let playbackParamsUpdated: PlayerEvent.Type = PlaybackParamsUpdated.self
+    @objc public static let playbackInfo: PlayerEvent.Type = PlaybackInfo.self
     /// Sent when player state is changed.
     @objc public static let stateChanged: PlayerEvent.Type = StateChanged.self
     /// Sent when timed metadata is available.
@@ -118,9 +144,9 @@ import AVFoundation
         }
     }
     
-    class PlaybackParamsUpdated: PlayerEvent {
-        convenience init(currentBitrate: Double) {
-            self.init([EventDataKeys.CurrentBitrate : NSNumber(value: currentBitrate)])
+    class PlaybackInfo: PlayerEvent {
+        convenience init(playbackInfo: PKPlaybackInfo) {
+            self.init([EventDataKeys.PlaybackInfo: playbackInfo])
         }
     }
     

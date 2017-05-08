@@ -7,17 +7,13 @@
 //
 
 import YouboraLib
-import YouboraPluginAVPlayer
-import Foundation
-import UIKit
-import AVFoundation
-import AVKit
 
 class YouboraManager: YBPluginGeneric {
 
     fileprivate weak var pkPlayer: Player?
-    var lastReportedBitrate: Double?
     var lastReportedResource: String?
+    /// The last reported playback info.
+    var playbackInfo: PKPlaybackInfo?
     
     fileprivate weak var messageBus: MessageBus?
     
@@ -76,7 +72,8 @@ extension YouboraManager {
     }
     
     override func getResource() -> String! {
-        return self.lastReportedResource ?? super.getResource() // FIXME: make sure to expose player content url and use it here instead of id
+        // TODO: make sure to expose player content url and use it here instead of id
+        return self.lastReportedResource ?? super.getResource()
     }
     
     override func getTitle() -> String! {
@@ -92,11 +89,35 @@ extension YouboraManager {
         return "\(PlayKitManager.clientTag)"
     }
     
+    override func getIsLive() -> NSValue! {
+        if let mediaType = self.pkPlayer?.mediaEntry?.mediaType {
+            if mediaType == .live {
+                return NSNumber(value: true)
+            }
+            return NSNumber(value: false)
+        }
+        return super.getIsLive()
+    }
+    
     override func getBitrate() -> NSNumber! {
-        if let bitrate = lastReportedBitrate {
-            return NSNumber(value: bitrate)
+        if let playbackInfo = self.playbackInfo, playbackInfo.bitrate > 0 {
+            return NSNumber(value: playbackInfo.bitrate)
         }
         return super.getBitrate()
+    }
+    
+    override func getThroughput() -> NSNumber! {
+        if let playbackInfo = self.playbackInfo, playbackInfo.observedBitrate > 0 {
+            return NSNumber(value: playbackInfo.observedBitrate)
+        }
+        return super.getThroughput()
+    }
+    
+    override func getRendition() -> String! {
+        if let pi = self.playbackInfo, pi.indicatedBitrate > 0 && pi.bitrate > 0 && pi.bitrate != pi.indicatedBitrate {
+            return YBUtils.buildRenditionString(withBitrate: pi.indicatedBitrate)
+        }
+        return super.getRendition()
     }
 }
 
@@ -114,8 +135,8 @@ extension YouboraManager {
             PlayerEvent.playing,
             PlayerEvent.seeking,
             PlayerEvent.seeked,
-            //PlayerEvent.ended, FIXME: check with youbora if needed
-            PlayerEvent.playbackParamsUpdated,
+            PlayerEvent.ended,
+            PlayerEvent.playbackInfo,
             PlayerEvent.stateChanged,
             AdEvent.adCuePointsUpdate,
             AdEvent.allAdsCompleted
@@ -175,19 +196,18 @@ extension YouboraManager {
                     strongSelf.seekedHandler()
                     strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
-                // FIXME: check with youbora if needed
-            /*case let e where e.self == PlayerEvent.ended:
+            case let e where e.self == PlayerEvent.ended:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     if !strongSelf.shouldDelayEndedHandler {
                         strongSelf.endedHandler()
                     }
                     strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
-                }*/
-            case let e where e.self == PlayerEvent.playbackParamsUpdated:
+                }
+            case let e where e.self == PlayerEvent.playbackInfo:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    strongSelf.lastReportedBitrate = event.currentBitrate?.doubleValue
+                    strongSelf.playbackInfo = event.playbackInfo
                     strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
             case let e where e.self == PlayerEvent.stateChanged:
@@ -230,8 +250,13 @@ extension YouboraManager {
 
 extension YouboraManager {
     
+    func resetForBackground() {
+        self.playbackInfo = nil
+        self.isFirstPlay = true
+    }
+    
     func reset() {
-        self.lastReportedBitrate = nil
+        self.playbackInfo = nil
         self.lastReportedResource = nil
         self.isFirstPlay = true
         self.shouldDelayEndedHandler = false

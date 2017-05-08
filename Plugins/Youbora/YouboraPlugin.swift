@@ -7,8 +7,6 @@
 //
 
 import YouboraLib
-import YouboraPluginAVPlayer
-import AVFoundation
 
 /************************************************************/
 // MARK: - YouboraPlugin
@@ -21,7 +19,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     }
     
     /// The key for enabling adnalyzer in the config dictionary
-    public static let adnalyzerEnabledKey = "enableAdnalyzer"
+    public static let enableSmartAdsKey = "enableSmartAds"
     
     /// The youbora plugin inheriting from `YBPluginGeneric`
     /// - important: Make sure to call `playHandler()` at the start of any flow before everying
@@ -48,7 +46,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         let options = config.params
         let optionsObject = NSDictionary(dictionary: options)
         self.youboraManager = YouboraManager(options: optionsObject, player: player)
-        if let enableAdnalyzer = config.params[YouboraPlugin.adnalyzerEnabledKey] as? Bool, enableAdnalyzer == true {
+        if let enableSmartAds = config.params[YouboraPlugin.enableSmartAdsKey] as? Bool, enableSmartAds == true {
             self.adnalyzerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
             self.youboraManager.adnalyzer = self.adnalyzerManager
         }
@@ -81,12 +79,12 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         self.config = config
         self.setupYoubora(withConfig: config)
         // make sure to create or destroy adnalyzer based on config
-        if let enableAdnalyzer = config.params[YouboraPlugin.adnalyzerEnabledKey] as? Bool {
-            if enableAdnalyzer == true && self.adnalyzerManager == nil {
+        if let enableSmartAds = config.params[YouboraPlugin.enableSmartAdsKey] as? Bool {
+            if enableSmartAds == true && self.adnalyzerManager == nil {
                 self.adnalyzerManager = YouboraAdnalyzerManager(pluginInstance: self.youboraManager)
                 self.youboraManager.adnalyzer = self.adnalyzerManager
                 self.startMonitoringAdnalyzer()
-            } else if enableAdnalyzer == false && self.adnalyzerManager != nil {
+            } else if enableSmartAds == false && self.adnalyzerManager != nil {
                 self.stopMonitoringAdnalyzer()
                 self.adnalyzerManager = nil
             }
@@ -114,6 +112,13 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
                 // we must call `endedHandler()` when stopped so youbora will know player stopped playing content.
                 self.endedHandler()
                 AppStateSubject.shared.remove(observer: self)
+            },
+            NotificationObservation(name: .UIApplicationDidEnterBackground) { [unowned self] in
+                // when entering background we should call `endedHandler()` to make sure coming back starts a new session.
+                // otherwise events could be lost (youbora only retry sending events for 5 minutes).
+                self.endedHandler()
+                // reset the youbora plugin for background handling to start playing again when we return.
+                self.youboraManager.resetForBackground()
             }
         ]
     }

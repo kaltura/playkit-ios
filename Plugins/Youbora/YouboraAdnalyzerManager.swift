@@ -6,7 +6,6 @@
 //
 //
 
-import Foundation
 import YouboraLib
 
 class YouboraAdnalyzerManager: YBAdnalyzerGeneric {
