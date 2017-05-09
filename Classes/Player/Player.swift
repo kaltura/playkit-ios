@@ -16,10 +16,10 @@ import AVKit
 
 /// `PlayerSettings` used for optional `Player` settings.
 @objc public protocol PlayerSettings {
-    func set(contentRequestAdapter: PKRequestParamsAdapter?)
+    var contentRequestAdapter: PKRequestParamsAdapter? { get set }
 }
 
-@objc public protocol Player: PlayerSettings {
+@objc public protocol Player {
     
     @objc weak var delegate: PlayerDelegate? { get set }
     
@@ -48,7 +48,7 @@ import AVKit
     @objc var currentTextTrack: String? { get }
     
     /// The player's session id. the `sessionId` is initialized when the player loads.
-    @objc var sessionId: UUID { get }
+    @objc var sessionId: String { get }
 
     /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
     @objc func prepare(_ config: MediaConfig)
