@@ -24,9 +24,9 @@ import AVFoundation
         if logEvent.segmentsDownloadedDuration > 0 {
             // bitrate is equal to:
             // (amount of bytes transfered) * 8 (bits in byte) / (amount of time took to download the transfered bytes)
-            bitrate = Double(logEvent.numberOfBytesTransferred * 8) / logEvent.segmentsDownloadedDuration;
+            bitrate = Double(logEvent.numberOfBytesTransferred * 8) / logEvent.segmentsDownloadedDuration
         } else {
-            bitrate = logEvent.indicatedBitrate;
+            bitrate = logEvent.indicatedBitrate
         }
         let indicatedBitrate = logEvent.indicatedBitrate
         let observedBitrate = logEvent.observedBitrate
