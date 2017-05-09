@@ -291,10 +291,6 @@ enum IMAState: Int, StateProtocol {
             let event = event.ad != nil ? AdEvent.AdStarted(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdStarted()
             self.notify(event: event)
             self.showLoadingView(false, alpha: 0)
-        case .AD_BREAK_STARTED:
-            self.notify(event: AdEvent.AdBreakStarted())
-            self.showLoadingView(false, alpha: 0)
-        case .AD_BREAK_ENDED: self.notify(event: AdEvent.AdBreakEnded())
         case .ALL_ADS_COMPLETED:
             // detaching the delegate and destroying the adsManager. 
             // means all ads have been played so we can destroy the adsManager.
@@ -302,17 +298,16 @@ enum IMAState: Int, StateProtocol {
             self.notify(event: AdEvent.AllAdsCompleted())
         case .CLICKED: self.notify(event: AdEvent.AdClicked())
         case .COMPLETE: self.notify(event: AdEvent.AdComplete())
-        case .CUEPOINTS_CHANGED: self.notify(event: AdEvent.AdCuePointsUpdate(adCuePoints: adsManager.getAdCuePoints()))
         case .FIRST_QUARTILE: self.notify(event: AdEvent.AdFirstQuartile())
         case .LOG: self.notify(event: AdEvent.AdLog())
         case .MIDPOINT: self.notify(event: AdEvent.AdMidpoint())
         case .PAUSE: self.notify(event: AdEvent.AdPaused())
         case .RESUME: self.notify(event: AdEvent.AdResumed())
         case .SKIPPED: self.notify(event: AdEvent.AdSkipped())
-        case .STREAM_LOADED: self.notify(event: AdEvent.AdStreamLoaded())
         case .TAPPED: self.notify(event: AdEvent.AdTapped())
         case .THIRD_QUARTILE: self.notify(event: AdEvent.AdThirdQuartile())
-        default: break 
+        // Only used for dynamic ad insertion (not officially supported)
+        case .AD_BREAK_ENDED, .AD_BREAK_STARTED, .CUEPOINTS_CHANGED, .STREAM_LOADED, .STREAM_STARTED: break
         }
     }
     
