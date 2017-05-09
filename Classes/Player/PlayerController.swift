@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: NSObject, Player {
+class PlayerController: NSObject, Player, PlayerSettings {
     
     var onEventBlock: ((PKEvent)->Void)?
     
@@ -18,7 +18,8 @@ class PlayerController: NSObject, Player {
     
     fileprivate var currentPlayer: AVPlayerEngine
     fileprivate var assetBuilder: AssetBuilder?
-    fileprivate var contentRequestAdapter: PKRequestParamsAdapter?
+    
+    var contentRequestAdapter: PKRequestParamsAdapter?
     
     var settings: PlayerSettings {
         return self
@@ -63,8 +64,7 @@ class PlayerController: NSObject, Player {
     public override init() {
         self.currentPlayer = AVPlayerEngine()
         super.init()
-        // initial creation of play session id adapter
-        self.contentRequestAdapter = KalturaPlaybackRequestAdapter(sessionId: self.sessionId)
+
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.trace("postEvent:: \(event)")
             self?.onEventBlock?(event)
@@ -77,15 +77,9 @@ class PlayerController: NSObject, Player {
     var shouldRefresh: Bool = false
     
     func prepare(_ config: MediaConfig) {
-        // configure media sources content request adapter if request adapter exists
-        if let _ = self.contentRequestAdapter {
-            // create new media session uuid
-            self.mediaSessionUUID = UUID()
-            // update the request adapter with the updated session id
-            self.contentRequestAdapter!.sessionId = self.sessionId
-            // configure media source with the adapter
-            config.mediaEntry.configureMediaSource(withContentRequestAdapter: self.contentRequestAdapter!)
-        }
+        // update the media source request adapter with new media uuid if using kaltura request adapter
+        self.updateRequestAdapterIfExists(forMediaConfig: config)
+        
         self.currentPlayer.startPosition = config.startTime
         self.assetBuilder = AssetBuilder(mediaEntry: config.mediaEntry)
         self.assetBuilder?.build { (error: Error?, asset: AVAsset?) in
@@ -146,13 +140,22 @@ class PlayerController: NSObject, Player {
 }
 
 /************************************************************/
-// MARK: - PlayerSettings
+// MARK: - Private
 /************************************************************/
 
-extension PlayerController: PlayerSettings {
+extension PlayerController {
     
-    func set(contentRequestAdapter: PKRequestParamsAdapter?) {
-        self.contentRequestAdapter = contentRequestAdapter
+    /// Updates the request adapter if it is kaltura type
+    fileprivate func updateRequestAdapterIfExists(forMediaConfig config: MediaConfig) {
+        // configure media sources content request adapter if kaltura request adapter exists
+        if let _ = self.contentRequestAdapter as? KalturaPlaybackRequestAdapter {
+            // create new media session uuid
+            self.mediaSessionUUID = UUID()
+            // update the request adapter with the updated session id
+            self.contentRequestAdapter!.updateRequestAdapter(withPlayer: self)
+            // configure media source with the adapter
+            config.mediaEntry.configureMediaSource(withContentRequestAdapter: self.contentRequestAdapter!)
+        }
     }
 }
 

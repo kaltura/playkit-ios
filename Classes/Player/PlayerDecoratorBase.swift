@@ -122,14 +122,3 @@ import AVKit
     }
 }
 
-/************************************************************/
-// MARK: - PlayerSettings
-/************************************************************/
-
-extension PlayerDecoratorBase: PlayerSettings {
-    
-    public func set(contentRequestAdapter: PKRequestParamsAdapter?) {
-        self.player.set(contentRequestAdapter: contentRequestAdapter)
-    }
-}
-
