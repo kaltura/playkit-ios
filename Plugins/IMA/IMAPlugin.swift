@@ -154,11 +154,15 @@ enum IMAState: Int, StateProtocol {
         let request = IMAAdsRequest(adTagUrl: self.config.adTagUrl, adDisplayContainer: adDisplayContainer, contentPlayhead: self, userContext: nil)
         // sets the state to adsRequest
         self.stateMachine.set(state: .adsRequested)
-        
+        // request ads
+        IMAPlugin.loader.requestAds(with: request)
+        // notify ads requested
+        self.notify(event: AdEvent.AdsRequested(adTagUrl: self.config.adTagUrl))
+        // start timeout timer
         self.requestTimeoutTimer = Timer.after(self.requestTimeoutInterval) { [unowned self] in
             if self.adsManager == nil {
                 self.showLoadingView(false, alpha: 0)
-                
+    
                 switch self.stateMachine.getState() {
                 case .adsRequested: self.delegate?.adsRequestTimedOut(shouldPlay: false)
                 case .adsRequestedAndPlay: self.delegate?.adsRequestTimedOut(shouldPlay: true)
@@ -172,8 +176,6 @@ enum IMAState: Int, StateProtocol {
                 self.notify(event: AdEvent.RequestTimedOut())
             }
         }
-
-        IMAPlugin.loader.requestAds(with: request)
         PKLog.trace("request Ads")
     }
     
@@ -253,10 +255,12 @@ enum IMAState: Int, StateProtocol {
     
     public func adsManagerAdDidStartBuffering(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(true, alpha: 0.1)
+        self.notify(event: AdEvent.AdStartedBuffering())
     }
     
     public func adsManagerAdPlaybackReady(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(false, alpha: 0)
+        self.notify(event: AdEvent.AdPlaybackReady())
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
@@ -291,10 +295,6 @@ enum IMAState: Int, StateProtocol {
             let event = event.ad != nil ? AdEvent.AdStarted(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdStarted()
             self.notify(event: event)
             self.showLoadingView(false, alpha: 0)
-        case .AD_BREAK_STARTED:
-            self.notify(event: AdEvent.AdBreakStarted())
-            self.showLoadingView(false, alpha: 0)
-        case .AD_BREAK_ENDED: self.notify(event: AdEvent.AdBreakEnded())
         case .ALL_ADS_COMPLETED:
             // detaching the delegate and destroying the adsManager. 
             // means all ads have been played so we can destroy the adsManager.
@@ -302,16 +302,16 @@ enum IMAState: Int, StateProtocol {
             self.notify(event: AdEvent.AllAdsCompleted())
         case .CLICKED: self.notify(event: AdEvent.AdClicked())
         case .COMPLETE: self.notify(event: AdEvent.AdComplete())
-        case .CUEPOINTS_CHANGED: self.notify(event: AdEvent.AdCuePointsUpdate(adCuePoints: adsManager.getAdCuePoints()))
         case .FIRST_QUARTILE: self.notify(event: AdEvent.AdFirstQuartile())
         case .LOG: self.notify(event: AdEvent.AdLog())
         case .MIDPOINT: self.notify(event: AdEvent.AdMidpoint())
         case .PAUSE: self.notify(event: AdEvent.AdPaused())
         case .RESUME: self.notify(event: AdEvent.AdResumed())
         case .SKIPPED: self.notify(event: AdEvent.AdSkipped())
-        case .STREAM_LOADED: self.notify(event: AdEvent.AdStreamLoaded())
         case .TAPPED: self.notify(event: AdEvent.AdTapped())
         case .THIRD_QUARTILE: self.notify(event: AdEvent.AdThirdQuartile())
+        // Only used for dynamic ad insertion (not officially supported)
+        case .AD_BREAK_ENDED, .AD_BREAK_STARTED, .CUEPOINTS_CHANGED, .STREAM_LOADED, .STREAM_STARTED: break
         }
     }
     
@@ -324,13 +324,13 @@ enum IMAState: Int, StateProtocol {
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
         self.stateMachine.set(state: .adsPlaying)
-        self.notify(event: AdEvent.AdDidRequestPause())
+        self.notify(event: AdEvent.AdDidRequestContentPause())
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
         self.stateMachine.set(state: .contentPlaying)
         self.showLoadingView(false, alpha: 0)
-        self.notify(event: AdEvent.AdDidRequestResume())
+        self.notify(event: AdEvent.AdDidRequestContentResume())
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {
@@ -454,7 +454,7 @@ enum IMAState: Int, StateProtocol {
     }
     
     private func shouldDiscardAd() -> Bool {
-        if currentTime < self.dataSource?.adsPluginStartTime ?? 0 {
+        if self.currentTime < self.dataSource?.adsPluginStartTime ?? 0 {
             return true
         }
         return false

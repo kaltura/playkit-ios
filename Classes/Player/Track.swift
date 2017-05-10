@@ -14,7 +14,7 @@ import Foundation
     @objc public var language: String?
     
     init(id: String?, title: String?, language: String?) {
-        PKLog.debug("init:: id:\(id) title:\(title) language: \(language)")
+        PKLog.debug("init:: id:\(String(describing: id)) title:\(String(describing: title)) language: \(String(describing: language))")
         
         self.id = id
         self.title = title

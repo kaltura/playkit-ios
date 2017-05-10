@@ -85,7 +85,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     override var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.play,
-            PlayerEvent.playbackParamsUpdated,
+            PlayerEvent.playbackInfo,
             PlayerEvent.pause,
             PlayerEvent.stateChanged
         ]
@@ -111,12 +111,12 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
                     PKLog.debug("pause event: \(event)")
                     strongSelf.stopLiveEvents()
                 }
-            case let e where e.self == PlayerEvent.playbackParamsUpdated:
+            case let e where e.self == PlayerEvent.playbackInfo:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     PKLog.debug("playbackParamsUpdated event: \(event)")
-                    if type(of: event) == PlayerEvent.playbackParamsUpdated {
-                        strongSelf.lastReportedBitrate = Int32(event.currentBitrate!)
+                    if type(of: event) == PlayerEvent.playbackInfo && event.playbackInfo != nil {
+                        strongSelf.lastReportedBitrate = Int32(event.playbackInfo!.bitrate)
                     }
                 }
             case let e where e.self == PlayerEvent.stateChanged:
@@ -205,7 +205,7 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
         self.messageBus?.post(event)
         
         let entryId: String
-        let sessionId = player.sessionId.uuidString
+        let sessionId = player.sessionId
         var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
         var parterId = ""
         

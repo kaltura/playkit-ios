@@ -52,6 +52,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     init(adsPlugin: AdsPlugin) {
         super.init()
         self.adsPlugin = adsPlugin
+        AppStateSubject.shared.add(observer: self)
     }
         
     override var delegate: PlayerDelegate? {
@@ -110,6 +111,11 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         return super.createPiPController(with: self.adsPlugin)
     }
     
+    override func destroy() {
+        AppStateSubject.shared.remove(observer: self)
+        super.destroy()
+    }
+    
     /************************************************************/
     // MARK: - AdsPluginDataSource
     /************************************************************/
@@ -142,9 +148,9 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
         switch event {
-        case let e where type(of: e) == AdEvent.adDidRequestPause:
+        case let e where type(of: e) == AdEvent.adDidRequestContentPause:
             super.pause()
-        case let e where type(of: e) == AdEvent.adDidRequestResume:
+        case let e where type(of: e) == AdEvent.adDidRequestContentResume:
             if !self.shouldPreventContentResume {
                 self.preparePlayerIfNeeded()
                 super.resume()
@@ -192,5 +198,21 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
             self.stateMachine.set(state: .prepared)
         }
         self.prepareSemaphore.signal()
+    }
+}
+
+/************************************************************/
+// MARK: - AppStateObservable
+/************************************************************/
+
+extension AdsEnabledPlayerController: AppStateObservable {
+    
+    var observations: Set<NotificationObservation> {
+        return [
+            NotificationObservation(name: .UIApplicationDidEnterBackground) { [unowned self] in
+                // when we enter background make sure to pause if we were playing.
+                self.pause()
+            }
+        ]
     }
 }

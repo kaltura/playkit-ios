@@ -159,6 +159,8 @@ class AVPlayerEngine: AVPlayer {
     
     deinit {
         PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
+        // Avoid dealloc while key value observers were still registered
+        self.removeObservers()
     }
     
     func stop() {
@@ -166,6 +168,7 @@ class AVPlayerEngine: AVPlayer {
         self.pause()
         self.seek(to: kCMTimeZero)
         self.replaceCurrentItem(with: nil)
+        self.post(event: PlayerEvent.Stopped())
     }
     
     override func pause() {

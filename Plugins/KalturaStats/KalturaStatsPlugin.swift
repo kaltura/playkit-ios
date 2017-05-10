@@ -299,7 +299,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
         PKLog.debug("Action: \(action)")
         
         let entryId: String
-        let sessionId = player.sessionId.uuidString
+        let sessionId = player.sessionId
         var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
         var confId = 0
         var parterId = ""

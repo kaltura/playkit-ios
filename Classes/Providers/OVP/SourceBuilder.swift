@@ -19,7 +19,6 @@ class SourceBuilder {
     var uiconfId:Int64?
     var format:String? = "url"
     var sourceProtocol:String? = "https"
-    var playSessionId:String?
     var drmSchemes:[String]?
     var fileExtension: String?
     
@@ -71,13 +70,6 @@ class SourceBuilder {
         self.sourceProtocol = sourceProtocol
         return self
     }
-    
-    @discardableResult
-    func set(playSessionId:String?) -> SourceBuilder {
-        self.playSessionId = playSessionId
-        return self
-    }
-    
     
     @discardableResult
     func set(drmSchemes:[String]?) -> SourceBuilder {
@@ -136,10 +128,6 @@ class SourceBuilder {
         urlAsString = urlAsString + "/a." + fileExt
         
         var params: [String] = [String]()
-        
-        if let playSessionId = self.playSessionId{
-            params.append("playSessionId=" + playSessionId)
-        }
         
         if flavorsExist == true , let uiconfId = self.uiconfId {
             params.append("/uiConfId/" + String(uiconfId))
