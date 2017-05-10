@@ -25,7 +25,7 @@ extension PKEvent {
     struct EventDataKeys {
         static let Duration = "duration"
         static let Tracks = "tracks"
-        static let CurrentBitrate = "currentBitrate"
+        static let PlaybackInfo = "playbackInfo"
         static let OldState = "oldState"
         static let NewState = "newState"
         static let Error = "error"
@@ -45,8 +45,8 @@ extension PKEvent {
     }
     
     /// Current Bitrate Value, PKEvent Data Accessor
-    @objc public var currentBitrate: NSNumber? {
-        return self.data?[EventDataKeys.CurrentBitrate] as? NSNumber
+    @objc public var playbackInfo: PKPlaybackInfo? {
+        return self.data?[EventDataKeys.PlaybackInfo] as? PKPlaybackInfo
     }
     
     /// Current Old State Value, PKEvent Data Accessor

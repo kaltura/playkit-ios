@@ -154,11 +154,15 @@ enum IMAState: Int, StateProtocol {
         let request = IMAAdsRequest(adTagUrl: self.config.adTagUrl, adDisplayContainer: adDisplayContainer, contentPlayhead: self, userContext: nil)
         // sets the state to adsRequest
         self.stateMachine.set(state: .adsRequested)
-        
+        // request ads
+        IMAPlugin.loader.requestAds(with: request)
+        // notify ads requested
+        self.notify(event: AdEvent.AdsRequested(adTagUrl: self.config.adTagUrl))
+        // start timeout timer
         self.requestTimeoutTimer = Timer.after(self.requestTimeoutInterval) { [unowned self] in
             if self.adsManager == nil {
                 self.showLoadingView(false, alpha: 0)
-                
+    
                 switch self.stateMachine.getState() {
                 case .adsRequested: self.delegate?.adsRequestTimedOut(shouldPlay: false)
                 case .adsRequestedAndPlay: self.delegate?.adsRequestTimedOut(shouldPlay: true)
@@ -172,8 +176,6 @@ enum IMAState: Int, StateProtocol {
                 self.notify(event: AdEvent.RequestTimedOut())
             }
         }
-
-        IMAPlugin.loader.requestAds(with: request)
         PKLog.trace("request Ads")
     }
     
@@ -253,10 +255,12 @@ enum IMAState: Int, StateProtocol {
     
     public func adsManagerAdDidStartBuffering(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(true, alpha: 0.1)
+        self.notify(event: AdEvent.AdStartedBuffering())
     }
     
     public func adsManagerAdPlaybackReady(_ adsManager: IMAAdsManager!) {
         self.showLoadingView(false, alpha: 0)
+        self.notify(event: AdEvent.AdPlaybackReady())
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive event: IMAAdEvent!) {
@@ -320,13 +324,13 @@ enum IMAState: Int, StateProtocol {
     
     public func adsManagerDidRequestContentPause(_ adsManager: IMAAdsManager!) {
         self.stateMachine.set(state: .adsPlaying)
-        self.notify(event: AdEvent.AdDidRequestPause())
+        self.notify(event: AdEvent.AdDidRequestContentPause())
     }
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
         self.stateMachine.set(state: .contentPlaying)
         self.showLoadingView(false, alpha: 0)
-        self.notify(event: AdEvent.AdDidRequestResume())
+        self.notify(event: AdEvent.AdDidRequestContentResume())
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, adDidProgressToTime mediaTime: TimeInterval, totalTime: TimeInterval) {

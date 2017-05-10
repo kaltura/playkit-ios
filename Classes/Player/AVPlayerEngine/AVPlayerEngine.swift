@@ -168,6 +168,7 @@ class AVPlayerEngine: AVPlayer {
         self.pause()
         self.seek(to: kCMTimeZero)
         self.replaceCurrentItem(with: nil)
+        self.post(event: PlayerEvent.Stopped())
     }
     
     override func pause() {
