@@ -162,12 +162,10 @@ import AVFoundation
 
 @objc public class AdEvent: PKEvent {
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, adBreakEnded, adBreakStarted, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestContentPause, adDidRequestContentResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, requestTimedOut
+        adBreakReady, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestContentPause, adDidRequestContentResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, requestTimedOut
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
-    @objc public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self
-    @objc public static let adBreakStarted: AdEvent.Type = AdBreakStarted.self
     @objc public static let allAdsCompleted: AdEvent.Type = AllAdsCompleted.self
     @objc public static let adComplete: AdEvent.Type = AdComplete.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
@@ -179,7 +177,6 @@ import AVFoundation
     @objc public static let adResumed: AdEvent.Type = AdResumed.self
     @objc public static let adSkipped: AdEvent.Type = AdSkipped.self
     @objc public static let adStarted: AdEvent.Type = AdStarted.self
-    @objc public static let adStreamLoaded: AdEvent.Type = AdStreamLoaded.self
     @objc public static let adTapped: AdEvent.Type = AdTapped.self
     @objc public static let adThirdQuartile: AdEvent.Type = AdThirdQuartile.self
     @objc public static let adDidProgressToTime: AdEvent.Type = AdDidProgressToTime.self
@@ -218,8 +215,6 @@ import AVFoundation
     }
     
     class AdBreakReady: AdEvent {}
-    class AdBreakEnded: AdEvent {}
-    class AdBreakStarted: AdEvent {}
     class AllAdsCompleted: AdEvent {}
     class AdComplete: AdEvent {}
     class AdClicked: AdEvent {}
@@ -229,7 +224,6 @@ import AVFoundation
     class AdPaused: AdEvent {}
     class AdResumed: AdEvent {}
     class AdSkipped: AdEvent {}
-    class AdStreamLoaded: AdEvent {}
     class AdTapped: AdEvent {}
     class AdThirdQuartile: AdEvent {}
     
