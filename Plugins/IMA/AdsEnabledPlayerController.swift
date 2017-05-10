@@ -52,6 +52,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     init(adsPlugin: AdsPlugin) {
         super.init()
         self.adsPlugin = adsPlugin
+        AppStateSubject.shared.add(observer: self)
     }
         
     override var delegate: PlayerDelegate? {
@@ -108,6 +109,11 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
     override func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
         self.adsPlugin.pipDelegate = delegate
         return super.createPiPController(with: self.adsPlugin)
+    }
+    
+    override func destroy() {
+        AppStateSubject.shared.remove(observer: self)
+        super.destroy()
     }
     
     /************************************************************/
@@ -192,5 +198,21 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
             self.stateMachine.set(state: .prepared)
         }
         self.prepareSemaphore.signal()
+    }
+}
+
+/************************************************************/
+// MARK: - AppStateObservable
+/************************************************************/
+
+extension AdsEnabledPlayerController: AppStateObservable {
+    
+    var observations: Set<NotificationObservation> {
+        return [
+            NotificationObservation(name: .UIApplicationDidEnterBackground) { [unowned self] in
+                // when we enter background make sure to pause if we were playing.
+                self.pause()
+            }
+        ]
     }
 }

@@ -25,7 +25,7 @@ class YouboraManager: YBPluginGeneric {
     
     init(options: NSObject!, player: Player) {
         super.init(options: options)
-        self.pluginVersion = YBYouboraLibVersion + "-" + PlayKitManager.clientTag // TODO: put plugin version when we will seperate
+        self.pluginVersion = YBYouboraLibVersion + "-kaltura-" + PlayKitManager.clientTag // TODO: put plugin version when we will seperate
         self.pkPlayer = player
     }
     
@@ -73,6 +73,7 @@ extension YouboraManager {
     
     override func getResource() -> String! {
         // TODO: make sure to expose player content url and use it here instead of id
+        // will be added when we will have the relevant data, currently only a placeholder
         return self.lastReportedResource ?? super.getResource()
     }
     
@@ -138,6 +139,7 @@ extension YouboraManager {
             PlayerEvent.ended,
             PlayerEvent.playbackInfo,
             PlayerEvent.stateChanged,
+            PlayerEvent.error,
             AdEvent.adCuePointsUpdate,
             AdEvent.allAdsCompleted
         ]
@@ -162,7 +164,7 @@ extension YouboraManager {
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     // we must call `endedHandler()` when stopped so youbora will know player stopped playing content.
-                    strongSelf.adnalyzer.endedAdHandler()
+                    strongSelf.adnalyzer?.endedAdHandler()
                     strongSelf.endedHandler()
                     strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
@@ -221,6 +223,13 @@ extension YouboraManager {
                         strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                     }
                 }
+            case let e where e.self == PlayerEvent.error:
+                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    if let error = event.error, error.code == PKErrorCode.playerItemFailed {
+                        strongSelf.errorHandler(withCode: "\(error.code)", message: error.localizedDescription, andErrorMetadata: error.description)
+                    }
+                }
             case let e where e.self == AdEvent.adCuePointsUpdate:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     if let hasPostRoll = event.adCuePoints?.hasPostRoll, hasPostRoll == true {
@@ -231,7 +240,7 @@ extension YouboraManager {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     if let shouldDelayEndedHandler = self?.shouldDelayEndedHandler, shouldDelayEndedHandler == true {
                         self?.shouldDelayEndedHandler = false
-                        self?.adnalyzer.endedAdHandler()
+                        self?.adnalyzer?.endedAdHandler()
                     }
                 }
             default: assertionFailure("all events must be handled")

@@ -35,7 +35,7 @@ extension AVPlayerEngine {
         }
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.playerFailed(notification:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.playerPlayedToEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.playerPlayedToEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem) // TODO: check if fired same as playerItem.status == failed if yes then remove this notificaiton observation.
         NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: self.currentItem?.timebase)
@@ -82,7 +82,7 @@ extension AVPlayerEngine {
         self.currentState = newState
         
         if let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? NSError {
-            self.post(event: PlayerEvent.Error(error: PlayerError.failedToPlayToEndTime(rootError: error)))
+            self.post(event: PlayerEvent.Error(error: PlayerError.playerItemFailed(rootError: error)))
         } else {
             self.post(event: PlayerEvent.Error())
         }
@@ -115,20 +115,13 @@ extension AVPlayerEngine {
         PKLog.debug("keyPath:: \(keyPath)")
         
         switch keyPath {
-        case #keyPath(currentItem.playbackLikelyToKeepUp):
-            self.handleLikelyToKeepUp()
-        case #keyPath(currentItem.playbackBufferEmpty):
-            self.handleBufferEmptyChange()
-        case #keyPath(rate):
-            self.handleRate()
-        case #keyPath(currentItem.status):
-            self.handleStatusChange()
-        case #keyPath(currentItem):
-            self.handleItemChange()
-        case #keyPath(currentItem.timedMetadata):
-            self.handleTimedMedia()
-        default:
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        case #keyPath(currentItem.playbackLikelyToKeepUp): self.handleLikelyToKeepUp()
+        case #keyPath(currentItem.playbackBufferEmpty): self.handleBufferEmptyChange()
+        case #keyPath(rate): self.handleRate()
+        case #keyPath(currentItem.status): self.handleStatusChange()
+        case #keyPath(currentItem): self.handleItemChange()
+        case #keyPath(currentItem.timedMetadata): self.handleTimedMedia()
+        default: super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
     
@@ -201,6 +194,9 @@ extension AVPlayerEngine {
             let newState = PlayerState.error
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
+            if let error = currentItem?.error as? NSError {
+                self.post(event: PlayerEvent.Error(error: PlayerError.playerItemFailed(rootError: error)))
+            }
         }
     }
     

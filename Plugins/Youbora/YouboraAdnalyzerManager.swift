@@ -18,7 +18,7 @@ class YouboraAdnalyzerManager: YBAdnalyzerGeneric {
     
     override init!(pluginInstance plugin: YBPluginGeneric!) {
         super.init(pluginInstance: plugin)
-        self.adnalyzerVersion = YBYouboraLibVersion + "-" + PlayKitManager.clientTag // TODO: put plugin version when we will seperate
+        self.adnalyzerVersion = YBYouboraLibVersion + "-kaltura-" + PlayKitManager.clientTag // TODO: put plugin version when we will seperate
     }
     
     // we must override this init in order to override the `pluginInstance` init
@@ -150,6 +150,11 @@ extension YouboraAdnalyzerManager {
             case let e where e.self == AdEvent.adResumed:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     self?.resumeAdHandler()
+                    // if we were coming from background and ad was resumed
+                    // has no effect when already playing ad and resumed because ad was already started.
+                    self?.plugin?.playHandler()
+                    self?.playAdHandler()
+                    self?.joinAdHandler()
                 }
             case let e where e.self == AdEvent.adPaused:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in

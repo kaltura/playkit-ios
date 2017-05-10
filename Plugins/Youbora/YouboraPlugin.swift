@@ -14,6 +14,10 @@ import YouboraLib
 
 public class YouboraPlugin: BasePlugin, AppStateObservable {
     
+    struct CustomPropertyKey {
+        static let sessionId = "sessionId"
+    }
+    
     public override class var pluginName: String {
         return "YouboraPlugin"
     }
@@ -30,7 +34,8 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     private var youboraManager: YouboraManager
     private var adnalyzerManager: YouboraAdnalyzerManager?
     
-    var config: AnalyticsConfig?
+    /// The plugin's config
+    var config: AnalyticsConfig
     
     /************************************************************/
     // MARK: - PKPlugin
@@ -67,6 +72,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         self.endedHandler()
         self.adnalyzerManager?.reset()
         self.youboraManager.reset()
+        self.setupYoubora(withConfig: self.config)
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {
@@ -128,7 +134,8 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     /************************************************************/
     
     private func setupYoubora(withConfig config: AnalyticsConfig) {
-        let options = config.params
+        var options = config.params
+        self.addCustomProperties(toOptions: &options)
         let optionsObject = NSDictionary(dictionary: options)
         self.youboraManager.setOptions(optionsObject)
     }
@@ -164,6 +171,20 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         if let adnalyerManager = self.adnalyzerManager {
             PKLog.debug("Stop monitoring using Youbora Adnalyzer")
             adnalyerManager.stopMonitoring()
+        }
+    }
+    
+    private func addCustomProperties(toOptions options: inout [String: Any]) {
+        guard let player = self.player else {
+            PKLog.warning("couldn't add custom properties, player instance is nil")
+            return
+        }
+        let propertiesKey = "properties"
+        if var properties = options[propertiesKey] as? [String: Any] { // if properties already exists override the custom properties only
+            properties[CustomPropertyKey.sessionId] = player.sessionId
+            options[propertiesKey] = properties
+        } else { // if properties doesn't exist then add
+            options[propertiesKey] = [CustomPropertyKey.sessionId: player.sessionId]
         }
     }
 }
