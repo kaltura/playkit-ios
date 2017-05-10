@@ -79,7 +79,7 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
             PKLog.debug("Register event: \(event.self)")
             
             switch event {
-            case let e where e.self == PlayerEvent.seeked: strongSelf.isContentEnded = false
+            case let e where e.self == PlayerEvent.seeked: self.isContentEnded = false
             case let e where e.self == PlayerEvent.ended:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
