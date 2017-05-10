@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.2.x-dev'
+s.version          = '0.2.0.rc2'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 
 
@@ -28,7 +28,7 @@ s.subspec 'IMAPlugin' do |ssp|
         'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
     }
     ssp.dependency 'PlayKit/Core'
-    ssp.dependency 'GoogleAds-IMA-iOS-SDK', '3.5.2'
+    ssp.dependency 'GoogleAds-IMA-iOS-SDK', '3.4.1'
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
