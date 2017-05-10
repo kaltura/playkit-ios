@@ -194,7 +194,7 @@ extension AVPlayerEngine {
             let newState = PlayerState.error
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
-            if let error = currentItem?.error as? NSError {
+            if let error = currentItem?.error as NSError? {
                 self.post(event: PlayerEvent.Error(error: PlayerError.playerItemFailed(rootError: error)))
             }
         }

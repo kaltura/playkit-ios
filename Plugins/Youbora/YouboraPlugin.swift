@@ -25,6 +25,8 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     /// The key for enabling adnalyzer in the config dictionary
     public static let enableSmartAdsKey = "enableSmartAds"
     
+    public static let kaltura = "kaltura"
+    
     /// The youbora plugin inheriting from `YBPluginGeneric`
     /// - important: Make sure to call `playHandler()` at the start of any flow before everying
     /// (for example before pre-roll in ads) also make sure to call `endedHandler() at the end of every flow

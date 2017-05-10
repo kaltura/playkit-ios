@@ -18,7 +18,7 @@ class YouboraAdnalyzerManager: YBAdnalyzerGeneric {
     
     override init!(pluginInstance plugin: YBPluginGeneric!) {
         super.init(pluginInstance: plugin)
-        self.adnalyzerVersion = YBYouboraLibVersion + "-kaltura-" + PlayKitManager.clientTag // TODO: put plugin version when we will seperate
+        self.adnalyzerVersion = YBYouboraLibVersion + "-\(YouboraPlugin.kaltura)-" + PlayKitManager.clientTag // TODO: put plugin version when we will seperate
     }
     
     // we must override this init in order to override the `pluginInstance` init
