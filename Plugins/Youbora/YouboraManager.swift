@@ -218,10 +218,8 @@ extension YouboraManager {
                     if event.newState == .buffering {
                         strongSelf.bufferingHandler()
                         strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
-                    } else if event.oldState == .buffering {
-                        strongSelf.bufferedHandler()
-                        strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                     }
+                    
                 }
             case let e where e.self == PlayerEvent.error:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
@@ -241,6 +239,7 @@ extension YouboraManager {
                     if let shouldDelayEndedHandler = self?.shouldDelayEndedHandler, shouldDelayEndedHandler == true {
                         self?.shouldDelayEndedHandler = false
                         self?.adnalyzer?.endedAdHandler()
+                        self?.endedHandler()
                     }
                 }
             default: assertionFailure("all events must be handled")
