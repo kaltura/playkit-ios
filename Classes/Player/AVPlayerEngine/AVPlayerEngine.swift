@@ -26,6 +26,7 @@ class AVPlayerEngine: AVPlayer {
     
     private var avPlayerLayer: AVPlayerLayer!
     private var _view: PlayerView!
+    private var isDestroyed: Bool = false
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
     var lastTimebaseRate: Float64 = 0
@@ -160,7 +161,9 @@ class AVPlayerEngine: AVPlayer {
     deinit {
         PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
         // Avoid dealloc while key value observers were still registered
-        self.removeObservers()
+        if (!self.isDestroyed) {
+            self.removeObservers()
+        }
     }
     
     func stop() {
@@ -205,6 +208,7 @@ class AVPlayerEngine: AVPlayer {
             // removes app state observer
             AppStateSubject.shared.remove(observer: self)
             self.replaceCurrentItem(with: nil)
+            self.isDestroyed = true
         }
     }
     
