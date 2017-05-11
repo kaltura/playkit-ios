@@ -1,8 +1,7 @@
 Pod::Spec.new do |s|
 s.name             = 'PlayKit'
-s.version          = '0.2.0.rc3'
+s.version          = '0.2.0.rc4'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
-
 
 s.homepage         = 'https://github.com/kaltura/playkit-ios'
 s.license          = { :type => 'AGPLv3', :text => 'AGPLv3' }
