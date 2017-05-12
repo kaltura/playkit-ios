@@ -20,7 +20,7 @@ extension AVPlayerEngine {
         super.replaceCurrentItem(with: item)
     }
     
-    func asynchronouslyLoadURLAsset(_ newAsset: AVAsset) {
+    func asynchronouslyLoadURLAsset(_ newAsset: AVURLAsset) {
         /*
          Using AVAsset now runs the risk of blocking the current thread (the
          main UI thread) whilst I/O happens to populate the properties. It's

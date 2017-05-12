@@ -11,15 +11,7 @@ import AVFoundation
 
 class AssetBuilder {
     
-    let mediaEntry: MediaEntry
-    var assetHandler: AssetHandler?
-    
-    init(mediaEntry: MediaEntry) {
-        self.mediaEntry = mediaEntry
-    }
-
-    func getPreferredMediaSource() -> (MediaSource, AssetHandler.Type)? {
-        
+    static func getPreferredMediaSource(fromMediaEntry mediaEntry: MediaEntry) -> (MediaSource, AssetHandler.Type)? {
         guard let sources = mediaEntry.sources else {
             PKLog.error("no media sources in mediaEntry!")
             return nil
@@ -63,9 +55,8 @@ class AssetBuilder {
         return nil
     }
 
-    func build(readyCallback: @escaping (Error?, AVAsset?) -> Void) -> Void {
-        
-        guard let (source, handlerClass) = getPreferredMediaSource() else {
+    static func build(fromMediaEntry mediaEntry: MediaEntry, readyCallback: @escaping (Error?, AVURLAsset?) -> Void) -> Void {
+        guard let (source, handlerClass) = getPreferredMediaSource(fromMediaEntry: mediaEntry) else {
             PKLog.error("No playable sources")
             readyCallback(AssetError.noPlayableSources, nil)
             return
@@ -74,13 +65,12 @@ class AssetBuilder {
         // Build the asset
         let handler = handlerClass.init()
         handler.buildAsset(mediaSource: source, readyCallback: readyCallback)
-        self.assetHandler = handler
     }
 }
 
 protocol AssetHandler {
     init()
-    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?) -> Void)
+    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVURLAsset?) -> Void)
 }
 
 protocol RefreshableAssetHandler: AssetHandler {
