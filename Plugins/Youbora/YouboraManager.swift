@@ -139,6 +139,7 @@ extension YouboraManager {
             PlayerEvent.ended,
             PlayerEvent.playbackInfo,
             PlayerEvent.stateChanged,
+            PlayerEvent.sourceSelected,
             PlayerEvent.error,
             AdEvent.adCuePointsUpdate,
             AdEvent.allAdsCompleted
@@ -219,7 +220,12 @@ extension YouboraManager {
                         strongSelf.bufferingHandler()
                         strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                     }
-                    
+                }
+            case let e where e.self == PlayerEvent.sourceSelected:
+                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    self?.lastReportedResource = event.contentURL?.absoluteString
+                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
                 }
             case let e where e.self == PlayerEvent.error:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
