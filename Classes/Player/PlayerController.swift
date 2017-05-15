@@ -86,7 +86,6 @@ class PlayerController: NSObject, Player, PlayerSettings {
     let reachability = PKReachability()
     var shouldRefresh: Bool = false
     
-    
     func setMedia(from mediaConfig: MediaConfig) {
         self.mediaConfig = mediaConfig
         
