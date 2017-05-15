@@ -80,13 +80,13 @@ class PlayerController: NSObject, Player, PlayerSettings {
     let reachability = PKReachability()
     var shouldRefresh: Bool = false
     
-    func prepareMedia(fromMediaEntry mediaEntry: MediaEntry) {
+    func setMedia(fromMediaEntry mediaEntry: MediaEntry) {
         // update the media source request adapter with new media uuid if using kaltura request adapter
         self.updateRequestAdapterIfExists(inMediaEntry: mediaEntry)
         AssetBuilder.build(fromMediaEntry: mediaEntry) { error, asset in
             if let assetToPrepare = asset {
                 self.assetToPrepare = assetToPrepare
-                self.onEventBlock?(PlayerEvent.MediaPrepared(contentURL: assetToPrepare.url))
+                self.onEventBlock?(PlayerEvent.SourceSelected(contentURL: assetToPrepare.url))
             }
         }
     }

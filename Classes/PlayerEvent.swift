@@ -74,6 +74,8 @@ import AVFoundation
     @objc public static let stateChanged: PlayerEvent.Type = StateChanged.self
     /// Sent when timed metadata is available.
     @objc public static let timedMetadata: PlayerEvent.Type = TimedMetadata.self
+    /// Sent when source was selected.
+    @objc public static let sourceSelected: PlayerEvent.Type = SourceSelected.self
     
     /// Sent when an error occurs.
     @objc public static let error: PlayerEvent.Type = Error.self
@@ -100,7 +102,7 @@ import AVFoundation
     class Seeking: PlayerEvent {}
     class Seeked: PlayerEvent {}
     
-    class MediaPrepared: PlayerEvent {
+    class SourceSelected: PlayerEvent {
         convenience init(contentURL: URL) {
             self.init([EventDataKeys.contentURL: contentURL])
         }
