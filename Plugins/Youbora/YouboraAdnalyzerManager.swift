@@ -10,7 +10,7 @@ import YouboraLib
 
 class YouboraAdnalyzerManager: YBAdnalyzerGeneric {
     
-    weak var adInfo: PKAdInfo?
+    var adInfo: PKAdInfo?
     var adPlayhead: TimeInterval?
     var lastReportedResource: String?
     
