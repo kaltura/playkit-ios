@@ -46,7 +46,7 @@ class AVPlayerEngine: AVPlayer {
         return _view
     }
     
-    public var asset: AVAsset? {
+    public var asset: AVURLAsset? {
         didSet {
             guard let newAsset = asset else { return }
             self.asynchronouslyLoadURLAsset(newAsset)

@@ -9,7 +9,7 @@
 import Foundation
 import AVFoundation
 
-typealias ReadyCallback = (Error?, AVAsset?) -> Void
+typealias ReadyCallback = (Error?, AVURLAsset?) -> Void
 typealias RefreshCallback = (Bool) -> Void
 
 class WidevineClassicAssetHandler: RefreshableAssetHandler {

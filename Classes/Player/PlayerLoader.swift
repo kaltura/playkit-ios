@@ -21,6 +21,7 @@ class PlayerLoader: PlayerDecoratorBase {
     
     var loadedPlugins = Dictionary<String, LoadedPlugin>()
     var messageBus = MessageBus()
+    var concreatePlayerController: PlayerController?
     
     func load(pluginConfig: PluginConfig?) throws {
         var playerController: PlayerController
@@ -30,6 +31,7 @@ class PlayerLoader: PlayerDecoratorBase {
             self.messageBus.post(event)
         }
         
+        self.concreatePlayerController = playerController
         var player: Player = playerController
         // initial creation of play session id adapter will update session id in prepare if needed
         player.settings.contentRequestAdapter = KalturaPlaybackRequestAdapter()
@@ -53,6 +55,7 @@ class PlayerLoader: PlayerDecoratorBase {
     }
     
     override func prepare(_ config: MediaConfig) {
+        self.concreatePlayerController?.setMedia(from: config)
         super.prepare(config)
         // update all loaded plugins with media config
         for (pluginName, loadedPlugin) in loadedPlugins {
