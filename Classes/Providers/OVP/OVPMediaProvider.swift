@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftyXMLParser
+import KalturaNetKit
 
 @objc public class OVPMediaProvider: NSObject, MediaEntryProvider {
 
@@ -301,7 +302,6 @@ import SwiftyXMLParser
                 .set(uiconfId: loadInfo.uiconfId?.int64Value)
                 .set(flavors: source.flavors)
                 .set(partnerId: loadInfo.sessionProvider.partnerId)
-                .set(playSessionId: UUID().uuidString)
                 .set(sourceProtocol: source.protocols?.last)
                 .set(fileExtension: formatType.fileExtension)
                 .set(ks: ks)

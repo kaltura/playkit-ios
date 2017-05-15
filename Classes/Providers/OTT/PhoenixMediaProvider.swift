@@ -8,16 +8,56 @@
 
 import UIKit
 import SwiftyJSON
+import KalturaNetKit
+
+
+@objc public enum AssetType: Int {
+    case media
+    case epg
+    case unknown
+    
+    var asString: String {
+        switch self {
+        case .media: return "media"
+        case .epg: return "epg"
+        case .unknown: return ""
+        }
+    }
+}
+
+
+@objc public enum PlaybackContextType: Int {
+    
+    case trailer
+    case catchup
+    case startOver
+    case playback
+    case unknown
+    
+    var asString: String {
+        switch self {
+        case .trailer: return "TRAILER"
+        case .catchup: return "CATCHUP"
+        case .startOver: return "START_OVER"
+        case .playback: return "PLAYBACK"
+        case .unknown: return ""
+        }
+    }
+}
+
 
 /************************************************************/
 // MARK: - PhoenixMediaProviderError
 /************************************************************/
+
 public enum PhoenixMediaProviderError: PKError {
 
     case invalidInputParam(param: String)
     case unableToParseData(data: Any)
     case noSourcesFound
     case serverError(info:String)
+    /// in case the response data is empty
+    case emptyResponse
 
     static let domain = "com.kaltura.playkit.error.PhoenixMediaProvider"
 
@@ -27,6 +67,7 @@ public enum PhoenixMediaProviderError: PKError {
         case .unableToParseData: return 1
         case .noSourcesFound: return 2
         case .serverError: return 3
+        case .emptyResponse: return 4
         }
     }
 
@@ -34,9 +75,10 @@ public enum PhoenixMediaProviderError: PKError {
 
         switch self {
         case .invalidInputParam(let param): return "Invalid input param: \(param)"
-        case .unableToParseData(let data): return "Unable to parse object"
+        case .unableToParseData(let data): return "Unable to parse object (data: \(String(describing: data)))"
         case .noSourcesFound: return "No source found to play content"
         case .serverError(let info): return "Server Error: \(info)"
+        case .emptyResponse: return "Response data is empty"
         }
     }
 
@@ -168,10 +210,10 @@ public enum PhoenixMediaProviderError: PKError {
     struct LoaderInfo {
         var sessionProvider: SessionProvider
         var assetId: String
-        var assetType: AssetType
+        var assetType: AssetObjectType
         var formats: [String]?
         var fileIds: [String]?
-        var playbackContextType: PlaybackContextType
+        var playbackContextType: PlaybackType
         var networkProtocol: String
         var executor: RequestExecutor
 
@@ -198,7 +240,9 @@ public enum PhoenixMediaProviderError: PKError {
         let pr = self.networkProtocol ?? defaultProtocol
         let executor = self.executor ?? USRExecutor.shared
 
-        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, assetId: assetId, assetType: self.type, formats: self.formats, fileIds: self.fileIds, playbackContextType: self.playbackContextType, networkProtocol:pr, executor: executor)
+        let assetType = self.convertAssetTyp(type: self.type)
+        let contextPlaybackContextType = self.convertPlaybackContextType(type: self.playbackContextType)
+        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, assetId: assetId, assetType: assetType, formats: self.formats, fileIds: self.fileIds, playbackContextType: contextPlaybackContextType, networkProtocol: pr, executor: executor)
 
         self.startLoad(loaderInfo: loaderParams, callback: callback)
     }
@@ -251,21 +295,31 @@ public enum PhoenixMediaProviderError: PKError {
                 callback(nil, PhoenixMediaProviderError.invalidInputParam(param:"requests params"))
                 return
             }
-
+            
             let isMultiRequest = requestBuilder is KalturaMultiRequestBuilder
 
             let request = requestBuilder.set(completion: { (response: Response) in
 
+                if let error = response.error {
+                    // if error is of type `PKError` pass it as `NSError` else pass the `Error` object.
+                    callback(nil, (error as? PKError)?.asNSError ?? error)
+                }
+                
+                guard let responseData = response.data else {
+                    callback(nil, PhoenixMediaProviderError.emptyResponse.asNSError)
+                    return
+                }
+                
                 var playbackContext: OTTBaseObject? = nil
                 do {
                     if (isMultiRequest) {
-                        playbackContext =  try OTTMultiResponseParser.parse(data: response.data).last
+                        playbackContext =  try OTTMultiResponseParser.parse(data: responseData).last
                     } else {
-                        playbackContext =  try OTTResponseParser.parse(data: response.data)
+                        playbackContext =  try OTTResponseParser.parse(data: responseData)
                     }
 
                 } catch {
-                    callback(nil, PhoenixMediaProviderError.unableToParseData(data:response.data).asNSError)
+                    callback(nil, PhoenixMediaProviderError.unableToParseData(data: responseData).asNSError)
                 }
 
                 if let context = playbackContext as? OTTPlaybackContext {
@@ -276,9 +330,9 @@ public enum PhoenixMediaProviderError: PKError {
                         callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                     }
                 } else if let error = playbackContext as? OTTError {
-                        callback(nil, PhoenixMediaProviderError.serverError(info: error.message ?? "Unknown Error").asNSError)
+                    callback(nil, PhoenixMediaProviderError.serverError(info: error.message ?? "Unknown Error").asNSError)
                 } else {
-                        callback(nil, PhoenixMediaProviderError.unableToParseData(data: response.data).asNSError)
+                    callback(nil, PhoenixMediaProviderError.unableToParseData(data: responseData).asNSError)
                 }
             }).build()
 
@@ -388,6 +442,33 @@ public enum PhoenixMediaProviderError: PKError {
             default:
                 return .unknown
             }
+    }
+    
+    func convertAssetTyp(type: AssetType) -> AssetObjectType {
+        
+        switch type {
+        case .epg:
+            return .epg
+        case .media:
+            return .media
+        default:
+            return .unknown
+        }
+    }
+    
+    func convertPlaybackContextType(type: PlaybackContextType) -> PlaybackType {
+        switch type {
+        case .catchup:
+            return .catchup
+        case .playback:
+            return .playback
+        case .startOver:
+            return .startOver
+        case .trailer:
+            return .trailer
+        default:
+            return .unknown
+        }
     }
 
 }

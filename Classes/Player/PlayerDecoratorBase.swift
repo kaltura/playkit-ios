@@ -60,7 +60,7 @@ import AVKit
         return self.player.view
     }
     
-    public var sessionId: UUID {
+    public var sessionId: String {
         return self.player.sessionId
     }
     
@@ -119,17 +119,6 @@ import AVKit
     
     public func selectTrack(trackId: String) {
         self.player.selectTrack(trackId: trackId)
-    }
-}
-
-/************************************************************/
-// MARK: - PlayerSettings
-/************************************************************/
-
-extension PlayerDecoratorBase: PlayerSettings {
-    
-    public func set(contentRequestAdapter: PKRequestParamsAdapter) {
-        self.player.set(contentRequestAdapter: contentRequestAdapter)
     }
 }
 

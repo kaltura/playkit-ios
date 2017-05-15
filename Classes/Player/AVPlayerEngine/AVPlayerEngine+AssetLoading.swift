@@ -11,6 +11,15 @@ import AVFoundation
 
 extension AVPlayerEngine {
     
+    override func replaceCurrentItem(with item: AVPlayerItem?) {
+        // when changing asset reset last timebase
+        self.lastTimebaseRate = 0
+        // When changing media (loading new asset) we want to reset isFirstReady in order to receive `CanPlay` & `LoadedMetadata` accuratly.
+        self.isFirstReady = true
+        
+        super.replaceCurrentItem(with: item)
+    }
+    
     func asynchronouslyLoadURLAsset(_ newAsset: AVAsset) {
         /*
          Using AVAsset now runs the risk of blocking the current thread (the
@@ -59,9 +68,6 @@ extension AVPlayerEngine {
                     
                     return
                 }
-                
-                // When changing media (loading new asset) we want to reset isFirstReady in order to receive `CanPlay` & `LoadedMetadata` accuratly.
-                self.isFirstReady = true
                     
                 /*
                  We can play this asset. Create a new `AVPlayerItem` and make

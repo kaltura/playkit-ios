@@ -8,6 +8,32 @@
 import Foundation
 import AVFoundation
 
+@objc public class PKPlaybackInfo: NSObject {
+    let bitrate: Double
+    let indicatedBitrate: Double
+    let observedBitrate: Double
+    
+    init(bitrate: Double, indicatedBitrate: Double, observedBitrate: Double) {
+        self.bitrate = bitrate
+        self.indicatedBitrate = indicatedBitrate
+        self.observedBitrate = observedBitrate
+    }
+    
+    convenience init(logEvent: AVPlayerItemAccessLogEvent) {
+        let bitrate: Double
+        if logEvent.segmentsDownloadedDuration > 0 {
+            // bitrate is equal to:
+            // (amount of bytes transfered) * 8 (bits in byte) / (amount of time took to download the transfered bytes)
+            bitrate = Double(logEvent.numberOfBytesTransferred * 8) / logEvent.segmentsDownloadedDuration
+        } else {
+            bitrate = logEvent.indicatedBitrate
+        }
+        let indicatedBitrate = logEvent.indicatedBitrate
+        let observedBitrate = logEvent.observedBitrate
+        self.init(bitrate: bitrate, indicatedBitrate: indicatedBitrate, observedBitrate: observedBitrate)
+    }
+}
+
 /// PlayerEvent is a class used to reflect player events.
 @objc public class PlayerEvent: PKEvent {
     
@@ -15,7 +41,7 @@ import AVFoundation
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, ended, loadedMetadata,
         play, pause, playing, seeking, seeked, stateChanged,
-        tracksAvailable, playbackParamsUpdated, error
+        tracksAvailable, playbackInfo, error
     ]
     
     // MARK: - Player Events Static Reference
@@ -24,6 +50,8 @@ import AVFoundation
     @objc public static let canPlay: PlayerEvent.Type = CanPlay.self
     /// The metadata has loaded or changed, indicating a change in duration of the media. This is sent, for example, when the media has loaded enough that the duration is known.
     @objc public static let durationChanged: PlayerEvent.Type = DurationChanged.self
+    /// Sent when playback stopped.
+    @objc public static let stopped: PlayerEvent.Type = Stopped.self
     /// Sent when playback completes.
     @objc public static let ended: PlayerEvent.Type = Ended.self
     /// The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
@@ -41,7 +69,7 @@ import AVFoundation
     /// Sent when tracks available.
     @objc public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
     /// Sent when Playback Params Updated.
-    @objc public static let playbackParamsUpdated: PlayerEvent.Type = PlaybackParamsUpdated.self
+    @objc public static let playbackInfo: PlayerEvent.Type = PlaybackInfo.self
     /// Sent when player state is changed.
     @objc public static let stateChanged: PlayerEvent.Type = StateChanged.self
     /// Sent when timed metadata is available.
@@ -63,6 +91,7 @@ import AVFoundation
         }
     }
     
+    class Stopped: PlayerEvent {}
     class Ended: PlayerEvent {}
     class LoadedMetadata: PlayerEvent {}
     class Play: PlayerEvent {}
@@ -115,9 +144,9 @@ import AVFoundation
         }
     }
     
-    class PlaybackParamsUpdated: PlayerEvent {
-        convenience init(currentBitrate: Double) {
-            self.init([EventDataKeys.CurrentBitrate : NSNumber(value: currentBitrate)])
+    class PlaybackInfo: PlayerEvent {
+        convenience init(playbackInfo: PKPlaybackInfo) {
+            self.init([EventDataKeys.PlaybackInfo: playbackInfo])
         }
     }
     
@@ -133,12 +162,10 @@ import AVFoundation
 
 @objc public class AdEvent: PKEvent {
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, adBreakEnded, adBreakStarted, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adStreamLoaded, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestPause, adDidRequestResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser
+        adBreakReady, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestContentPause, adDidRequestContentResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, requestTimedOut
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
-    @objc public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self
-    @objc public static let adBreakStarted: AdEvent.Type = AdBreakStarted.self
     @objc public static let allAdsCompleted: AdEvent.Type = AllAdsCompleted.self
     @objc public static let adComplete: AdEvent.Type = AdComplete.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
@@ -150,12 +177,13 @@ import AVFoundation
     @objc public static let adResumed: AdEvent.Type = AdResumed.self
     @objc public static let adSkipped: AdEvent.Type = AdSkipped.self
     @objc public static let adStarted: AdEvent.Type = AdStarted.self
-    @objc public static let adStreamLoaded: AdEvent.Type = AdStreamLoaded.self
     @objc public static let adTapped: AdEvent.Type = AdTapped.self
     @objc public static let adThirdQuartile: AdEvent.Type = AdThirdQuartile.self
     @objc public static let adDidProgressToTime: AdEvent.Type = AdDidProgressToTime.self
-    @objc public static let adDidRequestPause: AdEvent.Type = AdDidRequestPause.self
-    @objc public static let adDidRequestResume: AdEvent.Type = AdDidRequestResume.self
+    /// Ad requested the content to pause (before ad starts playing)
+    @objc public static let adDidRequestContentPause: AdEvent.Type = AdDidRequestContentPause.self
+    /// Ad requested content resume (when finished playing ads or when error occurs and playback needs to continue)
+    @objc public static let adDidRequestContentResume: AdEvent.Type = AdDidRequestContentResume.self
     @objc public static let webOpenerEvent: AdEvent.Type = WebOpenerEvent.self
     @objc public static let adWebOpenerWillOpenExternalBrowser: AdEvent.Type = AdWebOpenerWillOpenExternalBrowser.self
     @objc public static let adWebOpenerWillOpenInAppBrowser: AdEvent.Type = AdWebOpenerWillOpenInAppBrowser.self
@@ -163,6 +191,14 @@ import AVFoundation
     @objc public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
     @objc public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
     @objc public static let adCuePointsUpdate: AdEvent.Type = AdCuePointsUpdate.self
+    /// Sent when an ad started buffering
+    @objc public static let adStartedBuffering: AdEvent.Type = AdStartedBuffering.self
+    /// Sent when ad finished buffering and ready for playback
+    @objc public static let adPlaybackReady: AdEvent.Type = AdPlaybackReady.self
+    /// Sent when the ads request timed out.
+    @objc public static let requestTimedOut: AdEvent.Type = RequestTimedOut.self
+    /// delivered when ads request was sent.
+    @objc public static let adsRequested: AdEvent.Type = AdsRequested.self
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
     
@@ -172,22 +208,27 @@ import AVFoundation
         }
     }
     
+    class AdLoaded: AdEvent {
+        convenience init(adInfo: PKAdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+    
     class AdBreakReady: AdEvent {}
-    class AdBreakEnded: AdEvent {}
-    class AdBreakStarted: AdEvent {}
     class AllAdsCompleted: AdEvent {}
     class AdComplete: AdEvent {}
     class AdClicked: AdEvent {}
     class AdFirstQuartile: AdEvent {}
-    class AdLoaded: AdEvent {}
     class AdLog: AdEvent {}
     class AdMidpoint: AdEvent {}
     class AdPaused: AdEvent {}
     class AdResumed: AdEvent {}
     class AdSkipped: AdEvent {}
-    class AdStreamLoaded: AdEvent {}
     class AdTapped: AdEvent {}
     class AdThirdQuartile: AdEvent {}
+    
+    class AdStartedBuffering: AdEvent {}
+    class AdPlaybackReady: AdEvent {}
     
     // `AdCuePointsUpdate` event is received when ad cue points were updated. only sent when there is more then 0.
     class AdCuePointsUpdate: AdEvent {
@@ -209,8 +250,17 @@ import AVFoundation
         }
     }
     
-    class AdDidRequestPause: AdEvent {}
-    class AdDidRequestResume: AdEvent {}
+    class AdDidRequestContentPause: AdEvent {}
+    class AdDidRequestContentResume: AdEvent {}
+    
+    /// Sent when the ads request timed out.
+    class RequestTimedOut: AdEvent {}
+    /// delivered when ads request was sent.
+    class AdsRequested: AdEvent {
+        convenience init(adTagUrl: String) {
+            self.init([AdEventDataKeys.adTagUrl: adTagUrl])
+        }
+    }
     
     class WebOpenerEvent: AdEvent {
         convenience init(webOpener: NSObject!) {
@@ -238,22 +288,23 @@ extension PKEvent {
         static let error = "error"
         static let adCuePoints = "adCuePoints"
         static let adInfo = "adInfo"
+        static let adTagUrl = "adTagUrl"
     }
     
     // MARK: Ad Data Accessors
     
     /// MediaTime, PKEvent Ad Data Accessor
-    @objc public var mediaTime: NSNumber? {
+    @objc public var adMediaTime: NSNumber? {
         return self.data?[AdEventDataKeys.mediaTime] as? NSNumber
     }
     
     /// TotalTime, PKEvent Ad Data Accessor
-    @objc public var totalTime: NSNumber? {
+    @objc public var adTotalTime: NSNumber? {
         return self.data?[AdEventDataKeys.totalTime] as? NSNumber
     }
     
     /// WebOpener, PKEvent Ad Data Accessor
-    @objc public var webOpener: NSObject? {
+    @objc public var adWebOpener: NSObject? {
         return self.data?[AdEventDataKeys.webOpener] as? NSObject
     }
     
@@ -265,5 +316,10 @@ extension PKEvent {
     /// Ad cue points, PKEvent Ad Data Accessor
     @objc public var adCuePoints: PKAdCuePoints? {
         return self.data?[AdEventDataKeys.adCuePoints] as? PKAdCuePoints
+    }
+    
+    /// TotalTime, PKEvent Ad Data Accessor
+    @objc public var adTagUrl: String? {
+        return self.data?[AdEventDataKeys.adTagUrl] as? String
     }
 }

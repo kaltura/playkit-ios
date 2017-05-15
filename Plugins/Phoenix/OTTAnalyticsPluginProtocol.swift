@@ -7,13 +7,14 @@
 //
 
 import Foundation
+import KalturaNetKit
 
 enum OTTAnalyticsEventType: String {
     case hit
     case play
     case stop
     case pause
-    case firstPlay
+    case first_play
     case swoosh
     case load
     case finish
