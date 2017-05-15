@@ -22,6 +22,12 @@ class PlayerController: NSObject, Player, PlayerSettings {
     private var assetToPrepare: AVURLAsset?
     /// private media entry stored property
     private var _mediaEntry: MediaEntry?
+    /// the current selected media source
+    fileprivate var preferredMediaSource: MediaSource?
+    /// the current handler type for the selected source
+    fileprivate var assetHandlerType: AssetHandler.Type?
+    /// the current media config that was set
+    private var mediaConfig: MediaConfig?
     
     var contentRequestAdapter: PKRequestParamsAdapter?
     
@@ -80,20 +86,33 @@ class PlayerController: NSObject, Player, PlayerSettings {
     let reachability = PKReachability()
     var shouldRefresh: Bool = false
     
-    func setMedia(fromMediaEntry mediaEntry: MediaEntry) {
+    
+    func setMedia(from mediaConfig: MediaConfig) {
+        self.mediaConfig = mediaConfig
+        
+        // get the preferred media source and post source selected event
+        guard let (preferredMediaSource, handlerType) = AssetBuilder.getPreferredMediaSource(from: mediaConfig.mediaEntry) else { return }
+        self.onEventBlock?(PlayerEvent.SourceSelected(contentURL: preferredMediaSource.playbackUrl))
+        self.preferredMediaSource = preferredMediaSource
+        self.assetHandlerType = handlerType
+        
         // update the media source request adapter with new media uuid if using kaltura request adapter
-        self.updateRequestAdapterIfExists(inMediaEntry: mediaEntry)
-        AssetBuilder.build(fromMediaEntry: mediaEntry) { error, asset in
+        var pms = preferredMediaSource
+        self.updateRequestAdapterIfExists(in: &pms)
+        
+        // build the asset from the selected source
+        AssetBuilder.build(from: preferredMediaSource, using: handlerType) { error, asset in
             if let assetToPrepare = asset {
                 self.assetToPrepare = assetToPrepare
-                self.onEventBlock?(PlayerEvent.SourceSelected(contentURL: assetToPrepare.url))
             }
         }
     }
     
     func prepare(_ config: MediaConfig) {
         guard let assetToPrepare = self.assetToPrepare else { return }
-        self.currentPlayer.startPosition = config.startTime
+        if let startTime = self.mediaConfig?.startTime {
+            self.currentPlayer.startPosition = startTime
+        }
         self.currentPlayer.asset = assetToPrepare
         if DRMSupport.widevineClassicHandler != nil {
             self.addAssetRefreshObservers()
@@ -154,7 +173,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
 extension PlayerController {
     
     /// Updates the request adapter if it is kaltura type
-    fileprivate func updateRequestAdapterIfExists(inMediaEntry mediaEntry: MediaEntry) {
+    fileprivate func updateRequestAdapterIfExists(in mediaSource: inout MediaSource) {
         // configure media sources content request adapter if kaltura request adapter exists
         if let _ = self.contentRequestAdapter as? KalturaPlaybackRequestAdapter {
             // create new media session uuid
@@ -162,7 +181,7 @@ extension PlayerController {
             // update the request adapter with the updated session id
             self.contentRequestAdapter!.updateRequestAdapter(withPlayer: self)
             // configure media source with the adapter
-            mediaEntry.configureMediaSource(withContentRequestAdapter: self.contentRequestAdapter!)
+            mediaSource.contentRequestAdapter = self.contentRequestAdapter!
         }
     }
 }
@@ -174,11 +193,11 @@ extension PlayerController {
 extension PlayerController {
     
     private func shouldRefreshAsset() {
-        guard let mediaEntry = self.mediaEntry,
-            let (source, handler) = AssetBuilder.getPreferredMediaSource(fromMediaEntry: mediaEntry),
-            let refreshableHandler = handler as? RefreshableAssetHandler else { return }
+        guard let preferredMediaSource = self.preferredMediaSource,
+            let assetHandlerType = self.assetHandlerType,
+            let refreshableHandler = assetHandlerType as? RefreshableAssetHandler else { return }
         
-        refreshableHandler.shouldRefreshAsset(mediaSource: source) { [unowned self] (shouldRefresh) in
+        refreshableHandler.shouldRefreshAsset(mediaSource: preferredMediaSource) { [unowned self] (shouldRefresh) in
             if shouldRefresh {
                 self.shouldRefresh = true
             }
@@ -186,12 +205,12 @@ extension PlayerController {
     }
     
     private func refreshAsset() {
-        guard let mediaEntry = self.mediaEntry,
-            let (source, handler) = AssetBuilder.getPreferredMediaSource(fromMediaEntry: mediaEntry),
-            let refreshableHandler = handler as? RefreshableAssetHandler else { return }
+        guard let preferredMediaSource = self.preferredMediaSource,
+            let assetHandlerType = self.assetHandlerType,
+            let refreshableHandler = assetHandlerType as? RefreshableAssetHandler else { return }
 
         self.currentPlayer.startPosition = self.currentPlayer.currentPosition
-        refreshableHandler.refreshAsset(mediaSource: source)
+        refreshableHandler.refreshAsset(mediaSource: preferredMediaSource)
     }
     
     func addAssetRefreshObservers() {
