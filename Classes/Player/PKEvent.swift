@@ -23,35 +23,36 @@ import AVFoundation
 extension PKEvent {
     // MARK: - Event Data Keys
     struct EventDataKeys {
-        static let Duration = "duration"
-        static let Tracks = "tracks"
-        static let PlaybackInfo = "playbackInfo"
-        static let OldState = "oldState"
-        static let NewState = "newState"
-        static let Error = "error"
-        static let Metadata = "metadata"
+        static let duration = "duration"
+        static let tracks = "tracks"
+        static let playbackInfo = "playbackInfo"
+        static let oldState = "oldState"
+        static let newState = "newState"
+        static let error = "error"
+        static let metadata = "metadata"
+        static let contentURL = "contentURL"
     }
     
     // MARK: Player Data Accessors
     
     /// Duration Value, PKEvent Data Accessor
     @objc public var duration: NSNumber? {
-        return self.data?[EventDataKeys.Duration] as? NSNumber
+        return self.data?[EventDataKeys.duration] as? NSNumber
     }
     
     /// Tracks Value, PKEvent Data Accessor
     @objc public var tracks: PKTracks? {
-        return self.data?[EventDataKeys.Tracks] as? PKTracks
+        return self.data?[EventDataKeys.tracks] as? PKTracks
     }
     
     /// Current Bitrate Value, PKEvent Data Accessor
     @objc public var playbackInfo: PKPlaybackInfo? {
-        return self.data?[EventDataKeys.PlaybackInfo] as? PKPlaybackInfo
+        return self.data?[EventDataKeys.playbackInfo] as? PKPlaybackInfo
     }
     
     /// Current Old State Value, PKEvent Data Accessor
     @objc public var oldState: PlayerState {
-        guard let oldState = self.data?[EventDataKeys.OldState] as? PlayerState else {
+        guard let oldState = self.data?[EventDataKeys.oldState] as? PlayerState else {
             return PlayerState.unknown
         }
         
@@ -60,7 +61,7 @@ extension PKEvent {
     
     /// Current New State Value, PKEvent Data Accessor
     @objc public var newState: PlayerState {
-        guard let newState = self.data?[EventDataKeys.NewState] as? PlayerState else {
+        guard let newState = self.data?[EventDataKeys.newState] as? PlayerState else {
             return PlayerState.unknown
         }
         
@@ -69,11 +70,16 @@ extension PKEvent {
     
     /// Associated error from error event, PKEvent Data Accessor
     @objc public var error: NSError? {
-        return self.data?[EventDataKeys.Error] as? NSError
+        return self.data?[EventDataKeys.error] as? NSError
     }
     
     /// Associated metadata from the event, PKEvent Data Accessor
     @objc public var timedMetadata: [AVMetadataItem]? {
-        return self.data?[EventDataKeys.Metadata] as? [AVMetadataItem]
+        return self.data?[EventDataKeys.metadata] as? [AVMetadataItem]
+    }
+    
+    /// Content url, PKEvent Data Accessor
+    @objc public var contentURL: URL? {
+        return self.data?[EventDataKeys.contentURL] as? URL
     }
 }

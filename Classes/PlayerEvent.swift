@@ -74,6 +74,8 @@ import AVFoundation
     @objc public static let stateChanged: PlayerEvent.Type = StateChanged.self
     /// Sent when timed metadata is available.
     @objc public static let timedMetadata: PlayerEvent.Type = TimedMetadata.self
+    /// Sent when source was selected.
+    @objc public static let sourceSelected: PlayerEvent.Type = SourceSelected.self
     
     /// Sent when an error occurs.
     @objc public static let error: PlayerEvent.Type = Error.self
@@ -87,7 +89,7 @@ import AVFoundation
     class CanPlay: PlayerEvent {}
     class DurationChanged: PlayerEvent {
         convenience init(duration: TimeInterval) {
-            self.init([EventDataKeys.Duration: NSNumber(value: duration)])
+            self.init([EventDataKeys.duration: NSNumber(value: duration)])
         }
     }
     
@@ -100,39 +102,45 @@ import AVFoundation
     class Seeking: PlayerEvent {}
     class Seeked: PlayerEvent {}
     
+    class SourceSelected: PlayerEvent {
+        convenience init(contentURL: URL) {
+            self.init([EventDataKeys.contentURL: contentURL])
+        }
+    }
+    
     class Error: PlayerEvent {
         convenience init(nsError: NSError) {
-            self.init([EventDataKeys.Error: nsError])
+            self.init([EventDataKeys.error: nsError])
         }
         
         convenience init(error: PKError) {
-            self.init([EventDataKeys.Error: error.asNSError])
+            self.init([EventDataKeys.error: error.asNSError])
         }
     }
     
     class PluginError: PlayerEvent {
         convenience init(nsError: NSError) {
-            self.init([EventDataKeys.Error: nsError])
+            self.init([EventDataKeys.error: nsError])
         }
         
         convenience init(error: PKError) {
-            self.init([EventDataKeys.Error: error.asNSError])
+            self.init([EventDataKeys.error: error.asNSError])
         }
     }
     
     class ErrorLog: PlayerEvent {
         convenience init(nsError: NSError) {
-            self.init([EventDataKeys.Error: nsError])
+            self.init([EventDataKeys.error: nsError])
         }
         
         convenience init(error: PKError) {
-            self.init([EventDataKeys.Error: error.asNSError])
+            self.init([EventDataKeys.error: error.asNSError])
         }
     }
     
     class TimedMetadata: PlayerEvent {
         convenience init(metadata: [AVMetadataItem]) {
-            self.init([EventDataKeys.Metadata: metadata])
+            self.init([EventDataKeys.metadata: metadata])
         }
     }
     
@@ -140,13 +148,13 @@ import AVFoundation
     
     class TracksAvailable: PlayerEvent {
         convenience init(tracks: PKTracks) {
-            self.init([EventDataKeys.Tracks : tracks])
+            self.init([EventDataKeys.tracks : tracks])
         }
     }
     
     class PlaybackInfo: PlayerEvent {
         convenience init(playbackInfo: PKPlaybackInfo) {
-            self.init([EventDataKeys.PlaybackInfo: playbackInfo])
+            self.init([EventDataKeys.playbackInfo: playbackInfo])
         }
     }
     
@@ -154,8 +162,8 @@ import AVFoundation
 
     class StateChanged: PlayerEvent {
         convenience init(newState: PlayerState, oldState: PlayerState) {
-            self.init([EventDataKeys.NewState : newState as AnyObject,
-                       EventDataKeys.OldState : oldState as AnyObject])
+            self.init([EventDataKeys.newState : newState as AnyObject,
+                       EventDataKeys.oldState : oldState as AnyObject])
         }
     }
 }
