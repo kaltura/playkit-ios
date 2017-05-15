@@ -103,7 +103,7 @@ import AVFoundation
     class Seeked: PlayerEvent {}
     
     class SourceSelected: PlayerEvent {
-        convenience init(contentURL: URL) {
+        convenience init(contentURL: URL?) {
             self.init([EventDataKeys.contentURL: contentURL])
         }
     }

@@ -7,34 +7,40 @@
 //
 
 import UIKit
+import AVFoundation
 
 /// A simple `UIView` subclass that is backed by an `AVPlayerLayer` layer.
-class PlayerView: UIView {
-
-    var playerLayer: CALayer?
+public class PlayerView: UIView {
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    init(playerLayer: CALayer) {
-        super.init(frame: CGRect.zero)
-        self.playerLayer = playerLayer
-        self.layer.addSublayer(self.playerLayer!)
-    }
-    
-    override var frame: CGRect {
-        didSet {
-            self.playerLayer?.frame = CGRect(origin: CGPoint.zero, size: frame.size)
+    var player: AVPlayer? {
+        get {
+            return playerLayer.player
+        }
+        set {
+            playerLayer.player = newValue
         }
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        self.playerLayer?.frame = CGRect(origin: CGPoint.zero, size: frame.size)
+    var playerLayer: AVPlayerLayer {
+        return self.layer as! AVPlayerLayer
+    }
+    
+    // Override UIView property
+    override public static var layerClass: AnyClass {
+        return AVPlayerLayer.self
+    }
+    
+    /// adds the player view as a subview to the container view and sets up constraints
+    @objc public func add(toContainer container: UIView) {
+        self.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(self)
+        
+        let views = ["playerView": self]
+        
+        let horizontalConstraint = NSLayoutConstraint.constraints(withVisualFormat: "H:|-0-[playerView]-0-|", options: [], metrics: nil, views: views)
+        let verticalConstraint = NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[playerView]-0-|", options: [], metrics: nil, views: views)
+        
+        container.addConstraints(horizontalConstraint)
+        container.addConstraints(verticalConstraint)
     }
 }

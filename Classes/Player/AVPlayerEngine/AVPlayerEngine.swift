@@ -24,8 +24,8 @@ class AVPlayerEngine: AVPlayer {
         "hasProtectedContent"
     ]
     
-    private var avPlayerLayer: AVPlayerLayer!
-    private var _view: PlayerView!
+    private var playerLayer: AVPlayerLayer
+    private var _view: PlayerView
     private var isDestroyed: Bool = false
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
@@ -41,7 +41,7 @@ class AVPlayerEngine: AVPlayer {
     
     public var onEventBlock: ((PKEvent) -> Void)?
     
-    public var view: UIView! {
+    public var view: PlayerView {
         PKLog.debug("get player view: \(_view)")
         return _view
     }
@@ -148,10 +148,14 @@ class AVPlayerEngine: AVPlayer {
         
         self.startPosition = 0
         
+        // create player view and assign player layer
+        self._view = PlayerView()
+        self.playerLayer = _view.layer as! AVPlayerLayer
+        
         super.init()
         
-        avPlayerLayer = AVPlayerLayer(player: self)
-        _view = PlayerView(playerLayer: avPlayerLayer)
+        // connect player engine to the player layer to output the video
+        _view.player = self
         
         self.onEventBlock = nil
         
@@ -202,8 +206,7 @@ class AVPlayerEngine: AVPlayer {
         DispatchQueue.main.async {
             PKLog.info("destroy player")
             self.removeObservers()
-            self.avPlayerLayer = nil
-            self._view = nil
+            self._view.removeFromSuperview()
             self.onEventBlock = nil
             // removes app state observer
             AppStateSubject.shared.remove(observer: self)
@@ -214,7 +217,7 @@ class AVPlayerEngine: AVPlayer {
     
     @available(iOS 9.0, *)
     func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        let pip = AVPictureInPictureController(playerLayer: avPlayerLayer)
+        let pip = AVPictureInPictureController(playerLayer: playerLayer)
         pip?.delegate = delegate
         return pip
     }
