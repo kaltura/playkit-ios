@@ -28,11 +28,17 @@ import Foundation
     @objc public var adSystem: String
     @objc public var height: Int
     @objc public var width: Int
+    /// Total number of ads in the pod this ad belongs to. Will be 1 for standalone ads.
     @objc public var totalAds: Int
+    /// The position of this ad within an ad pod. Will be 1 for standalone ads.
     @objc public var adPosition: Int
     /// The position of the pod in the content in seconds. Pre-roll returns 0,
     /// post-roll returns -1 and mid-rolls return the scheduled time of the pod.
     @objc public var timeOffset: TimeInterval
+    @objc public var isBumper: Bool
+    // The index of the pod, where pre-roll pod is 0, mid-roll pods are 1 .. N
+    // and the post-roll is -1.
+    @objc public var podIndex: Int
     
     /// returns the position type of the ad (pre, mid, post)
     @objc public var positionType: AdPositionType {
@@ -56,7 +62,9 @@ import Foundation
          width: Int,
          totalAds: Int,
          adPosition: Int,
-         timeOffset: TimeInterval) {
+         timeOffset: TimeInterval,
+         isBumper: Bool,
+         podIndex: Int) {
         
         self.adDescription = adDescription
         self.duration = adDuration
@@ -70,6 +78,8 @@ import Foundation
         self.totalAds = totalAds
         self.adPosition = adPosition
         self.timeOffset = timeOffset
+        self.isBumper = isBumper
+        self.podIndex = podIndex
     }
 }
 

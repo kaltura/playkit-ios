@@ -47,5 +47,10 @@ protocol AdsPlugin: PKPlugin, AVPictureInPictureControllerDelegate {
     /// called when play() or resume() was called.
     /// used to make the neccery checks with the ads plugin if can play or resume the content.
     func didRequestPlay(ofType type: AdsEnabledPlayerController.PlayType)
+    
+    /// called when entered to background
+    func didEnterBackground()
+    /// called when coming back from background
+    func willEnterForeground()
 }
 

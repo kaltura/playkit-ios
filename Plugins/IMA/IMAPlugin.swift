@@ -47,11 +47,13 @@ enum IMAState: Int, StateProtocol {
     private var stateMachine = BasicStateMachine(initialState: IMAState.start, allowTransitionToInitialState: false)
     
     private static var loader: IMAAdsLoader!
+    private static let loaderRetryCount = 3
+    private var loaderRetries = IMAPlugin.loaderRetryCount
+    
     private var adsManager: IMAAdsManager?
     private var renderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
     private var pictureInPictureProxy: IMAPictureInPictureProxy?
     private var loadingView: UIView?
-    
     // we must have config error will be thrown otherwise
     private var config: IMAConfig!
     
@@ -90,19 +92,21 @@ enum IMAState: Int, StateProtocol {
     public override class var pluginName: String { return "IMAPlugin" }
     
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
-        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-        if let adsConfig = pluginConfig as? IMAConfig {
-            self.config = adsConfig
-            self.requestTimeoutInterval = adsConfig.requestTimeoutInterval
-            if IMAPlugin.loader == nil {
-                self.setupLoader(with: adsConfig)
-            }
-            IMAPlugin.loader.contentComplete()
-            IMAPlugin.loader.delegate = self
-        } else {
+        guard let imaConfig = pluginConfig as? IMAConfig else {
             PKLog.error("missing plugin config")
             throw PKPluginError.missingPluginConfig(pluginName: IMAPlugin.pluginName)
         }
+        
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        
+        self.config = imaConfig
+        self.requestTimeoutInterval = imaConfig.requestTimeoutInterval
+        if IMAPlugin.loader == nil {
+            self.setupLoader(with: imaConfig)
+        }
+        // whenever we create the plugin we need to set the loader's delegate to the new plugin object
+        IMAPlugin.loader.contentComplete()
+        IMAPlugin.loader.delegate = self
         
         self.messageBus?.addObserver(self, events: [PlayerEvent.ended]) { [weak self] event in
             self?.contentComplete()
@@ -117,11 +121,6 @@ enum IMAState: Int, StateProtocol {
         if let adsConfig = pluginConfig as? IMAConfig {
             self.config = adsConfig
         }
-    }
-    
-    // TODO:: finilize update config & updateMedia logic
-    public override func onUpdateMedia(mediaConfig: MediaConfig) {
-        super.onUpdateMedia(mediaConfig: mediaConfig)
     }
     
     public override func destroy() {
@@ -150,17 +149,23 @@ enum IMAState: Int, StateProtocol {
     func requestAds() {
         guard let player = self.player else { return }
         
-        let adDisplayContainer = self.createAdDisplayContainer(forView: player.view)
+        let adDisplayContainer = IMAPlugin.createAdDisplayContainer(forView: player.view, withCompanionView: self.config.companionView)
         let request = IMAAdsRequest(adTagUrl: self.config.adTagUrl, adDisplayContainer: adDisplayContainer, contentPlayhead: self, userContext: nil)
-        // sets the state to adsRequest
+        // sets the state
         self.stateMachine.set(state: .adsRequested)
+        // make sure loader exists otherwise create.
+        if IMAPlugin.loader == nil {
+            self.createLoader()
+        }
         // request ads
+        PKLog.debug("request Ads")
         IMAPlugin.loader.requestAds(with: request)
         // notify ads requested
         self.notify(event: AdEvent.AdsRequested(adTagUrl: self.config.adTagUrl))
         // start timeout timer
         self.requestTimeoutTimer = Timer.after(self.requestTimeoutInterval) { [unowned self] in
             if self.adsManager == nil {
+                PKLog.debug("Ads request timed out")
                 self.showLoadingView(false, alpha: 0)
     
                 switch self.stateMachine.getState() {
@@ -176,7 +181,6 @@ enum IMAState: Int, StateProtocol {
                 self.notify(event: AdEvent.RequestTimedOut())
             }
         }
-        PKLog.trace("request Ads")
     }
     
     func resume() {
@@ -188,10 +192,11 @@ enum IMAState: Int, StateProtocol {
     }
     
     func contentComplete() {
-        IMAPlugin.loader.contentComplete()
+        IMAPlugin.loader?.contentComplete()
     }
     
     func destroyManager() {
+        self.invalidateRequestTimer()
         self.adsManager?.delegate = nil
         self.adsManager?.destroy()
         // In order to make multiple ad requests, AdsManager instance should be destroyed, and then contentComplete() should be called on AdsLoader.
@@ -216,11 +221,28 @@ enum IMAState: Int, StateProtocol {
         }
     }
     
+    func didEnterBackground() {
+        switch self.stateMachine.getState() {
+        case .adsRequested, .adsRequestedAndPlay: self.destroyManager()
+        default: break
+        }
+    }
+    
+    func willEnterForeground() {
+        print(self.stateMachine.getState())
+        switch self.stateMachine.getState() {
+        case .start: self.requestAds()
+        default: break
+        }
+    }
+    
     /************************************************************/
     // MARK: - AdsLoaderDelegate
     /************************************************************/
     
     public func adsLoader(_ loader: IMAAdsLoader!, adsLoadedWith adsLoadedData: IMAAdsLoadedData!) {
+        self.loaderRetries = IMAPlugin.loaderRetryCount
+        
         switch self.stateMachine.getState() {
         case .adsRequested: self.stateMachine.set(state: .adsLoaded)
         case .adsRequestedAndPlay: self.stateMachine.set(state: .adsLoadedAndPlay)
@@ -244,9 +266,19 @@ enum IMAState: Int, StateProtocol {
         self.invalidateRequestTimer()
         self.stateMachine.set(state: .adsRequestFailed)
         self.showLoadingView(false, alpha: 0)
-        PKLog.error(adErrorData.adError.message)
-        self.messageBus?.post(AdEvent.Error(nsError: IMAPluginError(adError: adErrorData.adError).asNSError))
-        self.delegate?.adsPlugin(self, loaderFailedWith: adErrorData.adError.message)
+        
+        guard let adError = adErrorData.adError else { return }
+        PKLog.error(adError.message)
+        self.messageBus?.post(AdEvent.Error(nsError: IMAPluginError(adError: adError).asNSError))
+        self.delegate?.adsPlugin(self, loaderFailedWith: adError.message)
+        
+        // if the error relates to IMA SDK failed to load recreate loader instance.
+        // otherwise loader will never work again
+        IMAPlugin.loader = nil
+        if (adError.code.rawValue == 1005 || adError.code.rawValue == 1010) && self.loaderRetries > 0 {
+            self.loaderRetries -= 1
+            self.requestAds()
+        }
     }
     
     /************************************************************/
@@ -350,10 +382,16 @@ enum IMAState: Int, StateProtocol {
         IMAPlugin.loader = IMAAdsLoader(settings: imaSettings)
     }
     
-    private func createAdDisplayContainer(forView view: UIView) -> IMAAdDisplayContainer {
+    private func createLoader() {
+        self.setupLoader(with: self.config)
+        IMAPlugin.loader.contentComplete()
+        IMAPlugin.loader.delegate = self
+    }
+    
+    private static func createAdDisplayContainer(forView view: UIView, withCompanionView companionView: UIView? = nil) -> IMAAdDisplayContainer {
         // setup ad display container and companion if exists, needs to create a new ad container for each request.
-        if let companionView = self.config?.companionView {
-            let companionAdSlot = IMACompanionAdSlot(view: companionView, width: Int32(companionView.frame.size.width), height: Int32(companionView.frame.size.height))
+        if let cv = companionView {
+            let companionAdSlot = IMACompanionAdSlot(view: companionView, width: Int32(cv.frame.size.width), height: Int32(cv.frame.size.height))
             return IMAAdDisplayContainer(adContainer: view, companionSlots: [companionAdSlot!])
         } else {
             return IMAAdDisplayContainer(adContainer: view, companionSlots: [])
