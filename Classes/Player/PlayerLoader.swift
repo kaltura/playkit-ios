@@ -31,6 +31,8 @@ class PlayerLoader: PlayerDecoratorBase {
         }
         
         var player: Player = playerController
+        // initial creation of play session id adapter will update session id in prepare if needed
+        player.settings.contentRequestAdapter = KalturaPlaybackRequestAdapter()
         
         if let pluginConfigs = pluginConfig?.config {
             for pluginName in pluginConfigs.keys {

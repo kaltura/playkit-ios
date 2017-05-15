@@ -20,7 +20,6 @@ extension AVPlayerEngine {
             #keyPath(currentItem),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
-            #keyPath(currentItem.duration),
             #keyPath(currentItem.timedMetadata)
         ]
     }
@@ -36,7 +35,7 @@ extension AVPlayerEngine {
         }
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.playerFailed(notification:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.playerPlayedToEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.playerPlayedToEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem) // TODO: check if fired same as playerItem.status == failed if yes then remove this notificaiton observation.
         NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: self.currentItem?.timebase)
@@ -67,11 +66,7 @@ extension AVPlayerEngine {
                 PKLog.debug("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
             }
             
-            if lastEvent.indicatedBitrate != self.lastBitrate {
-                self.lastBitrate = lastEvent.indicatedBitrate
-                PKLog.trace("currentBitrate:: \(self.lastBitrate)")
-                self.post(event: PlayerEvent.PlaybackParamsUpdated(currentBitrate: self.lastBitrate))
-            }
+            self.post(event: PlayerEvent.PlaybackInfo(playbackInfo: PKPlaybackInfo(logEvent: lastEvent)))
         }
     }
     
@@ -87,7 +82,7 @@ extension AVPlayerEngine {
         self.currentState = newState
         
         if let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? NSError {
-            self.post(event: PlayerEvent.Error(error: PlayerError.failedToPlayToEndTime(rootError: error)))
+            self.post(event: PlayerEvent.Error(error: PlayerError.playerItemFailed(rootError: error)))
         } else {
             self.post(event: PlayerEvent.Error())
         }
@@ -120,24 +115,13 @@ extension AVPlayerEngine {
         PKLog.debug("keyPath:: \(keyPath)")
         
         switch keyPath {
-        case #keyPath(currentItem.playbackLikelyToKeepUp):
-            self.handleLikelyToKeepUp()
-        case #keyPath(currentItem.playbackBufferEmpty):
-            self.handleBufferEmptyChange()
-        case #keyPath(currentItem.duration):
-            if let currentItem = self.currentItem {
-                self.post(event: PlayerEvent.DurationChanged(duration: CMTimeGetSeconds(currentItem.duration)))
-            }
-        case #keyPath(rate):
-            self.handleRate()
-        case #keyPath(currentItem.status):
-            self.handleStatusChange()
-        case #keyPath(currentItem):
-            self.handleItemChange()
-        case #keyPath(currentItem.timedMetadata):
-            self.handleTimedMedia()
-        default:
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        case #keyPath(currentItem.playbackLikelyToKeepUp): self.handleLikelyToKeepUp()
+        case #keyPath(currentItem.playbackBufferEmpty): self.handleBufferEmptyChange()
+        case #keyPath(rate): self.handleRate()
+        case #keyPath(currentItem.status): self.handleStatusChange()
+        case #keyPath(currentItem): self.handleItemChange()
+        case #keyPath(currentItem.timedMetadata): self.handleTimedMedia()
+        default: super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
     
@@ -198,6 +182,11 @@ extension AVPlayerEngine {
             
             if self.isFirstReady {
                 self.isFirstReady = false
+                // when player item is readyToPlay for the first time it is safe to assume we have a valid duration.
+                if let duration = self.currentItem?.duration, duration != kCMTimeIndefinite {
+                    PKLog.debug("duration in seconds: \(CMTimeGetSeconds(duration))")
+                    self.post(event: PlayerEvent.DurationChanged(duration: CMTimeGetSeconds(duration)))
+                }
                 self.post(event: PlayerEvent.LoadedMetadata())
                 self.post(event: PlayerEvent.CanPlay())
             }
@@ -205,6 +194,9 @@ extension AVPlayerEngine {
             let newState = PlayerState.error
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
+            if let error = currentItem?.error as NSError? {
+                self.post(event: PlayerEvent.Error(error: PlayerError.playerItemFailed(rootError: error)))
+            }
         }
     }
     
