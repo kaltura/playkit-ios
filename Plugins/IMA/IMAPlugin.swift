@@ -443,7 +443,7 @@ enum IMAState: Int, StateProtocol {
         self.loadingView!.alpha = alpha
         self.loadingView!.isHidden = !show
         
-        self.player?.view?.bringSubview(toFront: self.loadingView!)
+        self.player?.view.bringSubview(toFront: self.loadingView!)
     }
     
     private func notify(event: AdEvent) {
