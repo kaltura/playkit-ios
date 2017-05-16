@@ -90,7 +90,7 @@ class OTTAnalyticsPluginTest: QuickSpec {
         
         let lock: AnyObject = UUID().uuidString as AnyObject
         
-        var observers = [AppStateObservable]()
+        var observers = [AppStateObserver]()
         var appStateProvider: AppStateProvider
         var isObserving = false
     }
@@ -123,8 +123,8 @@ class OTTAnalyticsPluginTest: QuickSpec {
                     var analyticsPluginMock = analyticsPluginMock
                     print("received analytics event: \(eventType.rawValue)")
                     switch eventType {
-                    case .firstPlay, .play:
-                        if eventType == .firstPlay {
+                    case .first_play, .play:
+                        if eventType == .first_play {
                             analyticsPluginMock.invocationCount.firstPlayCount += 1
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                 player.pause()
@@ -149,9 +149,9 @@ class OTTAnalyticsPluginTest: QuickSpec {
                                 analyticsPluginMock.finishedHandling = true
                             }
                         }
-                        if eventType == .firstPlay || eventType == .play {
+                        if eventType == .first_play || eventType == .play {
                             switch analyticsPluginMock.invocationCount.playCount {
-                            case 0: expect(eventType).to(equal(OTTAnalyticsEventType.firstPlay))
+                            case 0: expect(eventType).to(equal(OTTAnalyticsEventType.first_play))
                             default: expect(eventType).to(equal(OTTAnalyticsEventType.play))
                             }
                             analyticsPluginMock.invocationCount.playCount += 1
@@ -167,7 +167,7 @@ class OTTAnalyticsPluginTest: QuickSpec {
                 }
                 
                 it("can test event handling") {
-                    print("request: \(phoenixPluginMock.buildRequest(ofType: .play))")
+                    print("request: \(String(describing: phoenixPluginMock.buildRequest(ofType: .play)))")
                     phoenixPluginMock.onAnalyticsEvent = onAnalyticsEvent
                     tvpapiPluginMock.onAnalyticsEvent = onAnalyticsEvent
                     // to start the whole flow we need to make an initial play

@@ -18,18 +18,17 @@ class SourceSelectorTest: XCTestCase {
     let wvm = MediaSource("wvm", contentUrl: URL(string: "https://example.com/a.wvm"), mediaFormat: .wvm )
     
     func testSelectedSource() {
-        
-        var builder: AssetBuilder
-        
-        builder = AssetBuilder(mediaEntry: MediaEntry("e", sources: [mp4, hls, fps]))
-        builder.build { (_, asset) in
-            guard let asset = asset as? AVURLAsset else {
+        guard let preferredMedia = AssetBuilder.getPreferredMediaSource(from: MediaEntry("e", sources: [mp4, hls, fps])) else {
+            XCTFail()
+            return
+        }
+        AssetBuilder.build(from: preferredMedia.0, using: preferredMedia.1) { (_, asset) in
+            guard let asset = asset else {
                 XCTFail()
                 return
             }
             XCTAssertEqual(asset.url.lastPathComponent, "hls.m3u8")
         }
-        
     }
     
     
