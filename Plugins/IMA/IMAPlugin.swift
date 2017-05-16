@@ -12,6 +12,9 @@ import GoogleInteractiveMediaAds
 enum IMAState: Int, StateProtocol {
     /// initial state.
     case start = 0
+    /// when request was interrupted by going to background.
+    /// (indicates we should make the request again when return to foreground)
+    case startAndRequest
     /// ads request was made.
     case adsRequested
     /// ads request was made and play() was used.
@@ -223,16 +226,16 @@ enum IMAState: Int, StateProtocol {
     
     func didEnterBackground() {
         switch self.stateMachine.getState() {
-        case .adsRequested, .adsRequestedAndPlay: self.destroyManager()
+        case .adsRequested, .adsRequestedAndPlay:
+            self.destroyManager()
+            self.stateMachine.set(state: .startAndRequest)
         default: break
         }
     }
     
     func willEnterForeground() {
-        print(self.stateMachine.getState())
-        switch self.stateMachine.getState() {
-        case .start: self.requestAds()
-        default: break
+        if self.stateMachine.getState() == .startAndRequest {
+            self.requestAds()
         }
     }
     
