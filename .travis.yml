@@ -6,7 +6,8 @@ script:
   - cd Example
   - pod update
   - xcodebuild -scheme PlayKit-Example -workspace PlayKit.xcworkspace
-  - xcodebuild test -scheme PlayKit-Example -workspace PlayKit.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 6,OS=9.3'
+  - xcodebuild build-for-testing -workspace "PlayKit.xcworkspace" -scheme "PlayKit-Example" -destination "platform=iOS Simulator,name=iPhone 7,OS=10.3" -derivedDataPath "build"
+  - xcodebuild test-without-building -xctestrun "build/Build/Products/PlayKit-Example_iphonesimulator10.3-x86_64" -destination "platform=iOS Simulator,name=iPhone 7,OS=10.3"
 notifications:
   email:
     recipients:
