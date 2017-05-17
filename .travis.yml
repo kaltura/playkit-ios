@@ -3,13 +3,15 @@ osx_image: xcode8.1
 before_install:
   - gem install cocoapods # Since Travis is not always on latest version
 script:
-  - cd PlayKitFramework
+  - cd Example
   - pod update
-  - xcodebuild -scheme PlayKitFramework -workspace PlayKitFramework.xcworkspace
+  - xcodebuild -scheme PlayKit-Example -workspace PlayKit.xcworkspace
+  - xcodebuild test -scheme PlayKit-Example -workspace PlayKit.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 6,OS=9.3'
 notifications:
   email:
     recipients:
       - noam.tamim@kaltura.com
       - eliza.sapir@kaltura.com
+      - gal.orlanczyk@kaltura.com
     on_success: change
     on_failure: always

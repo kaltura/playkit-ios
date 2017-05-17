@@ -19,25 +19,7 @@ class PlayerControllerTest: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        
-        var source = [String : Any]()
-        source["id"] = "test"
-        source["url"] = "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
-        
-        var sources = [JSON]()
-        sources.append(JSON(source))
-        
-        var entry = [String : Any]()
-        entry["id"] = "test"
-        entry["sources"] = sources
-        let mediaConfig = MediaConfig(mediaEntry: MediaEntry(json: entry))
-        
-        do{
-        self.player = try PlayKitManager.shared.loadPlayer(pluginConfig: nil)
-        } catch {
-            
-        }
-        self.player.prepare(mediaConfig)
+        self.player = self.createPlayer()
     }
     
     override func tearDown() {
@@ -68,7 +50,9 @@ class PlayerControllerTest: XCTestCase {
                 XCTFail()
             }
         }
-        self.player.pause()
+        self.player.addObserver(self, events: [PlayerEvent.playing]) { [weak self] event in
+            self?.player.pause()
+        }
         waitForExpectations(timeout: 10.0) { (_) -> Void in}
     }
     

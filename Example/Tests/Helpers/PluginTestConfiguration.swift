@@ -21,8 +21,8 @@ enum PluginTestConfiguration {
     
     var pluginName: String {
         switch self {
-        case .TVPAPI: return "PhoenixAnalyticsPluginMock"
-        case .Phoenix: return "TVPAPIAnalyticsPluginMock"
+        case .TVPAPI: return "TVPAPIAnalyticsPluginMock" 
+        case .Phoenix: return "PhoenixAnalyticsPluginMock"
         }
     }
     
@@ -31,7 +31,7 @@ enum PluginTestConfiguration {
         case .TVPAPI: return [
             "fileId": "464302",
             "baseUrl": "http://tvpapi-preprod.ott.kaltura.com/v3_9/gateways/jsonpostgw.aspx?",
-            "timerInterval":30000,
+            "timerInterval":30,
             "initObj": ""
             ]
         case .Phoenix: return [
