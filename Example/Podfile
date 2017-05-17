@@ -6,7 +6,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 abstract_target 'PlayKit' do
     
     pod 'PlayKit', :path => '../../playkit-ios'
-    pod'GoogleAds-IMA-iOS-SDK', '~> 3.3'
+    #pod'GoogleAds-IMA-iOS-SDK', '~> 3.3'
     pod 'PlayKit/IMAPlugin', :path => '../../playkit-ios'
     pod 'PlayKit/YouboraPlugin', :path => '../../playkit-ios'
     pod 'PlayKit/PhoenixPlugin', :path => '../../playkit-ios' 
