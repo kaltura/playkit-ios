@@ -38,9 +38,7 @@ class PhoenixPluginTest: QuickSpec {
             }
             
             afterEach {
-                player.stop()
-                player.destroy()
-                player = nil
+                self.destroyPlayer(player)
             }
             
             it("can build play event request") {

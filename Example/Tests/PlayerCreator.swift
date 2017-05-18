@@ -53,6 +53,13 @@ extension PlayerCreator {
         
         return PlayerLoader()
     }
+    
+    func destroyPlayer(_ player: Player!) {
+        player.stop()
+        player.destroy()
+        var p = player
+        p = nil
+    }
 }
 
 /************************************************************/

@@ -24,7 +24,7 @@ class PlayerControllerTest: XCTestCase {
     
     override func tearDown() {
         super.tearDown()
-        self.player.destroy()
+        self.destroyPlayer(player)
     }
     
     func testPlayCommand() {
