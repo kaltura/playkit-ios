@@ -2,9 +2,9 @@ language: objective-c
 osx_image: xcode8.1
 before_install:
   - gem install cocoapods # Since Travis is not always on latest version
+  - xcrun instruments -w 'iPhone 6 (9.3)' || sleep 15
 script:
   - cd Example
-  - pod install
   - pod update
   - xcodebuild test -scheme PlayKit-Example -workspace PlayKit.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 6,OS=9.3'
 notifications:
