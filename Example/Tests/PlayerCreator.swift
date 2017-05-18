@@ -15,54 +15,50 @@ enum PlayerCreationError: Error {
     case PluginNamesCountMismatch
 }
 
-protocol PlayerCreator { }
+protocol PlayerCreator: class { }
 
-// make sure all quick spec classes have player creator.
-extension QuickSpec: PlayerCreator { }
+// make sure all xctest case classes have player creator.
+extension XCTestCase: PlayerCreator { }
 
 /************************************************************/
 // MARK: - Basic Player
 /************************************************************/
 
-extension PlayerCreator where Self: QuickSpec {
+extension PlayerCreator {
     
     func createPlayer(pluginConfigDict: [String : Any]? = nil, shouldStartPreparing: Bool = true) -> PlayerLoader {
         let player: PlayerLoader
         
-        var source = [String : Any]()
-        source["id"] = "test"
-        source["url"] = "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
-        // FIXME: change to offline video when available, Bundle(for: type(of: self)).path(forResource: "big_buck_bunny_short", ofType: "mp4")!
-        
-        var sources = [JSON]()
-        sources.append(JSON(source))
-        
-        var entry = [String : Any]()
-        entry["id"] = "test"
-        entry["sources"] = sources
-        let mediaConfig = MediaConfig(mediaEntry: MediaEntry(json: entry))
-        do{
-        let pluginConfig: PluginConfig?
-        if let pluginConfigDict = pluginConfigDict {
-            let pluginConfig = PluginConfig(config: pluginConfigDict)
-            
-            
-            player = try PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
-        } else {
-            pluginConfig = nil
-            player = try PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
-        }
+        // for hls stream use: "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
+        let url = URL(fileURLWithPath: Bundle(for: type(of: self)).path(forResource: "big_buck_bunny_short", ofType: "mp4")!)
+        let entry = MediaEntry("test", sources: [MediaSource("test", contentUrl: url)])
+        let mediaConfig = MediaConfig(mediaEntry: entry)
+        do {
+            let pluginConfig: PluginConfig?
+            if let pluginConfigDict = pluginConfigDict {
+                let pluginConfig = PluginConfig(config: pluginConfigDict)
+                player = try PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
+            } else {
+                pluginConfig = nil
+                player = try PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
+            }
             
             if shouldStartPreparing {
                 player.prepare(mediaConfig)
             }
             return player
-        }catch{
-            
+        } catch {
+            print("could not create player instance")
         }
         
         return PlayerLoader()
-        
+    }
+    
+    func destroyPlayer(_ player: Player!) {
+        player.stop()
+        player.destroy()
+        var p = player
+        p = nil
     }
 }
 
@@ -70,12 +66,19 @@ extension PlayerCreator where Self: QuickSpec {
 // MARK: - OTT Analytics Player
 /************************************************************/
 
-extension PlayerCreator where Self: QuickSpec {
+extension PlayerCreator {
+    
+    func createPlayerForPhoenix(shouldStartPreparing: Bool = true) -> PlayerLoader {
+        let pluginConfigDict: [String : Any] = [
+            PluginTestConfiguration.Phoenix.pluginName: AnalyticsConfig(params: PluginTestConfiguration.Phoenix.paramsDict)
+        ]
+        return self.createPlayer(pluginConfigDict: pluginConfigDict, shouldStartPreparing: shouldStartPreparing)
+    }
     
     func createPlayerForPhoenixAndTVPAPI(shouldStartPreparing: Bool = true) -> PlayerLoader {
         let pluginConfigDict: [String : Any] = [
-            PluginTestConfiguration.Phoenix.pluginName : PluginTestConfiguration.Phoenix.paramsDict,
-            PluginTestConfiguration.TVPAPI.pluginName : PluginTestConfiguration.TVPAPI.paramsDict
+            PluginTestConfiguration.Phoenix.pluginName: AnalyticsConfig(params: PluginTestConfiguration.Phoenix.paramsDict),
+            PluginTestConfiguration.TVPAPI.pluginName: AnalyticsConfig(params: PluginTestConfiguration.TVPAPI.paramsDict)
         ]
         return self.createPlayer(pluginConfigDict: pluginConfigDict, shouldStartPreparing: shouldStartPreparing)
     }

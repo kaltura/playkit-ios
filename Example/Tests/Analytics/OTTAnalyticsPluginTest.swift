@@ -101,20 +101,20 @@ class OTTAnalyticsPluginTest: QuickSpec {
     
     override func spec() {
         describe("OTT analytics plugins test") {
-            PlayKitManager.shared.registerPlugin(OTTAnalyticsPluginTestPhoenixMock.self)
-            PlayKitManager.shared.registerPlugin(OTTAnalyticsPluginTestTVPAPIMock.self)
             var player: PlayerLoader!
             var phoenixPluginMock: OTTAnalyticsPluginTestPhoenixMock!
             var tvpapiPluginMock: OTTAnalyticsPluginTestTVPAPIMock!
             
             beforeEach {
+                PlayKitManager.shared.registerPlugin(OTTAnalyticsPluginTestPhoenixMock.self)
+                PlayKitManager.shared.registerPlugin(OTTAnalyticsPluginTestTVPAPIMock.self)
                 player = self.createPlayerForPhoenixAndTVPAPI()
                 phoenixPluginMock = player.loadedPlugins[OTTAnalyticsPluginTestPhoenixMock.pluginName]!.plugin as! OTTAnalyticsPluginTestPhoenixMock
                 tvpapiPluginMock = player.loadedPlugins[OTTAnalyticsPluginTestTVPAPIMock.pluginName]!.plugin as! OTTAnalyticsPluginTestTVPAPIMock
             }
             
             afterEach {
-                player.destroy()
+                self.destroyPlayer(player)
             }
             
             context("analytics events handling") {
@@ -126,25 +126,25 @@ class OTTAnalyticsPluginTest: QuickSpec {
                     case .first_play, .play:
                         if eventType == .first_play {
                             analyticsPluginMock.invocationCount.firstPlayCount += 1
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                player.pause()
-                            }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                player.play()
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                 player.pause()
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                                 player.play()
-                                player.seek(to: CMTimeMake(Int64(player.duration - 1), 1))
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                                player.pause()
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
+                                player.play()
+                                player.seek(to: CMTimeMake(Int64(player.duration - 1), 1))
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
                                 expect(analyticsPluginMock.invocationCount.playCount).to(equal(3)) // 3 from player.play()
-                                expect(analyticsPluginMock.invocationCount.pauseCount).to(equal(3)) // 3 in total, 2 from player.pause() and 1 from ended after seek to end
+                                expect(analyticsPluginMock.invocationCount.pauseCount).to(equal(2)) // 2 from player.pause()
                                 expect(analyticsPluginMock.invocationCount.firstPlayCount).to(equal(1)) // 1 from player.play() first play should happen only once
                                 expect(analyticsPluginMock.invocationCount.loadCount).to(equal(1)) // 1 from player.play()
-                                expect(analyticsPluginMock.invocationCount.endedCount).to(equal(2)) // 1 from ended after seek to end and 1 from player destroy
+                                expect(analyticsPluginMock.invocationCount.endedCount).to(equal(1)) // 1 from ended after seek to end (ended)
                                 print(type(of: analyticsPluginMock))
                                 analyticsPluginMock.finishedHandling = true
                             }

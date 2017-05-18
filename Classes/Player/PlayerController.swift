@@ -20,8 +20,6 @@ class PlayerController: NSObject, Player, PlayerSettings {
 
     /// the asset to prepare and pass to the player engine to start buffering.
     private var assetToPrepare: AVURLAsset?
-    /// private media entry stored property
-    private var _mediaEntry: MediaEntry?
     /// the current selected media source
     fileprivate var preferredMediaSource: MediaSource?
     /// the current handler type for the selected source
@@ -36,7 +34,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     }
     
     public var mediaEntry: MediaEntry? {
-        return self._mediaEntry
+        return self.mediaConfig?.mediaEntry
     }
     
     public var duration: Double {

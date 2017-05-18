@@ -28,17 +28,17 @@ class PhoenixPluginTest: QuickSpec {
     
     override func spec() {
         describe("phoenix request builder test") {
-            PlayKitManager.shared.registerPlugin(PhoenixPluginTest.PhoenixAnalyticsPluginMock.self)
             var player: PlayerLoader!
             var phoenixPluginMock: PhoenixPluginTest.PhoenixAnalyticsPluginMock!
             
             beforeEach {
-                player = self.createPlayer()
+                PlayKitManager.shared.registerPlugin(PhoenixPluginTest.PhoenixAnalyticsPluginMock.self)
+                player = self.createPlayerForPhoenix()
                 phoenixPluginMock = player.loadedPlugins[PhoenixPluginTest.PhoenixAnalyticsPluginMock.pluginName]!.plugin as! PhoenixPluginTest.PhoenixAnalyticsPluginMock
             }
             
             afterEach {
-                player.destroy()
+                self.destroyPlayer(player)
             }
             
             it("can build play event request") {

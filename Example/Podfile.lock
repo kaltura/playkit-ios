@@ -3,40 +3,40 @@ PODS:
     - google-cast-sdk/Core (= 3.3.0)
   - google-cast-sdk/Core (3.3.0)
   - GoogleAds-IMA-iOS-SDK (3.4.1)
-  - KalturaNetKit (0.0.11):
-    - KalturaNetKit/Core (= 0.0.11)
-  - KalturaNetKit/Core (0.0.11):
+  - KalturaNetKit (0.0.14):
+    - KalturaNetKit/Core (= 0.0.14)
+  - KalturaNetKit/Core (0.0.14):
     - SwiftyJSON
   - Log (1.0)
   - Nimble (6.0.1)
-  - PlayKit (0.1.x-dev):
-    - PlayKit/Core (= 0.1.x-dev)
-  - PlayKit/AnalyticsCommon (0.1.x-dev):
+  - PlayKit (0.2.x-dev):
+    - PlayKit/Core (= 0.2.x-dev)
+  - PlayKit/AnalyticsCommon (0.2.x-dev):
     - PlayKit/Core
-  - PlayKit/Core (0.1.x-dev):
-    - KalturaNetKit
-    - Log
-    - SwiftyJSON
-    - SwiftyXMLParser
-  - PlayKit/GoogleCastAddon (0.1.x-dev):
-    - google-cast-sdk
+  - PlayKit/Core (0.2.x-dev):
+    - KalturaNetKit (~> 0.0)
+    - Log (= 1.0)
+    - SwiftyJSON (= 3.1.4)
+    - SwiftyXMLParser (= 3.0.0)
+  - PlayKit/GoogleCastAddon (0.2.x-dev):
+    - google-cast-sdk (= 3.3.0)
     - PlayKit/Core
-  - PlayKit/IMAPlugin (0.1.x-dev):
+  - PlayKit/IMAPlugin (0.2.x-dev):
     - GoogleAds-IMA-iOS-SDK (= 3.4.1)
     - PlayKit/Core
-  - PlayKit/KalturaLiveStatsPlugin (0.1.x-dev):
+  - PlayKit/KalturaLiveStatsPlugin (0.2.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-  - PlayKit/KalturaStatsPlugin (0.1.x-dev):
+  - PlayKit/KalturaStatsPlugin (0.2.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-  - PlayKit/PhoenixPlugin (0.1.x-dev):
+  - PlayKit/PhoenixPlugin (0.2.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-  - PlayKit/YouboraPlugin (0.1.x-dev):
+  - PlayKit/YouboraPlugin (0.2.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-    - Youbora-AVPlayer/dynamic
+    - Youbora-AVPlayer/dynamic (= 5.3.5)
   - Quick (1.1.0)
   - SwiftyJSON (3.1.4)
   - SwiftyXMLParser (3.0.0)
@@ -45,7 +45,6 @@ PODS:
   - Youbora-YouboraLib/dynamic (5.3.8)
 
 DEPENDENCIES:
-  - GoogleAds-IMA-iOS-SDK (~> 3.3)
   - Nimble (= 6.0.1)
   - PlayKit (from `../../playkit-ios`)
   - PlayKit/GoogleCastAddon (from `../../playkit-ios`)
@@ -58,21 +57,21 @@ DEPENDENCIES:
 
 EXTERNAL SOURCES:
   PlayKit:
-    :path: ../../playkit-ios
+    :path: "../../playkit-ios"
 
 SPEC CHECKSUMS:
   google-cast-sdk: da1989cbc1b9ff7b50ddb9dae5b1969d95a65a0f
   GoogleAds-IMA-iOS-SDK: 7355db22ce69be4607ed0cc5112847b2b0c5e89d
-  KalturaNetKit: b6bc21d1ffb6957192c33afc12f5c2203d5208b2
+  KalturaNetKit: bd3825d14e604c9f06bb41607eb6ce8929f27556
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
   Nimble: 1527fd1bd2b4cf0636251a36bc8ab37e81da8347
-  PlayKit: c50b4b7582aa7bef031bb34e15b6ca2303093525
+  PlayKit: 819a420427627c73936c4da3ae5df6a4104ff90e
   Quick: dafc587e21eed9f4cab3249b9f9015b0b7a7f71d
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
   SwiftyXMLParser: 8d2295fb4fbc6e2ff241e7c8d7717e159be35969
   Youbora-AVPlayer: 02aea2a12a4f7e6a61d8a1747e5dfc177bf2354b
   Youbora-YouboraLib: 523adf7cd09c4a213e3485e6ec7c48d498986246
 
-PODFILE CHECKSUM: 8702b84cf4a02b3d2de2ccf0fe915659f256d0e6
+PODFILE CHECKSUM: bf5ee1ab2e41dcf80f06c3b004f52bddb8aa071d
 
 COCOAPODS: 1.2.0
