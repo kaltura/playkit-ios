@@ -39,7 +39,7 @@ s.subspec 'GoogleCastAddon' do |ssp|
         'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
         'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
     }
-    ssp.dependency 'google-cast-sdk', '3.3.0'
+    ssp.dependency 'google-cast-sdk', '3.5'
     ssp.dependency 'PlayKit/Core'
 end
 
