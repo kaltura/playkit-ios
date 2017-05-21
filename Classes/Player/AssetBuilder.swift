@@ -11,15 +11,7 @@ import AVFoundation
 
 class AssetBuilder {
     
-    let mediaEntry: MediaEntry
-    var assetHandler: AssetHandler?
-    
-    init(mediaEntry: MediaEntry) {
-        self.mediaEntry = mediaEntry
-    }
-
-    func getPreferredMediaSource() -> (MediaSource, AssetHandler.Type)? {
-        
+    static func getPreferredMediaSource(from mediaEntry: MediaEntry) -> (MediaSource, AssetHandler.Type)? {
         guard let sources = mediaEntry.sources else {
             PKLog.error("no media sources in mediaEntry!")
             return nil
@@ -62,25 +54,17 @@ class AssetBuilder {
         PKLog.error("no playable media sources!")
         return nil
     }
-
-    func build(readyCallback: @escaping (Error?, AVAsset?) -> Void) -> Void {
-        
-        guard let (source, handlerClass) = getPreferredMediaSource() else {
-            PKLog.error("No playable sources")
-            readyCallback(AssetError.noPlayableSources, nil)
-            return
-        }
-        
-        // Build the asset
-        let handler = handlerClass.init()
-        handler.buildAsset(mediaSource: source, readyCallback: readyCallback)
-        self.assetHandler = handler
+    
+    // builds the asset from the selected media source
+    static func build(from mediaSource: MediaSource, using assetHandlerType: AssetHandler.Type, readyCallback: @escaping (Error?, AVURLAsset?) -> Void) -> Void {
+        let handler = assetHandlerType.init()
+        handler.buildAsset(mediaSource: mediaSource, readyCallback: readyCallback)
     }
 }
 
 protocol AssetHandler {
     init()
-    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVAsset?) -> Void)
+    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVURLAsset?) -> Void)
 }
 
 protocol RefreshableAssetHandler: AssetHandler {
