@@ -6,7 +6,11 @@
 //
 //
 
-import YouboraLib
+#if os(iOS)
+    import YouboraLib
+#elseif os(tvOS)
+    import YouboraLibTvOS
+#endif
 
 class YouboraAdnalyzerManager: YBAdnalyzerGeneric {
     

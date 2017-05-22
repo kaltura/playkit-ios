@@ -1,15 +1,15 @@
 Pod::Spec.new do |s|
+
 s.name             = 'PlayKit'
 s.version          = '0.2.x-dev'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
-
-
 s.homepage         = 'https://github.com/kaltura/playkit-ios'
 s.license          = { :type => 'AGPLv3', :text => 'AGPLv3' }
 s.author           = { 'Kaltura' => 'community@kaltura.com' }
 s.source           = { :git => 'https://github.com/kaltura/playkit-ios.git', :tag => 'v' + s.version.to_s }
 
 s.ios.deployment_target = '8.0'
+s.tvos.deployment_target = '9.0'
 
 s.subspec 'Core' do |sp|
     sp.source_files = 'Classes/**/*'
@@ -45,12 +45,6 @@ end
 
 s.subspec 'YouboraPlugin' do |ssp|
     ssp.source_files = 'Plugins/Youbora'
-    ssp.xcconfig = { 
-        'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
-        'OTHER_LDFLAGS' => '$(inherited) -framework "YouboraLib" -framework "YouboraPluginAVPlayer"',
-        'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
-        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
-    }
     ssp.dependency 'Youbora-AVPlayer/dynamic', '5.3.5'
     ssp.dependency 'PlayKit/Core'
     ssp.dependency 'PlayKit/AnalyticsCommon'

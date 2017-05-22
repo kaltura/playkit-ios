@@ -6,12 +6,6 @@
 //  Copyright © 2016 Kaltura, Inc. All rights reserved.
 //
 
-import YouboraLib
-
-/************************************************************/
-// MARK: - YouboraPlugin
-/************************************************************/
-
 public class YouboraPlugin: BasePlugin, AppStateObservable {
     
     struct CustomPropertyKey {

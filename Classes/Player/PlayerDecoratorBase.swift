@@ -100,11 +100,6 @@ import AVKit
         self.player.stop()
     }
     
-    @available(iOS 9.0, *)
-    public func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        return self.player.createPiPController(with: delegate)
-    }
-    
     public func updatePluginConfig(pluginName: String, config: Any) {
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
     }
@@ -121,4 +116,18 @@ import AVKit
         self.player.selectTrack(trackId: trackId)
     }
 }
+
+/************************************************************/
+// MARK: - iOS Only
+/************************************************************/
+
+#if os(iOS)
+    extension PlayerDecoratorBase {
+        
+        @available(iOS 9.0, *)
+        public func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+            return self.player.createPiPController(with: delegate)
+        }
+    }
+#endif
 
