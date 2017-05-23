@@ -93,13 +93,19 @@ class PlayerLoader: PlayerDecoratorBase {
         self.destroyPlayer()
     }
     
+    public override func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
+        messageBus.addObserver(observer, events: [event], block: block)
+    }
+    
     public override func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent)->Void) {
-        // TODO:: finilizing + object validation
         messageBus.addObserver(observer, events: events, block: block)
     }
     
+    override func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
+        messageBus.removeObserver(observer, events: [event])
+    }
+    
     public override func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
-        // TODO:: finilizing + object validation
         messageBus.removeObserver(observer, events: events)
     }
     
