@@ -50,6 +50,9 @@ import AVKit
     /// The player's session id. the `sessionId` is initialized when the player loads.
     @objc var sessionId: String { get }
 
+    /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
+    @objc var rate: Float { get }
+    
     /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
     @objc func prepare(_ config: MediaConfig)
     
