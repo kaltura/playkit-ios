@@ -72,9 +72,15 @@ import AVKit
     @objc func destroy()
     
     /// Add Observation to relevant event.
+    @objc func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void)
+    
+    /// Add Observation to relevant events.
     @objc func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void)
     
-    /// Remove Observation.
+    /// Remove Observer for single event.
+    @objc func removeObserver(_ observer: AnyObject, event: PKEvent.Type)
+    
+    /// Remove Observer for several events.
     @objc func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
     
     /// Select Track

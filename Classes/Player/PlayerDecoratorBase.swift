@@ -109,7 +109,15 @@ import AVKit
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
     }
     
+    public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
     public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
+    public func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
         //Assert.shouldNeverHappen();
     }
     
