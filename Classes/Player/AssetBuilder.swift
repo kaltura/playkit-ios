@@ -56,9 +56,10 @@ class AssetBuilder {
     }
     
     // builds the asset from the selected media source
-    static func build(from mediaSource: MediaSource, using assetHandlerType: AssetHandler.Type, readyCallback: @escaping (Error?, AVURLAsset?) -> Void) -> Void {
+    static func build(from mediaSource: MediaSource, using assetHandlerType: AssetHandler.Type, readyCallback: @escaping (Error?, AVURLAsset?) -> Void) -> AssetHandler {
         let handler = assetHandlerType.init()
         handler.buildAsset(mediaSource: mediaSource, readyCallback: readyCallback)
+        return handler
     }
 }
 
