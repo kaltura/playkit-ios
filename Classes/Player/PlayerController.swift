@@ -66,6 +66,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
         return self.sessionUUID.uuidString + ":" + (self.mediaSessionUUID?.uuidString ?? "")
     }
     
+    public var rate: Float {
+        return self.currentPlayer.rate
+    }
+    
     let sessionUUID = UUID()
     var mediaSessionUUID: UUID?
     

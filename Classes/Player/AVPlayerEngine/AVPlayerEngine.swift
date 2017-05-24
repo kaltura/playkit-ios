@@ -42,7 +42,7 @@ class AVPlayerEngine: AVPlayer {
     public var onEventBlock: ((PKEvent) -> Void)?
     
     public var view: PlayerView {
-        PKLog.debug("get player view: \(_view)")
+        PKLog.trace("get player view: \(_view)")
         return _view
     }
     

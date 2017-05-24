@@ -64,6 +64,10 @@ import AVKit
         return self.player.sessionId
     }
     
+    public var rate: Float {
+        return self.player.rate
+    }
+    
     public func prepare(_ config: MediaConfig) {
         return self.player.prepare(config)
     }
