@@ -66,6 +66,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
         return self.sessionUUID.uuidString + ":" + (self.mediaSessionUUID?.uuidString ?? "")
     }
     
+    public var rate: Float {
+        return self.currentPlayer.rate
+    }
+    
     let sessionUUID = UUID()
     var mediaSessionUUID: UUID?
     
@@ -143,7 +147,15 @@ class PlayerController: NSObject, Player, PlayerSettings {
         self.removeAssetRefreshObservers()
     }
     
+    func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
     func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
+    func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
         //Assert.shouldNeverHappen();
     }
     

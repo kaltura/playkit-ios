@@ -64,6 +64,10 @@ import AVKit
         return self.player.sessionId
     }
     
+    public var rate: Float {
+        return self.player.rate
+    }
+    
     public func prepare(_ config: MediaConfig) {
         return self.player.prepare(config)
     }
@@ -104,7 +108,15 @@ import AVKit
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
     }
     
+    public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
     public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
+    public func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
         //Assert.shouldNeverHappen();
     }
     

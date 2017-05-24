@@ -50,6 +50,9 @@ import AVKit
     /// The player's session id. the `sessionId` is initialized when the player loads.
     @objc var sessionId: String { get }
 
+    /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
+    @objc var rate: Float { get }
+    
     /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
     @objc func prepare(_ config: MediaConfig)
     
@@ -72,9 +75,15 @@ import AVKit
     @objc func destroy()
     
     /// Add Observation to relevant event.
+    @objc func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void)
+    
+    /// Add Observation to relevant events.
     @objc func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void)
     
-    /// Remove Observation.
+    /// Remove Observer for single event.
+    @objc func removeObserver(_ observer: AnyObject, event: PKEvent.Type)
+    
+    /// Remove Observer for several events.
     @objc func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
     
     /// Select Track

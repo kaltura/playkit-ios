@@ -4,7 +4,7 @@ before_install:
   - gem install cocoapods # Since Travis is not always on latest version
 script:
   - cd PlayKitFramework
-  - pod install --repo-update
+  - pod update --repo-update
   - xcodebuild -scheme PlayKitFramework -workspace PlayKitFramework.xcworkspace
 notifications:
   email:
