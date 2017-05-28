@@ -139,10 +139,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
         self.currentPlayer.currentPosition = CMTimeGetSeconds(time)
     }
     
-    @available(iOS 9.0, *)
-    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        return self.currentPlayer.createPiPController(with: delegate)
-    }
+    
     
     func destroy() {
         self.currentPlayer.destroy()
@@ -173,6 +170,20 @@ class PlayerController: NSObject, Player, PlayerSettings {
         //Assert.shouldNeverHappen();
     }
 }
+
+/************************************************************/
+// MARK: - iOS Only
+/************************************************************/
+
+#if os(iOS)
+    extension PlayerController {
+        
+        @available(iOS 9.0, *)
+        func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+            return self.currentPlayer.createPiPController(with: delegate)
+        }
+    }
+#endif
 
 /************************************************************/
 // MARK: - Private
