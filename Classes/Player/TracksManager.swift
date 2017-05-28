@@ -55,7 +55,7 @@ class TracksManager: NSObject {
     
     public func currentAudioTrack(item: AVPlayerItem) -> String? {
         if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicAudible), let option = item.selectedMediaOption(in: group) {
-            return self.audioTracks?.filter{($0.title! == option.displayName)}.first?.id
+            return self.audioTracks?.filter{($0.title == option.displayName)}.first?.id
         }
         return nil
     }
@@ -68,7 +68,7 @@ class TracksManager: NSObject {
             } else {
                 displayName = textOffDisplay
             }
-            return self.textTracks?.filter{($0.title! == displayName)}.first?.id
+            return self.textTracks?.filter{($0.title == displayName)}.first?.id
         }
         return nil
     }
