@@ -9,10 +9,10 @@
 import Foundation
 
 /// class `BasePlugin` is a base plugin object used for plugin subclasses
-@objc public class BasePlugin: NSObject, PKPlugin {
+@objc open class BasePlugin: NSObject, PKPlugin {
     
     /// abstract implementation subclasses will have names
-    @objc public class var pluginName: String {
+    @objc open class var pluginName: String {
         fatalError("abstract property should be overriden in subclass")
     }
 
