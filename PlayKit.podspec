@@ -20,6 +20,7 @@ s.subspec 'Core' do |sp|
 end
 
 s.subspec 'IMAPlugin' do |ssp|
+    ssp.ios.deployment_target = '8.0'
     ssp.source_files = 'Plugins/IMA'
     ssp.xcconfig = { 
         'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
@@ -32,6 +33,7 @@ s.subspec 'IMAPlugin' do |ssp|
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
+    ssp.ios.deployment_target = '8.0'
     ssp.source_files = 'Addons/GoogleCast'
     ssp.xcconfig = { 
         'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
@@ -51,6 +53,7 @@ s.subspec 'YouboraPlugin' do |ssp|
 end
 
 s.subspec 'WidevineClassic' do |ssp|
+  ssp.ios.deployment_target = '8.0'  
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKit/Core'
   #ssp.dependency 'PlayKitWV'
