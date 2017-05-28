@@ -122,7 +122,7 @@ import AVFoundation
     
     class TracksAvailable: PlayerEvent {
         convenience init(tracks: PKTracks) {
-            self.init([EventDataKeys.tracks : tracks])
+            self.init([EventDataKeys.tracks: tracks])
         }
     }
     
@@ -136,8 +136,8 @@ import AVFoundation
 
     class StateChanged: PlayerEvent {
         convenience init(newState: PlayerState, oldState: PlayerState) {
-            self.init([EventDataKeys.newState : newState as AnyObject,
-                       EventDataKeys.oldState : oldState as AnyObject])
+            self.init([EventDataKeys.newState: newState as AnyObject,
+                       EventDataKeys.oldState: oldState as AnyObject])
         }
     }
 }
