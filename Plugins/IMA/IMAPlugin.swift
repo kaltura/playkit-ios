@@ -56,7 +56,7 @@ enum IMAState: Int, StateProtocol {
     private var adsManager: IMAAdsManager?
     private var renderingSettings: IMAAdsRenderingSettings! = IMAAdsRenderingSettings()
     private var pictureInPictureProxy: IMAPictureInPictureProxy?
-    private var loadingView: UIView?
+    
     // we must have config error will be thrown otherwise
     private var config: IMAConfig!
     
@@ -169,7 +169,6 @@ enum IMAState: Int, StateProtocol {
         self.requestTimeoutTimer = Timer.after(self.requestTimeoutInterval) { [unowned self] in
             if self.adsManager == nil {
                 PKLog.debug("Ads request timed out")
-                self.showLoadingView(false, alpha: 0)
     
                 switch self.stateMachine.getState() {
                 case .adsRequested: self.delegate?.adsRequestTimedOut(shouldPlay: false)
@@ -268,7 +267,6 @@ enum IMAState: Int, StateProtocol {
         // cancel the request timer
         self.invalidateRequestTimer()
         self.stateMachine.set(state: .adsRequestFailed)
-        self.showLoadingView(false, alpha: 0)
         
         guard let adError = adErrorData.adError else { return }
         PKLog.error(adError.message)
@@ -289,12 +287,10 @@ enum IMAState: Int, StateProtocol {
     /************************************************************/
     
     public func adsManagerAdDidStartBuffering(_ adsManager: IMAAdsManager!) {
-        self.showLoadingView(true, alpha: 0.1)
         self.notify(event: AdEvent.AdStartedBuffering())
     }
     
     public func adsManagerAdPlaybackReady(_ adsManager: IMAAdsManager!) {
-        self.showLoadingView(false, alpha: 0)
         self.notify(event: AdEvent.AdPlaybackReady())
     }
     
@@ -329,7 +325,6 @@ enum IMAState: Int, StateProtocol {
             self.stateMachine.set(state: .adsPlaying)
             let event = event.ad != nil ? AdEvent.AdStarted(adInfo: PKAdInfo(ad: event.ad)) : AdEvent.AdStarted()
             self.notify(event: event)
-            self.showLoadingView(false, alpha: 0)
         case .ALL_ADS_COMPLETED:
             // detaching the delegate and destroying the adsManager. 
             // means all ads have been played so we can destroy the adsManager.
@@ -351,7 +346,6 @@ enum IMAState: Int, StateProtocol {
     }
     
     public func adsManager(_ adsManager: IMAAdsManager!, didReceive error: IMAAdError!) {
-        self.showLoadingView(false, alpha: 0)
         PKLog.error(error.message)
         self.messageBus?.post(AdEvent.Error(nsError: IMAPluginError(adError: error).asNSError))
         self.delegate?.adsPlugin(self, managerFailedWith: error.message)
@@ -364,7 +358,6 @@ enum IMAState: Int, StateProtocol {
     
     public func adsManagerDidRequestContentResume(_ adsManager: IMAAdsManager!) {
         self.stateMachine.set(state: .contentPlaying)
-        self.showLoadingView(false, alpha: 0)
         self.notify(event: AdEvent.AdDidRequestContentResume())
     }
     
@@ -401,30 +394,6 @@ enum IMAState: Int, StateProtocol {
         }
     }
     
-    private func setupLoadingView() {
-        self.loadingView = UIView(frame: CGRect.zero)
-        self.loadingView!.translatesAutoresizingMaskIntoConstraints = false
-        self.loadingView!.backgroundColor = UIColor.black
-        self.loadingView!.isHidden = true
-        
-        let indicator = UIActivityIndicatorView()
-        indicator.translatesAutoresizingMaskIntoConstraints = false
-        indicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
-        indicator.startAnimating()
-        
-        self.loadingView!.addSubview(indicator)
-        self.loadingView!.addConstraint(NSLayoutConstraint(item: self.loadingView!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: indicator, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0))
-        self.loadingView!.addConstraint(NSLayoutConstraint(item: self.loadingView!, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: indicator, attribute: NSLayoutAttribute.centerY, multiplier: 1, constant: 0))
-        
-        if let videoView = self.player?.view {
-            videoView.addSubview(self.loadingView!)
-            videoView.addConstraint(NSLayoutConstraint(item: videoView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0))
-            videoView.addConstraint(NSLayoutConstraint(item: videoView, attribute: NSLayoutAttribute.left, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.left, multiplier: 1, constant: 0))
-            videoView.addConstraint(NSLayoutConstraint(item: videoView, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0))
-            videoView.addConstraint(NSLayoutConstraint(item: videoView, attribute: NSLayoutAttribute.right, relatedBy: NSLayoutRelation.equal, toItem: self.loadingView!, attribute: NSLayoutAttribute.right, multiplier: 1, constant: 0))
-        }
-    }
-    
     private func createRenderingSettings() {
         self.renderingSettings.webOpenerDelegate = self
         if let webOpenerPresentingController = self.config?.webOpenerPresentingController {
@@ -436,17 +405,6 @@ enum IMAState: Int, StateProtocol {
         if let mimeTypes = self.config?.videoMimeTypes {
             self.renderingSettings.mimeTypes = mimeTypes
         }
-    }
-    
-    private func showLoadingView(_ show: Bool, alpha: CGFloat) {
-        if self.loadingView == nil {
-            self.setupLoadingView()
-        }
-        
-        self.loadingView!.alpha = alpha
-        self.loadingView!.isHidden = !show
-        
-        self.player?.view.bringSubview(toFront: self.loadingView!)
     }
     
     private func notify(event: AdEvent) {
