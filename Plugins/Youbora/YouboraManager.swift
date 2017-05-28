@@ -29,6 +29,7 @@ class YouboraManager: YBPluginGeneric {
     
     init(options: NSObject!, player: Player) {
         super.init(options: options)
+        self.pluginName = "\(YouboraPlugin.kaltura)-iOS"
         self.pluginVersion = YBYouboraLibVersion + "-\(YouboraPlugin.kaltura)-" + PlayKitManager.clientTag // TODO: put plugin version when we will seperate
         self.pkPlayer = player
     }
