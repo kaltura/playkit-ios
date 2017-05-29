@@ -311,7 +311,7 @@ enum IMAState: Int, StateProtocol {
         case .TAPPED: self.notify(event: AdEvent.AdTapped())
         case .THIRD_QUARTILE: self.notify(event: AdEvent.AdThirdQuartile())
         // Only used for dynamic ad insertion (not officially supported)
-        case .AD_BREAK_ENDED, .AD_BREAK_STARTED, .CUEPOINTS_CHANGED, .STREAM_LOADED: break
+        case .AD_BREAK_ENDED, .AD_BREAK_STARTED, .CUEPOINTS_CHANGED, .STREAM_LOADED, .STREAM_STARTED: break
         }
     }
     
