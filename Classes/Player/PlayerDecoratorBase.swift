@@ -10,7 +10,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-@objc public class PlayerDecoratorBase: NSObject, Player {
+@objc open class PlayerDecoratorBase: NSObject, Player {
     
     fileprivate var player: Player!
     
@@ -52,7 +52,7 @@ import AVKit
         return self.player.currentTextTrack
     }
     
-    public var isPlaying: Bool {
+    open var isPlaying: Bool {
         return self.player.isPlaying
     }
     
@@ -68,7 +68,7 @@ import AVKit
         return self.player.rate
     }
     
-    public func prepare(_ config: MediaConfig) {
+    open func prepare(_ config: MediaConfig) {
         return self.player.prepare(config)
     }
     
@@ -84,11 +84,11 @@ import AVKit
         
     }
     
-    public func play() {
+    open func play() {
         self.player.play()
     }
     
-    public func pause() {
+    open func pause() {
         self.player.pause()
     }
     
@@ -102,11 +102,6 @@ import AVKit
     
     public func stop() {
         self.player.stop()
-    }
-    
-    @available(iOS 9.0, *)
-    public func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        return self.player.createPiPController(with: delegate)
     }
     
     public func updatePluginConfig(pluginName: String, config: Any) {
@@ -134,3 +129,16 @@ import AVKit
     }
 }
 
+/************************************************************/
+// MARK: - iOS Only
+/************************************************************/
+
+#if os(iOS)
+    extension PlayerDecoratorBase {
+        
+        @available(iOS 9.0, *)
+        public func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+            return self.player.createPiPController(with: delegate)
+        }
+    }
+#endif

@@ -78,7 +78,11 @@ import AVFoundation
     
     class SourceSelected: PlayerEvent {
         convenience init(contentURL: URL?) {
-            self.init([EventDataKeys.contentURL: contentURL])
+            guard let url = contentURL  else {
+                self.init()
+                return
+            }
+            self.init([EventDataKeys.contentURL: url])
         }
     }
     

@@ -24,7 +24,7 @@ class AVPlayerEngine: AVPlayer {
         "hasProtectedContent"
     ]
     
-    private var playerLayer: AVPlayerLayer
+    fileprivate var playerLayer: AVPlayerLayer
     private var _view: PlayerView
     private var isDestroyed: Bool = false
 
@@ -215,12 +215,7 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    @available(iOS 9.0, *)
-    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        let pip = AVPictureInPictureController(playerLayer: playerLayer)
-        pip?.delegate = delegate
-        return pip
-    }
+    
     
     public func selectTrack(trackId: String) {
         if trackId.isEmpty == false {
@@ -241,6 +236,22 @@ class AVPlayerEngine: AVPlayer {
         self.post(event: stateChangedEvent)
     }
 }
+
+/************************************************************/
+// MARK: - iOS Only
+/************************************************************/
+
+#if os(iOS)
+    extension AVPlayerEngine {
+        
+        @available(iOS 9.0, *)
+        func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+            let pip = AVPictureInPictureController(playerLayer: playerLayer)
+            pip?.delegate = delegate
+            return pip
+        }
+    }
+#endif
 
 /************************************************************/
 // MARK: - App State Handling

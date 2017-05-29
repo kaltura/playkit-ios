@@ -92,12 +92,15 @@ import AVKit
     /// Update Plugin Config
     @objc func updatePluginConfig(pluginName: String, config: Any)
     
+    #if os(iOS)
     /// Create PiP Controller
     @available(iOS 9.0, *)
     @objc func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
+    #endif
 }
 
 public protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
+
 

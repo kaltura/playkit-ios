@@ -17,7 +17,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     weak var delegate: PlayerDelegate?
     
     fileprivate var currentPlayer: AVPlayerEngine
-
+    
     /// the asset to prepare and pass to the player engine to start buffering.
     private var assetToPrepare: AVURLAsset?
     /// the current selected media source
@@ -26,6 +26,8 @@ class PlayerController: NSObject, Player, PlayerSettings {
     fileprivate var assetHandler: AssetHandler?
     /// the current media config that was set
     private var mediaConfig: MediaConfig?
+    /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
+    private let prepareSemaphore = DispatchSemaphore(value: 0)
     
     var contentRequestAdapter: PKRequestParamsAdapter?
     
@@ -44,7 +46,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     public var isPlaying: Bool {
         return self.currentPlayer.isPlaying
     }
-
+    
     public var currentTime: TimeInterval {
         get { return self.currentPlayer.currentPosition }
         set { self.currentPlayer.currentPosition = newValue }
@@ -76,7 +78,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     public override init() {
         self.currentPlayer = AVPlayerEngine()
         super.init()
-
+        
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.trace("postEvent:: \(event)")
             self?.onEventBlock?(event)
@@ -105,17 +107,25 @@ class PlayerController: NSObject, Player, PlayerSettings {
             if let assetToPrepare = asset {
                 self.assetToPrepare = assetToPrepare
             }
+            // send signal when assetToPrepare is set
+            self.prepareSemaphore.signal()
         }
     }
     
     func prepare(_ config: MediaConfig) {
-        guard let assetToPrepare = self.assetToPrepare else { return }
-        if let startTime = self.mediaConfig?.startTime {
-            self.currentPlayer.startPosition = startTime
-        }
-        self.currentPlayer.asset = assetToPrepare
-        if DRMSupport.widevineClassicHandler != nil {
-            self.addAssetRefreshObservers()
+        // set background thread to make sure main thread is not stuck while waiting
+        DispatchQueue.global().async {
+            // wait till assetToPrepare is set
+            self.prepareSemaphore.wait()
+            
+            guard let assetToPrepare = self.assetToPrepare else { return }
+            if let startTime = self.mediaConfig?.startTime {
+                self.currentPlayer.startPosition = startTime
+            }
+            self.currentPlayer.asset = assetToPrepare
+            if DRMSupport.widevineClassicHandler != nil {
+                self.addAssetRefreshObservers()
+            }
         }
     }
     
@@ -139,10 +149,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
         self.currentPlayer.currentPosition = CMTimeGetSeconds(time)
     }
     
-    @available(iOS 9.0, *)
-    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        return self.currentPlayer.createPiPController(with: delegate)
-    }
+    
     
     func destroy() {
         self.currentPlayer.destroy()
@@ -173,6 +180,20 @@ class PlayerController: NSObject, Player, PlayerSettings {
         //Assert.shouldNeverHappen();
     }
 }
+
+/************************************************************/
+// MARK: - iOS Only
+/************************************************************/
+
+#if os(iOS)
+    extension PlayerController {
+        
+        @available(iOS 9.0, *)
+        func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+            return self.currentPlayer.createPiPController(with: delegate)
+        }
+    }
+#endif
 
 /************************************************************/
 // MARK: - Private
@@ -214,7 +235,7 @@ extension PlayerController {
     private func refreshAsset() {
         guard let preferredMediaSource = self.preferredMediaSource,
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
-
+        
         self.currentPlayer.startPosition = self.currentPlayer.currentPosition
         refreshableHandler.refreshAsset(mediaSource: preferredMediaSource)
     }
