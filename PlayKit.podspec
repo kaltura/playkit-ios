@@ -27,7 +27,7 @@ s.subspec 'IMAPlugin' do |ssp|
         'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
     }
     ssp.dependency 'PlayKit/Core'
-    ssp.dependency 'GoogleAds-IMA-iOS-SDK', '3.4.1'
+    ssp.dependency 'GoogleAds-IMA-iOS-SDK', '3.5.2'
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
