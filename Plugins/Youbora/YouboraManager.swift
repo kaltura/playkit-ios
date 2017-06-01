@@ -77,8 +77,6 @@ extension YouboraManager {
     }
     
     override func getResource() -> String! {
-        // TODO: make sure to expose player content url and use it here instead of id
-        // will be added when we will have the relevant data, currently only a placeholder
         return self.lastReportedResource ?? super.getResource()
     }
     
@@ -164,7 +162,7 @@ extension YouboraManager {
                     // play handler to start when asset starts loading.
                     // this point is the closest point to prepare call.
                     strongSelf.playHandler()
-                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                    strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.stopped:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
@@ -172,13 +170,13 @@ extension YouboraManager {
                     // we must call `endedHandler()` when stopped so youbora will know player stopped playing content.
                     strongSelf.adnalyzer?.endedAdHandler()
                     strongSelf.endedHandler()
-                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                    strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.pause:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     strongSelf.pauseHandler()
-                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                    strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.playing:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
@@ -190,19 +188,19 @@ extension YouboraManager {
                     } else {
                         strongSelf.resumeHandler()
                     }
-                    strongSelf.postEventLogWithMessage(message: "\(String(describing: type(of: event)))")
+                    strongSelf.postEventLog(withMessage: "\(String(describing: event.namespace)))")
                 }
             case let e where e.self == PlayerEvent.seeking:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     strongSelf.seekingHandler()
-                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                    strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.seeked:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     strongSelf.seekedHandler()
-                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                    strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.ended:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
@@ -210,27 +208,27 @@ extension YouboraManager {
                     if !strongSelf.shouldDelayEndedHandler {
                         strongSelf.endedHandler()
                     }
-                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                    strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.playbackInfo:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     strongSelf.playbackInfo = event.playbackInfo
-                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                    strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.stateChanged:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     if event.newState == .buffering {
                         strongSelf.bufferingHandler()
-                        strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                        strongSelf.postEventLog(withMessage: "\(event.namespace)")
                     }
                 }
             case let e where e.self == PlayerEvent.sourceSelected:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     self?.lastReportedResource = event.contentURL?.absoluteString
-                    strongSelf.postEventLogWithMessage(message: "\(type(of: event))")
+                    strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.error:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
@@ -288,7 +286,7 @@ extension YouboraManager {
 
 extension YouboraManager {
     
-    fileprivate func postEventLogWithMessage(message: String) {
+    fileprivate func postEventLog(withMessage message: String) {
         let eventLog = YouboraEvent.Report(message: message)
         self.messageBus?.post(eventLog)
     }
