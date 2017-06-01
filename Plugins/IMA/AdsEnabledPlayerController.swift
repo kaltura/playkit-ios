@@ -124,7 +124,7 @@ class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPl
         return self.delegate!.playerShouldPlayAd(self)
     }
     
-    var adsPluginStartTime: TimeInterval {
+    var playAdsAfterTime: TimeInterval {
         return self.prepareMediaConfig?.startTime ?? 0
     }
     
