@@ -73,6 +73,24 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
                     callback(WidevineClassicError.missingWidevineFile.asNSError)
                     PKLog.error("Widevine file not found")
                     break
+                case KCDMEvent_AssetCanPlay:
+                    PKLog.info("KCDMEvent_AssetCanPlay")
+                    break
+                case KCDMEvent_AssetStopped:
+                PKLog.info("KCDMEvent_AssetStopped")
+                    break
+                case KCDMEvent_AssetStatus:
+                PKLog.info("KCDMEvent_AssetStatus")
+                    break
+                case KCDMEvent_LicenseFailed:
+                    PKLog.info("KCDMEvent_LicenseFailed")
+                    break
+                case KCDMEvent_Unregistered:
+                    PKLog.info("KCDMEvent_Unregistered")
+                    break
+                case KCDMEvent_Null:
+                    PKLog.info("KCDMEvent_Null")
+                    break
                 default:
                     PKLog.debug("event::", event)
                 }

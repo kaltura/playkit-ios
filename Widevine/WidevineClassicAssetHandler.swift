@@ -44,7 +44,7 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
             return
         }
         
-        guard let licenseUri = mediaSource.drmData?.first?.licenseUri else {
+        guard (mediaSource.drmData?.first?.licenseUri) != nil else {
             PKLog.error("Missing licenseUri")
             refreshCallback(false)
             return
@@ -100,7 +100,6 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         
         if let localSource = mediaSource as? LocalMediaSource {
             PKLog.debug("Creating local asset")
-            let asset = AVURLAsset(url: contentUrl)
 
             WidevineClassicHelper.playLocalAsset(localSource.contentUrl?.absoluteString) { (_ playbackURL:String?) in
                 guard let playbackURL = playbackURL else {
