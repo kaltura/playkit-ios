@@ -16,7 +16,7 @@ internal class BookmarkService {
                                    partnerId: Int,
                                    ks: String,
                                    eventType: String,
-                                   currentTime: Int32,
+                                   currentTime: Int64,
                                    assetId: String,
                                    fileId: String) -> KalturaRequestBuilder? {
         
@@ -32,7 +32,7 @@ internal class BookmarkService {
         }
     }
 
-    private static func createBookmark(eventType: String, position: Int32, assetId: String, fileId: String) -> JSON {
+    private static func createBookmark(eventType: String, position: Int64, assetId: String, fileId: String) -> JSON {
         var json: JSON = JSON.init(["objectType": "KalturaBookmark"])
         json["type"] = JSON("media")
         json["id"] = JSON(assetId)

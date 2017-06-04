@@ -50,14 +50,14 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
             return nil
         }
         
-        guard let requestBuilder: KalturaRequestBuilder = BookmarkService.actionAdd(baseURL: baseUrl,
-                                                                          partnerId: parterId,
-                                                                          ks: ks,
-                                                                          eventType: type.rawValue.uppercased(),
-                                                                          currentTime: player.currentTime.toInt32(),
-                                                                          assetId: mediaEntry.id,
-                                                                          fileId: fileId) else {
-            return nil
+        guard let requestBuilder = BookmarkService.actionAdd(baseURL: baseUrl,
+                                                             partnerId: parterId,
+                                                             ks: ks,
+                                                             eventType: type.rawValue.uppercased(),
+                                                             currentTime: player.currentTime.epoch,
+                                                             assetId: mediaEntry.id, // position should be sent in ms.
+                                                             fileId: fileId) else {
+                                                                return nil
         }
         
         requestBuilder.set { (response: Response) in
