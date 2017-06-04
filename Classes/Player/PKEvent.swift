@@ -16,6 +16,20 @@ import AVFoundation
     
     @objc public required init(_ data: [String: Any]? = nil) {
         self.data = data
+        super.init()
+        self.namespace = self.getEventNamespace()
+    }
+    
+    private(set) var namespace: String = ""
+    
+    private func getEventNamespace() -> String {
+        var namespace = ""
+        var mirror: Mirror? = Mirror(reflecting: self)
+        while let m = mirror, m.subjectType != PKEvent.self && m.subjectType != NSObject.self {
+            namespace = namespace == "" ? String(describing: m.subjectType) : "\(String(describing: m.subjectType))." + namespace
+            mirror = m.superclassMirror
+        }
+        return namespace
     }
 }
 
