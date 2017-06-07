@@ -166,7 +166,7 @@ class OTTAnalyticsPluginTest: QuickSpec {
                     }
                 }
                 
-                it("can test event handling") {
+                it("tests event handling") {
                     print("request: \(String(describing: phoenixPluginMock.buildRequest(ofType: .play)))")
                     phoenixPluginMock.onAnalyticsEvent = onAnalyticsEvent
                     tvpapiPluginMock.onAnalyticsEvent = onAnalyticsEvent
@@ -177,7 +177,7 @@ class OTTAnalyticsPluginTest: QuickSpec {
                 }
             }
             context("termination observation") {
-                it("test app state termination observation with finish event") {
+                it("tests app state termination observation with finish event") {
                     AppStateSubjectMock.shared.add(observer: phoenixPluginMock)
                     AppStateSubjectMock.shared.add(observer: tvpapiPluginMock)
                     let onTerminate: (MockableOTTAnalyticsPluginProtocol) -> Void = { analyticsPluginMock in
