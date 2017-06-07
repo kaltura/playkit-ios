@@ -8,11 +8,11 @@
 
 import Foundation
 
-protocol IntRawRepresentable: RawRepresentable {
+public protocol IntRawRepresentable: RawRepresentable {
     var rawValue: Int { get }
 }
 
-protocol StateProtocol: IntRawRepresentable, Hashable {}
+public protocol StateProtocol: IntRawRepresentable, Hashable {}
 
 extension StateProtocol {
     var hashValue: Int {
@@ -20,7 +20,7 @@ extension StateProtocol {
     }
 }
 
-class BasicStateMachine<T: StateProtocol> {
+public class BasicStateMachine<T: StateProtocol> {
     /// the current state.
     private var state: T
     /// the queue to make changes and fetches on.
@@ -32,7 +32,7 @@ class BasicStateMachine<T: StateProtocol> {
     /// a block to perform on every state changing (performed on the main queue).
     var onStateChange: ((T) -> Void)?
     
-    init(initialState: T, allowTransitionToInitialState: Bool = true) {
+    public init(initialState: T, allowTransitionToInitialState: Bool = true) {
         self.state = initialState
         self.initialState = initialState
         self.allowTransitionToInitialState = allowTransitionToInitialState
@@ -40,14 +40,14 @@ class BasicStateMachine<T: StateProtocol> {
     }
     
     /// gets the current state.
-    func getState() -> T {
+    public func getState() -> T {
         return self.dispatchQueue.sync {
             return self.state
         }
     }
     
     /// sets the state to a new value.
-    func set(state: T) {
+    public func set(state: T) {
         self.dispatchQueue.sync {
             if state == self.initialState && !self.allowTransitionToInitialState {
                 PKLog.error("\(String(describing: type(of: self))) was set to initial state, this is not allowed")
@@ -64,7 +64,7 @@ class BasicStateMachine<T: StateProtocol> {
     }
     
     /// sets the state machine to the initial value.
-    func reset() {
+    public func reset() {
         dispatchQueue.sync {
             self.state = self.initialState
             DispatchQueue.main.async {
