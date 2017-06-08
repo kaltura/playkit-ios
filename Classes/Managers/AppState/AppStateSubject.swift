@@ -157,7 +157,7 @@ public typealias ObservationName = Notification.Name // used as typealias in cas
 
 /// represents a single observation with observation name as the type, and a block to perform when observing.
 public struct NotificationObservation: Hashable {
-    public init(name: ObservationName,  onObserve: @escaping () -> Void) {
+    public init(name: ObservationName, onObserve: @escaping () -> Void) {
         self.name = name
         self.onObserve = onObserve
     }
