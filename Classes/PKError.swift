@@ -19,6 +19,7 @@ enum PlayerError: PKError {
     case failedToLoadAssetFromKeys(rootError: NSError?)
     case assetNotPlayable
     case playerItemFailed(rootError: NSError)
+    case failed(rootError: NSError)
     
     static let domain = "com.kaltura.playkit.error.player"
     
@@ -27,6 +28,7 @@ enum PlayerError: PKError {
         case .failedToLoadAssetFromKeys: return PKErrorCode.failedToLoadAssetFromKeys
         case .assetNotPlayable: return PKErrorCode.assetNotPlayable
         case .playerItemFailed: return PKErrorCode.playerItemFailed
+        case .failed: return PKErrorCode.playerFailed
         }
     }
     
@@ -35,6 +37,7 @@ enum PlayerError: PKError {
         case .failedToLoadAssetFromKeys: return "Can't use this AVAsset because one of it's keys failed to load"
         case .assetNotPlayable: return "Can't use this AVAsset because it isn't playable"
         case .playerItemFailed: return "Player item failed to play"
+        case .failed: return "Player failed, you can no longer use the player for playback and need to recreate it"
         }
     }
     
@@ -47,6 +50,7 @@ enum PlayerError: PKError {
             return [:]
         case .assetNotPlayable: return [:]
         case .playerItemFailed(let rootError): return [PKErrorKeys.RootErrorKey: rootError]
+        case .failed(let rootError): return [PKErrorKeys.RootErrorKey: rootError]
         }
     }
 }
@@ -237,6 +241,7 @@ struct PKErrorKeys {
     @objc(FailedToLoadAssetFromKeys) public static let failedToLoadAssetFromKeys = 7000
     @objc(AssetNotPlayable) public static let assetNotPlayable = 7001
     @objc(PlayerItemFailed) public static let playerItemFailed = 7002
+    @objc(PlayerFailed) public static let playerFailed = 7003
     // PlayerErrorLog
     @objc(PlayerItemErrorLogEvent) public static let playerItemErrorLogEvent = 7100
     // PKPluginError
