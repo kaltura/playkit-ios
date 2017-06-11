@@ -8,6 +8,13 @@
 
 import UIKit
 
+extension Bundle {
+    /// returns the app display name from info.plist
+    var displayName: String {
+        return (object(forInfoDictionaryKey: "CFBundleDisplayName") as? String) ?? ""
+    }
+}
+
 /**
  Manager class used for:
   - creating `Player` objects.
