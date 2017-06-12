@@ -32,7 +32,7 @@ enum PluginTestConfiguration {
             "fileId": "464302",
             "baseUrl": "http://tvpapi-preprod.ott.kaltura.com/v3_9/gateways/jsonpostgw.aspx?",
             "timerInterval":30,
-            "initObj": ""
+            "initObj": ["": ""]
             ]
         case .Phoenix: return [
             "fileId": "464302",
