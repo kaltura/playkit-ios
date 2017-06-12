@@ -24,7 +24,7 @@ class KalturaPlaybackRequestAdapter: PKRequestParamsAdapter {
         let queryItems = [
             URLQueryItem(name: "playSessionId", value: sessionId),
             URLQueryItem(name: "clientTag", value: PlayKitManager.clientTag),
-            URLQueryItem(name: "referrer", value: Bundle.main.displayName.data(using: .utf8)?.base64EncodedString() ?? "")
+            URLQueryItem(name: "referrer", value: Bundle.main.bundleIdentifier?.data(using: .utf8)?.base64EncodedString() ?? "")
         ]
         if var urlQueryItems = urlComponents.queryItems {
             urlQueryItems += queryItems
