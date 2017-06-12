@@ -27,7 +27,7 @@ class PhoenixPluginTest: QuickSpec {
     /************************************************************/
     
     override func spec() {
-        describe("phoenix request builder test") {
+        describe("PhoenixPluginTest") {
             var player: PlayerLoader!
             var phoenixPluginMock: PhoenixPluginTest.PhoenixAnalyticsPluginMock!
             
@@ -42,7 +42,13 @@ class PhoenixPluginTest: QuickSpec {
             }
             
             it("can build play event request") {
+                let expectedDataBody = "{\"clientTag\":\"java:16-09-10\",\"apiVersion\":\"3.6.1078.11798\",\"bookmark\":{\"position\":0,\"objectType\":\"KalturaBookmark\",\"type\":\"media\",\"id\":\"test\",\"playerData\":{\"fileId\":\"464302\",\"action\":\"PLAY\",\"objectType\":\"KalturaBookmarkPlayerData\"}},\"ks\":\"\"}".data(using: .utf8)
+                let expectedUrl = "http://api-preprod.ott.kaltura.com/v4_1/api_v3//service/bookmark/action/add"
+                
                 let request = phoenixPluginMock.buildRequest(ofType: .play)
+                
+                expect(expectedUrl).to(equal(request?.url.absoluteString))
+                expect(expectedDataBody).to(equal(request?.dataBody))
             }
         }
     }

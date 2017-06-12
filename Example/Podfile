@@ -16,7 +16,7 @@ abstract_target 'PlayKit' do
     
     target 'PlayKit_Tests' do
         pod 'Quick', '1.1.0'
-        pod 'Nimble', '6.0.1'
+        pod 'Nimble', '7.0.1'
     end
     
 end

@@ -37,7 +37,6 @@ enum PluginTestConfiguration {
         case .Phoenix: return [
             "fileId": "464302",
             "baseUrl": "http://api-preprod.ott.kaltura.com/v4_1/api_v3/",
-            "ks": "djJ8MTk4fL1W9Rs4udDqNt_CpUT9dJKk1laPk9_XnBtUaq7PXVcVPYrXz2shTbKSW1G5Lhn_Hvbbnh0snheANOmSodl7Puowxhk2WYkpmNugi9vNAg5C",
             "partnerId": 198,
             "timerInterval": 30
             ]

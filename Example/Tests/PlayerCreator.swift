@@ -55,10 +55,10 @@ extension PlayerCreator {
     }
     
     func destroyPlayer(_ player: Player!) {
-        player.stop()
-        player.destroy()
-        var p = player
-        p = nil
+        var player = player
+        player?.stop()
+        player?.destroy()
+        player = nil
     }
 }
 
