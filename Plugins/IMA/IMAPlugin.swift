@@ -169,7 +169,6 @@ enum IMAState: Int, StateProtocol {
         self.requestTimeoutTimer = Timer.after(self.requestTimeoutInterval) { [unowned self] in
             if self.adsManager == nil {
                 PKLog.debug("Ads request timed out")
-    
                 switch self.stateMachine.getState() {
                 case .adsRequested: self.delegate?.adsRequestTimedOut(shouldPlay: false)
                 case .adsRequestedAndPlay: self.delegate?.adsRequestTimedOut(shouldPlay: true)
@@ -302,13 +301,9 @@ enum IMAState: Int, StateProtocol {
         // Ad break, will be called before each scheduled ad break. Ad breaks may contain more than 1 ad.
         // `event.ad` is not available at this point do not use it here.
         case .AD_BREAK_READY:
-            if shouldDiscardAd() {
-                PKLog.debug("discard Ad Break")
-            } else {
-                self.notify(event: AdEvent.AdBreakReady())
-                guard canPlayAd(forState: currentState) else { return }
-                self.start(adsManager: adsManager)
-            }
+            self.notify(event: AdEvent.AdBreakReady())
+            guard canPlayAd(forState: currentState) else { return }
+            self.start(adsManager: adsManager)
         // single ad only fires `LOADED` without `AD_BREAK_READY`.
         case .LOADED:
             if shouldDiscard(ad: event.ad, currentState: currentState) {
@@ -405,6 +400,9 @@ enum IMAState: Int, StateProtocol {
         if let mimeTypes = self.config?.videoMimeTypes {
             self.renderingSettings.mimeTypes = mimeTypes
         }
+        if let playAdsAfterTime = self.dataSource?.playAdsAfterTime {
+            self.renderingSettings.playAdsAfterTime = playAdsAfterTime
+        }
     }
     
     private func notify(event: AdEvent) {
@@ -452,18 +450,10 @@ enum IMAState: Int, StateProtocol {
         return false
     }
     
-    private func shouldDiscardAd() -> Bool {
-        if self.currentTime < self.dataSource?.adsPluginStartTime ?? 0 {
-            return true
-        }
-        return false
-    }
-    
     private func shouldDiscard(ad: IMAAd, currentState: IMAState) -> Bool {
         let adInfo = PKAdInfo(ad: ad)
-        let isStartTimeInvalid = adInfo.positionType != .postRoll && adInfo.timeOffset < self.dataSource?.adsPluginStartTime ?? 0
         let isPreRollInvalid = adInfo.positionType == .preRoll && (currentState == .adsRequestTimedOut || currentState == .contentPlaying)
-        if isStartTimeInvalid || isPreRollInvalid {
+        if isPreRollInvalid {
             return true
         }
         return false
