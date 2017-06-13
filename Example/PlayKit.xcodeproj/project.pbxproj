@@ -13,6 +13,7 @@
 		2012AFB41E4B872300BBA61C /* PlayerCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFB31E4B872300BBA61C /* PlayerCreator.swift */; };
 		20ADCFB11EE983A900B01019 /* KalturaRequestBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20ADCFB01EE983A900B01019 /* KalturaRequestBuilderTest.swift */; };
 		20C02A321EEE90EC00F83B44 /* TVPAPIPluginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C02A311EEE90EC00F83B44 /* TVPAPIPluginTest.swift */; };
+		20C02A351EEEC17400F83B44 /* AssetBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C02A341EEEC17400F83B44 /* AssetBuilderTest.swift */; };
 		20CD64591E4C9697002C9401 /* PluginTestConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CD64581E4C9697002C9401 /* PluginTestConfiguration.swift */; };
 		49AD556D5A90D82F391750B8 /* Pods_PlayKit_PlayKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BF84E8D861C5637BA8624EE /* Pods_PlayKit_PlayKit_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
@@ -50,6 +51,7 @@
 		2012AFB31E4B872300BBA61C /* PlayerCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerCreator.swift; sourceTree = "<group>"; };
 		20ADCFB01EE983A900B01019 /* KalturaRequestBuilderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KalturaRequestBuilderTest.swift; path = RequestBuilder/KalturaRequestBuilderTest.swift; sourceTree = "<group>"; };
 		20C02A311EEE90EC00F83B44 /* TVPAPIPluginTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TVPAPIPluginTest.swift; path = TVPAPI/TVPAPIPluginTest.swift; sourceTree = "<group>"; };
+		20C02A341EEEC17400F83B44 /* AssetBuilderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AssetBuilderTest.swift; path = Player/AssetBuilderTest.swift; sourceTree = "<group>"; };
 		20CD64581E4C9697002C9401 /* PluginTestConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PluginTestConfiguration.swift; sourceTree = "<group>"; };
 		347179E45954932C0B17A1AF /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		349AFD3D2D9F85463A6A0F41 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -150,6 +152,14 @@
 			name = TVPAPI;
 			sourceTree = "<group>";
 		};
+		20C02A331EEEC13000F83B44 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				20C02A341EEEC17400F83B44 /* AssetBuilderTest.swift */,
+			);
+			name = Player;
+			sourceTree = "<group>";
+		};
 		20CD64571E4C9697002C9401 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
@@ -205,6 +215,7 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				20C02A331EEEC13000F83B44 /* Player */,
 				2012AFB31E4B872300BBA61C /* PlayerCreator.swift */,
 				20CD64571E4C9697002C9401 /* Helpers */,
 				2012AFAD1E4B85CA00BBA61C /* Analytics */,
@@ -503,6 +514,7 @@
 				20C02A321EEE90EC00F83B44 /* TVPAPIPluginTest.swift in Sources */,
 				2012AFB21E4B860B00BBA61C /* PhoenixPluginTest.swift in Sources */,
 				BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */,
+				20C02A351EEEC17400F83B44 /* AssetBuilderTest.swift in Sources */,
 				2012AFB41E4B872300BBA61C /* PlayerCreator.swift in Sources */,
 				C23A62D21DF4140B00635FA2 /* PhoenixMediaProviderTest.swift in Sources */,
 				2012AFAF1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift in Sources */,
