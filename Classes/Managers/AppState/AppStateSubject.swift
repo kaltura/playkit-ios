@@ -48,7 +48,7 @@ extension AppStateSubjectProtocol {
     }
     
     /// Adds an observer to inform when state events are posted.
-    func add(observer: AppStateObservable) {
+    public func add(observer: AppStateObservable) {
         sync {
             cleanObservers()
             PKLog.trace("add observer, \(observer)")
@@ -61,7 +61,7 @@ extension AppStateSubjectProtocol {
     }
     
     /// Removes an observer to stop being inform when state events are posted.
-    func remove(observer: AppStateObservable) {
+    public func remove(observer: AppStateObservable) {
         sync {
             cleanObservers()
             // search for the observer to remove
@@ -132,10 +132,10 @@ extension AppStateSubjectProtocol {
 ///
 /// **For Unit-Testing:** When mocking this object just conform to the `AppStateSubjectProtocol`.
 /// For firing events to observers manually use `appStateEventPosted(name: ObservationName)` with the observation name.
-final class AppStateSubject: AppStateSubjectProtocol {
+public final class AppStateSubject: AppStateSubjectProtocol {
     
     // singleton object and private init to prevent unwanted creation of more objects.
-    static let shared = AppStateSubject()
+    public static let shared = AppStateSubject()
     private init() {
         self.appStateProvider = AppStateProvider()
         self.appStateProvider.delegate = self
@@ -153,19 +153,23 @@ final class AppStateSubject: AppStateSubjectProtocol {
 /************************************************************/
 
 /// Used to specify observation name
-typealias ObservationName = Notification.Name // used as typealias in case we will change type in the future.
+public typealias ObservationName = Notification.Name // used as typealias in case we will change type in the future.
 
 /// represents a single observation with observation name as the type, and a block to perform when observing.
-struct NotificationObservation: Hashable {
-    var name: ObservationName
-    var onObserve: () -> Void
+public struct NotificationObservation: Hashable {
+    public init(name: ObservationName, onObserve: @escaping () -> Void) {
+        self.name = name
+        self.onObserve = onObserve
+    }
+    public var name: ObservationName
+    public var onObserve: () -> Void
     
-    var hashValue: Int {
+    public var hashValue: Int {
         return name.rawValue.hash
     }
 }
 
-func == (lhs: NotificationObservation, rhs: NotificationObservation) -> Bool {
+public func == (lhs: NotificationObservation, rhs: NotificationObservation) -> Bool {
     return lhs.name.rawValue == rhs.name.rawValue
 }
 
@@ -178,6 +182,6 @@ class AppStateObserver: AnyObject {
 
 /// A type that provides a set of NotificationObservation to observe.
 /// This interface defines the observations we would want in our class, for example a set of [willTerminate, didEnterBackground etc.]
-protocol AppStateObservable: AnyObject {
+public protocol AppStateObservable: AnyObject {
     var observations: Set<NotificationObservation> { get }
 }
