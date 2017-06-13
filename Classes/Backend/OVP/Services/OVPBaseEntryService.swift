@@ -56,7 +56,7 @@ class OVPBaseEntryService {
     
     internal static func getPlaybackContext(baseURL: String, ks: String, entryID: String) -> KalturaRequestBuilder? {
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "baseEntry", action: "getPlaybackContext") {
-            let contextData:[String:Any] = ["objectType":"KalturaContextDataParams"]
+            let contextData:[String:Any] = ["flavorTags":"all", "objectType":"KalturaContextDataParams"]
             request.setBody(key: "ks", value: JSON(ks))
                 .setBody(key: "entryId", value: JSON(entryID))
                 .setBody(key: "contextDataParams", value: JSON(contextData))
