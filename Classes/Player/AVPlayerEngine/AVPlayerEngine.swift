@@ -24,8 +24,10 @@ class AVPlayerEngine: AVPlayer {
         "hasProtectedContent"
     ]
     
-    fileprivate var playerLayer: AVPlayerLayer!
-    private var _view: PlayerView!
+    fileprivate var playerLayer: AVPlayerLayer? {
+        return view?.playerLayer
+    }
+    
     private var isDestroyed: Bool = false
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
@@ -41,9 +43,10 @@ class AVPlayerEngine: AVPlayer {
     
     public var onEventBlock: ((PKEvent) -> Void)?
     
-    public var view: PlayerView! {
-        PKLog.trace("get player view: \(_view)")
-        return _view
+    public weak var view: PlayerView? {
+        didSet {
+            view?.player = self
+        }
     }
     
     public var asset: AVURLAsset? {
@@ -145,20 +148,9 @@ class AVPlayerEngine: AVPlayer {
     
     public override init() {
         PKLog.info("init AVPlayer")
-        
         self.startPosition = 0
-        
-        // create player view and assign player layer
-        self._view = PlayerView()
-        self.playerLayer = _view.layer as! AVPlayerLayer
-        
         super.init()
-        
-        // connect player engine to the player layer to output the video
-        _view.player = self
-        
         self.onEventBlock = nil
-        
         AppStateSubject.shared.add(observer: self)
     }
     
@@ -206,8 +198,6 @@ class AVPlayerEngine: AVPlayer {
         DispatchQueue.main.async {
             PKLog.info("destroy player")
             self.removeObservers()
-            self.playerLayer = nil
-            self._view = nil
             self.onEventBlock = nil
             // removes app state observer
             AppStateSubject.shared.remove(observer: self)
@@ -247,6 +237,7 @@ class AVPlayerEngine: AVPlayer {
         
         @available(iOS 9.0, *)
         func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+            guard let playerLayer = self.playerLayer else { return nil }
             let pip = AVPictureInPictureController(playerLayer: playerLayer)
             pip?.delegate = delegate
             return pip

@@ -56,8 +56,13 @@ import AVKit
         return self.player.isPlaying
     }
     
-    public var view: PlayerView! {
-        return self.player.view
+    public weak var view: PlayerView? {
+        get {
+            return self.player.view
+        }
+        set {
+            self.player.view = newValue
+        }
     }
     
     public var sessionId: String {

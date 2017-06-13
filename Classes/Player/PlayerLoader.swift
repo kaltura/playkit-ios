@@ -27,8 +27,8 @@ class PlayerLoader: PlayerDecoratorBase {
         var playerController: PlayerController
         
         playerController = PlayerController()
-        playerController.onEventBlock = { [unowned self] event in
-            self.messageBus.post(event)
+        playerController.onEventBlock = { [weak self] event in
+            self?.messageBus.post(event)
         }
         
         self.concreatePlayerController = playerController
