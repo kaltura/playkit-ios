@@ -56,7 +56,7 @@ import AVKit
         return self.player.isPlaying
     }
     
-    public var view: PlayerView {
+    public var view: PlayerView! {
         return self.player.view
     }
     

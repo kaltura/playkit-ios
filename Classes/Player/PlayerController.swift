@@ -60,7 +60,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
         return self.currentPlayer.currentTextTrack
     }
     
-    public var view: PlayerView {
+    public var view: PlayerView! {
         return self.currentPlayer.view
     }
     
