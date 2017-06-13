@@ -55,8 +55,8 @@ import AVKit
     open var isPlaying: Bool {
         return self.player.isPlaying
     }
-    
-    open var view: PlayerView {
+
+    public var view: PlayerView! {
         return self.player.view
     }
     
