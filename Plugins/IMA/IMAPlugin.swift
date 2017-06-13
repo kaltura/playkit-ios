@@ -150,9 +150,9 @@ enum IMAState: Int, StateProtocol {
     }
     
     func requestAds() {
-        guard let player = self.player else { return }
+        guard let playerView = self.player?.view else { return }
         
-        let adDisplayContainer = IMAPlugin.createAdDisplayContainer(forView: player.view, withCompanionView: self.config.companionView)
+        let adDisplayContainer = IMAPlugin.createAdDisplayContainer(forView: playerView, withCompanionView: self.config.companionView)
         let request = IMAAdsRequest(adTagUrl: self.config.adTagUrl, adDisplayContainer: adDisplayContainer, contentPlayhead: self, userContext: nil)
         // sets the state
         self.stateMachine.set(state: .adsRequested)
