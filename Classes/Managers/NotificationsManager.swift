@@ -9,7 +9,7 @@
 import Foundation
 
 /// The `NotificationsManager` objects provides a mechanism for adding/removing observers within a program
-final class NotificationsManager {
+public final class NotificationsManager {
     
     let notificationCenter = NotificationCenter.default
     
