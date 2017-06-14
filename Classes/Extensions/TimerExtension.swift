@@ -9,7 +9,7 @@
 import Foundation
 
 // Timer extension to add block based timers without the need for Timer's selector.
-extension Timer {
+public extension Timer {
     
     /// Create a timer that will call `block` after interval once.
     class func after(_ interval: TimeInterval, _ block: @escaping () -> Void) -> Timer {

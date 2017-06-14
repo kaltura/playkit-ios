@@ -25,15 +25,15 @@ import Foundation
         self.messageBus = messageBus
     }
     
-    @objc public func onUpdateMedia(mediaConfig: MediaConfig) {
+    @objc open func onUpdateMedia(mediaConfig: MediaConfig) {
         PKLog.info("plugin \(type(of:self)) onUpdateMedia with media config: \(String(describing: mediaConfig))")
     }
     
-    @objc public func onUpdateConfig(pluginConfig: Any) {
+    @objc open func onUpdateConfig(pluginConfig: Any) {
         PKLog.info("plugin \(type(of:self)) onUpdateConfig with media config: \(String(describing: pluginConfig))")
     }
     
-    @objc public func destroy() {
+    @objc open func destroy() {
         PKLog.info("destroying plugin \(type(of:self))")
     }
 }

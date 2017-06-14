@@ -19,19 +19,6 @@ s.subspec 'Core' do |sp|
     sp.dependency 'KalturaNetKit', '~> 0.0'
 end
 
-s.subspec 'IMAPlugin' do |ssp|
-    ssp.ios.deployment_target = '8.0'
-    ssp.source_files = 'Plugins/IMA'
-    ssp.xcconfig = { 
-        'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
-        'OTHER_LDFLAGS' => '$(inherited) -framework "GoogleInteractiveMediaAds"',
-        'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
-        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
-    }
-    ssp.dependency 'PlayKit/Core'
-    ssp.dependency 'GoogleAds-IMA-iOS-SDK', '3.5.2'
-end
-
 s.subspec 'GoogleCastAddon' do |ssp|
     ssp.ios.deployment_target = '8.0'
     ssp.source_files = 'Addons/GoogleCast'

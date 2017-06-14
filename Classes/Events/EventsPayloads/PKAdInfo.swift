@@ -18,9 +18,13 @@ import Foundation
 /// `PKAdInfo` represents ad information.
 @objc public class PKAdInfo: NSObject {
     
-    @objc public var adDescription: String
     @objc public var duration: TimeInterval
     @objc public var title: String
+    /// The position of the pod in the content in seconds. Pre-roll returns 0,
+    /// post-roll returns -1 and mid-rolls return the scheduled time of the pod.
+    @objc public var timeOffset: TimeInterval
+    
+    @objc public var adDescription: String
     @objc public var isSkippable: Bool
     @objc public var contentType: String
     @objc public var adId: String
@@ -32,9 +36,6 @@ import Foundation
     @objc public var totalAds: Int
     /// The position of this ad within an ad pod. Will be 1 for standalone ads.
     @objc public var adPosition: Int
-    /// The position of the pod in the content in seconds. Pre-roll returns 0,
-    /// post-roll returns -1 and mid-rolls return the scheduled time of the pod.
-    @objc public var timeOffset: TimeInterval
     @objc public var isBumper: Bool
     // The index of the pod, where pre-roll pod is 0, mid-roll pods are 1 .. N
     // and the post-roll is -1.
@@ -51,7 +52,7 @@ import Foundation
         }
     }
     
-    init(adDescription: String,
+    public init(adDescription: String,
          adDuration: TimeInterval,
          title: String,
          isSkippable: Bool,
@@ -82,11 +83,3 @@ import Foundation
         self.podIndex = podIndex
     }
 }
-
-extension PKEvent {
-    /// Ad info, PKEvent Ad Data Accessor
-    @objc public var adInfo: PKAdInfo? {
-        return self.data?[AdEventDataKeys.adInfo] as? PKAdInfo
-    }
-}
-

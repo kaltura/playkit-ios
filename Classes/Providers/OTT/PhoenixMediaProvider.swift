@@ -59,9 +59,9 @@ public enum PhoenixMediaProviderError: PKError {
     /// in case the response data is empty
     case emptyResponse
 
-    static let domain = "com.kaltura.playkit.error.PhoenixMediaProvider"
+    public static let domain = "com.kaltura.playkit.error.PhoenixMediaProvider"
 
-    var code: Int {
+    public var code: Int {
         switch self {
         case .invalidInputParam: return 0
         case .unableToParseData: return 1
@@ -71,7 +71,7 @@ public enum PhoenixMediaProviderError: PKError {
         }
     }
 
-    var errorDescription: String {
+    public var errorDescription: String {
 
         switch self {
         case .invalidInputParam(let param): return "Invalid input param: \(param)"
@@ -82,7 +82,7 @@ public enum PhoenixMediaProviderError: PKError {
         }
     }
 
-    var userInfo: [String: Any] {
+    public var userInfo: [String: Any] {
         return [String: Any]()
     }
 

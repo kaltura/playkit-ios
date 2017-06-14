@@ -85,8 +85,8 @@ import AVKit
         return self.player
     }
     
-    public func destroy() {
-        
+    open func destroy() {
+        self.player.destroy()
     }
     
     open func play() {
@@ -97,15 +97,15 @@ import AVKit
         self.player.pause()
     }
     
-    public func seek(to time: CMTime) {
+    open func seek(to time: CMTime) {
         self.player.seek(to: time)
     }
     
-    public func resume() {
+    open func resume() {
         self.player.resume()
     }
     
-    public func stop() {
+    open func stop() {
         self.player.stop()
     }
     
@@ -142,7 +142,7 @@ import AVKit
     extension PlayerDecoratorBase {
         
         @available(iOS 9.0, *)
-        public func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+        open func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
             return self.player.createPiPController(with: delegate)
         }
     }
