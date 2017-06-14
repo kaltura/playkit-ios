@@ -9,7 +9,7 @@
 import Foundation
 
 /// The interface of `AppStateSubject`, allows us to better divide the logic and mock easier.
-protocol AppStateSubjectProtocol: class, AppStateProviderDelegate {
+public protocol AppStateSubjectProtocol: class, AppStateProviderDelegate {
     associatedtype InstanceType
     static var shared: InstanceType { get }
     /// Lock object for synchronizing access.
@@ -94,7 +94,7 @@ extension AppStateSubjectProtocol {
     // MARK: AppStateProviderDelegate
     /************************************************************/
     
-    func appStateEventPosted(name: ObservationName) {
+    public func appStateEventPosted(name: ObservationName) {
         sync {
             PKLog.trace("app state event posted with name: \(name.rawValue)")
             for appStateObserver in self.observers {
@@ -141,11 +141,11 @@ public final class AppStateSubject: AppStateSubjectProtocol {
         self.appStateProvider.delegate = self
     }
     
-    let lock: AnyObject = UUID().uuidString as AnyObject
+    public let lock: AnyObject = UUID().uuidString as AnyObject
     
-    var observers = [AppStateObserver]()
-    var appStateProvider: AppStateProvider
-    var isObserving = false
+    public var observers = [AppStateObserver]()
+    public var appStateProvider: AppStateProvider
+    public var isObserving = false
 }
 
 /************************************************************/
@@ -173,7 +173,7 @@ public func == (lhs: NotificationObservation, rhs: NotificationObservation) -> B
     return lhs.name.rawValue == rhs.name.rawValue
 }
 
-class AppStateObserver: AnyObject {
+public class AppStateObserver: AnyObject {
     weak var observer: AppStateObservable?
     init(_ observer: AppStateObservable) {
         self.observer = observer
