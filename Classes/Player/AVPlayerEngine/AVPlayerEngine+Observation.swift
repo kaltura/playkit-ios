@@ -119,21 +119,17 @@ extension AVPlayerEngine {
         case #keyPath(currentItem.playbackBufferEmpty): self.handleBufferEmptyChange()
         case #keyPath(rate): self.handleRate()
         case #keyPath(status):
-            let newStatus: AVPlayerStatus
-            if let newStatusAsNumber = change?[NSKeyValueChangeKey.newKey] as? NSNumber {
-                newStatus = AVPlayerStatus(rawValue: newStatusAsNumber.intValue)!
-            } else {
-                newStatus = .unknown
+            guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerStatus = AVPlayerStatus(rawValue: statusChange.intValue) else {
+                PKLog.error("unknown player status")
+                return
             }
-            self.handle(status: newStatus)
+            self.handle(status: newPlayerStatus)
         case #keyPath(currentItem.status):
-            let newStatus: AVPlayerItemStatus
-            if let newStatusAsNumber = change?[NSKeyValueChangeKey.newKey] as? NSNumber {
-                newStatus = AVPlayerItemStatus(rawValue: newStatusAsNumber.intValue)!
-            } else {
-                newStatus = .unknown
+            guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerItemStatus = AVPlayerItemStatus(rawValue: statusChange.intValue) else {
+                PKLog.error("unknown player item status")
+                return
             }
-            self.handle(playerItemStatus: newStatus)
+            self.handle(playerItemStatus: newPlayerItemStatus)
         case #keyPath(currentItem): self.handleItemChange()
         case #keyPath(currentItem.timedMetadata): self.handleTimedMedia()
         default: super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
