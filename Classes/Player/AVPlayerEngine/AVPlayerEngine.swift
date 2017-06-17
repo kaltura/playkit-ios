@@ -26,7 +26,6 @@ class AVPlayerEngine: AVPlayer {
     
     fileprivate var playerLayer: AVPlayerLayer!
     private var _view: PlayerView!
-    private var isDestroyed: Bool = false
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
     var lastTimebaseRate: Float64 = 0
