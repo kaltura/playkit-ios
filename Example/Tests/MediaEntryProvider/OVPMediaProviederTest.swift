@@ -7,20 +7,44 @@
 //
 
 import XCTest
-import PlayKit
+@testable import PlayKit
 import KalturaNetKit
+import Nimble
+import Quick
 
-class OVPMediaProviederTest: XCTestCase, SessionProvider {
+class OVPMediaProviederTest: QuickSpec, SessionProvider {
+    
+    /************************************************************/
+    // MARK: - Mocks
+    /************************************************************/
+    
+    fileprivate class RequestExecutorMock: RequestExecutor {
+        
+        let onRequestSend: (Request) -> Void
+        
+        init(onRequestSend: @escaping (Request) -> Void) {
+            self.onRequestSend = onRequestSend
+        }
+        
+        func send(request: Request) {
+            onRequestSend(request)
+        }
+        
+        func cancel(request: Request) {}
+        func clean() {}
+    }
+    
+    /************************************************************/
+    // MARK: - SessionProvider
+    /************************************************************/
     
     public func loadKS(completion: @escaping (String?, Error?) -> Void) {
         completion("", nil)
     }
-
+    
     let entryID = "1_ytsd86sc"
     var partnerId: Int64 = 2222401
     var serverURL: String  = "https://cdnapisec.kaltura.com"
-    
-
     
     override func setUp() {
         super.setUp()
@@ -30,50 +54,35 @@ class OVPMediaProviederTest: XCTestCase, SessionProvider {
         super.tearDown()
     }
     
-    /* test not working
-    func testRegularCaseTest() {
-        let theExeption = expectation(description: "test")
-        
-        let provider = OVPMediaProvider()
-        .set(sessionProvider: self)
-        .set(entryId: self.entryID)
-        .set(executor: MediaEntryProviderMockExecutor(entryID: entryID, domain: "ovp"))
-        
-        provider.loadMedia { (media, error) in
-            if (error != nil){
-                XCTFail()
-            }else{
-                theExeption.fulfill()
-            }
-           
-        }
-        
-        
-        self.waitForExpectations(timeout: 6.0) { (_) -> Void in
-            
-        }
-    }*/
+    /************************************************************/
+    // MARK: - Tests
+    /************************************************************/
     
-    func test_new_ovp_api() {
-        let theExeption = expectation(description: "test")
-        
-        let provider = OVPMediaProvider()
-            .set(sessionProvider: self)
-            .set(entryId: self.entryID)
-            .set(executor: USRExecutor.shared )
-        
-        
-        provider.loadMedia { (media, error) in
-            if (error != nil){
-                XCTFail()
-            }else{
-                theExeption.fulfill()
+    override func spec() {
+        describe("OVPMediaProviderTest") {
+            it("should make a request") {
+                let expectedUrl = URL(string: "https://cdnapisec.kaltura.com/api_v3/service/multirequest")!
+                let expectedBodyData = "{\"1\":{\"service\":\"session\",\"action\":\"startWidgetSession\",\"widgetId\":\"_2222401\"},\"2\":{\"responseProfile\":{\"fields\":\"mediaType,dataUrl,id,name,duration,msDuration,flavorParamsIds\",\"type\":1},\"action\":\"list\",\"filter\":{\"redirectFromEntryId\":\"1_ytsd86sc\"},\"service\":\"baseEntry\",\"ks\":\"{1:result:ks}\"},\"3\":{\"entryId\":\"1_ytsd86sc\",\"action\":\"getPlaybackContext\",\"service\":\"baseEntry\",\"contextDataParams\":{\"objectType\":\"KalturaContextDataParams\"},\"ks\":\"{1:result:ks}\"},\"4\":{\"filter:objectType\":\"KalturaMetadataFilter\",\"action\":\"list\",\"filter:metadataObjectTypeEqual\":\"1\",\"service\":\"metadata_metadata\",\"filter:objectIdEqual\":\"1_ytsd86sc\",\"ks\":\"{1:result:ks}\"},\"clientTag\":\"playkit\",\"format\":1,\"apiVersion\":\"3.3.0\"}".data(using: .utf8)
+                let expectedRequestMethod: RequestMethod = .post
+                let expectedHeaders = ["Content-Type": "application/json", "Accept": "application/json"]
+                
+                waitUntil(timeout: 10) { (done) in
+                    let mockExecutor = RequestExecutorMock { (request) in
+                        expect(expectedUrl).to(equal(request.url))
+                        expect(expectedRequestMethod).to(equal(request.method))
+                        expect(expectedBodyData).to(equal(request.dataBody))
+                        expect(expectedHeaders).to(equal(request.headers))
+                        done()
+                    }
+                    
+                    let provider = OVPMediaProvider()
+                        .set(sessionProvider: self)
+                        .set(entryId: self.entryID)
+                        .set(executor: mockExecutor)
+                    
+                    provider.loadMedia { (media, error) in }
+                }
             }
-        }
-        
-        
-        self.waitForExpectations(timeout: 6.0) { (_) -> Void in
-            
         }
     }
 }

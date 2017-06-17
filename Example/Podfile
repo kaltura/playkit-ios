@@ -5,7 +5,6 @@ source 'https://github.com/CocoaPods/Specs.git'
 abstract_target 'PlayKit' do
     
     pod 'PlayKit', :path => '../../playkit-ios'
-    pod 'PlayKit/IMAPlugin', :path => '../../playkit-ios'
     pod 'PlayKit/YouboraPlugin', :path => '../../playkit-ios'
     pod 'PlayKit/PhoenixPlugin', :path => '../../playkit-ios' 
     pod 'PlayKit/KalturaStatsPlugin', :path => '../../playkit-ios'
@@ -16,7 +15,7 @@ abstract_target 'PlayKit' do
     
     target 'PlayKit_Tests' do
         pod 'Quick', '1.1.0'
-        pod 'Nimble', '6.0.1'
+        pod 'Nimble', '7.0.1'
     end
     
 end

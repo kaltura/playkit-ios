@@ -107,7 +107,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     // MARK: - App State Handling
     /************************************************************/
     
-    var observations: Set<NotificationObservation> {
+    public var observations: Set<NotificationObservation> {
         return [
             NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
                 PKLog.debug("youbora plugin will terminate event received")

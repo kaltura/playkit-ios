@@ -24,8 +24,9 @@ class AVPlayerEngine: AVPlayer {
         "hasProtectedContent"
     ]
     
-    fileprivate var playerLayer: AVPlayerLayer
-    private var _view: PlayerView
+    fileprivate var playerLayer: AVPlayerLayer!
+    private var _view: PlayerView!
+    private var isDestroyed: Bool = false
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
     var lastTimebaseRate: Float64 = 0
@@ -40,7 +41,7 @@ class AVPlayerEngine: AVPlayer {
     
     public var onEventBlock: ((PKEvent) -> Void)?
     
-    public var view: PlayerView {
+    public var view: PlayerView! {
         PKLog.trace("get player view: \(_view)")
         return _view
     }
@@ -202,7 +203,8 @@ class AVPlayerEngine: AVPlayer {
         // this make sure everything will be cleared without any race conditions
         DispatchQueue.main.async {
             PKLog.info("destroy player")
-            self._view.removeFromSuperview()
+            self.playerLayer = nil
+            self._view = nil
             self.onEventBlock = nil
             // removes app state observer
             AppStateSubject.shared.remove(observer: self)

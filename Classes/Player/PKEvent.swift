@@ -34,7 +34,7 @@ import AVFoundation
 }
 
 // MARK: - PKEvent Data Accessors Extension
-extension PKEvent {
+public extension PKEvent {
     // MARK: - Event Data Keys
     struct EventDataKeys {
         static let duration = "duration"

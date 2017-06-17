@@ -55,10 +55,10 @@ extension PlayerCreator {
     }
     
     func destroyPlayer(_ player: Player!) {
-        player.stop()
-        player.destroy()
-        var p = player
-        p = nil
+        var player = player
+        player?.stop()
+        player?.destroy()
+        player = nil
     }
 }
 
@@ -67,6 +67,13 @@ extension PlayerCreator {
 /************************************************************/
 
 extension PlayerCreator {
+    
+    func createPlayerForTVPAPI(shouldStartPreparing: Bool = true) -> PlayerLoader {
+        let pluginConfigDict: [String : Any] = [
+            PluginTestConfiguration.TVPAPI.pluginName: AnalyticsConfig(params: PluginTestConfiguration.TVPAPI.paramsDict)
+        ]
+        return self.createPlayer(pluginConfigDict: pluginConfigDict, shouldStartPreparing: shouldStartPreparing)
+    }
     
     func createPlayerForPhoenix(shouldStartPreparing: Bool = true) -> PlayerLoader {
         let pluginConfigDict: [String : Any] = [

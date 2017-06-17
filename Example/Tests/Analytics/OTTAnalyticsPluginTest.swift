@@ -39,6 +39,7 @@ class OTTAnalyticsPluginTest: QuickSpec {
         
         var onAnalyticsEvent: ((OTTAnalyticsEventType, MockableOTTAnalyticsPluginProtocol) -> Void)?
         var onTerminate: ((MockableOTTAnalyticsPluginProtocol) -> Void)?
+        var onDestory: ((MockableOTTAnalyticsPluginProtocol) -> Void)?
         var finishedHandling: Bool = false
         var invocationCount = OTTAnalyticsPluginInvocationCount()
         
@@ -50,8 +51,8 @@ class OTTAnalyticsPluginTest: QuickSpec {
             return [
                 NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
                     PKLog.trace("plugin: \(self) will terminate event received, sending analytics stop event")
-                    self.onTerminate?(self)
                     self.destroy()
+                    self.onTerminate?(self)
                 }
             ]
         }
@@ -100,7 +101,7 @@ class OTTAnalyticsPluginTest: QuickSpec {
     /************************************************************/
     
     override func spec() {
-        describe("OTT analytics plugins test") {
+        describe("OTTAnalyticsPluginTest") {
             var player: PlayerLoader!
             var phoenixPluginMock: OTTAnalyticsPluginTestPhoenixMock!
             var tvpapiPluginMock: OTTAnalyticsPluginTestTVPAPIMock!
@@ -115,6 +116,8 @@ class OTTAnalyticsPluginTest: QuickSpec {
             
             afterEach {
                 self.destroyPlayer(player)
+                phoenixPluginMock = nil
+                tvpapiPluginMock = nil
             }
             
             context("analytics events handling") {
@@ -167,7 +170,6 @@ class OTTAnalyticsPluginTest: QuickSpec {
                 }
                 
                 it("tests event handling") {
-                    print("request: \(String(describing: phoenixPluginMock.buildRequest(ofType: .play)))")
                     phoenixPluginMock.onAnalyticsEvent = onAnalyticsEvent
                     tvpapiPluginMock.onAnalyticsEvent = onAnalyticsEvent
                     // to start the whole flow we need to make an initial play
@@ -177,23 +179,102 @@ class OTTAnalyticsPluginTest: QuickSpec {
                 }
             }
             context("termination observation") {
-                it("tests app state termination observation with finish event") {
+                
+                it("can observe termination") {
                     AppStateSubjectMock.shared.add(observer: phoenixPluginMock)
                     AppStateSubjectMock.shared.add(observer: tvpapiPluginMock)
                     let onTerminate: (MockableOTTAnalyticsPluginProtocol) -> Void = { analyticsPluginMock in
                         var analyticsPluginMock = analyticsPluginMock
-                        AppStateSubjectMock.shared.remove(observer: phoenixPluginMock)
-                        AppStateSubjectMock.shared.remove(observer: tvpapiPluginMock)
                         analyticsPluginMock.finishedHandling = true
                     }
                     phoenixPluginMock.onTerminate = onTerminate
                     tvpapiPluginMock.onTerminate = onTerminate
+                    
                     // to start the whole flow we need to make an initial play
                     player.play()
+                    
                     // post stub termination
                     AppStateSubjectMock.shared.appStateEventPosted(name: .UIApplicationWillTerminate)
                     expect(phoenixPluginMock.finishedHandling).toEventually(beTrue(), timeout: 20, pollInterval: 2, description: "makes sure finished handling the event")
                     expect(tvpapiPluginMock.finishedHandling).toEventually(beTrue(), timeout: 20, pollInterval: 2, description: "makes sure finished handling the event")
+                }
+                
+                it("receive stop event on termination when content not ended") {
+                    AppStateSubjectMock.shared.add(observer: phoenixPluginMock)
+                    AppStateSubjectMock.shared.add(observer: tvpapiPluginMock)
+                    let onAnalyticsEvent: (OTTAnalyticsEventType, MockableOTTAnalyticsPluginProtocol) -> Void = { eventType, analyticsPluginMock in
+                        var analyticsPluginMock = analyticsPluginMock
+                        switch eventType {
+                        case .stop:
+                            analyticsPluginMock.finishedHandling = true
+                        default: break
+                        }
+                    }
+                    phoenixPluginMock.onAnalyticsEvent = onAnalyticsEvent
+                    tvpapiPluginMock.onAnalyticsEvent = onAnalyticsEvent
+                    
+                    // to start the whole flow we need to make an initial play
+                    player.play()
+                    
+                    player.addObserver(self, event: PlayerEvent.playing) { event in
+                        // post stub termination only when started playing
+                        AppStateSubjectMock.shared.appStateEventPosted(name: .UIApplicationWillTerminate)
+                    }
+                    
+                    expect(phoenixPluginMock.finishedHandling).toEventually(beTrue(), timeout: 20, pollInterval: 2, description: "makes sure finished handling the event")
+                    expect(tvpapiPluginMock.finishedHandling).toEventually(beTrue(), timeout: 20, pollInterval: 2, description: "makes sure finished handling the event")
+                }
+                
+                // this test make sure we don't receive stop event from ott analytics after the content ended.
+                // we do this by playing the content and seeking to the end,
+                // then we call terminate event that will call destroy() which in turn will activate the onTerminate block
+                // if the termination will happen for the ott mock plugins without failing it means we haven't received the stop event and test is succeeded.
+                it("doesn't receive stop event on termination when content ended") {
+                    AppStateSubjectMock.shared.add(observer: phoenixPluginMock)
+                    AppStateSubjectMock.shared.add(observer: tvpapiPluginMock)
+                    
+                    // check sent events if we receive stop event the test will fail
+                    let onAnalyticsEvent: (OTTAnalyticsEventType, MockableOTTAnalyticsPluginProtocol) -> Void = { eventType, analyticsPluginMock in
+                        var analyticsPluginMock = analyticsPluginMock
+                        switch eventType {
+                        case .stop:
+                            analyticsPluginMock.finishedHandling = true
+                            XCTFail() // if we receive stop event the test is failed, we should receive.
+                        default: break
+                        }
+                    }
+                    phoenixPluginMock.onAnalyticsEvent = onAnalyticsEvent
+                    tvpapiPluginMock.onAnalyticsEvent = onAnalyticsEvent
+                    
+                    // counts the number of terminations
+                    var terminationCount = 0
+                    let onTerminate: (MockableOTTAnalyticsPluginProtocol) -> Void = { analyticsPluginMock in
+                        expect(analyticsPluginMock.finishedHandling).to(beFalse())
+                        terminationCount += 1
+                    }
+                    phoenixPluginMock.onTerminate = onTerminate
+                    tvpapiPluginMock.onTerminate = onTerminate
+                    
+                    var firstPlay = true
+                    
+                    // to start the whole flow we need to make an initial play
+                    player.play()
+                    
+                    player.addObserver(self, event: PlayerEvent.playing) { event in
+                        if firstPlay {
+                            firstPlay = false
+                            // seek to the end of the media
+                            print("player duration: \(player.duration)")
+                            player.currentTime = player.duration - 1
+                        }
+                    }
+                    player.addObserver(self, event: PlayerEvent.ended) { event in
+                        // post stub termination only when ended
+                        AppStateSubjectMock.shared.appStateEventPosted(name: .UIApplicationWillTerminate)
+                    }
+                    
+                    // if no stop event will be recieved termination count should be 2 for the 2 mock plugins
+                    expect(terminationCount).toEventually(equal(2), timeout: 6)
                 }
             }
         }
