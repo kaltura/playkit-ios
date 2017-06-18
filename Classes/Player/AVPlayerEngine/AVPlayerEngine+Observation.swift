@@ -77,7 +77,7 @@ extension AVPlayerEngine {
         self.post(event: PlayerEvent.ErrorLog(error: PlayerErrorLog(errorLogEvent: lastEvent)))
     }
     
-    public func didFailToPlayToEndTime(_ notification: NSNotification) {
+    func didFailToPlayToEndTime(_ notification: NSNotification) {
         let newState = PlayerState.error
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
@@ -89,7 +89,7 @@ extension AVPlayerEngine {
         }
     }
     
-    public func didPlayToEndTime(_ notification: NSNotification) {
+    func didPlayToEndTime(_ notification: NSNotification) {
         let newState = PlayerState.idle
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
