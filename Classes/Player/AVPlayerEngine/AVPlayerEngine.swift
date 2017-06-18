@@ -127,7 +127,7 @@ class AVPlayerEngine: AVPlayer {
         return nil
     }
   
-    var rangeStart: CMTime {
+    private var rangeStart: CMTime {
         get {
             var result: CMTime = CMTimeMakeWithSeconds(0, 1)
             if let currentItem = self.currentItem {
