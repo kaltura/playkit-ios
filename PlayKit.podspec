@@ -58,9 +58,9 @@ end
 s.subspec 'WidevineClassic' do |ssp|
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKit/Core'
-  #ssp.dependency 'PlayKitWV'
-  #ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1',
-   #                           'OTHER_SWIFT_FLAGS' => '$(inherited) -DWIDEVINE_ENABLED' }
+  ssp.dependency 'PlayKitWV'
+  ssp.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'GCC_PREPROCESSOR_DEFINITIONS'=>'WIDEVINE_ENABLED=1',
+                             'OTHER_SWIFT_FLAGS' => '$(inherited) -DWIDEVINE_ENABLED' }
 end
 
 s.subspec 'PhoenixPlugin' do |ssp|
