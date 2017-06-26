@@ -12,13 +12,13 @@ PODS:
     - KalturaNetKit (~> 0.0)
     - Log (= 1.0)
     - SwiftyJSON (= 3.1.4)
-    - SwiftyXMLParser (= 3.0.0)
+    - SwiftyXMLParser (~> 3.0.0)
   - PlayKit/YouboraPlugin (0.2.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
     - Youbora-AVPlayer/dynamic (= 5.3.5)
   - SwiftyJSON (3.1.4)
-  - SwiftyXMLParser (3.0.0)
+  - SwiftyXMLParser (3.0.3)
   - Youbora-AVPlayer/dynamic (5.3.5):
     - Youbora-YouboraLib/dynamic (= 5.3.8)
   - Youbora-YouboraLib/dynamic (5.3.8)
@@ -34,9 +34,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   KalturaNetKit: bd3825d14e604c9f06bb41607eb6ce8929f27556
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
-  PlayKit: f961321903e4223de688b31529f5932f72ee4723
+  PlayKit: 4869e2a5cf6359e24667d4cb7054690709032c31
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
-  SwiftyXMLParser: 8d2295fb4fbc6e2ff241e7c8d7717e159be35969
+  SwiftyXMLParser: 9c6cc0310e778266a63d8eba50d9e07925aab0fb
   Youbora-AVPlayer: 02aea2a12a4f7e6a61d8a1747e5dfc177bf2354b
   Youbora-YouboraLib: 523adf7cd09c4a213e3485e6ec7c48d498986246
 
