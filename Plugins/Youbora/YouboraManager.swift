@@ -227,7 +227,7 @@ extension YouboraManager {
             case let e where e.self == PlayerEvent.sourceSelected:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    self?.lastReportedResource = event.contentURL?.absoluteString
+                    self?.lastReportedResource = event.mediaSource?.playbackUrl?.absoluteString
                     strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.error:
