@@ -24,7 +24,7 @@ import Foundation
     let ks: String
     let partnerId: Int
     
-    public init(baseUrl: String, timerInterval: TimeInterval, ks: String, partnerId: Int) {
+    @objc public init(baseUrl: String, timerInterval: TimeInterval, ks: String, partnerId: Int) {
         self.ks = ks
         self.partnerId = partnerId
         super.init(baseUrl: baseUrl, timerInterval: timerInterval)
@@ -35,7 +35,7 @@ import Foundation
     
     let initObject: [String: Any]
     
-    public init(baseUrl: String, timerInterval: TimeInterval, initObject: [String: Any]) {
+    @objc public init(baseUrl: String, timerInterval: TimeInterval, initObject: [String: Any]) {
         self.initObject = initObject
         super.init(baseUrl: baseUrl, timerInterval: timerInterval)
     }
