@@ -146,7 +146,6 @@ extension AVPlayerEngine {
     
     private func handleBufferEmptyChange() {
         if self.currentItem != nil {
-            print("---------buffering")
             let newState = PlayerState.buffering
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
