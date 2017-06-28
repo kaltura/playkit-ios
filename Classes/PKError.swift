@@ -100,7 +100,7 @@ public enum PKPluginError: PKError {
     public var errorDescription: String {
         switch self {
         case .failedToCreatePlugin(let pluginName): return "failed to create plugin (\(pluginName)), doesn't exist in registry"
-        case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName)"
+        case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName) (wrong type or doesn't exist)"
         }
     }
     
@@ -194,21 +194,6 @@ public extension PKError {
 public extension PKError where Self: RawRepresentable, Self.RawValue == String {
     var description: String {
         return "\(self.rawValue), domain: \(type(of: self).domain), errorCode: \(self.code)"
-    }
-}
-
-/************************************************************/
-// MARK: - Error
-/************************************************************/
-// extension for easier access to domain and code properties.
-extension Error {
-    
-    public var domain: String {
-        return self._domain
-    }
-    
-    public var code: Int {
-        return self._code
     }
 }
 
