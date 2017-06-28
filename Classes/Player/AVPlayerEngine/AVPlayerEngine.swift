@@ -26,7 +26,6 @@ class AVPlayerEngine: AVPlayer {
     
     fileprivate var playerLayer: AVPlayerLayer!
     private var _view: PlayerView!
-    private var isDestroyed: Bool = false
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
     var lastTimebaseRate: Float64 = 0
@@ -39,21 +38,21 @@ class AVPlayerEngine: AVPlayer {
     var tracksManager = TracksManager()
     var observerContext = 0
     
-    public var onEventBlock: ((PKEvent) -> Void)?
+    var onEventBlock: ((PKEvent) -> Void)?
     
-    public var view: PlayerView! {
+    var view: PlayerView! {
         PKLog.trace("get player view: \(_view)")
         return _view
     }
     
-    public var asset: AVURLAsset? {
+    var asset: AVURLAsset? {
         didSet {
             guard let newAsset = asset else { return }
             self.asynchronouslyLoadURLAsset(newAsset)
         }
     }
     
-    public var currentPosition: Double {
+    var currentPosition: Double {
         get {
             PKLog.trace("get currentPosition: \(self.currentTime())")
             return CMTimeGetSeconds(self.currentTime() - rangeStart)
@@ -73,13 +72,13 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    public var startPosition: Double {
+    var startPosition: Double {
         didSet {
             PKLog.debug("set startPosition: \(startPosition)")
         }
     }
     
-    public var duration: Double {
+    var duration: Double {
         guard let currentItem = self.currentItem else { return 0.0 }
         
         var result = CMTimeGetSeconds(currentItem.duration)
@@ -96,7 +95,7 @@ class AVPlayerEngine: AVPlayer {
         return result
     }
     
-    public var isPlaying: Bool {
+    var isPlaying: Bool {
         guard let currentItem = self.currentItem else {
             PKLog.error("current item is empty")
             return false
@@ -114,14 +113,14 @@ class AVPlayerEngine: AVPlayer {
         return false
     }
     
-    public var currentAudioTrack: String? {
+    var currentAudioTrack: String? {
         if let currentItem = self.currentItem {
             return self.tracksManager.currentAudioTrack(item: currentItem)
         }
         return nil
     }
     
-    public var currentTextTrack: String? {
+    var currentTextTrack: String? {
         if let currentItem = self.currentItem {
             return self.tracksManager.currentTextTrack(item: currentItem)
         }
@@ -143,7 +142,7 @@ class AVPlayerEngine: AVPlayer {
     
     // MARK: Player Methods
     
-    public override init() {
+    override init() {
         PKLog.info("init AVPlayer")
         
         self.startPosition = 0
@@ -164,10 +163,8 @@ class AVPlayerEngine: AVPlayer {
     
     deinit {
         PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
-        // Avoid dealloc while key value observers were still registered
-        if (!self.isDestroyed) {
-            self.removeObservers()
-        }
+        // removes the observers only on deinit to prevent chances of being removed twice.
+        self.removeObservers()
     }
     
     func stop() {
@@ -205,20 +202,16 @@ class AVPlayerEngine: AVPlayer {
         // this make sure everything will be cleared without any race conditions
         DispatchQueue.main.async {
             PKLog.info("destroy player")
-            self.removeObservers()
             self.playerLayer = nil
             self._view = nil
             self.onEventBlock = nil
             // removes app state observer
             AppStateSubject.shared.remove(observer: self)
             self.replaceCurrentItem(with: nil)
-            self.isDestroyed = true
         }
     }
     
-    
-    
-    public func selectTrack(trackId: String) {
+    func selectTrack(trackId: String) {
         if trackId.isEmpty == false {
             self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
         } else {
