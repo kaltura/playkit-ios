@@ -90,7 +90,7 @@ extension AVPlayerEngine {
     }
     
     func didPlayToEndTime(_ notification: NSNotification) {
-        let newState = PlayerState.idle
+        let newState = PlayerState.ended
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         // In iOS 9 and below rate is 1.0 even when playback is finished.
@@ -146,6 +146,7 @@ extension AVPlayerEngine {
     
     private func handleBufferEmptyChange() {
         if self.currentItem != nil {
+            print("---------buffering")
             let newState = PlayerState.buffering
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState

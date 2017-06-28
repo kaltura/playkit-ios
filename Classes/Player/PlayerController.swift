@@ -43,6 +43,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
         return self.currentPlayer.duration
     }
     
+    public var currentState: PlayerState {
+        return self.currentPlayer.currentState
+    }
+    
     public var isPlaying: Bool {
         return self.currentPlayer.isPlaying
     }

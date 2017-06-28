@@ -12,12 +12,12 @@ import Foundation
 @objc public enum PlayerState: Int {
 /// Sent when player's state idle.
     case idle
-/// Sent when player's state loading.
-    case loading
 /// Sent when player's state ready.
     case ready
 /// Sent when player's state buffering.
     case buffering
+/// Sent when player's state ended.
+    case ended
 /// Sent when player's state errored.    
     case error
 /// Sent when player's state unknown.

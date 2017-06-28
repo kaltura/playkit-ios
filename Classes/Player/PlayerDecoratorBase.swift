@@ -52,6 +52,10 @@ import AVKit
         return self.player.currentTextTrack
     }
     
+    open var currentState: PlayerState {
+        return self.player.currentState
+    }
+    
     open var isPlaying: Bool {
         return self.player.isPlaying
     }
