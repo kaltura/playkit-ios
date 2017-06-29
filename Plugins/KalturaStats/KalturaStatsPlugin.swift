@@ -198,12 +198,6 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
                         switch stateChanged.newState {
                         case .idle:
                             strongSelf.sendWidgetLoaded()
-                        case .loading:
-                            strongSelf.sendWidgetLoaded()
-                            if strongSelf.isBuffering {
-                                strongSelf.isBuffering = false
-                                strongSelf.sendEvent(ofType: .bufferEnd, withMessage: "Buffer end event")
-                            }
                         case .ready:
                             if strongSelf.isBuffering {
                                 strongSelf.isBuffering = false
