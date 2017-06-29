@@ -68,7 +68,7 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         guard let config = pluginConfig as? KalturaLiveStatsPluginConfig else {
             PKLog.error("missing plugin config or wrong plugin class type")
-            throw PKPluginError.missingPluginConfig(pluginName: KalturaStatsPlugin.pluginName)
+            throw PKPluginError.missingPluginConfig(pluginName: KalturaLiveStatsPlugin.pluginName)
         }
         self.config = config
         self.registerEvents()
