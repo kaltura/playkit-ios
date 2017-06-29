@@ -200,12 +200,8 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
                         switch stateChanged.newState {
                         case .idle:
                             strongSelf.sendWidgetLoaded()
-                        case .loading:
-                            strongSelf.sendWidgetLoaded()
-                            if strongSelf.isBuffering {
-                                strongSelf.isBuffering = false
-                                strongSelf.sendAnalyticsEvent(action: .bufferEnd)
-                            }
+                        case .ended:
+                            PKLog.info("media ended")
                         case .ready:
                             if strongSelf.isBuffering {
                                 strongSelf.isBuffering = false

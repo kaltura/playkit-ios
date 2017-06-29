@@ -37,6 +37,9 @@ import AVKit
     /// The current player position.
     @objc var currentTime: TimeInterval { get set }
     
+    /// The player's currentState.
+    @objc var currentState: PlayerState { get }
+    
     /// The player's duration.
     @objc var isPlaying: Bool { get }
     
