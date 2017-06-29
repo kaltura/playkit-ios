@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  ViewController.swift
-//  PlayKit
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Rivka Schwartz on 11/07/2016.
-//  Copyright (c) 2016 Rivka Schwartz. All rights reserved.
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import UIKit
 import PlayKit
