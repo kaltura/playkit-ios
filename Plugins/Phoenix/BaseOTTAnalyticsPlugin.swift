@@ -15,7 +15,6 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
     var intervalOn: Bool = false
     var timer: Timer?
     var interval: TimeInterval = 30
-    var isContentEnded: Bool = false
     
     /************************************************************/
     // MARK: - PKPlugin
@@ -29,14 +28,13 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
     public override func onUpdateMedia(mediaConfig: MediaConfig) {
         super.onUpdateMedia(mediaConfig: mediaConfig)
         self.intervalOn = false
-        self.isContentEnded = false
         self.timer?.invalidate()
     }
     
     public override func destroy() {
         super.destroy()
         // only send stop event if content started playing already & content is not ended
-        if !self.isFirstPlay && !self.isContentEnded {
+        if !self.isFirstPlay && self.player?.currentState != PlayerState.ended {
             self.sendAnalyticsEvent(ofType: .stop)
         }
         self.timer?.invalidate()
@@ -67,8 +65,7 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
             PlayerEvent.error,
             PlayerEvent.pause,
             PlayerEvent.loadedMetadata,
-            PlayerEvent.playing,
-            PlayerEvent.seeked
+            PlayerEvent.playing
         ]
     }
     
@@ -79,14 +76,12 @@ public class BaseOTTAnalyticsPlugin: BaseAnalyticsPlugin, OTTAnalyticsPluginProt
             PKLog.debug("Register event: \(event.self)")
             
             switch event {
-            case let e where e.self == PlayerEvent.seeked: self.isContentEnded = false
             case let e where e.self == PlayerEvent.ended:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     PKLog.debug("ended event: \(event)")
                     strongSelf.timer?.invalidate()
                     strongSelf.sendAnalyticsEvent(ofType: .finish)
-                    strongSelf.isContentEnded = true
                 }
             case let e where e.self == PlayerEvent.error:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
