@@ -27,7 +27,6 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
         }
         self.config = config
         self.interval = config.timerInterval
-        self.registerEvents()
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {

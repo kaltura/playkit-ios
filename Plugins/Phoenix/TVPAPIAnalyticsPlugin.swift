@@ -28,7 +28,6 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
         }
         self.config = config
         self.interval = config.timerInterval
-        self.registerEvents()
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {

@@ -28,7 +28,7 @@ extension PKEvent {
     }
 }
 
-public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
+public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
 
     enum KLiveStatsEventType : Int {
         case live = 1
@@ -39,40 +39,66 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
         return "KalturaLiveStats"
     }
     
+    /// the allowed distance from the live playhead to be considered as live.
+    /// values greater than these are considered dvr playback.
+    private let distanceFromLiveThreshold: TimeInterval = 15.0
+    
     private var isLive = false
-    private var eventIdx = 0
+    private var eventIdx = 1
     private var currentBitrate = -1
     private var bufferTime: Int32 = 0
     private var bufferStartTime: Int32 = 0
     private var lastReportedBitrate: Int32 = -1
     private var lastReportedStartTime: Int32 = 0
-    
     private var isBuffering = false
-    
     private var timer: Timer?
-    private var interval = 10
+    private var config: KalturaLiveStatsPluginConfig!
+    /// indicates whether we played for the first time or not.
+    var isFirstPlay: Bool = true
+    
+    private let interval = 10.0
     
     /************************************************************/
     // MARK: - PKPlugin
     /************************************************************/
     
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        guard let config = pluginConfig as? KalturaLiveStatsPluginConfig else {
+            PKLog.error("missing plugin config or wrong plugin class type")
+            throw PKPluginError.missingPluginConfig(pluginName: KalturaStatsPlugin.pluginName)
+        }
+        self.config = config
+        self.registerEvents()
+    }
+    
     public override func onUpdateMedia(mediaConfig: MediaConfig) {
         self.isLive = false
-        self.eventIdx = 0
+        self.eventIdx = 1
         self.currentBitrate = -1
         self.bufferTime = 0
         self.bufferStartTime = 0
         self.lastReportedBitrate = -1
         self.lastReportedStartTime = 0
-        
         self.isBuffering = false
-        
+        self.isFirstPlay = true
         self.timer?.invalidate()
+    }
+    
+    public override func onUpdateConfig(pluginConfig: Any) {
+        super.onUpdateConfig(pluginConfig: pluginConfig)
+        
+        guard let config = pluginConfig as? KalturaLiveStatsPluginConfig else {
+            PKLog.error("plugin config is wrong type")
+            return
+        }
+        
+        PKLog.debug("new config::\(String(describing: config))")
+        self.config = config
     }
     
     public override func destroy() {
         super.destroy()
-        eventIdx = 0
         if let t = self.timer {
             t.invalidate()
         }
@@ -82,16 +108,18 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     // MARK: - AnalyticsPluginProtocol
     /************************************************************/
     
-    override var playerEventsToRegister: [PlayerEvent.Type] {
+    var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.play,
+            PlayerEvent.playing,
             PlayerEvent.playbackInfo,
             PlayerEvent.pause,
+            PlayerEvent.error,
             PlayerEvent.stateChanged
         ]
     }
     
-    override func registerEvents() {
+    func registerEvents() {
         PKLog.debug("register player events")
         
         self.playerEventsToRegister.forEach { event in
@@ -99,22 +127,29 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
             
             switch event {
             case let e where e.self == PlayerEvent.play:
-                self.messageBus?.addObserver(self, events: [e.self]){ [weak self] event in
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self, let player = self?.player else { return }
-                    PKLog.debug("play event: \(event)")
                     strongSelf.lastReportedStartTime = player.currentTime.toInt32()
+                    strongSelf.startLiveEvents()
+                }
+            case let e where e.self == PlayerEvent.playing:
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     strongSelf.startLiveEvents()
                 }
             case let e where e.self == PlayerEvent.pause:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    PKLog.debug("pause event: \(event)")
+                    strongSelf.stopLiveEvents()
+                }
+            case let e where e.self == PlayerEvent.error:
+                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
                     strongSelf.stopLiveEvents()
                 }
             case let e where e.self == PlayerEvent.playbackInfo:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    PKLog.debug("playbackParamsUpdated event: \(event)")
                     if type(of: event) == PlayerEvent.playbackInfo && event.playbackInfo != nil {
                         strongSelf.lastReportedBitrate = Int32(event.playbackInfo!.bitrate)
                     }
@@ -122,7 +157,6 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
             case let e where e.self == PlayerEvent.stateChanged:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    PKLog.debug("playbackParamsUpdated event: \(event)")
                     
                     if type(of: event) == PlayerEvent.stateChanged {
                         switch event.newState {
@@ -162,23 +196,18 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     private func stopLiveEvents(){
         self.isLive = false
         self.timer?.invalidate()
+        self.timer = nil
     }
     
     private func createTimer() {
-        
-        if let intr = self.config?.params["timerInterval"] as? Int {
-            self.interval = intr
-        }
-
         if let t = self.timer {
             t.invalidate()
         }
-        
-        self.timer = Timer.scheduledTimer(timeInterval: TimeInterval(self.interval), target: self, selector: #selector(KalturaLiveStatsPlugin.timerHit), userInfo: nil, repeats: true)
-    }
-    
-    @objc private func timerHit() {
-        self.sendLiveEvent(withBufferTime: bufferTime);
+        self.timer = Timer.every(self.interval) { [weak self] in
+            self?.sendLiveEvent(withBufferTime: self?.bufferTime ?? 0)
+            self?.eventIdx += 1
+            PKLog.debug("current time: \(String(describing: self?.player?.currentTime)), duration: \(String(describing: self?.player?.duration))")
+        }
     }
     
     private func calculateBuffer(isBuffering: Bool) -> Int32 {
@@ -197,49 +226,32 @@ public class KalturaLiveStatsPlugin: BaseAnalyticsPlugin {
     }
     
     private func sendLiveEvent(withBufferTime bufferTime: Int32) {
-        guard let player = self.player, let mediaEntry = player.mediaEntry else { return }
+        guard let player = self.player else { return }
         
         PKLog.debug("sendLiveEvent - Buffer Time: \(bufferTime)")
         // post event to message bus
         let event = KalturaLiveStatsEvent.Report(bufferTime: bufferTime)
         self.messageBus?.post(event)
         
-        let entryId: String
         let sessionId = player.sessionId
-        var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
-        var parterId = ""
         
-        if let url = self.config?.params["baseUrl"] as? String {
-            baseUrl = url
-        }
+        let eventType: KLiveStatsEventType = (player.duration - player.currentTime) > self.distanceFromLiveThreshold ? .dvr : .live
         
-        if let pId = self.config?.params["partnerId"] as? Int {
-            parterId = String(pId)
-        }
-        
-        if let eId = self.config?.params["entryId"] as? String {
-            entryId = eId
-        } else {
-            entryId = mediaEntry.id
-        }
-        
-        if let builder: RequestBuilder = LiveStatsService.sendLiveStatsEvent(baseURL: baseUrl,
-                                                                           partnerId: parterId,
-                                                                           eventType: self.isLive ? 1 : 0,
-                                                                           eventIndex: self.eventIdx,
-                                                                           bufferTime: bufferTime,
-                                                                           bitrate: self.lastReportedBitrate,
-                                                                           sessionId: sessionId,
-                                                                           startTime: self.lastReportedStartTime,
-                                                                           entryId: entryId,
-                                                                           isLive: isLive,
-                                                                           clientVer: PlayKitManager.clientTag,
-                                                                           deliveryType: "hls") {
+        if let builder: RequestBuilder = LiveStatsService.sendLiveStatsEvent(
+            baseURL: self.config.baseUrl,
+            partnerId: "\(self.config.partnerId)", eventType: eventType.rawValue,
+            eventIndex: self.eventIdx,
+            bufferTime: bufferTime,
+            bitrate: self.lastReportedBitrate,
+            sessionId: sessionId,
+            startTime: self.lastReportedStartTime,
+            entryId: self.config.entryId,
+            isLive: isLive,
+            clientVer: PlayKitManager.clientTag,
+            deliveryType: "hls") {
             
             builder.set { (response: Response) in
-                
                 PKLog.debug("Response: \(response)")
-                
             }
             USRExecutor.shared.send(request: builder.build())
         }

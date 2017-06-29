@@ -8,7 +8,7 @@
 
 import Foundation
 
-@objc public class KalturaStatsConfig: NSObject {
+@objc public class KalturaStatsPluginConfig: NSObject {
     
     private let defaultBaseUrl = "https://stats.kaltura.com/api_v3/index.php"
     
