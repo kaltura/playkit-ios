@@ -14,6 +14,35 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
     
     public override class var pluginName: String { return "TVPAPIAnalytics" }
     
+    var config: TVPAPIAnalyticsPluginConfig! {
+        didSet {
+            self.interval = config.timerInterval
+        }
+    }
+    
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        guard let config = pluginConfig as? TVPAPIAnalyticsPluginConfig else {
+            PKLog.error("missing/wrong plugin config")
+            throw PKPluginError.missingPluginConfig(pluginName: TVPAPIAnalyticsPlugin.pluginName)
+        }
+        self.config = config
+        self.interval = config.timerInterval
+        self.registerEvents()
+    }
+    
+    public override func onUpdateConfig(pluginConfig: Any) {
+        super.onUpdateConfig(pluginConfig: pluginConfig)
+        
+        guard let config = pluginConfig as? TVPAPIAnalyticsPluginConfig else {
+            PKLog.error("plugin config is wrong")
+            return
+        }
+        
+        PKLog.debug("new config::\(String(describing: config))")
+        self.config = config
+    }
+    
     /************************************************************/
     // MARK: - KalturaOTTAnalyticsPluginProtocol
     /************************************************************/
@@ -21,38 +50,21 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
     override func buildRequest(ofType type: OTTAnalyticsEventType) -> Request? {
         guard let player = self.player else { return nil }
         
-        var fileId = ""
-        var baseUrl = ""
-        
-        guard let initObj = self.config?.params["initObj"] as? [String: Any] else {
-            PKLog.error("send analytics failed due to no initObj data")
-            self.messageBus?.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingInitObject))
-            return nil
-        }
-        
         guard let mediaEntry = player.mediaEntry else {
             PKLog.error("send analytics failed due to nil mediaEntry")
-            self.messageBus?.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingMediaEntry))
             return nil
         }
         
         let method = type == .hit ? "MediaHit" : "MediaMark"
-        
-        if let url = self.config?.params["baseUrl"] as? String {
-            baseUrl = url
-        }
-        if let fId = self.config?.params["fileId"] as? String {
-            fileId = fId
-        }
 
-        baseUrl = "\(baseUrl)m=\(method)"
+        let baseUrl = "\(self.config.baseUrl)m=\(method)"
         
         guard let requestBuilder: RequestBuilder = MediaMarkService.sendTVPAPIEVent(baseURL: baseUrl,
-                                                                                    initObj: initObj,
+                                                                                    initObj: self.config.initObject,
                                                                                     eventType: type.rawValue,
                                                                                     currentTime: player.currentTime.toInt32(),
                                                                                     assetId: mediaEntry.id,
-                                                                                    fileId: fileId) else {
+                                                                                    fileId: self.fileId ?? "") else {
             return nil
         }
         requestBuilder.set(responseSerializer: StringSerializer())

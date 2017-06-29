@@ -99,7 +99,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
         
         // get the preferred media source and post source selected event
         guard let (preferredMediaSource, handlerType) = AssetBuilder.getPreferredMediaSource(from: mediaConfig.mediaEntry) else { return }
-        self.onEventBlock?(PlayerEvent.SourceSelected(contentURL: preferredMediaSource.playbackUrl))
+        self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: preferredMediaSource))
         self.preferredMediaSource = preferredMediaSource
         
         // update the media source request adapter with new media uuid if using kaltura request adapter

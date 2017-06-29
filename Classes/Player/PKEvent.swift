@@ -44,7 +44,7 @@ public extension PKEvent {
         static let newState = "newState"
         static let error = "error"
         static let metadata = "metadata"
-        static let contentURL = "contentURL"
+        static let mediaSource = "mediaSource"
     }
     
     // MARK: Player Data Accessors
@@ -93,7 +93,7 @@ public extension PKEvent {
     }
     
     /// Content url, PKEvent Data Accessor
-    @objc public var contentURL: URL? {
-        return self.data?[EventDataKeys.contentURL] as? URL
+    @objc public var mediaSource: MediaSource? {
+        return self.data?[EventDataKeys.mediaSource] as? MediaSource
     }
 }
