@@ -14,7 +14,7 @@ import KalturaNetKit
 
 internal class OVPStatsService {
 
-    static func get(config: KalturaStatsConfig, eventType: Int, clientVer: String, duration: Float, sessionId: String, position: Int32, widgetId: String, isSeek: Bool, referrer: String = "") -> KalturaRequestBuilder? {
+    static func get(config: KalturaStatsPluginConfig, eventType: Int, clientVer: String, duration: Float, sessionId: String, position: Int32, widgetId: String, isSeek: Bool, referrer: String = "") -> KalturaRequestBuilder? {
         
         return get(
             baseURL: config.baseUrl,

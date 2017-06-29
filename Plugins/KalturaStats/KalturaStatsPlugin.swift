@@ -94,7 +94,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     private var timer: Timer?
     private var interval: TimeInterval = 10
     
-    var config: KalturaStatsConfig!
+    var config: KalturaStatsPluginConfig!
     /// indicates whether we played for the first time or not.
     var isFirstPlay: Bool = true
     
@@ -108,7 +108,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-        guard let config = pluginConfig as? KalturaStatsConfig else {
+        guard let config = pluginConfig as? KalturaStatsPluginConfig else {
             PKLog.error("missing plugin config or wrong plugin class type")
             throw PKPluginError.missingPluginConfig(pluginName: KalturaStatsPlugin.pluginName)
         }
@@ -125,7 +125,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     public override func onUpdateConfig(pluginConfig: Any) {
         super.onUpdateConfig(pluginConfig: pluginConfig)
         
-        guard let config = pluginConfig as? KalturaStatsConfig else {
+        guard let config = pluginConfig as? KalturaStatsPluginConfig else {
             PKLog.error("plugin configis wrong")
             return
         }
@@ -182,7 +182,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
                     guard let strongSelf = self else { return }
                     PKLog.debug("play event: \(event)")
                     if strongSelf.isFirstPlay {
-                        strongSelf.sendEvent(ofType: .play, withMessage: "Play event")
+                        strongSelf.sendAnalyticsEvent(action: .play)
                         strongSelf.isFirstPlay = false
                     }
                 })
@@ -190,7 +190,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
                 self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
                     guard let strongSelf = self else { return }
                     PKLog.debug("error event: \(event)")
-                    strongSelf.sendEvent(ofType: .error, withMessage: "Error event")
+                    strongSelf.sendAnalyticsEvent(action: .error)
                 })
             case let e where e.self == PlayerEvent.stateChanged:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
@@ -204,12 +204,12 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
                             strongSelf.sendWidgetLoaded()
                             if strongSelf.isBuffering {
                                 strongSelf.isBuffering = false
-                                strongSelf.sendEvent(ofType: .bufferEnd, withMessage: "Buffer end event")
+                                strongSelf.sendAnalyticsEvent(action: .bufferEnd)
                             }
                         case .ready:
                             if strongSelf.isBuffering {
                                 strongSelf.isBuffering = false
-                                strongSelf.sendEvent(ofType: .bufferEnd, withMessage: "Buffer end event")
+                                strongSelf.sendAnalyticsEvent(action: .bufferEnd)
                             }
                             if !strongSelf.intervalOn {
                                 strongSelf.intervalOn = true
@@ -219,7 +219,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
                         case .buffering:
                             strongSelf.sendWidgetLoaded()
                             strongSelf.isBuffering = true
-                            strongSelf.sendEvent(ofType: .bufferStart, withMessage: "Buffer start event")
+                            strongSelf.sendAnalyticsEvent(action: .error)
                         case .error: break
                         case .unknown: break
                         }
@@ -246,14 +246,6 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
             sendAnalyticsEvent(action: .mediaLoaded)
             self.isMediaLoaded = true
         }
-    }
-    
-    private func sendEvent(ofType type: KalturaStatsEventType, withMessage message: String) {
-        // send event to messageBus
-        let event = KalturaStatsEvent.Report(message: message)
-        self.messageBus?.post(event)
-        // send event to analytics entity
-        self.sendAnalyticsEvent(action: type)
     }
     
     private func resetPlayerFlags() {
@@ -303,8 +295,11 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
     private func sendAnalyticsEvent(action: KalturaStatsEventType) {
         guard let player = self.player else { return }
-        
         PKLog.debug("Action: \(action)")
+        
+        // send event to messageBus
+        let event = KalturaStatsEvent.Report(message: "send event with action type: \(action.rawValue)")
+        self.messageBus?.post(event)
         
         guard let builder: KalturaRequestBuilder = OVPStatsService.get(config: self.config,
                                                                        eventType: action.rawValue,

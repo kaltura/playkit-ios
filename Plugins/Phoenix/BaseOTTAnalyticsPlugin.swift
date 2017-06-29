@@ -191,6 +191,7 @@ extension BaseOTTAnalyticsPlugin {
     fileprivate func createTimer() {
         if let t = self.timer {
             t.invalidate()
+            self.timer = nil
         }
         
         // media hit should fire on every time we start the timer.
