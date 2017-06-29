@@ -17,6 +17,8 @@ import Foundation
 /// Sent when player's state buffering.
     case buffering
 /// Sent when player's state ended.
+/// Same event sent when observing PlayerEvent.ended.
+/// This state was attached to reflect current state and avoid unrelevant boolean.
     case ended
 /// Sent when player's state errored.    
     case error

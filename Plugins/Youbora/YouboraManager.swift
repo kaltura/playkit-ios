@@ -21,7 +21,7 @@ class YouboraManager: YBPluginGeneric {
     
     fileprivate weak var messageBus: MessageBus?
     
-    /// indicates whether we played for the first time or not.
+    /// Indicates whether we played for the first time or not.
     fileprivate var isFirstPlay: Bool = true
     
     /// Indicates if we have to delay the endedHandler() (for example when we have post-roll).
@@ -34,7 +34,7 @@ class YouboraManager: YBPluginGeneric {
         self.pkPlayer = player
     }
     
-    // we must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift). 
+    // We must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift). 
     private override init() {
         super.init()
     }
