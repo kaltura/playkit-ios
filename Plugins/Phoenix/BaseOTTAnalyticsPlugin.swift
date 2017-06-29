@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  BaseOTTAnalyticsPlugin.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 06/02/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import KalturaNetKit
@@ -184,6 +186,7 @@ extension BaseOTTAnalyticsPlugin {
     fileprivate func createTimer() {
         if let t = self.timer {
             t.invalidate()
+            self.timer = nil
         }
         
         // media hit should fire on every time we start the timer.

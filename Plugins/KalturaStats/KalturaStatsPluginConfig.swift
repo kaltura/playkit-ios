@@ -1,14 +1,16 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  KalturaStatsConfig.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 20/06/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
-@objc public class KalturaStatsConfig: NSObject {
+@objc public class KalturaStatsPluginConfig: NSObject {
     
     private let defaultBaseUrl = "https://stats.kaltura.com/api_v3/index.php"
     

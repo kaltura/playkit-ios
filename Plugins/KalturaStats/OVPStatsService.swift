@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  OTTStatsService.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Oded Klein on 07/12/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import UIKit
 import SwiftyJSON
@@ -12,7 +14,7 @@ import KalturaNetKit
 
 internal class OVPStatsService {
 
-    static func get(config: KalturaStatsConfig, eventType: Int, clientVer: String, duration: Float, sessionId: String, position: Int32, widgetId: String, isSeek: Bool, referrer: String = "") -> KalturaRequestBuilder? {
+    static func get(config: KalturaStatsPluginConfig, eventType: Int, clientVer: String, duration: Float, sessionId: String, position: Int32, widgetId: String, isSeek: Bool, referrer: String = "") -> KalturaRequestBuilder? {
         
         return get(
             baseURL: config.baseUrl,

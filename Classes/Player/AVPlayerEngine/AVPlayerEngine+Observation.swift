@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  AVPlayerEngine+Observation.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 07/03/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
@@ -17,8 +19,8 @@ extension AVPlayerEngine {
         return [
             #keyPath(rate),
             #keyPath(status),
-            #keyPath(currentItem.status),
             #keyPath(currentItem),
+            #keyPath(currentItem.status),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
             #keyPath(currentItem.timedMetadata)
@@ -124,13 +126,13 @@ extension AVPlayerEngine {
                 return
             }
             self.handle(status: newPlayerStatus)
+        case #keyPath(currentItem): self.handleItemChange()
         case #keyPath(currentItem.status):
             guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerItemStatus = AVPlayerItemStatus(rawValue: statusChange.intValue) else {
                 PKLog.error("unknown player item status")
                 return
             }
             self.handle(playerItemStatus: newPlayerItemStatus)
-        case #keyPath(currentItem): self.handleItemChange()
         case #keyPath(currentItem.timedMetadata): self.handleTimedMedia()
         default: super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
@@ -207,7 +209,7 @@ extension AVPlayerEngine {
             if self.isFirstReady {
                 self.isFirstReady = false
                 // when player item is readyToPlay for the first time it is safe to assume we have a valid duration.
-                if let duration = self.currentItem?.duration, duration != kCMTimeIndefinite {
+                if let duration = self.currentItem?.duration, !CMTIME_IS_INDEFINITE(duration) {
                     PKLog.debug("duration in seconds: \(CMTimeGetSeconds(duration))")
                     self.post(event: PlayerEvent.DurationChanged(duration: CMTimeGetSeconds(duration)))
                 }
