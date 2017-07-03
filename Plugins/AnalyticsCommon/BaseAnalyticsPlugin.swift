@@ -1,52 +1,14 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  BaseAnalyticsPlugin.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 17/02/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
-
-/************************************************************/
-// MARK: - AnalyticsPluginError
-/************************************************************/
-
-/// `AnalyticsError` represents analytics plugins (kaltura stats, kaltura live stats, phoenix and tvpapi) common errors.
-enum AnalyticsPluginError: PKError {
-    
-    case missingMediaEntry
-    case missingInitObject
-    
-    static let domain = "com.kaltura.playkit.error.analyticsPlugin"
-    
-    var code: Int {
-        switch self {
-        case .missingMediaEntry: return PKErrorCode.missingMediaEntry
-        case .missingInitObject: return PKErrorCode.missingInitObject
-        }
-    }
-    
-    var errorDescription: String {
-        switch self {
-        case .missingMediaEntry: return "failed to send analytics event, mediaEntry is nil"
-        case .missingInitObject: return "failed to send analytics event, missing initObj"
-        }
-    }
-    
-    var userInfo: [String: Any] {
-        return [:]
-    }
-}
-
-extension PKErrorDomain {
-    @objc(AnalyticsPlugin) public static let analyticsPlugin = AnalyticsPluginError.domain
-}
-
-extension PKErrorCode {
-    @objc(MissingMediaEntry) public static let missingMediaEntry = 2100
-    @objc(MissingInitObject) public static let missingInitObject = 2101
-}
 
 /************************************************************/
 // MARK: - BaseAnalyticsPlugin

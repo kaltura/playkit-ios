@@ -1,22 +1,24 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  AppStateProvider.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 19/01/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
 /// The delegate of `AppStateProvider`, allows the delegate to inform on app state notifications.
-protocol AppStateProviderDelegate: class {
+public protocol AppStateProviderDelegate: class {
     /// fire this delegate function when received observation event.
     /// for every observer with the same observation event process the on observe block.
     func appStateEventPosted(name: ObservationName)
 }
 
 /// The interface of `AppStateProvider`, allows us to better divide the logic and mock easier.
-protocol AppStateProviderProtocol {
+public protocol AppStateProviderProtocol {
     var notificationsManager: NotificationsManager { get }
     /// Holds all the observation names we will be observing.
     /// If you want to observe more events add them here.
@@ -47,17 +49,17 @@ extension AppStateProviderProtocol {
 
 /// The `AppStateProvider` is a provider for receiving events from the system about app states.
 /// Used to seperate the events providing from the app state subject and enabling us to mock better.
-final class AppStateProvider: AppStateProviderProtocol {
+public final class AppStateProvider: AppStateProviderProtocol {
     
-    init(delegate: AppStateProviderDelegate? = nil) {
+    public init(delegate: AppStateProviderDelegate? = nil) {
         self.delegate = delegate
     }
     
-    var delegate: AppStateProviderDelegate?
+    public var delegate: AppStateProviderDelegate?
     
-    let notificationsManager = NotificationsManager()
+    public let notificationsManager = NotificationsManager()
     
-    let observationNames: Set<ObservationName> = [
+    public let observationNames: Set<ObservationName> = [
         .UIApplicationWillTerminate,
         .UIApplicationDidEnterBackground,
         .UIApplicationDidBecomeActive,

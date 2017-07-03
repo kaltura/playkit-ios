@@ -1,16 +1,18 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PlayerDecoratorBase.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Vadim Kononov on 09/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
 import AVKit
 
-@objc public class PlayerDecoratorBase: NSObject, Player {
+@objc open class PlayerDecoratorBase: NSObject, Player {
     
     fileprivate var player: Player!
     
@@ -52,11 +54,15 @@ import AVKit
         return self.player.currentTextTrack
     }
     
-    public var isPlaying: Bool {
-        return self.player.isPlaying
+    open var currentState: PlayerState {
+        return self.player.currentState
     }
     
-    public var view: PlayerView {
+    open var isPlaying: Bool {
+        return self.player.isPlaying
+    }
+
+    public var view: PlayerView! {
         return self.player.view
     }
     
@@ -64,7 +70,11 @@ import AVKit
         return self.player.sessionId
     }
     
-    public func prepare(_ config: MediaConfig) {
+    public var rate: Float {
+        return self.player.rate
+    }
+    
+    open func prepare(_ config: MediaConfig) {
         return self.player.prepare(config)
     }
     
@@ -76,40 +86,43 @@ import AVKit
         return self.player
     }
     
-    public func destroy() {
-        
+    open func destroy() {
+        self.player.destroy()
     }
     
-    public func play() {
+    open func play() {
         self.player.play()
     }
     
-    public func pause() {
+    open func pause() {
         self.player.pause()
     }
     
-    public func seek(to time: CMTime) {
+    open func seek(to time: CMTime) {
         self.player.seek(to: time)
     }
     
-    public func resume() {
+    open func resume() {
         self.player.resume()
     }
     
-    public func stop() {
+    open func stop() {
         self.player.stop()
-    }
-    
-    @available(iOS 9.0, *)
-    public func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        return self.player.createPiPController(with: delegate)
     }
     
     public func updatePluginConfig(pluginName: String, config: Any) {
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
     }
     
+    public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
     public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
+    public func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
         //Assert.shouldNeverHappen();
     }
     
@@ -122,3 +135,16 @@ import AVKit
     }
 }
 
+/************************************************************/
+// MARK: - iOS Only
+/************************************************************/
+
+#if os(iOS)
+    extension PlayerDecoratorBase {
+        
+        @available(iOS 9.0, *)
+        open func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+            return self.player.createPiPController(with: delegate)
+        }
+    }
+#endif

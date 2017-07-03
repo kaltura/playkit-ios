@@ -1,15 +1,17 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  NotificationsManager.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 19/01/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
 /// The `NotificationsManager` objects provides a mechanism for adding/removing observers within a program
-final class NotificationsManager {
+public final class NotificationsManager {
     
     let notificationCenter = NotificationCenter.default
     

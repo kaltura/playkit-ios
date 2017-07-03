@@ -1,15 +1,17 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  AppStateSubject.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 19/01/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
 /// The interface of `AppStateSubject`, allows us to better divide the logic and mock easier.
-protocol AppStateSubjectProtocol: class, AppStateProviderDelegate {
+public protocol AppStateSubjectProtocol: class, AppStateProviderDelegate {
     associatedtype InstanceType
     static var shared: InstanceType { get }
     /// Lock object for synchronizing access.
@@ -48,7 +50,7 @@ extension AppStateSubjectProtocol {
     }
     
     /// Adds an observer to inform when state events are posted.
-    func add(observer: AppStateObservable) {
+    public func add(observer: AppStateObservable) {
         sync {
             cleanObservers()
             PKLog.trace("add observer, \(observer)")
@@ -61,7 +63,7 @@ extension AppStateSubjectProtocol {
     }
     
     /// Removes an observer to stop being inform when state events are posted.
-    func remove(observer: AppStateObservable) {
+    public func remove(observer: AppStateObservable) {
         sync {
             cleanObservers()
             // search for the observer to remove
@@ -94,7 +96,7 @@ extension AppStateSubjectProtocol {
     // MARK: AppStateProviderDelegate
     /************************************************************/
     
-    func appStateEventPosted(name: ObservationName) {
+    public func appStateEventPosted(name: ObservationName) {
         sync {
             PKLog.trace("app state event posted with name: \(name.rawValue)")
             for appStateObserver in self.observers {
@@ -132,20 +134,20 @@ extension AppStateSubjectProtocol {
 ///
 /// **For Unit-Testing:** When mocking this object just conform to the `AppStateSubjectProtocol`.
 /// For firing events to observers manually use `appStateEventPosted(name: ObservationName)` with the observation name.
-final class AppStateSubject: AppStateSubjectProtocol {
+public final class AppStateSubject: AppStateSubjectProtocol {
     
     // singleton object and private init to prevent unwanted creation of more objects.
-    static let shared = AppStateSubject()
+    public static let shared = AppStateSubject()
     private init() {
         self.appStateProvider = AppStateProvider()
         self.appStateProvider.delegate = self
     }
     
-    let lock: AnyObject = UUID().uuidString as AnyObject
+    public let lock: AnyObject = UUID().uuidString as AnyObject
     
-    var observers = [AppStateObserver]()
-    var appStateProvider: AppStateProvider
-    var isObserving = false
+    public var observers = [AppStateObserver]()
+    public var appStateProvider: AppStateProvider
+    public var isObserving = false
 }
 
 /************************************************************/
@@ -153,23 +155,27 @@ final class AppStateSubject: AppStateSubjectProtocol {
 /************************************************************/
 
 /// Used to specify observation name
-typealias ObservationName = Notification.Name // used as typealias in case we will change type in the future.
+public typealias ObservationName = Notification.Name // used as typealias in case we will change type in the future.
 
 /// represents a single observation with observation name as the type, and a block to perform when observing.
-struct NotificationObservation: Hashable {
-    var name: ObservationName
-    var onObserve: () -> Void
+public struct NotificationObservation: Hashable {
+    public init(name: ObservationName, onObserve: @escaping () -> Void) {
+        self.name = name
+        self.onObserve = onObserve
+    }
+    public var name: ObservationName
+    public var onObserve: () -> Void
     
-    var hashValue: Int {
+    public var hashValue: Int {
         return name.rawValue.hash
     }
 }
 
-func == (lhs: NotificationObservation, rhs: NotificationObservation) -> Bool {
+public func == (lhs: NotificationObservation, rhs: NotificationObservation) -> Bool {
     return lhs.name.rawValue == rhs.name.rawValue
 }
 
-class AppStateObserver: AnyObject {
+public class AppStateObserver: AnyObject {
     weak var observer: AppStateObservable?
     init(_ observer: AppStateObservable) {
         self.observer = observer
@@ -178,6 +184,6 @@ class AppStateObserver: AnyObject {
 
 /// A type that provides a set of NotificationObservation to observe.
 /// This interface defines the observations we would want in our class, for example a set of [willTerminate, didEnterBackground etc.]
-protocol AppStateObservable: AnyObject {
+public protocol AppStateObservable: AnyObject {
     var observations: Set<NotificationObservation> { get }
 }

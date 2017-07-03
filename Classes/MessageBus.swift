@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  MessageBus.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Eliza Sapir on 14/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
@@ -59,7 +61,7 @@ private struct Observation {
     
     @objc public func post(_ event: PKEvent) {
         DispatchQueue.global().async { [weak self] in
-            PKLog.info("Post event: \(String(describing: type(of: event)))")
+            PKLog.info("post event: \(event.namespace), with data: \(event.data ?? [:])")
             let typeId = NSStringFromClass(type(of: event))
             
             if let array = self?.observations[typeId] {

@@ -1,15 +1,17 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PKTimer.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 31/01/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
 // Timer extension to add block based timers without the need for Timer's selector.
-extension Timer {
+public extension Timer {
     
     /// Create a timer that will call `block` after interval once.
     class func after(_ interval: TimeInterval, _ block: @escaping () -> Void) -> Timer {

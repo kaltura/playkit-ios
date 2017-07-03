@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  AnalyticsPluginConfig.swift
-//  PlayKit
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 08/02/2017.
-//  Copyright © 2017 CocoaPods. All rights reserved.
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
@@ -21,8 +23,8 @@ enum PluginTestConfiguration {
     
     var pluginName: String {
         switch self {
-        case .TVPAPI: return "PhoenixAnalyticsPluginMock"
-        case .Phoenix: return "TVPAPIAnalyticsPluginMock"
+        case .TVPAPI: return "TVPAPIAnalyticsPluginMock" 
+        case .Phoenix: return "PhoenixAnalyticsPluginMock"
         }
     }
     
@@ -31,13 +33,12 @@ enum PluginTestConfiguration {
         case .TVPAPI: return [
             "fileId": "464302",
             "baseUrl": "http://tvpapi-preprod.ott.kaltura.com/v3_9/gateways/jsonpostgw.aspx?",
-            "timerInterval":30000,
-            "initObj": ""
+            "timerInterval":30,
+            "initObj": ["": ""]
             ]
         case .Phoenix: return [
             "fileId": "464302",
             "baseUrl": "http://api-preprod.ott.kaltura.com/v4_1/api_v3/",
-            "ks": "djJ8MTk4fL1W9Rs4udDqNt_CpUT9dJKk1laPk9_XnBtUaq7PXVcVPYrXz2shTbKSW1G5Lhn_Hvbbnh0snheANOmSodl7Puowxhk2WYkpmNugi9vNAg5C",
             "partnerId": 198,
             "timerInterval": 30
             ]

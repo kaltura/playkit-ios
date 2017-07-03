@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  OTTEntryProvider.swift
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//
-//  Created by Admin on 13/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import UIKit
 import SwiftyJSON
@@ -59,9 +61,9 @@ public enum PhoenixMediaProviderError: PKError {
     /// in case the response data is empty
     case emptyResponse
 
-    static let domain = "com.kaltura.playkit.error.PhoenixMediaProvider"
+    public static let domain = "com.kaltura.playkit.error.PhoenixMediaProvider"
 
-    var code: Int {
+    public var code: Int {
         switch self {
         case .invalidInputParam: return 0
         case .unableToParseData: return 1
@@ -71,7 +73,7 @@ public enum PhoenixMediaProviderError: PKError {
         }
     }
 
-    var errorDescription: String {
+    public var errorDescription: String {
 
         switch self {
         case .invalidInputParam(let param): return "Invalid input param: \(param)"
@@ -82,7 +84,7 @@ public enum PhoenixMediaProviderError: PKError {
         }
     }
 
-    var userInfo: [String: Any] {
+    public var userInfo: [String: Any] {
         return [String: Any]()
     }
 

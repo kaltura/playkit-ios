@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PlayerControllerTest.swift
-//  PlayKit
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Itay Kinnrot on 04/12/2016.
-//  Copyright © 2016 CocoaPods. All rights reserved.
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import XCTest
 import PlayKit
@@ -19,30 +21,12 @@ class PlayerControllerTest: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        
-        var source = [String : Any]()
-        source["id"] = "test"
-        source["url"] = "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
-        
-        var sources = [JSON]()
-        sources.append(JSON(source))
-        
-        var entry = [String : Any]()
-        entry["id"] = "test"
-        entry["sources"] = sources
-        let mediaConfig = MediaConfig(mediaEntry: MediaEntry(json: entry))
-        
-        do{
-        self.player = try PlayKitManager.shared.loadPlayer(pluginConfig: nil)
-        } catch {
-            
-        }
-        self.player.prepare(mediaConfig)
+        self.player = self.createPlayer()
     }
     
     override func tearDown() {
         super.tearDown()
-        self.player.destroy()
+        self.destroyPlayer(player)
     }
     
     func testPlayCommand() {
@@ -68,7 +52,9 @@ class PlayerControllerTest: XCTestCase {
                 XCTFail()
             }
         }
-        self.player.pause()
+        self.player.addObserver(self, events: [PlayerEvent.playing]) { [weak self] event in
+            self?.player.pause()
+        }
         waitForExpectations(timeout: 10.0) { (_) -> Void in}
     }
     

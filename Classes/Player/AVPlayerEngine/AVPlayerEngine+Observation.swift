@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  AVPlayerEngine+Observation.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 07/03/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
@@ -16,8 +18,9 @@ extension AVPlayerEngine {
     private var observedKeyPaths: [String] {
         return [
             #keyPath(rate),
-            #keyPath(currentItem.status),
+            #keyPath(status),
             #keyPath(currentItem),
+            #keyPath(currentItem.status),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
             #keyPath(currentItem.timedMetadata)
@@ -34,8 +37,8 @@ extension AVPlayerEngine {
             addObserver(self, forKeyPath: keyPath, options: [.new, .initial], context: &observerContext)
         }
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.playerFailed(notification:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.playerPlayedToEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem) // TODO: check if fired same as playerItem.status == failed if yes then remove this notificaiton observation.
+        NotificationCenter.default.addObserver(self, selector: #selector(self.didFailToPlayToEndTime(_:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.didPlayToEndTime(_:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: self.currentItem?.timebase)
@@ -62,7 +65,7 @@ extension AVPlayerEngine {
     
     func onAccessLogEntryNotification(notification: Notification) {
         if let item = notification.object as? AVPlayerItem, let accessLog = item.accessLog(), let lastEvent = accessLog.events.last {
-            if #available(iOS 10.0, *) {
+            if #available(iOS 10.0, tvOS 10.0, *) {
                 PKLog.debug("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
             }
             
@@ -76,7 +79,7 @@ extension AVPlayerEngine {
         self.post(event: PlayerEvent.ErrorLog(error: PlayerErrorLog(errorLogEvent: lastEvent)))
     }
     
-    public func playerFailed(notification: NSNotification) {
+    func didFailToPlayToEndTime(_ notification: NSNotification) {
         let newState = PlayerState.error
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
@@ -88,8 +91,8 @@ extension AVPlayerEngine {
         }
     }
     
-    public func playerPlayedToEnd(notification: NSNotification) {
-        let newState = PlayerState.idle
+    func didPlayToEndTime(_ notification: NSNotification) {
+        let newState = PlayerState.ended
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         // In iOS 9 and below rate is 1.0 even when playback is finished.
@@ -100,7 +103,6 @@ extension AVPlayerEngine {
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
         PKLog.debug("observeValue:: onEvent/onState")
         
         guard context == &observerContext else {
@@ -118,8 +120,19 @@ extension AVPlayerEngine {
         case #keyPath(currentItem.playbackLikelyToKeepUp): self.handleLikelyToKeepUp()
         case #keyPath(currentItem.playbackBufferEmpty): self.handleBufferEmptyChange()
         case #keyPath(rate): self.handleRate()
-        case #keyPath(currentItem.status): self.handleStatusChange()
+        case #keyPath(status):
+            guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerStatus = AVPlayerStatus(rawValue: statusChange.intValue) else {
+                PKLog.error("unknown player status")
+                return
+            }
+            self.handle(status: newPlayerStatus)
         case #keyPath(currentItem): self.handleItemChange()
+        case #keyPath(currentItem.status):
+            guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerItemStatus = AVPlayerItemStatus(rawValue: statusChange.intValue) else {
+                PKLog.error("unknown player item status")
+                return
+            }
+            self.handle(playerItemStatus: newPlayerItemStatus)
         case #keyPath(currentItem.timedMetadata): self.handleTimedMedia()
         default: super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
@@ -164,8 +177,21 @@ extension AVPlayerEngine {
         PKLog.debug("player rate was changed, now: \(self.rate)")
     }
     
-    private func handleStatusChange() {
-        if currentItem?.status == .readyToPlay {
+    private func handle(status: AVPlayerStatus) {
+        switch status {
+        case .readyToPlay: PKLog.debug("player is ready to play player items")
+        case .failed:
+            PKLog.error("player failed you must recreate the player instance")
+            if let error = (self.error as NSError?) {
+                self.post(event: PlayerEvent.Error(error: PlayerError.failed(rootError: error)))
+            }
+        case .unknown: break
+        }
+    }
+    
+    private func handle(playerItemStatus status: AVPlayerItemStatus) {
+        switch status {
+        case .readyToPlay:
             let newState = PlayerState.ready
             
             if self.startPosition > 0 {
@@ -183,20 +209,21 @@ extension AVPlayerEngine {
             if self.isFirstReady {
                 self.isFirstReady = false
                 // when player item is readyToPlay for the first time it is safe to assume we have a valid duration.
-                if let duration = self.currentItem?.duration, duration != kCMTimeIndefinite {
+                if let duration = self.currentItem?.duration, !CMTIME_IS_INDEFINITE(duration) {
                     PKLog.debug("duration in seconds: \(CMTimeGetSeconds(duration))")
                     self.post(event: PlayerEvent.DurationChanged(duration: CMTimeGetSeconds(duration)))
                 }
                 self.post(event: PlayerEvent.LoadedMetadata())
                 self.post(event: PlayerEvent.CanPlay())
             }
-        } else if currentItem?.status == .failed {
+        case .failed:
             let newState = PlayerState.error
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             if let error = currentItem?.error as NSError? {
                 self.post(event: PlayerEvent.Error(error: PlayerError.playerItemFailed(rootError: error)))
             }
+        case .unknown: break
         }
     }
     

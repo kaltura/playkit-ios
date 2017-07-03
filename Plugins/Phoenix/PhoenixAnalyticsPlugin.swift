@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PhoenixAnalyticsPlugin.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Oded Klein on 27/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import UIKit
 import KalturaNetKit
@@ -13,32 +15,40 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
     
     public override class var pluginName: String { return "PhoenixAnalytics" }
     
+    var config: PhoenixAnalyticsPluginConfig! {
+        didSet {
+            self.interval = config.timerInterval
+        }
+    }
+    
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        guard let config = pluginConfig as? PhoenixAnalyticsPluginConfig else {
+            PKLog.error("missing/wrong plugin config")
+            throw PKPluginError.missingPluginConfig(pluginName: PhoenixAnalyticsPlugin.pluginName)
+        }
+        self.config = config
+        self.interval = config.timerInterval
+    }
+    
+    public override func onUpdateConfig(pluginConfig: Any) {
+        super.onUpdateConfig(pluginConfig: pluginConfig)
+        
+        guard let config = pluginConfig as? PhoenixAnalyticsPluginConfig else {
+            PKLog.error("plugin config is wrong")
+            return
+        }
+        
+        PKLog.debug("new config::\(String(describing: config))")
+        self.config = config
+    }
+    
     /************************************************************/
     // MARK: - KalturaOTTAnalyticsPluginProtocol
     /************************************************************/
     
     override func buildRequest(ofType type: OTTAnalyticsEventType) -> Request? {
-        var fileId = ""
-        var baseUrl = ""
-        var ks = ""
-        var parterId = 0
-        
-        if let url = self.config?.params["baseUrl"] as? String {
-            baseUrl = url
-        }
-        
-        if let fId = self.config?.params["fileId"] as? String {
-            fileId = fId
-        }
-        
-        if let theKs = self.config?.params["ks"] as? String {
-            ks = theKs
-        }
-        
-        if let pId = self.config?.params["partnerId"] as? Int {
-            parterId = pId
-        }
-        
+       
         guard let player = self.player else {
             PKLog.error("send analytics failed due to nil associated player")
             return nil
@@ -46,18 +56,17 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
         
         guard let mediaEntry = player.mediaEntry else {
             PKLog.error("send analytics failed due to nil mediaEntry")
-            self.messageBus?.post(PlayerEvent.PluginError(error: AnalyticsPluginError.missingMediaEntry))
             return nil
         }
         
-        guard let requestBuilder: KalturaRequestBuilder = BookmarkService.actionAdd(baseURL: baseUrl,
-                                                                          partnerId: parterId,
-                                                                          ks: ks,
-                                                                          eventType: type.rawValue.uppercased(),
-                                                                          currentTime: player.currentTime.toInt32(),
-                                                                          assetId: mediaEntry.id,
-                                                                          fileId: fileId) else {
-            return nil
+        guard let requestBuilder: KalturaRequestBuilder = BookmarkService.actionAdd(baseURL: config.baseUrl,
+                                                                                    partnerId: config.partnerId,
+                                                                                    ks: config.ks,
+                                                                                    eventType: type.rawValue.uppercased(),
+                                                                                    currentTime: player.currentTime.toInt32(),
+                                                                                    assetId: mediaEntry.id,
+                                                                                    fileId: fileId ?? "") else {
+                                                                                        return nil
         }
         
         requestBuilder.set { (response: Response) in

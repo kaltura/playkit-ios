@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  AdCuePoints.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 05/03/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
@@ -12,7 +14,7 @@ import Foundation
     
     @objc public private(set) var cuePoints: [TimeInterval]
     
-    init(cuePoints: [TimeInterval]) {
+    public init(cuePoints: [TimeInterval]) {
         self.cuePoints = cuePoints.sorted() // makes sure array is sorted
     }
     

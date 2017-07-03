@@ -1,16 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  YouboraPlugin.swift
-//  AdvancedExample
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Oded Klein on 19/10/2016.
-//  Copyright © 2016 Kaltura, Inc. All rights reserved.
-//
-
-import YouboraLib
-
-/************************************************************/
-// MARK: - YouboraPlugin
-/************************************************************/
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 public class YouboraPlugin: BasePlugin, AppStateObservable {
     
@@ -113,7 +109,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     // MARK: - App State Handling
     /************************************************************/
     
-    var observations: Set<NotificationObservation> {
+    public var observations: Set<NotificationObservation> {
         return [
             NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
                 PKLog.debug("youbora plugin will terminate event received")

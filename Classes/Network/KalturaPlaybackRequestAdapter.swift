@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  KalturaPlaybackRequestAdapter.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 05/04/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
@@ -21,7 +23,11 @@ class KalturaPlaybackRequestAdapter: PKRequestParamsAdapter {
         guard requestParams.url.path.contains("/playManifest/") else { return requestParams }
         guard var urlComponents = URLComponents(url: requestParams.url, resolvingAgainstBaseURL: false) else { return requestParams }
         // add query items to the request
-        let queryItems = [URLQueryItem(name: "playSessionId", value: sessionId), URLQueryItem(name: "clientTag", value: PlayKitManager.clientTag)]
+        let queryItems = [
+            URLQueryItem(name: "playSessionId", value: sessionId),
+            URLQueryItem(name: "clientTag", value: PlayKitManager.clientTag),
+            URLQueryItem(name: "referrer", value: Bundle.main.bundleIdentifier?.data(using: .utf8)?.base64EncodedString() ?? "")
+        ]
         if var urlQueryItems = urlComponents.queryItems {
             urlQueryItems += queryItems
             urlComponents.queryItems = urlQueryItems

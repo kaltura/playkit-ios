@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  Player.swift
-//  PlayKit
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Noam Tamim on 28/08/2016.
-//  Copyright © 2016 Kaltura. All rights reserved.
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import UIKit
 import AVFoundation
@@ -30,10 +32,13 @@ import AVKit
     @objc var settings: PlayerSettings { get }
     
     /// The player's view component.
-    @objc var view: PlayerView { get }
+    @objc var view: PlayerView! { get }
     
     /// The current player position.
     @objc var currentTime: TimeInterval { get set }
+    
+    /// The player's currentState.
+    @objc var currentState: PlayerState { get }
     
     /// The player's duration.
     @objc var isPlaying: Bool { get }
@@ -50,6 +55,9 @@ import AVKit
     /// The player's session id. the `sessionId` is initialized when the player loads.
     @objc var sessionId: String { get }
 
+    /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
+    @objc var rate: Float { get }
+    
     /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
     @objc func prepare(_ config: MediaConfig)
     
@@ -72,9 +80,15 @@ import AVKit
     @objc func destroy()
     
     /// Add Observation to relevant event.
+    @objc func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void)
+    
+    /// Add Observation to relevant events.
     @objc func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void)
     
-    /// Remove Observation.
+    /// Remove Observer for single event.
+    @objc func removeObserver(_ observer: AnyObject, event: PKEvent.Type)
+    
+    /// Remove Observer for several events.
     @objc func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
     
     /// Select Track
@@ -83,12 +97,15 @@ import AVKit
     /// Update Plugin Config
     @objc func updatePluginConfig(pluginName: String, config: Any)
     
+    #if os(iOS)
     /// Create PiP Controller
     @available(iOS 9.0, *)
     @objc func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
+    #endif
 }
 
 public protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
+
 

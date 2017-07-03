@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PKError.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 19/02/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation 
@@ -19,6 +21,7 @@ enum PlayerError: PKError {
     case failedToLoadAssetFromKeys(rootError: NSError?)
     case assetNotPlayable
     case playerItemFailed(rootError: NSError)
+    case failed(rootError: NSError)
     
     static let domain = "com.kaltura.playkit.error.player"
     
@@ -27,6 +30,7 @@ enum PlayerError: PKError {
         case .failedToLoadAssetFromKeys: return PKErrorCode.failedToLoadAssetFromKeys
         case .assetNotPlayable: return PKErrorCode.assetNotPlayable
         case .playerItemFailed: return PKErrorCode.playerItemFailed
+        case .failed: return PKErrorCode.playerFailed
         }
     }
     
@@ -35,6 +39,7 @@ enum PlayerError: PKError {
         case .failedToLoadAssetFromKeys: return "Can't use this AVAsset because one of it's keys failed to load"
         case .assetNotPlayable: return "Can't use this AVAsset because it isn't playable"
         case .playerItemFailed: return "Player item failed to play"
+        case .failed: return "Player failed, you can no longer use the player for playback and need to recreate it"
         }
     }
     
@@ -47,6 +52,7 @@ enum PlayerError: PKError {
             return [:]
         case .assetNotPlayable: return [:]
         case .playerItemFailed(let rootError): return [PKErrorKeys.RootErrorKey: rootError]
+        case .failed(let rootError): return [PKErrorKeys.RootErrorKey: rootError]
         }
     }
 }
@@ -79,28 +85,28 @@ struct PlayerErrorLog: PKError {
 /************************************************************/
 
 /// `PKPluginError` represents plugins errors.
-enum PKPluginError: PKError {
+public enum PKPluginError: PKError {
     
     case failedToCreatePlugin(pluginName: String)
     case missingPluginConfig(pluginName: String)
     
-    static let domain = "com.kaltura.playkit.error.plugins"
+    public static let domain = "com.kaltura.playkit.error.plugins"
     
-    var code: Int {
+    public var code: Int {
         switch self {
         case .failedToCreatePlugin: return PKErrorCode.failedToCreatePlugin
         case .missingPluginConfig: return PKErrorCode.missingPluginConfig
         }
     }
     
-    var errorDescription: String {
+    public var errorDescription: String {
         switch self {
         case .failedToCreatePlugin(let pluginName): return "failed to create plugin (\(pluginName)), doesn't exist in registry"
-        case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName)"
+        case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName) (wrong type or doesn't exist)"
         }
     }
     
-    var userInfo: [String: Any] {
+    public var userInfo: [String: Any] {
         switch self {
         case .failedToCreatePlugin(let pluginName): return [PKErrorKeys.PluginNameKey: pluginName]
         case .missingPluginConfig(let pluginName): return [PKErrorKeys.PluginNameKey: pluginName]
@@ -119,7 +125,7 @@ extension PKErrorKeys {
 
 /// `PKError` is used as a protocol for errors that can be converted to `NSError` if need be.
 /// - important: should be used on enums for best results on multiple cases!
-protocol PKError: Error, CustomStringConvertible {
+public protocol PKError: Error, CustomStringConvertible {
     
     /// The error domain (used for creating `NSError`)
     static var domain: String { get }
@@ -173,38 +179,23 @@ protocol PKError: Error, CustomStringConvertible {
 // MARK: - PKError default implementations
 /************************************************************/
 
-extension PKError {
+public extension PKError {
     /// description string
     public var description: String {
         return "\(type(of: self)) ,domain: \(type(of: self).domain), errorCode: \(self.code)"
     }
     
     /// creates an `NSError` from the selected case.
-    var asNSError: NSError {
+    public var asNSError: NSError {
         var userInfo = self.userInfo
         userInfo[NSLocalizedDescriptionKey] = self.errorDescription
         return NSError(domain: Self.domain, code: self.code, userInfo: userInfo)
     }
 }
 
-extension PKError where Self: RawRepresentable, Self.RawValue == String {
+public extension PKError where Self: RawRepresentable, Self.RawValue == String {
     var description: String {
         return "\(self.rawValue), domain: \(type(of: self).domain), errorCode: \(self.code)"
-    }
-}
-
-/************************************************************/
-// MARK: - Error
-/************************************************************/
-// extension for easier access to domain and code properties.
-extension Error {
-    
-    public var domain: String {
-        return self._domain
-    }
-    
-    public var code: Int {
-        return self._code
     }
 }
 
@@ -213,7 +204,7 @@ extension Error {
 /************************************************************/
 
 // general userInfo keys.
-struct PKErrorKeys {
+public struct PKErrorKeys {
     static let RootErrorKey = NSUnderlyingErrorKey
     static let RootCodeKey = "rootCode"
     static let RootDomainKey = "rootDomain"
@@ -237,6 +228,7 @@ struct PKErrorKeys {
     @objc(FailedToLoadAssetFromKeys) public static let failedToLoadAssetFromKeys = 7000
     @objc(AssetNotPlayable) public static let assetNotPlayable = 7001
     @objc(PlayerItemFailed) public static let playerItemFailed = 7002
+    @objc(PlayerFailed) public static let playerFailed = 7003
     // PlayerErrorLog
     @objc(PlayerItemErrorLogEvent) public static let playerItemErrorLogEvent = 7100
     // PKPluginError

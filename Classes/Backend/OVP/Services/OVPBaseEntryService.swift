@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  OVPBaseEntry.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Rivka Peleg on 27/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import UIKit
 import SwiftyJSON
@@ -56,7 +58,7 @@ class OVPBaseEntryService {
     
     internal static func getPlaybackContext(baseURL: String, ks: String, entryID: String) -> KalturaRequestBuilder? {
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "baseEntry", action: "getPlaybackContext") {
-            let contextData:[String:Any] = ["objectType":"KalturaContextDataParams"]
+            let contextData:[String:Any] = ["flavorTags":"all", "objectType":"KalturaContextDataParams"]
             request.setBody(key: "ks", value: JSON(ks))
                 .setBody(key: "entryId", value: JSON(entryID))
                 .setBody(key: "contextDataParams", value: JSON(contextData))

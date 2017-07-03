@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  AVPlayerEngine.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Eliza Sapir on 07/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
@@ -24,9 +26,8 @@ class AVPlayerEngine: AVPlayer {
         "hasProtectedContent"
     ]
     
-    private var playerLayer: AVPlayerLayer
-    private var _view: PlayerView
-    private var isDestroyed: Bool = false
+    fileprivate var playerLayer: AVPlayerLayer!
+    private var _view: PlayerView!
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
     var lastTimebaseRate: Float64 = 0
@@ -39,28 +40,35 @@ class AVPlayerEngine: AVPlayer {
     var tracksManager = TracksManager()
     var observerContext = 0
     
-    public var onEventBlock: ((PKEvent) -> Void)?
+    var onEventBlock: ((PKEvent) -> Void)?
     
-    public var view: PlayerView {
-        PKLog.debug("get player view: \(_view)")
+    var view: PlayerView! {
+        PKLog.trace("get player view: \(_view)")
         return _view
     }
     
-    public var asset: AVURLAsset? {
+    var asset: AVURLAsset? {
         didSet {
             guard let newAsset = asset else { return }
             self.asynchronouslyLoadURLAsset(newAsset)
         }
     }
     
-    public var currentPosition: Double {
+    /// Holds the current time for the current item.
+    /// - Attention: **For live streams** returns relative time according to the allowed stream window.
+    ///
+    /// In addition, keep in mind that because the duration is calcaulated from `seekableTimeRanges`
+    /// in live streams there could be a chance that current time will be bigger than the duration
+    /// because the current segment wasn't yet added to the seekable time ranges.
+    var currentPosition: Double {
         get {
-            PKLog.trace("get currentPosition: \(self.currentTime())")
-            return CMTimeGetSeconds(self.currentTime() - rangeStart)
+            let position = self.currentTime() - self.rangeStart
+            PKLog.trace("get currentPosition: \(position)")
+            return CMTimeGetSeconds(position)
         }
         set {
-            PKLog.debug("set currentPosition: \(currentPosition)")
-            let newTime = rangeStart + CMTimeMakeWithSeconds(newValue, 1)
+            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
+            PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [unowned self] (isSeeked: Bool) in
                 if isSeeked {
                     self.post(event: PlayerEvent.Seeked())
@@ -73,18 +81,21 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    public var startPosition: Double {
+    var startPosition: Double {
         didSet {
             PKLog.debug("set startPosition: \(startPosition)")
         }
     }
     
-    public var duration: Double {
+    var duration: Double {
         guard let currentItem = self.currentItem else { return 0.0 }
         
         var result = CMTimeGetSeconds(currentItem.duration)
-    
-        if result.isNaN {
+        
+        // This checks if the duration equals `kCMTimeIndefinite` which indicates this is a live stream.
+        // Using the last range duration gives us the live window duration. 
+        // For example a duration of 120seconds means we can seek up to 120 seconds from live playhead.
+        if CMTIME_IS_INDEFINITE(currentItem.duration) {
             let seekableRanges = currentItem.seekableTimeRanges
             if seekableRanges.count > 0 {
                 let range = seekableRanges.last!.timeRangeValue
@@ -96,7 +107,7 @@ class AVPlayerEngine: AVPlayer {
         return result
     }
     
-    public var isPlaying: Bool {
+    var isPlaying: Bool {
         guard let currentItem = self.currentItem else {
             PKLog.error("current item is empty")
             return false
@@ -114,20 +125,22 @@ class AVPlayerEngine: AVPlayer {
         return false
     }
     
-    public var currentAudioTrack: String? {
+    var currentAudioTrack: String? {
         if let currentItem = self.currentItem {
             return self.tracksManager.currentAudioTrack(item: currentItem)
         }
         return nil
     }
     
-    public var currentTextTrack: String? {
+    var currentTextTrack: String? {
         if let currentItem = self.currentItem {
             return self.tracksManager.currentTextTrack(item: currentItem)
         }
         return nil
     }
   
+    /// Gives the start time of the last seekable range.
+    /// This helps calculate `currentTime` and `duration` for live streams.
     private var rangeStart: CMTime {
         get {
             var result: CMTime = CMTimeMakeWithSeconds(0, 1)
@@ -143,7 +156,7 @@ class AVPlayerEngine: AVPlayer {
     
     // MARK: Player Methods
     
-    public override init() {
+    override init() {
         PKLog.info("init AVPlayer")
         
         self.startPosition = 0
@@ -164,10 +177,8 @@ class AVPlayerEngine: AVPlayer {
     
     deinit {
         PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
-        // Avoid dealloc while key value observers were still registered
-        if (!self.isDestroyed) {
-            self.removeObservers()
-        }
+        // removes the observers only on deinit to prevent chances of being removed twice.
+        self.removeObservers()
     }
     
     func stop() {
@@ -205,24 +216,16 @@ class AVPlayerEngine: AVPlayer {
         // this make sure everything will be cleared without any race conditions
         DispatchQueue.main.async {
             PKLog.info("destroy player")
-            self.removeObservers()
-            self._view.removeFromSuperview()
+            self.playerLayer = nil
+            self._view = nil
             self.onEventBlock = nil
             // removes app state observer
             AppStateSubject.shared.remove(observer: self)
             self.replaceCurrentItem(with: nil)
-            self.isDestroyed = true
         }
     }
     
-    @available(iOS 9.0, *)
-    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        let pip = AVPictureInPictureController(playerLayer: playerLayer)
-        pip?.delegate = delegate
-        return pip
-    }
-    
-    public func selectTrack(trackId: String) {
+    func selectTrack(trackId: String) {
         if trackId.isEmpty == false {
             self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
         } else {
@@ -241,6 +244,22 @@ class AVPlayerEngine: AVPlayer {
         self.post(event: stateChangedEvent)
     }
 }
+
+/************************************************************/
+// MARK: - iOS Only
+/************************************************************/
+
+#if os(iOS)
+    extension AVPlayerEngine {
+        
+        @available(iOS 9.0, *)
+        func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+            let pip = AVPictureInPictureController(playerLayer: playerLayer)
+            pip?.delegate = delegate
+            return pip
+        }
+    }
+#endif
 
 /************************************************************/
 // MARK: - App State Handling

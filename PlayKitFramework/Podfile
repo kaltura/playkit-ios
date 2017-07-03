@@ -2,7 +2,6 @@ use_frameworks!
 
 target 'PlayKitFramework' do
   pod 'PlayKit', :path => '../'
-  pod 'PlayKit/IMAPlugin', :path => '../'
   pod 'PlayKit/YouboraPlugin', :path => '../'
 end
 

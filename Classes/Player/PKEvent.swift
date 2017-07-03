@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PKEvent.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Eliza Sapir on 14/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
@@ -16,11 +18,25 @@ import AVFoundation
     
     @objc public required init(_ data: [String: Any]? = nil) {
         self.data = data
+        super.init()
+        self.namespace = self.getEventNamespace()
+    }
+    
+    private(set) var namespace: String = ""
+    
+    private func getEventNamespace() -> String {
+        var namespace = ""
+        var mirror: Mirror? = Mirror(reflecting: self)
+        while let m = mirror, m.subjectType != PKEvent.self && m.subjectType != NSObject.self {
+            namespace = namespace == "" ? String(describing: m.subjectType) : "\(String(describing: m.subjectType))." + namespace
+            mirror = m.superclassMirror
+        }
+        return namespace
     }
 }
 
 // MARK: - PKEvent Data Accessors Extension
-extension PKEvent {
+public extension PKEvent {
     // MARK: - Event Data Keys
     struct EventDataKeys {
         static let duration = "duration"
@@ -30,7 +46,7 @@ extension PKEvent {
         static let newState = "newState"
         static let error = "error"
         static let metadata = "metadata"
-        static let contentURL = "contentURL"
+        static let mediaSource = "mediaSource"
     }
     
     // MARK: Player Data Accessors
@@ -79,7 +95,7 @@ extension PKEvent {
     }
     
     /// Content url, PKEvent Data Accessor
-    @objc public var contentURL: URL? {
-        return self.data?[EventDataKeys.contentURL] as? URL
+    @objc public var mediaSource: MediaSource? {
+        return self.data?[EventDataKeys.mediaSource] as? MediaSource
     }
 }

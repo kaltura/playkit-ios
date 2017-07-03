@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PlayerController.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Eliza Sapir on 06/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
@@ -20,8 +22,6 @@ class PlayerController: NSObject, Player, PlayerSettings {
     
     /// the asset to prepare and pass to the player engine to start buffering.
     private var assetToPrepare: AVURLAsset?
-    /// private media entry stored property
-    private var _mediaEntry: MediaEntry?
     /// the current selected media source
     fileprivate var preferredMediaSource: MediaSource?
     /// the current handler for the selected source
@@ -38,11 +38,15 @@ class PlayerController: NSObject, Player, PlayerSettings {
     }
     
     public var mediaEntry: MediaEntry? {
-        return self._mediaEntry
+        return self.mediaConfig?.mediaEntry
     }
     
     public var duration: Double {
         return self.currentPlayer.duration
+    }
+    
+    public var currentState: PlayerState {
+        return self.currentPlayer.currentState
     }
     
     public var isPlaying: Bool {
@@ -62,12 +66,16 @@ class PlayerController: NSObject, Player, PlayerSettings {
         return self.currentPlayer.currentTextTrack
     }
     
-    public var view: PlayerView {
+    public var view: PlayerView! {
         return self.currentPlayer.view
     }
     
     public var sessionId: String {
         return self.sessionUUID.uuidString + ":" + (self.mediaSessionUUID?.uuidString ?? "")
+    }
+    
+    public var rate: Float {
+        return self.currentPlayer.rate
     }
     
     let sessionUUID = UUID()
@@ -93,7 +101,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
         
         // get the preferred media source and post source selected event
         guard let (preferredMediaSource, handlerType) = AssetBuilder.getPreferredMediaSource(from: mediaConfig.mediaEntry) else { return }
-        self.onEventBlock?(PlayerEvent.SourceSelected(contentURL: preferredMediaSource.playbackUrl))
+        self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: preferredMediaSource))
         self.preferredMediaSource = preferredMediaSource
         
         // update the media source request adapter with new media uuid if using kaltura request adapter
@@ -147,17 +155,22 @@ class PlayerController: NSObject, Player, PlayerSettings {
         self.currentPlayer.currentPosition = CMTimeGetSeconds(time)
     }
     
-    @available(iOS 9.0, *)
-    func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-        return self.currentPlayer.createPiPController(with: delegate)
-    }
+    
     
     func destroy() {
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
     }
     
+    func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
     func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
+    func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
         //Assert.shouldNeverHappen();
     }
     
@@ -173,6 +186,20 @@ class PlayerController: NSObject, Player, PlayerSettings {
         //Assert.shouldNeverHappen();
     }
 }
+
+/************************************************************/
+// MARK: - iOS Only
+/************************************************************/
+
+#if os(iOS)
+    extension PlayerController {
+        
+        @available(iOS 9.0, *)
+        func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
+            return self.currentPlayer.createPiPController(with: delegate)
+        }
+    }
+#endif
 
 /************************************************************/
 // MARK: - Private

@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PhoenixPluginTest.swift
-//  PlayKit
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 08/02/2017.
-//  Copyright © 2017 CocoaPods. All rights reserved.
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import Quick
@@ -27,22 +29,28 @@ class PhoenixPluginTest: QuickSpec {
     /************************************************************/
     
     override func spec() {
-        describe("phoenix request builder test") {
-            PlayKitManager.shared.registerPlugin(PhoenixPluginTest.PhoenixAnalyticsPluginMock.self)
+        describe("PhoenixPluginTest") {
             var player: PlayerLoader!
             var phoenixPluginMock: PhoenixPluginTest.PhoenixAnalyticsPluginMock!
             
             beforeEach {
-                player = self.createPlayer()
+                PlayKitManager.shared.registerPlugin(PhoenixPluginTest.PhoenixAnalyticsPluginMock.self)
+                player = self.createPlayerForPhoenix()
                 phoenixPluginMock = player.loadedPlugins[PhoenixPluginTest.PhoenixAnalyticsPluginMock.pluginName]!.plugin as! PhoenixPluginTest.PhoenixAnalyticsPluginMock
             }
             
             afterEach {
-                player.destroy()
+                self.destroyPlayer(player)
             }
             
             it("can build play event request") {
+                let expectedDataBody = "{\"clientTag\":\"java:16-09-10\",\"apiVersion\":\"3.6.1078.11798\",\"bookmark\":{\"position\":0,\"objectType\":\"KalturaBookmark\",\"type\":\"media\",\"id\":\"test\",\"playerData\":{\"fileId\":\"464302\",\"action\":\"PLAY\",\"objectType\":\"KalturaBookmarkPlayerData\"}},\"ks\":\"\"}".data(using: .utf8)
+                let expectedUrl = "http://api-preprod.ott.kaltura.com/v4_1/api_v3//service/bookmark/action/add"
+                
                 let request = phoenixPluginMock.buildRequest(ofType: .play)
+                
+                expect(expectedUrl).to(equal(request?.url.absoluteString))
+                expect(expectedDataBody).to(equal(request?.dataBody))
             }
         }
     }

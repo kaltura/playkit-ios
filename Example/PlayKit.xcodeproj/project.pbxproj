@@ -11,6 +11,8 @@
 		2012AFAF1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFAE1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift */; };
 		2012AFB21E4B860B00BBA61C /* PhoenixPluginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFB11E4B860B00BBA61C /* PhoenixPluginTest.swift */; };
 		2012AFB41E4B872300BBA61C /* PlayerCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFB31E4B872300BBA61C /* PlayerCreator.swift */; };
+		20ADCFB11EE983A900B01019 /* KalturaRequestBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20ADCFB01EE983A900B01019 /* KalturaRequestBuilderTest.swift */; };
+		20C02A321EEE90EC00F83B44 /* TVPAPIPluginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C02A311EEE90EC00F83B44 /* TVPAPIPluginTest.swift */; };
 		20CD64591E4C9697002C9401 /* PluginTestConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CD64581E4C9697002C9401 /* PluginTestConfiguration.swift */; };
 		49AD556D5A90D82F391750B8 /* Pods_PlayKit_PlayKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BF84E8D861C5637BA8624EE /* Pods_PlayKit_PlayKit_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
@@ -46,6 +48,8 @@
 		2012AFAE1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTAnalyticsPluginTest.swift; sourceTree = "<group>"; };
 		2012AFB11E4B860B00BBA61C /* PhoenixPluginTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhoenixPluginTest.swift; path = Phoenix/PhoenixPluginTest.swift; sourceTree = "<group>"; };
 		2012AFB31E4B872300BBA61C /* PlayerCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerCreator.swift; sourceTree = "<group>"; };
+		20ADCFB01EE983A900B01019 /* KalturaRequestBuilderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KalturaRequestBuilderTest.swift; path = RequestBuilder/KalturaRequestBuilderTest.swift; sourceTree = "<group>"; };
+		20C02A311EEE90EC00F83B44 /* TVPAPIPluginTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TVPAPIPluginTest.swift; path = TVPAPI/TVPAPIPluginTest.swift; sourceTree = "<group>"; };
 		20CD64581E4C9697002C9401 /* PluginTestConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PluginTestConfiguration.swift; sourceTree = "<group>"; };
 		347179E45954932C0B17A1AF /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		349AFD3D2D9F85463A6A0F41 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -117,6 +121,7 @@
 			children = (
 				2012AFAE1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift */,
 				2012AFB01E4B85D600BBA61C /* Phoenix */,
+				20C02A301EEE90B600F83B44 /* TVPAPI */,
 			);
 			path = Analytics;
 			sourceTree = "<group>";
@@ -127,6 +132,22 @@
 				2012AFB11E4B860B00BBA61C /* PhoenixPluginTest.swift */,
 			);
 			name = Phoenix;
+			sourceTree = "<group>";
+		};
+		20ADCFAF1EE9832700B01019 /* RequestBuilder */ = {
+			isa = PBXGroup;
+			children = (
+				20ADCFB01EE983A900B01019 /* KalturaRequestBuilderTest.swift */,
+			);
+			name = RequestBuilder;
+			sourceTree = "<group>";
+		};
+		20C02A301EEE90B600F83B44 /* TVPAPI */ = {
+			isa = PBXGroup;
+			children = (
+				20C02A311EEE90EC00F83B44 /* TVPAPIPluginTest.swift */,
+			);
+			name = TVPAPI;
 			sourceTree = "<group>";
 		};
 		20CD64571E4C9697002C9401 /* Helpers */ = {
@@ -238,6 +259,7 @@
 		C23A62C81DF412FD00635FA2 /* MediaEntryProvider */ = {
 			isa = PBXGroup;
 			children = (
+				20ADCFAF1EE9832700B01019 /* RequestBuilder */,
 				C23A62C91DF412FD00635FA2 /* MockMediaProviderTest.swift */,
 				C23A62CA1DF412FD00635FA2 /* PhoenixMediaProviderTest.swift */,
 				C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */,
@@ -392,7 +414,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		7A881257393B54AEAE0C3921 /* [CP] Embed Pods Frameworks */ = {
@@ -452,7 +474,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -477,6 +499,8 @@
 				20CD64591E4C9697002C9401 /* PluginTestConfiguration.swift in Sources */,
 				C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */,
 				C2D803221E6C09CF00A3DE15 /* SourceSelectorTest.swift in Sources */,
+				20ADCFB11EE983A900B01019 /* KalturaRequestBuilderTest.swift in Sources */,
+				20C02A321EEE90EC00F83B44 /* TVPAPIPluginTest.swift in Sources */,
 				2012AFB21E4B860B00BBA61C /* PhoenixPluginTest.swift in Sources */,
 				BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */,
 				2012AFB41E4B872300BBA61C /* PlayerCreator.swift in Sources */,
@@ -537,6 +561,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -584,6 +609,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -644,6 +670,7 @@
 			baseConfigurationReference = 9EB557AA5D4017F3D9667F25 /* Pods-PlayKit-PlayKit_Tests.debug.xcconfig */;
 			buildSettings = {
 				DEPLOYMENT_POSTPROCESSING = YES;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -665,6 +692,7 @@
 			baseConfigurationReference = B6357392C349F8B33892AE33 /* Pods-PlayKit-PlayKit_Tests.release.xcconfig */;
 			buildSettings = {
 				DEPLOYMENT_POSTPROCESSING = YES;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INFOPLIST_FILE = Tests/Info.plist;

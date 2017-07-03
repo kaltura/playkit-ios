@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  OVPMediaProvider.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Rivka Peleg on 27/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import UIKit
 import SwiftyXMLParser
@@ -182,10 +184,14 @@ import KalturaNetKit
                             return
                     }
                     
+                    let masterSourceFlavorId = contextData.flavorAssets?.first( where: {$0.paramsId == 0})
+                    
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach { (source: OVPSource) in
-                        //detecting the source type
+                        //Remove master source flavorId from flavorIds.
+                        source.flavors = source.flavors?.filter({ $0 != masterSourceFlavorId?.id })
                         
+                        //detecting the source type
                         let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
                         //If source type is not supported source will not be created
                         guard format != .unknown else { return }
@@ -255,10 +261,6 @@ import KalturaNetKit
         
         return metaDataItems
     }
-    
-    
-
-    
     
     // Creating the drm data based on scheme
     private func buildDRMParams(drm: [OVPDRM]?) -> [DRMParams]? {
