@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  KalturaStatsPlugin.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Oded Klein on 01/12/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import KalturaNetKit
 
@@ -29,7 +31,7 @@ extension PKEvent {
     }
 }
 
-public class KalturaStatsPlugin: BaseAnalyticsPlugin {
+public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
     // stats event types
     enum KalturaStatsEventType : Int {
@@ -76,10 +78,6 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
         case error = 99
     }
     
-    public override class var pluginName: String {
-        return "KalturaStatsPlugin"
-    }
-    
     private var isWidgetLoaded = false
     private var isMediaLoaded = false
     private var isBuffering = false
@@ -94,13 +92,61 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     private var hasSeeked = false
     
     private var timer: Timer?
-    private var interval: TimeInterval = 30
+    private var interval: TimeInterval = 10
+    
+    var config: KalturaStatsPluginConfig!
+    /// indicates whether we played for the first time or not.
+    var isFirstPlay: Bool = true
+    
+    /************************************************************/
+    // MARK: - PKPlugin
+    /************************************************************/
+    
+    public override class var pluginName: String {
+        return "KalturaStatsPlugin"
+    }
+    
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        guard let config = pluginConfig as? KalturaStatsPluginConfig else {
+            PKLog.error("missing plugin config or wrong plugin class type")
+            throw PKPluginError.missingPluginConfig(pluginName: KalturaStatsPlugin.pluginName)
+        }
+        self.config = config
+        self.registerEvents()
+    }
+    
+    public override func onUpdateMedia(mediaConfig: MediaConfig) {
+        super.onUpdateMedia(mediaConfig: mediaConfig)
+        self.resetPlayerFlags()
+        self.timer?.invalidate()
+    }
+    
+    public override func onUpdateConfig(pluginConfig: Any) {
+        super.onUpdateConfig(pluginConfig: pluginConfig)
+        
+        guard let config = pluginConfig as? KalturaStatsPluginConfig else {
+            PKLog.error("plugin configis wrong")
+            return
+        }
+        
+        PKLog.debug("new config::\(String(describing: config))")
+        self.config = config
+    }
+    
+    public override func destroy() {
+        self.messageBus?.removeObserver(self, events: playerEventsToRegister)
+        if let t = self.timer {
+            t.invalidate()
+        }
+        super.destroy()
+    }
     
     /************************************************************/
     // MARK: - AnalyticsPluginProtocol
     /************************************************************/
     
-    override var playerEventsToRegister: [PlayerEvent.Type] {
+    var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.error,
             PlayerEvent.canPlay,
@@ -110,7 +156,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
         ]
     }
     
-    override func registerEvents() {
+    func registerEvents() {
         PKLog.debug("register player events")
         
         self.playerEventsToRegister.forEach { event in
@@ -136,7 +182,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                     guard let strongSelf = self else { return }
                     PKLog.debug("play event: \(event)")
                     if strongSelf.isFirstPlay {
-                        strongSelf.sendEvent(ofType: .play, withMessage: "Play event")
+                        strongSelf.sendAnalyticsEvent(action: .play)
                         strongSelf.isFirstPlay = false
                     }
                 })
@@ -144,7 +190,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                 self.messageBus?.addObserver(self, events: [e.self], block: { [weak self] (event) in
                     guard let strongSelf = self else { return }
                     PKLog.debug("error event: \(event)")
-                    strongSelf.sendEvent(ofType: .error, withMessage: "Error event")
+                    strongSelf.sendAnalyticsEvent(action: .error)
                 })
             case let e where e.self == PlayerEvent.stateChanged:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
@@ -154,16 +200,12 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                         switch stateChanged.newState {
                         case .idle:
                             strongSelf.sendWidgetLoaded()
-                        case .loading:
-                            strongSelf.sendWidgetLoaded()
-                            if strongSelf.isBuffering {
-                                strongSelf.isBuffering = false
-                                strongSelf.sendEvent(ofType: .bufferEnd, withMessage: "Buffer end event")
-                            }
+                        case .ended:
+                            PKLog.info("media ended")
                         case .ready:
                             if strongSelf.isBuffering {
                                 strongSelf.isBuffering = false
-                                strongSelf.sendEvent(ofType: .bufferEnd, withMessage: "Buffer end event")
+                                strongSelf.sendAnalyticsEvent(action: .bufferEnd)
                             }
                             if !strongSelf.intervalOn {
                                 strongSelf.intervalOn = true
@@ -173,7 +215,7 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                         case .buffering:
                             strongSelf.sendWidgetLoaded()
                             strongSelf.isBuffering = true
-                            strongSelf.sendEvent(ofType: .bufferStart, withMessage: "Buffer start event")
+                            strongSelf.sendAnalyticsEvent(action: .error)
                         case .error: break
                         case .unknown: break
                         }
@@ -181,35 +223,6 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
                 }
             default: assertionFailure("all events must be handled")
             }
-        }
-    }
-    
-    /************************************************************/
-    // MARK: - PKPlugin
-    /************************************************************/
-    
-    public override func onUpdateMedia(mediaConfig: MediaConfig) {
-        super.onUpdateMedia(mediaConfig: mediaConfig)
-        self.isWidgetLoaded = false
-        self.isMediaLoaded = false
-        self.isBuffering = false
-        
-        self.seekPercent = 0.0
-        
-        self.playReached25 = false
-        self.playReached50 = false
-        self.playReached75 = false
-        self.playReached100 = false
-        self.intervalOn = false
-        self.hasSeeked = false
-        
-        self.timer?.invalidate()
-    }
-    
-    public override func destroy() {
-        super.destroy()
-        if let t = self.timer {
-            t.invalidate()
         }
     }
     
@@ -231,32 +244,20 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
         }
     }
     
-    private func sendEvent(ofType type: KalturaStatsEventType, withMessage message: String) {
-        // send event to messageBus
-        let event = KalturaStatsEvent.Report(message: message)
-        self.messageBus?.post(event)
-        // send event to analytics entity
-        self.sendAnalyticsEvent(action: type)
-    }
-    
     private func resetPlayerFlags() {
-        isFirstPlay = true
-        hasSeeked = false
-        isBuffering = false
-        isMediaLoaded = false
-        isWidgetLoaded = false
-        playReached25 = false
-        playReached50 = false
-        playReached75 = false
-        playReached100 = false
+        self.isWidgetLoaded = false
+        self.isMediaLoaded = false
+        self.isBuffering = false
+        self.playReached25 = false
+        self.playReached50 = false
+        self.playReached75 = false
+        self.playReached100 = false
+        self.intervalOn = false
+        self.hasSeeked = false
+        self.isFirstPlay = true
     }
     
     private func createTimer() {
-        
-        if let intr = self.config?.params["timerInterval"] as? TimeInterval {
-            self.interval = intr
-        }
-
         if let t = self.timer {
             t.invalidate()
         }
@@ -290,49 +291,19 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
     
     private func sendAnalyticsEvent(action: KalturaStatsEventType) {
         guard let player = self.player else { return }
-        
-        guard let mediaEntry = player.mediaEntry else {
-            PKLog.error("send analytics failed due to nil mediaEntry")
-            return
-        }
-        
         PKLog.debug("Action: \(action)")
         
-        let entryId: String
-        let sessionId = player.sessionId
-        var baseUrl = "https://stats.kaltura.com/api_v3/index.php"
-        var confId = 0
-        var parterId = ""
+        // send event to messageBus
+        let event = KalturaStatsEvent.Report(message: "send event with action type: \(action.rawValue)")
+        self.messageBus?.post(event)
         
-        if let cId = self.config?.params["uiconfId"] as? Int {
-            confId = cId
-        }
-        
-        if let url = self.config?.params["baseUrl"] as? String {
-            baseUrl = url
-        }
-        
-        if let pId = self.config?.params["partnerId"] as? Int {
-            parterId = String(pId)
-        }
-        
-        if let eId = self.config?.params["entryId"] as? String {
-            entryId = eId
-        } else {
-            entryId = mediaEntry.id
-        }
-        
-        guard let builder: KalturaRequestBuilder = OVPStatsService.get(baseURL: baseUrl,
-                                                                 partnerId: parterId,
-                                                                 eventType: action.rawValue,
-                                                                 clientVer: PlayKitManager.clientTag,
-                                                                 duration: Float(player.duration),
-                                                                 sessionId: sessionId,
-                                                                 position: player.currentTime.toInt32(),
-                                                                 uiConfId: confId,
-                                                                 entryId: entryId,
-                                                                 widgetId: "_\(parterId)",
-                                                                 isSeek: hasSeeked) else { return }
+        guard let builder: KalturaRequestBuilder = OVPStatsService.get(config: self.config,
+                                                                       eventType: action.rawValue,
+                                                                       clientVer: PlayKitManager.clientTag,
+                                                                       duration: Float(player.duration),
+                                                                       sessionId: player.sessionId,
+                                                                       position: player.currentTime.toInt32(),
+                                                                       widgetId: "_\(self.config.partnerId)", isSeek: hasSeeked) else { return }
         
         builder.set { (response: Response) in
             PKLog.debug("Response: \(response)")
@@ -340,5 +311,4 @@ public class KalturaStatsPlugin: BaseAnalyticsPlugin {
         
         USRExecutor.shared.send(request: builder.build())
     }
-
 }

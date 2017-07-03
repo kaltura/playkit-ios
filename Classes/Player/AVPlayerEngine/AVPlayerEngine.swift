@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  AVPlayerEngine.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Eliza Sapir on 07/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
@@ -54,14 +56,21 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
+    /// Holds the current time for the current item.
+    /// - Attention: **For live streams** returns relative time according to the allowed stream window.
+    ///
+    /// In addition, keep in mind that because the duration is calcaulated from `seekableTimeRanges`
+    /// in live streams there could be a chance that current time will be bigger than the duration
+    /// because the current segment wasn't yet added to the seekable time ranges.
     var currentPosition: Double {
         get {
-            PKLog.trace("get currentPosition: \(self.currentTime())")
-            return CMTimeGetSeconds(self.currentTime() - rangeStart)
+            let position = self.currentTime() - self.rangeStart
+            PKLog.trace("get currentPosition: \(position)")
+            return CMTimeGetSeconds(position)
         }
         set {
-            PKLog.debug("set currentPosition: \(currentPosition)")
-            let newTime = rangeStart + CMTimeMakeWithSeconds(newValue, 1)
+            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
+            PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [unowned self] (isSeeked: Bool) in
                 if isSeeked {
                     self.post(event: PlayerEvent.Seeked())
@@ -84,8 +93,11 @@ class AVPlayerEngine: AVPlayer {
         guard let currentItem = self.currentItem else { return 0.0 }
         
         var result = CMTimeGetSeconds(currentItem.duration)
-    
-        if result.isNaN {
+        
+        // This checks if the duration equals `kCMTimeIndefinite` which indicates this is a live stream.
+        // Using the last range duration gives us the live window duration. 
+        // For example a duration of 120seconds means we can seek up to 120 seconds from live playhead.
+        if CMTIME_IS_INDEFINITE(currentItem.duration) {
             let seekableRanges = currentItem.seekableTimeRanges
             if seekableRanges.count > 0 {
                 let range = seekableRanges.last!.timeRangeValue
@@ -129,6 +141,8 @@ class AVPlayerEngine: AVPlayer {
         return nil
     }
   
+    /// Gives the start time of the last seekable range.
+    /// This helps calculate `currentTime` and `duration` for live streams.
     private var rangeStart: CMTime {
         get {
             var result: CMTime = CMTimeMakeWithSeconds(0, 1)

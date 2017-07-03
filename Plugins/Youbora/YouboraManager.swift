@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  YouboraManager.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Oded Klein on 28/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 #if os(iOS)
     import YouboraLib
@@ -21,7 +23,7 @@ class YouboraManager: YBPluginGeneric {
     
     fileprivate weak var messageBus: MessageBus?
     
-    /// indicates whether we played for the first time or not.
+    /// Indicates whether we played for the first time or not.
     fileprivate var isFirstPlay: Bool = true
     
     /// Indicates if we have to delay the endedHandler() (for example when we have post-roll).
@@ -34,7 +36,7 @@ class YouboraManager: YBPluginGeneric {
         self.pkPlayer = player
     }
     
-    // we must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift). 
+    // We must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift). 
     private override init() {
         super.init()
     }
@@ -227,7 +229,7 @@ extension YouboraManager {
             case let e where e.self == PlayerEvent.sourceSelected:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    self?.lastReportedResource = event.contentURL?.absoluteString
+                    self?.lastReportedResource = event.mediaSource?.playbackUrl?.absoluteString
                     strongSelf.postEventLog(withMessage: "\(event.namespace))")
                 }
             case let e where e.self == PlayerEvent.error:

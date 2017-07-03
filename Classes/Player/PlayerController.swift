@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PlayerController.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Eliza Sapir on 06/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
@@ -41,6 +43,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
     
     public var duration: Double {
         return self.currentPlayer.duration
+    }
+    
+    public var currentState: PlayerState {
+        return self.currentPlayer.currentState
     }
     
     public var isPlaying: Bool {
@@ -100,7 +106,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
         
         // get the preferred media source and post source selected event
         guard let (preferredMediaSource, handlerType) = AssetBuilder.getPreferredMediaSource(from: mediaConfig.mediaEntry) else { return }
-        self.onEventBlock?(PlayerEvent.SourceSelected(contentURL: preferredMediaSource.playbackUrl))
+        self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: preferredMediaSource))
         self.preferredMediaSource = preferredMediaSource
         
         // update the media source request adapter with new media uuid if using kaltura request adapter

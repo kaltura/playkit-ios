@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PlayerEvent.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Eliza Sapir on 14/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 import Foundation
 import AVFoundation
 
@@ -51,11 +53,11 @@ import AVFoundation
     /// Sent when source was selected.
     @objc public static let sourceSelected: PlayerEvent.Type = SourceSelected.self
     
-    /// Sent when an error occurs.
+    /// Sent when an error occurs in the player that the playback can recover from.
     @objc public static let error: PlayerEvent.Type = Error.self
-    /// Sent when an plugin error occurs.
+    /// Sent when a plugin error occurs.
     @objc public static let pluginError: PlayerEvent.Type = PluginError.self
-    /// Sent when an error log event received from player.
+    /// Sent when an error log event received from player (non fatal errors).
     @objc public static let errorLog: PlayerEvent.Type = ErrorLog.self
     
     // MARK: - Player Basic Events
@@ -77,12 +79,8 @@ import AVFoundation
     class Seeked: PlayerEvent {}
     
     class SourceSelected: PlayerEvent {
-        convenience init(contentURL: URL?) {
-            guard let url = contentURL  else {
-                self.init()
-                return
-            }
-            self.init([EventDataKeys.contentURL: url])
+        convenience init(mediaSource: MediaSource) {
+            self.init([EventDataKeys.mediaSource: mediaSource])
         }
     }
     

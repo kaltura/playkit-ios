@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PKEvent.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Eliza Sapir on 14/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
@@ -44,7 +46,7 @@ public extension PKEvent {
         static let newState = "newState"
         static let error = "error"
         static let metadata = "metadata"
-        static let contentURL = "contentURL"
+        static let mediaSource = "mediaSource"
     }
     
     // MARK: Player Data Accessors
@@ -93,7 +95,7 @@ public extension PKEvent {
     }
     
     /// Content url, PKEvent Data Accessor
-    @objc public var contentURL: URL? {
-        return self.data?[EventDataKeys.contentURL] as? URL
+    @objc public var mediaSource: MediaSource? {
+        return self.data?[EventDataKeys.mediaSource] as? MediaSource
     }
 }

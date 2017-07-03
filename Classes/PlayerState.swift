@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PlayerState.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Eliza Sapir on 29/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 
@@ -12,12 +14,14 @@ import Foundation
 @objc public enum PlayerState: Int {
 /// Sent when player's state idle.
     case idle
-/// Sent when player's state loading.
-    case loading
 /// Sent when player's state ready.
     case ready
 /// Sent when player's state buffering.
     case buffering
+/// Sent when player's state ended.
+/// Same event sent when observing PlayerEvent.ended.
+/// This state was attached to reflect current state and avoid unrelevant boolean.
+    case ended
 /// Sent when player's state errored.    
     case error
 /// Sent when player's state unknown.

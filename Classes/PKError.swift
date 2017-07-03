@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PKError.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Gal Orlanczyk on 19/02/2017.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation 
@@ -100,7 +102,7 @@ public enum PKPluginError: PKError {
     public var errorDescription: String {
         switch self {
         case .failedToCreatePlugin(let pluginName): return "failed to create plugin (\(pluginName)), doesn't exist in registry"
-        case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName)"
+        case .missingPluginConfig(let pluginName): return "Missing plugin config for plugin: \(pluginName) (wrong type or doesn't exist)"
         }
     }
     
@@ -194,21 +196,6 @@ public extension PKError {
 public extension PKError where Self: RawRepresentable, Self.RawValue == String {
     var description: String {
         return "\(self.rawValue), domain: \(type(of: self).domain), errorCode: \(self.code)"
-    }
-}
-
-/************************************************************/
-// MARK: - Error
-/************************************************************/
-// extension for easier access to domain and code properties.
-extension Error {
-    
-    public var domain: String {
-        return self._domain
-    }
-    
-    public var code: Int {
-        return self._code
     }
 }
 

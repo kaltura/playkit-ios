@@ -1,10 +1,12 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  PlayerDecoratorBase.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Vadim Kononov on 09/11/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
 import AVFoundation
@@ -50,6 +52,10 @@ import AVKit
 
     public var currentTextTrack: String? {
         return self.player.currentTextTrack
+    }
+    
+    open var currentState: PlayerState {
+        return self.player.currentState
     }
     
     open var isPlaying: Bool {

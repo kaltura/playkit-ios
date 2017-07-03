@@ -1,18 +1,20 @@
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
 //
-//  MediaMarkService.swift
-//  Pods
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
 //
-//  Created by Oded Klein on 12/12/2016.
-//
-//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import UIKit
 import SwiftyJSON
 import KalturaNetKit
 
-internal class MediaMarkService {
+class MediaMarkService {
 
-    internal static func sendTVPAPIEVent(baseURL: String,
+    static func sendTVPAPIEVent(baseURL: String,
                                          initObj: [String: Any],
                                          eventType: String,
                                          currentTime: Int32,
@@ -31,20 +33,8 @@ internal class MediaMarkService {
                 request.setBody(key: "Action", value: JSON(eventType))
             }
             return request
-        }else{
+        } else {
             return nil
         }
-
-    }
-
-    private static func createBookmark(eventType: String, position: Int32, assetId: String, fileId: String) -> JSON {
-        var json: JSON = JSON.init(["objectType": "KalturaBookmark"])
-        json["type"] = JSON("media")
-        json["id"] = JSON(assetId)
-        json["position"] = JSON(position)
-        json["playerData"] = JSON.init(["action": JSON(eventType), "objectType": JSON("KalturaBookmarkPlayerData"), "fileId": JSON(fileId)])
-
-        
-        return json
     }
 }
