@@ -13,6 +13,6 @@ import Foundation
 
 @objc public protocol MediaEntryProviderResponseDelegate {
     
-    @objc func providerGotResponse(sender:MediaEntryProvider?, response: [String:Any]?) -> Void
+    @objc func providerGotResponse(sender: MediaEntryProvider?, response: [String:Any]?) -> Void
 
 }
