@@ -7,12 +7,13 @@
 //
 
 import Foundation
+import KalturaNetKit
 
 //This protocol provides a way to use the response data of the requests are being sent by MediaEntryProvider.
 //For example the response of getPlaybackContext, or additional meta data.
 
-@objc public protocol MediaEntryProviderResponseDelegate {
+public protocol MediaEntryProviderResponseDelegate: class {
     
-    @objc func providerGotResponse(sender: MediaEntryProvider?, response: [String:Any]?) -> Void
+    func providerGotResponse(sender: MediaEntryProvider?, response: Response) -> Void
 
 }

@@ -129,7 +129,7 @@ public enum PhoenixMediaProviderError: PKError {
     @objc public var fileIds: [String]?
     @objc public var playbackContextType: PlaybackContextType = .unknown
     @objc public var networkProtocol: String?
-    @objc public weak var responseDelegate: MediaEntryProviderResponseDelegate? = nil
+    public weak var responseDelegate: MediaEntryProviderResponseDelegate? = nil
     
     public var executor: RequestExecutor?
 
@@ -318,7 +318,7 @@ public enum PhoenixMediaProviderError: PKError {
             let request = requestBuilder.set(completion: { (response: Response) in
 
                 if let delegate = self.responseDelegate {
-                    delegate.providerGotResponse(sender: self, response: (response.data as? [String: Any]))
+                    delegate.providerGotResponse(sender: self, response: response)
                 }
                 
                 if let error = response.error {
