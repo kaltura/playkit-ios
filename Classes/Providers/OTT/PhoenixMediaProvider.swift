@@ -129,6 +129,7 @@ public enum PhoenixMediaProviderError: PKError {
     @objc public var fileIds: [String]?
     @objc public var playbackContextType: PlaybackContextType = .unknown
     @objc public var networkProtocol: String?
+    public weak var responseDelegate: MediaEntryProviderResponseDelegate? = nil
     
     public var executor: RequestExecutor?
 
@@ -205,6 +206,20 @@ public enum PhoenixMediaProviderError: PKError {
         self.executor = executor
         return self
     }
+    
+    
+    /// - Parameter responseDelegate: responseDelegate which will be used to get the response of the requests are being sent by the mediaProvider
+    ///    default is nil
+    /// - Returns: Self
+    @discardableResult
+    @nonobjc public func set(responseDelegate: MediaEntryProviderResponseDelegate?) -> Self {
+        self.responseDelegate = responseDelegate
+        return self
+    }
+
+    
+    
+    
 
     let defaultProtocol = "https"
 
@@ -302,6 +317,10 @@ public enum PhoenixMediaProviderError: PKError {
 
             let request = requestBuilder.set(completion: { (response: Response) in
 
+                if let delegate = self.responseDelegate {
+                    delegate.providerGotResponse(sender: self, response: response)
+                }
+                
                 if let error = response.error {
                     // if error is of type `PKError` pass it as `NSError` else pass the `Error` object.
                     callback(nil, (error as? PKError)?.asNSError ?? error)
