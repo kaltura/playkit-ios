@@ -2,9 +2,9 @@ PODS:
   - google-cast-sdk (3.5.0):
     - google-cast-sdk/Core (= 3.5.0)
   - google-cast-sdk/Core (3.5.0)
-  - KalturaNetKit (0.0.15):
-    - KalturaNetKit/Core (= 0.0.15)
-  - KalturaNetKit/Core (0.0.15):
+  - KalturaNetKit (0.0.16):
+    - KalturaNetKit/Core (= 0.0.16)
+  - KalturaNetKit/Core (0.0.16):
     - SwiftyJSON
   - Log (1.0)
   - Nimble (7.0.1)
@@ -56,7 +56,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   google-cast-sdk: fc3728ead66150ac746e001ba03a44e4b10e359e
-  KalturaNetKit: 74948fa64df3d4015bcc825b26648829e3949a2d
+  KalturaNetKit: 7c2ce88fb5eb506891f0bf844970ae5306a2fef5
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
   Nimble: 657d000e11df8aebe27cdaf9d244de7f30ed87f7
   PlayKit: 759e3efd7ea61486324d71ba7124d47be006f974
