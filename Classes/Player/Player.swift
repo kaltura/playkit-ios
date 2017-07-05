@@ -32,7 +32,7 @@ import AVKit
     @objc var settings: PlayerSettings { get }
     
     /// The player's view component.
-    @objc weak var view: PlayerView? { get set }
+    @objc var view: PlayerView! { get }
     
     /// The current player position.
     @objc var currentTime: TimeInterval { get set }
