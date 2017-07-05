@@ -8,7 +8,7 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-mport KalturaNetKit
+import KalturaNetKit
 
 /// `KalturaStatsEvent` represents an event reporting from kaltura stats plugin.
 @objc public class KalturaLiveStatsEvent: PKEvent {

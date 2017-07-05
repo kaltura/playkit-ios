@@ -8,14 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-//
-//  KalturaLiveStatsPluginConfig.swift
-//  Pods
-//
-//  Created by Gal Orlanczyk on 28/06/2017.
-//
-//
-
 import Foundation
 
 @objc public class KalturaLiveStatsPluginConfig: NSObject {
