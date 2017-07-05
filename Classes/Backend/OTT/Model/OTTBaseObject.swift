@@ -10,7 +10,5 @@
 
 import UIKit
 
-protocol OTTBaseObject {
-
-     init?(json:Any)
+protocol OTTBaseObject: KalturaBaseObject{
 }
