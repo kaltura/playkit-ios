@@ -8,7 +8,7 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-mport Foundation
+import Foundation
 import AVFoundation
 
 /// PlayerEvent is a class used to reflect player events.
