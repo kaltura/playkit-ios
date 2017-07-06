@@ -10,5 +10,5 @@
 
 import UIKit
 
-protocol OTTBaseObject: KalturaBaseObject{
+protocol OTTBaseObject: KalturaBaseObject {
 }

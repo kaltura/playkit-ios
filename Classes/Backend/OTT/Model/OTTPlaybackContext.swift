@@ -41,7 +41,7 @@ class OTTPlaybackContext: OTTBaseObject {
     func hasErrorMessage() -> KalturaAccessControlMessage? {
         
         for message in self.messages {
-            if ( message.code != "OK"){
+            if (message.code != "OK"){
                 return message
             }
         }
@@ -52,7 +52,7 @@ class OTTPlaybackContext: OTTBaseObject {
     func hasBlockAction() -> KalturaRuleAction? {
         
         for action in self.actions {
-            if ( action.type == .block){
+            if (action.type == .block){
                 return action
             }
         }

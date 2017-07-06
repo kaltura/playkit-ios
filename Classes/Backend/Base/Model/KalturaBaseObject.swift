@@ -9,5 +9,5 @@
 import Foundation
 
 protocol KalturaBaseObject {
-    init?(json:Any)
+    init?(json: Any)
 }

@@ -89,8 +89,8 @@ public enum PhoenixMediaProviderError: PKError {
 
     public var userInfo: [String: Any] {
         switch self {
-        case .serverError(let code, let message): return [PhoenixMediaProviderError.serverErrorCodeKey:code,
-                                                          PhoenixMediaProviderError.serverErrorMessageKey:message]
+        case .serverError(let code, let message): return [PhoenixMediaProviderError.serverErrorCodeKey: code,
+                                                          PhoenixMediaProviderError.serverErrorMessageKey: message]
         default:
             return [String: Any]()
         }
@@ -355,10 +355,10 @@ public enum PhoenixMediaProviderError: PKError {
 
                 if let context = playbackContext as? OTTPlaybackContext {
                     
-                    if( context.hasBlockAction() != nil){
-                        if let error = context.hasErrorMessage(){
+                    if(context.hasBlockAction() != nil) {
+                        if let error = context.hasErrorMessage() {
                             callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
-                        }else{
+                        } else{
                             callback(nil, PhoenixMediaProviderError.serverError(code: "Blocked", message: "Blocked").asNSError)
                         }
                         return
