@@ -52,7 +52,7 @@ class OTTPlaybackContext: OTTBaseObject {
     func hasBlockAction() -> KalturaRuleAction? {
         
         for action in self.actions {
-            if (action.type == .block){
+            if (action.type == .ottBlock){
                 return action
             }
         }

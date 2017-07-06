@@ -10,7 +10,9 @@ import Foundation
 import SwiftyJSON
 
 enum KalturaRuleActionType: String {
-    case block = "BLOCK"
+    case ottBlock = "BLOCK"
+    case ovpBlock = "1"
+    case ovpPreview = "2"
 }
 
 class KalturaRuleAction: KalturaBaseObject {

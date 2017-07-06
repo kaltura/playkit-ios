@@ -17,17 +17,17 @@ class OVPPlaybackContext: OVPBaseObject {
     var sources: [OVPSource]?
     let flavorAssetsKey = "flavorAssets"
     let sourcesKey = "sources"
-    
+    var actions: [KalturaRuleAction] = []
+    var messages: [KalturaAccessControlMessage] = []
     
     required internal init?(json: Any)
     {
         let jsonObject = JSON(json)
         let flavorAssetsJson = jsonObject[flavorAssetsKey].array
         
-        
         self.flavorAssets = [OVPFlavorAsset]()
-        flavorAssetsJson?.forEach({ (flavorAssetJson:JSON) in
-            if let flavorAsset = OVPFlavorAsset(json:flavorAssetJson.object){
+        flavorAssetsJson?.forEach({ (flavorAssetJson: JSON) in
+            if let flavorAsset = OVPFlavorAsset(json: flavorAssetJson.object){
                 self.flavorAssets?.append(flavorAsset)
             }
         })
@@ -40,9 +40,49 @@ class OVPPlaybackContext: OVPBaseObject {
             }
         })
         
+        jsonObject["actions"].array?.forEach { (action: JSON) in
+            if let action = KalturaRuleAction(json: action.object) {
+                actions.append(action)
+            }
+        }
         
-        
-        
+        jsonObject["messages"].array?.forEach { (message: JSON) in
+            if let message = KalturaAccessControlMessage(json: message.object) {
+                messages.append(message)
+            }
+        }
     }
     
+    func hasErrorMessage() -> KalturaAccessControlMessage? {
+        
+        for message in self.messages {
+            if (message.code != "OK"){
+                return message
+            }
+        }
+        
+        return nil
+    }
+    
+    func hasBlockAction() -> KalturaRuleAction? {
+        
+        for action in self.actions {
+            if (action.type == .ovpBlock){
+                return action
+            }
+        }
+        
+        return nil
+    }
+    
+    func hasPreviewAction() -> KalturaRuleAction? {
+        
+        for action in self.actions {
+            if (action.type == .ovpPreview){
+                return action
+            }
+        }
+        
+        return nil
+    }
 }
