@@ -1,8 +1,8 @@
 //
-//  KalturaAccessControlMessage.swift
+//  OTTAccessControlMessage.swift
 //  Pods
 //
-//  Created by Rivka Peleg on 05/07/2017.
+//  Created by Eliza Sapir on 06/07/2017.
 //
 //
 
@@ -10,7 +10,7 @@ import Foundation
 import SwiftyJSON
 
 
-class KalturaAccessControlMessage: OTTBaseObject {
+class OTTAccessControlMessage: OTTBaseObject {
     var message: String? = nil
     var code: String? = nil
     
@@ -19,6 +19,4 @@ class KalturaAccessControlMessage: OTTBaseObject {
         self.message = jsonDict["message"].string
         self.code = jsonDict["code"].string
     }
-    
-    
 }

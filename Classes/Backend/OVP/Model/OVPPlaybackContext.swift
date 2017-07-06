@@ -17,8 +17,8 @@ class OVPPlaybackContext: OVPBaseObject {
     var sources: [OVPSource]?
     let flavorAssetsKey = "flavorAssets"
     let sourcesKey = "sources"
-    var actions: [KalturaRuleAction] = []
-    var messages: [KalturaAccessControlMessage] = []
+    var actions: [OVPRuleAction] = []
+    var messages: [OVPAccessControlMessage] = []
     
     required internal init?(json: Any)
     {
@@ -41,19 +41,19 @@ class OVPPlaybackContext: OVPBaseObject {
         })
         
         jsonObject["actions"].array?.forEach { (action: JSON) in
-            if let action = KalturaRuleAction(json: action.object) {
+            if let action = OVPRuleAction(json: action.object) {
                 actions.append(action)
             }
         }
         
         jsonObject["messages"].array?.forEach { (message: JSON) in
-            if let message = KalturaAccessControlMessage(json: message.object) {
+            if let message = OVPAccessControlMessage(json: message.object) {
                 messages.append(message)
             }
         }
     }
     
-    func hasErrorMessage() -> KalturaAccessControlMessage? {
+    func hasErrorMessage() -> OVPAccessControlMessage? {
         
         for message in self.messages {
             if (message.code != "OK"){
@@ -64,21 +64,10 @@ class OVPPlaybackContext: OVPBaseObject {
         return nil
     }
     
-    func hasBlockAction() -> KalturaRuleAction? {
+    func hasBlockAction() -> OVPRuleAction? {
         
         for action in self.actions {
-            if (action.type == .ovpBlock){
-                return action
-            }
-        }
-        
-        return nil
-    }
-    
-    func hasPreviewAction() -> KalturaRuleAction? {
-        
-        for action in self.actions {
-            if (action.type == .ovpPreview){
+            if (action.type == .block){
                 return action
             }
         }

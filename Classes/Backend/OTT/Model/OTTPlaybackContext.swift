@@ -14,8 +14,8 @@ import SwiftyJSON
 class OTTPlaybackContext: OTTBaseObject {
 
     var sources: [OTTPlaybackSource] = []
-    var actions: [KalturaRuleAction] = []
-    var messages: [KalturaAccessControlMessage] = []
+    var actions: [OTTRuleAction] = []
+    var messages: [OTTAccessControlMessage] = []
 
     required init?(json: Any) {
         let jsonObject = JSON(json)
@@ -26,19 +26,19 @@ class OTTPlaybackContext: OTTBaseObject {
         }
         
         jsonObject["actions"].array?.forEach { (action: JSON) in
-            if let action = KalturaRuleAction(json: action.object) {
+            if let action = OTTRuleAction(json: action.object) {
                 actions.append(action)
             }
         }
         
         jsonObject["messages"].array?.forEach { (message: JSON) in
-            if let message = KalturaAccessControlMessage(json: message.object) {
+            if let message = OTTAccessControlMessage(json: message.object) {
                 messages.append(message)
             }
         }
     }
     
-    func hasErrorMessage() -> KalturaAccessControlMessage? {
+    func hasErrorMessage() -> OTTAccessControlMessage? {
         
         for message in self.messages {
             if (message.code != "OK"){
@@ -49,10 +49,10 @@ class OTTPlaybackContext: OTTBaseObject {
         return nil
     }
     
-    func hasBlockAction() -> KalturaRuleAction? {
+    func hasBlockAction() -> OTTRuleAction? {
         
         for action in self.actions {
-            if (action.type == .ottBlock){
+            if (action.type == .block){
                 return action
             }
         }

@@ -53,7 +53,7 @@ import KalturaNetKit
             
             switch self {
             case .invalidParam(let param): return "Invalid input param: \(param)"
-            case .invalidKS(let ks): return "Invalid input ks: \(ks)"
+            case .invalidKS: return "Invalid input ks"
             case .invalidParams: return "Invalid input params"
             case .invalidResponse: return "Response data is empty"
             case .currentlyProcessingOtherRequest: return "Currently Processing Other Request"
@@ -228,13 +228,6 @@ import KalturaNetKit
                                 callback(nil, OVPMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
                             } else{
                                 callback(nil, OVPMediaProviderError.serverError(code: "Blocked", message: "Blocked").asNSError)
-                            }
-                            return
-                        } else if (context.hasPreviewAction() != nil) {
-                            if let error = context.hasErrorMessage() {
-                                callback(nil, OVPMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
-                            } else{
-                                callback(nil, OVPMediaProviderError.serverError(code: "Preview", message: "Preview").asNSError)
                             }
                             return
                         }
