@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -25,12 +25,50 @@ import KalturaNetKit
         }
     }
     
-    enum OVPMediaProviderError: Error {
+    enum OVPMediaProviderError: PKError {
         case invalidParam(paramName: String)
         case invalidKS
         case invalidParams
         case invalidResponse
         case currentlyProcessingOtherRequest
+        case serverError(code:String, message:String)
+        
+        public static let domain = "com.kaltura.playkit.error.OVPMediaProvider"
+        
+        public static let serverErrorCodeKey = "code"
+        public static let serverErrorMessageKey = "message"
+        
+        public var code: Int {
+            switch self {
+            case .invalidParam: return 0
+            case .invalidKS: return 1
+            case .invalidParams: return 2
+            case .invalidResponse: return 3
+            case .currentlyProcessingOtherRequest: return 4
+            case .serverError: return 5
+            }
+        }
+        
+        public var errorDescription: String {
+            
+            switch self {
+            case .invalidParam(let param): return "Invalid input param: \(param)"
+            case .invalidKS: return "Invalid input ks"
+            case .invalidParams: return "Invalid input params"
+            case .invalidResponse: return "Response data is empty"
+            case .currentlyProcessingOtherRequest: return "Currently Processing Other Request"
+            case .serverError(let code, let message): return "Server Error code: \(code), \n message: \(message)"
+            }
+        }
+        
+        public var userInfo: [String: Any] {
+            switch self {
+            case .serverError(let code, let message): return [PhoenixMediaProviderError.serverErrorCodeKey: code,
+                                                              PhoenixMediaProviderError.serverErrorMessageKey: message]
+            default:
+                return [String: Any]()
+            }
+        }
     }
     
     @objc public var sessionProvider: SessionProvider?
@@ -184,6 +222,17 @@ import KalturaNetKit
                             return
                     }
                     
+                    if let context = contextDataResponse as? OVPPlaybackContext {
+                        if (context.hasBlockAction() != nil) {
+                            if let error = context.hasErrorMessage() {
+                                callback(nil, OVPMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? ""))
+                            } else{
+                                callback(nil, OVPMediaProviderError.serverError(code: "Blocked", message: "Blocked"))
+                            }
+                            return
+                        }
+                    }
+
                     let masterSourceFlavorId = contextData.flavorAssets?.first( where: {$0.paramsId == 0})
                     
                     var mediaSources: [MediaSource] = [MediaSource]()
