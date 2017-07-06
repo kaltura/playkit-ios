@@ -225,9 +225,9 @@ import KalturaNetKit
                     if let context = contextDataResponse as? OVPPlaybackContext {
                         if (context.hasBlockAction() != nil) {
                             if let error = context.hasErrorMessage() {
-                                callback(nil, OVPMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
+                                callback(nil, OVPMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? ""))
                             } else{
-                                callback(nil, OVPMediaProviderError.serverError(code: "Blocked", message: "Blocked").asNSError)
+                                callback(nil, OVPMediaProviderError.serverError(code: "Blocked", message: "Blocked"))
                             }
                             return
                         }

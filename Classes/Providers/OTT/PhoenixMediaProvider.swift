@@ -368,7 +368,7 @@ public enum PhoenixMediaProviderError: PKError {
                         callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                     }
                 } else if let error = playbackContext as? OTTError {
-                    callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? ""))
+                    callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
                 } else {
                     callback(nil, PhoenixMediaProviderError.unableToParseData(data: responseData).asNSError)
                 }
