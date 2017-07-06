@@ -10,7 +10,5 @@
 
 import UIKit
 
-protocol OVPBaseObject{
-    
-    init?(json: Any)
+protocol OVPBaseObject: KalturaBaseObject {
 }

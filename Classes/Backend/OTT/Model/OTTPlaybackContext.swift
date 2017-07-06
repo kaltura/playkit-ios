@@ -14,6 +14,8 @@ import SwiftyJSON
 class OTTPlaybackContext: OTTBaseObject {
 
     var sources: [OTTPlaybackSource] = []
+    var actions: [OTTRuleAction] = []
+    var messages: [OTTAccessControlMessage] = []
 
     required init?(json: Any) {
         let jsonObject = JSON(json)
@@ -22,5 +24,39 @@ class OTTPlaybackContext: OTTBaseObject {
                 sources.append(source)
             }
         }
+        
+        jsonObject["actions"].array?.forEach { (action: JSON) in
+            if let action = OTTRuleAction(json: action.object) {
+                actions.append(action)
+            }
+        }
+        
+        jsonObject["messages"].array?.forEach { (message: JSON) in
+            if let message = OTTAccessControlMessage(json: message.object) {
+                messages.append(message)
+            }
+        }
+    }
+    
+    func hasErrorMessage() -> OTTAccessControlMessage? {
+        
+        for message in self.messages {
+            if (message.code != "OK"){
+                return message
+            }
+        }
+        
+        return nil
+    }
+    
+    func hasBlockAction() -> OTTRuleAction? {
+        
+        for action in self.actions {
+            if (action.type == .block){
+                return action
+            }
+        }
+        
+        return nil
     }
 }
