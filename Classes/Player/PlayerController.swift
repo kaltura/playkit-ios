@@ -66,8 +66,13 @@ class PlayerController: NSObject, Player, PlayerSettings {
         return self.currentPlayer.currentTextTrack
     }
     
-    public var view: PlayerView! {
-        return self.currentPlayer.view
+    public weak var view: PlayerView? {
+        get {
+            return self.currentPlayer.view
+        }
+        set {
+            self.currentPlayer.view = newValue
+        }
     }
     
     public var sessionId: String {
