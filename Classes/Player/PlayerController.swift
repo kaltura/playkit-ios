@@ -130,10 +130,13 @@ class PlayerController: NSObject, Player, PlayerSettings {
             self.prepareSemaphore.wait()
             
             guard let assetToPrepare = self.assetToPrepare else { return }
+            
             if let startTime = self.mediaConfig?.startTime {
                 self.currentPlayer.startPosition = startTime
             }
+            
             self.currentPlayer.asset = assetToPrepare
+            
             if DRMSupport.widevineClassicHandler != nil {
                 self.addAssetRefreshObservers()
             }
@@ -156,11 +159,9 @@ class PlayerController: NSObject, Player, PlayerSettings {
         self.currentPlayer.stop()
     }
     
-    func seek(to time: CMTime) {
-        self.currentPlayer.currentPosition = CMTimeGetSeconds(time)
+    func seek(to time: TimeInterval) {
+        self.currentPlayer.currentPosition = time
     }
-    
-    
     
     func destroy() {
         self.currentPlayer.destroy()

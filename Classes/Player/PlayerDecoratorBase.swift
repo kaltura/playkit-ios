@@ -103,7 +103,7 @@ import AVKit
         self.player.pause()
     }
     
-    open func seek(to time: CMTime) {
+    open func seek(to time: TimeInterval) {
         self.player.seek(to: time)
     }
     

@@ -62,7 +62,7 @@ class AVPlayerEngine: AVPlayer {
     /// In addition, keep in mind that because the duration is calcaulated from `seekableTimeRanges`
     /// in live streams there could be a chance that current time will be bigger than the duration
     /// because the current segment wasn't yet added to the seekable time ranges.
-    var currentPosition: Double {
+    var currentPosition: TimeInterval {
         get {
             let position = self.currentTime() - self.rangeStart
             PKLog.trace("get currentPosition: \(position)")
@@ -83,13 +83,13 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    var startPosition: Double {
+    var startPosition: TimeInterval {
         didSet {
             PKLog.debug("set startPosition: \(startPosition)")
         }
     }
     
-    var duration: Double {
+    var duration: TimeInterval {
         guard let currentItem = self.currentItem else { return 0.0 }
         
         var result = CMTimeGetSeconds(currentItem.duration)
