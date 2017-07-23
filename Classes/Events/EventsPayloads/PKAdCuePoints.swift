@@ -14,7 +14,7 @@ import Foundation
     
     @objc public private(set) var cuePoints: [TimeInterval]
     
-    public init(cuePoints: [TimeInterval]) {
+    @objc public init(cuePoints: [TimeInterval]) {
         self.cuePoints = cuePoints.sorted() // makes sure array is sorted
     }
     
