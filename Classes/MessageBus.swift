@@ -21,19 +21,20 @@ private struct Observation {
 
 /// `MessageBus` object handles all event message observing and posting
 @objc public class MessageBus: NSObject {
+    
     private var observations = [String: [Observation]]()
-    private let lock: AnyObject = UUID().uuidString as AnyObject
+    private let dispatchQueue = DispatchQueue(label: "com.kaltura.playkit.message-bus")
     
     @objc public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
         self.add(observer: observer, events: events, block: block)
     }
     
-    @objc public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], observeOn dispatchQueue: DispatchQueue, block: @escaping (PKEvent)->Void) {
+    @objc public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], observeOn dispatchQueue: DispatchQueue, block: @escaping (PKEvent) -> Void) {
         self.add(observer: observer, events: events, observeOn: dispatchQueue, block: block)
     }
     
-    private func add(observer: AnyObject, events: [PKEvent.Type], observeOn dispatchQueue: DispatchQueue = DispatchQueue.main, block: @escaping (PKEvent)->Void) {
-        sync {
+    private func add(observer: AnyObject, events: [PKEvent.Type], observeOn dispatchQueue: DispatchQueue = DispatchQueue.main, block: @escaping (PKEvent) -> Void) {
+        self.dispatchQueue.sync {
             PKLog.debug("Add observer: \(String(describing: observer)) for events: \(String(describing: events))")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
@@ -45,7 +46,7 @@ private struct Observation {
     }
     
     @objc public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
-        sync {
+        self.dispatchQueue.sync {
             PKLog.debug("Remove observer: \(String(describing: observer)) for events: \(String(describing: events))")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
@@ -60,14 +61,15 @@ private struct Observation {
     }
     
     @objc public func post(_ event: PKEvent) {
-        DispatchQueue.global().async { [weak self] in
+        self.dispatchQueue.sync { [weak self] in
+            guard let strongSelf = self else { return }
             PKLog.info("post event: \(event.namespace), with data: \(event.data ?? [:])")
             let typeId = NSStringFromClass(type(of: event))
             
-            if let array = self?.observations[typeId] {
+            if let array = strongSelf.observations[typeId] {
                 // remove nil observers replace current observations with new ones, and call block with the event
                 let newObservations = array.filter { $0.observer != nil }
-                self?.observations[typeId] = newObservations
+                strongSelf.observations[typeId] = newObservations
                 newObservations.forEach { observation in
                     observation.observeOn.async {
                         observation.block(event)
@@ -75,11 +77,5 @@ private struct Observation {
                 }
             }
         }
-    }
-    
-    private func sync(block: () -> ()) {
-        objc_sync_enter(lock)
-        block()
-        objc_sync_exit(lock)
     }
 }
