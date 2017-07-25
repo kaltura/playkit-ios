@@ -23,6 +23,8 @@ extension AVPlayerEngine {
             #keyPath(currentItem.status),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
+            #keyPath(currentItem.isPlaybackBufferFull),
+            #keyPath(currentItem.loadedTimeRanges),
             #keyPath(currentItem.timedMetadata)
         ]
     }
@@ -119,6 +121,12 @@ extension AVPlayerEngine {
         switch keyPath {
         case #keyPath(currentItem.playbackLikelyToKeepUp): self.handleLikelyToKeepUp()
         case #keyPath(currentItem.playbackBufferEmpty): self.handleBufferEmptyChange()
+        case #keyPath(currentItem.isPlaybackBufferFull): PKLog.debug("Buffer Full")
+        case #keyPath(currentItem.loadedTimeRanges):
+            guard let loadedTimeRanges = self.currentItem?.loadedTimeRanges else { return }
+            // convert values to PKTimeRange
+            let timeRanges = loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
+            self.post(event: PlayerEvent.LoadedTimeRanges(timeRanges: timeRanges))
         case #keyPath(rate): self.handleRate()
         case #keyPath(status):
             guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerStatus = AVPlayerStatus(rawValue: statusChange.intValue) else {

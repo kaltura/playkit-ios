@@ -83,6 +83,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
         return self.currentPlayer.rate
     }
     
+    public var loadedTimeRanges: [PKTimeRange]? {
+        return self.currentPlayer.currentItem?.loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
+    }
+    
     let sessionUUID = UUID()
     var mediaSessionUUID: UUID?
     

@@ -53,7 +53,10 @@ import AVFoundation
     @objc public static let timedMetadata: PlayerEvent.Type = TimedMetadata.self
     /// Sent when source was selected.
     @objc public static let sourceSelected: PlayerEvent.Type = SourceSelected.self
-    
+    /// Sent when loaded time ranges was changed, loaded time ranges represent the buffered content.
+    /// could be used to show amount buffered on the playhead UI.
+    @objc public static let loadedTimeRanges: PlayerEvent.Type = LoadedTimeRanges.self
+
     /// Sent when an error occurs in the player that the playback can recover from.
     @objc public static let error: PlayerEvent.Type = Error.self
     /// Sent when a plugin error occurs.
@@ -121,8 +124,6 @@ import AVFoundation
         }
     }
     
-    // MARK: - Player Tracks Events
-    
     class TracksAvailable: PlayerEvent {
         convenience init(tracks: PKTracks) {
             self.init([EventDataKeys.tracks: tracks])
@@ -134,13 +135,17 @@ import AVFoundation
             self.init([EventDataKeys.playbackInfo: playbackInfo])
         }
     }
-    
-    // MARK: - Player State Events
 
     class StateChanged: PlayerEvent {
         convenience init(newState: PlayerState, oldState: PlayerState) {
             self.init([EventDataKeys.newState: newState as AnyObject,
                        EventDataKeys.oldState: oldState as AnyObject])
+        }
+    }
+    
+    class LoadedTimeRanges: PlayerEvent {
+        convenience init(timeRanges: [PKTimeRange]) {
+            self.init([EventDataKeys.timeRanges: timeRanges])
         }
     }
 }
