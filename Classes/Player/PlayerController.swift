@@ -109,9 +109,9 @@ class PlayerController: NSObject, Player, PlayerSettings {
         self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: preferredMediaSource))
         self.preferredMediaSource = preferredMediaSource
         
-        // update the media source request adapter with new media uuid if using kaltura request adapter
+        // update the media source request adapter with new media uuid if using request adapter
         var pms = preferredMediaSource
-        self.updateKalturaRequestAdapterIfExists(in: &pms)
+        self.updateRequestAdapter(in: &pms)
         
         // build the asset from the selected source
         self.assetHandler = AssetBuilder.build(from: preferredMediaSource, using: handlerType) { error, asset in
@@ -212,10 +212,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
 
 extension PlayerController {
     
-    /// Updates the request adapter if it is kaltura type
-    fileprivate func updateKalturaRequestAdapterIfExists(in mediaSource: inout MediaSource) {
-        // configure media sources content request adapter if kaltura request adapter exists
-        if let _ = self.contentRequestAdapter as? KalturaPlaybackRequestAdapter {
+    /// Updates the request adapter if one exists
+    fileprivate func updateRequestAdapter(in mediaSource: inout MediaSource) {
+        // configure media sources content request adapter if request adapter exists
+        if let _ = self.contentRequestAdapter {
             // create new media session uuid
             self.mediaSessionUUID = UUID()
             // update the request adapter with the updated session id
