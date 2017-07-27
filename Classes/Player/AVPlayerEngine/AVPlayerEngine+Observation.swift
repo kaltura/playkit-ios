@@ -207,15 +207,21 @@ extension AVPlayerEngine {
                 self.startPosition = 0
             }
             
-            self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
-                self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
-            })
-            
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
             if self.isFirstReady {
                 self.isFirstReady = false
+                
+                // There is an issue with AVPlayer that when we select a track right after state is `.readyToPlay`
+                // AVPlayer ignores this selection and doesn't display the subtitles up until a later point in time.
+                // To resolve this internally we send `TracksAvailable` event **with a delay**.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+                        self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
+                    })
+                }
+                
                 // when player item is readyToPlay for the first time it is safe to assume we have a valid duration.
                 if let duration = self.currentItem?.duration, !CMTIME_IS_INDEFINITE(duration) {
                     PKLog.debug("duration in seconds: \(CMTimeGetSeconds(duration))")
