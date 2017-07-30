@@ -8,14 +8,30 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-import UIKit
+//
+//  OVPRuleAction.swift
+//  Pods
+//
+//  Created by Eliza Sapir on 06/07/2017.
+//
+//
 
-extension TimeInterval {
+import Foundation
+import SwiftyJSON
+
+enum OVPRuleActionType: Int {
+    case block = 1
+    case preview = 2
+}
+
+class OVPRuleAction: KalturaBaseObject {
     
-    func toInt32() -> Int32 {
-        if !self.isNaN && !self.isInfinite {
-            return Int32(self)
+    var type: OVPRuleActionType? = nil
+    
+    required init?(json: Any) {
+        let jsonDict = JSON(json)
+        if let type = jsonDict["type"].int {
+            self.type = OVPRuleActionType(rawValue: type)
         }
-        return 0
     }
 }

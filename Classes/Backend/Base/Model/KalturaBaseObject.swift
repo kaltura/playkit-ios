@@ -8,14 +8,16 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-import UIKit
+//
+//  KalturaBaseObject.swift
+//  Pods
+//
+//  Created by Rivka Peleg on 05/07/2017.
+//
+//
 
-extension TimeInterval {
-    
-    func toInt32() -> Int32 {
-        if !self.isNaN && !self.isInfinite {
-            return Int32(self)
-        }
-        return 0
-    }
+import Foundation
+
+protocol KalturaBaseObject {
+    init?(json: Any)
 }

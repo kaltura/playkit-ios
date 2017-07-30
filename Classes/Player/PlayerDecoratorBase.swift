@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -61,9 +61,14 @@ import AVKit
     open var isPlaying: Bool {
         return self.player.isPlaying
     }
-
-    public var view: PlayerView! {
-        return self.player.view
+    
+    public weak var view: PlayerView? {
+        get {
+            return self.player.view
+        }
+        set {
+            self.player.view = newValue
+        }
     }
     
     public var sessionId: String {
@@ -72,6 +77,10 @@ import AVKit
     
     public var rate: Float {
         return self.player.rate
+    }
+    
+    @objc public var loadedTimeRanges: [PKTimeRange]? {
+        return self.player.loadedTimeRanges
     }
     
     open func prepare(_ config: MediaConfig) {

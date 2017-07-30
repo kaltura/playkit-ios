@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -12,7 +12,7 @@ import UIKit
 import AVFoundation
 
 /// A simple `UIView` subclass that is backed by an `AVPlayerLayer` layer.
-public class PlayerView: UIView {
+@objc public class PlayerView: UIView {
     
     var player: AVPlayer? {
         get {
@@ -44,5 +44,14 @@ public class PlayerView: UIView {
         
         container.addConstraints(horizontalConstraint)
         container.addConstraints(verticalConstraint)
+    }
+    
+    /// creates a new `PlayerView` instance and connects it to the player
+    /// - important: make sure to keep strong reference for the player view instance (either from adding as subview or property),
+    /// otherwise it will be deallocated as the framework holds a weak reference to it
+    @objc public static func createPlayerView(forPlayer player: Player) -> PlayerView {
+        let playerView = PlayerView()
+        player.view = playerView
+        return playerView
     }
 }

@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -28,9 +28,12 @@ class DefaultAssetHandler: AssetHandler {
             return
         }
         
+        let headers = ["User-Agent": PlayKitManager.clientTag]
+        let assetOptions = ["AVURLAssetHTTPHeaderFieldsKey": headers]
+        
         if let localSource = mediaSource as? LocalMediaSource {
             PKLog.debug("Creating local asset")
-            let asset = AVURLAsset(url: contentUrl)
+            let asset = AVURLAsset(url: contentUrl, options: assetOptions)
             
             
             if #available(iOS 10.0, *) {
@@ -48,7 +51,7 @@ class DefaultAssetHandler: AssetHandler {
         
         guard let drmData = mediaSource.drmData?.first else {
             PKLog.debug("Creating clear AVURLAsset")
-            readyCallback(nil, AVURLAsset(url: playbackUrl))
+            readyCallback(nil, AVURLAsset(url: playbackUrl, options: assetOptions))
             return
         }
 
@@ -65,7 +68,7 @@ class DefaultAssetHandler: AssetHandler {
             return
         }
 
-        let asset = AVURLAsset(url: playbackUrl)
+        let asset = AVURLAsset(url: playbackUrl, options: assetOptions)
         
         self.assetLoaderDelegate = AssetLoaderDelegate.configureRemotePlay(asset: asset, drmData: fpsData)
         

@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -47,6 +47,7 @@ public extension PKEvent {
         static let error = "error"
         static let metadata = "metadata"
         static let mediaSource = "mediaSource"
+        static let timeRanges = "timeRanges"
     }
     
     // MARK: Player Data Accessors
@@ -97,5 +98,10 @@ public extension PKEvent {
     /// Content url, PKEvent Data Accessor
     @objc public var mediaSource: MediaSource? {
         return self.data?[EventDataKeys.mediaSource] as? MediaSource
+    }
+    
+    /// Content url, PKEvent Data Accessor
+    @objc public var timeRanges: [PKTimeRange]? {
+        return self.data?[EventDataKeys.timeRanges] as? [PKTimeRange]
     }
 }

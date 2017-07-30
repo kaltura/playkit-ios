@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -23,6 +23,8 @@ extension AVPlayerEngine {
             #keyPath(currentItem.status),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
+            #keyPath(currentItem.isPlaybackBufferFull),
+            #keyPath(currentItem.loadedTimeRanges),
             #keyPath(currentItem.timedMetadata)
         ]
     }
@@ -119,6 +121,12 @@ extension AVPlayerEngine {
         switch keyPath {
         case #keyPath(currentItem.playbackLikelyToKeepUp): self.handleLikelyToKeepUp()
         case #keyPath(currentItem.playbackBufferEmpty): self.handleBufferEmptyChange()
+        case #keyPath(currentItem.isPlaybackBufferFull): PKLog.debug("Buffer Full")
+        case #keyPath(currentItem.loadedTimeRanges):
+            guard let loadedTimeRanges = self.currentItem?.loadedTimeRanges else { return }
+            // convert values to PKTimeRange
+            let timeRanges = loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
+            self.post(event: PlayerEvent.LoadedTimeRanges(timeRanges: timeRanges))
         case #keyPath(rate): self.handleRate()
         case #keyPath(status):
             guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerStatus = AVPlayerStatus(rawValue: statusChange.intValue) else {
@@ -199,15 +207,21 @@ extension AVPlayerEngine {
                 self.startPosition = 0
             }
             
-            self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
-                self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
-            })
-            
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
             if self.isFirstReady {
                 self.isFirstReady = false
+                
+                // There is an issue with AVPlayer that when we select a track right after state is `.readyToPlay`
+                // AVPlayer ignores this selection and doesn't display the subtitles up until a later point in time.
+                // To resolve this internally we send `TracksAvailable` event **with a delay**.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+                        self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
+                    })
+                }
+                
                 // when player item is readyToPlay for the first time it is safe to assume we have a valid duration.
                 if let duration = self.currentItem?.duration, !CMTIME_IS_INDEFINITE(duration) {
                     PKLog.debug("duration in seconds: \(CMTimeGetSeconds(duration))")

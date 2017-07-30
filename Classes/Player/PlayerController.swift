@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -66,8 +66,13 @@ class PlayerController: NSObject, Player, PlayerSettings {
         return self.currentPlayer.currentTextTrack
     }
     
-    public var view: PlayerView! {
-        return self.currentPlayer.view
+    public weak var view: PlayerView? {
+        get {
+            return self.currentPlayer.view
+        }
+        set {
+            self.currentPlayer.view = newValue
+        }
     }
     
     public var sessionId: String {
@@ -76,6 +81,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
     
     public var rate: Float {
         return self.currentPlayer.rate
+    }
+    
+    public var loadedTimeRanges: [PKTimeRange]? {
+        return self.currentPlayer.currentItem?.loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
     }
     
     let sessionUUID = UUID()
@@ -98,15 +107,17 @@ class PlayerController: NSObject, Player, PlayerSettings {
     
     func setMedia(from mediaConfig: MediaConfig) {
         self.mediaConfig = mediaConfig
+        // create new media session uuid
+        self.mediaSessionUUID = UUID()
         
         // get the preferred media source and post source selected event
         guard let (preferredMediaSource, handlerType) = AssetBuilder.getPreferredMediaSource(from: mediaConfig.mediaEntry) else { return }
         self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: preferredMediaSource))
         self.preferredMediaSource = preferredMediaSource
         
-        // update the media source request adapter with new media uuid if using kaltura request adapter
+        // update the media source request adapter with new media uuid if using request adapter
         var pms = preferredMediaSource
-        self.updateRequestAdapterIfExists(in: &pms)
+        self.updateRequestAdapter(in: &pms)
         
         // build the asset from the selected source
         self.assetHandler = AssetBuilder.build(from: preferredMediaSource, using: handlerType) { error, asset in
@@ -207,16 +218,14 @@ class PlayerController: NSObject, Player, PlayerSettings {
 
 extension PlayerController {
     
-    /// Updates the request adapter if it is kaltura type
-    fileprivate func updateRequestAdapterIfExists(in mediaSource: inout MediaSource) {
-        // configure media sources content request adapter if kaltura request adapter exists
-        if let _ = self.contentRequestAdapter as? KalturaPlaybackRequestAdapter {
-            // create new media session uuid
-            self.mediaSessionUUID = UUID()
+    /// Updates the request adapter if one exists
+    fileprivate func updateRequestAdapter(in mediaSource: inout MediaSource) {
+        // configure media sources content request adapter if request adapter exists
+        if let adapter = self.contentRequestAdapter {
             // update the request adapter with the updated session id
-            self.contentRequestAdapter!.updateRequestAdapter(withPlayer: self)
+            adapter.updateRequestAdapter(with: self)
             // configure media source with the adapter
-            mediaSource.contentRequestAdapter = self.contentRequestAdapter!
+            mediaSource.contentRequestAdapter = adapter
         }
     }
 }
