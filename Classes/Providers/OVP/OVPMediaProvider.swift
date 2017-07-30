@@ -233,13 +233,8 @@ import KalturaNetKit
                         }
                     }
 
-                    let masterSourceFlavorId = contextData.flavorAssets?.first( where: {$0.paramsId == 0})
-                    
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach { (source: OVPSource) in
-                        //Remove master source flavorId from flavorIds.
-                        source.flavors = source.flavors?.filter({ $0 != masterSourceFlavorId?.id })
-                        
                         //detecting the source type
                         let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
                         //If source type is not supported source will not be created

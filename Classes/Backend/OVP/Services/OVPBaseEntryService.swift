@@ -24,7 +24,7 @@ class OVPBaseEntryService {
             .setBody(key: "responseProfile", value: JSON(responseProfile))
             .setBody(key: "filter", value: JSON(filter))
             return request
-        }else{
+        } else {
             return nil
         }
     }
@@ -37,7 +37,7 @@ class OVPBaseEntryService {
                 .setBody(key: "filter:objectIdEqual", value: JSON(entryID))
                 .setBody(key: "filter:metadataObjectTypeEqual", value: JSON("1"))
             return request
-        }else{
+        } else {
             return nil
         }
     }
@@ -45,12 +45,12 @@ class OVPBaseEntryService {
     internal static func getContextData(baseURL: String, ks: String,entryID: String) -> KalturaRequestBuilder? {
         
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "baseEntry", action: "getContextData") {
-            let contextData:[String:Any] = [String:Any]()
+            let contextData:[String: Any] = [String: Any]()
             request.setBody(key: "ks", value: JSON(ks))
                 .setBody(key: "entryId", value: JSON(entryID))
                 .setBody(key: "contextDataParams", value: JSON(contextData))
             return request
-        }else{
+        } else {
             return nil
         }
         
@@ -58,12 +58,12 @@ class OVPBaseEntryService {
     
     internal static func getPlaybackContext(baseURL: String, ks: String, entryID: String) -> KalturaRequestBuilder? {
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "baseEntry", action: "getPlaybackContext") {
-            let contextData:[String:Any] = ["flavorTags":"all", "objectType":"KalturaContextDataParams"]
+            let contextData:[String: Any] = ["objectType":"KalturaContextDataParams"]
             request.setBody(key: "ks", value: JSON(ks))
                 .setBody(key: "entryId", value: JSON(entryID))
                 .setBody(key: "contextDataParams", value: JSON(contextData))
             return request
-        }else{
+        } else {
             return nil
         }
     }

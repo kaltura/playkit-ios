@@ -58,6 +58,9 @@ import AVKit
     /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
     @objc var rate: Float { get }
     
+    /// Provides a collection of time ranges for which the player has the media data readily available. The ranges provided might be discontinuous.
+    @objc var loadedTimeRanges: [PKTimeRange]? { get }
+    
     /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
     @objc func prepare(_ config: MediaConfig)
     
