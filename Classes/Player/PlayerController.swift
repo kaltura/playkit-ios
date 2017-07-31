@@ -166,8 +166,6 @@ class PlayerController: NSObject, Player, PlayerSettings {
         self.currentPlayer.currentPosition = CMTimeGetSeconds(time)
     }
     
-    
-    
     func destroy() {
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
@@ -275,7 +273,9 @@ extension PlayerController {
             PKLog.warning("network unreachable")
         }
         reachability.onReachable = { [unowned self] reachability in
-            self.handleRefreshAsset()
+            if self.shouldRefresh {
+                self.handleRefreshAsset()
+            }
         }
     }
     
@@ -302,9 +302,7 @@ extension PlayerController {
     }
     
     private func handleRefreshAsset() {
-        if self.shouldRefresh {
             self.shouldRefresh = false
             self.refreshAsset()
-        }
     }
 }
