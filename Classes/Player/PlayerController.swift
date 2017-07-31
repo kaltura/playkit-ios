@@ -302,7 +302,7 @@ extension PlayerController {
     }
     
     private func handleRefreshAsset() {
-            self.shouldRefresh = false
-            self.refreshAsset()
+        self.shouldRefresh = false
+        self.refreshAsset()
     }
 }
