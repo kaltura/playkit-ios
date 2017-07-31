@@ -136,6 +136,7 @@ public enum PhoenixMediaProviderError: PKError {
     @objc public var fileIds: [String]?
     @objc public var playbackContextType: PlaybackContextType = .unknown
     @objc public var networkProtocol: String?
+    @objc public var referrer: String?
     public weak var responseDelegate: MediaEntryProviderResponseDelegate? = nil
     
     public var executor: RequestExecutor?
@@ -205,6 +206,15 @@ public enum PhoenixMediaProviderError: PKError {
         return self
     }
 
+    
+    /// - Parameter referrer: the referrer
+    /// - Returns: Self
+    @discardableResult
+    @nonobjc public func set(referrer: String?) -> Self {
+        self.referrer = referrer
+        return self
+    }
+    
     /// - Parameter executor: executor which will be used to send request.
     ///    default is USRExecutor
     /// - Returns: Self
@@ -283,7 +293,7 @@ public enum PhoenixMediaProviderError: PKError {
     /// - Returns: request builder
     func loaderRequestBuilder(ks: String?, loaderInfo: LoaderInfo) -> KalturaRequestBuilder? {
 
-       let playbackContextOptions = PlaybackContextOptions(playbackContextType: loaderInfo.playbackContextType, protocls: [loaderInfo.networkProtocol], assetFileIds: loaderInfo.fileIds)
+       let playbackContextOptions = PlaybackContextOptions(playbackContextType: loaderInfo.playbackContextType, protocls: [loaderInfo.networkProtocol], assetFileIds: loaderInfo.fileIds, referrer: self.referrer)
 
         if let token = ks {
 
