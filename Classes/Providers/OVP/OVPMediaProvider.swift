@@ -105,7 +105,7 @@ import KalturaNetKit
      uiconfId - UI Configuration id
      */
     @discardableResult
-    @nonobjc public func set(uiconfId: NSNumber?) -> Self{
+    @nonobjc public func set(uiconfId: NSNumber?) -> Self {
         self.uiconfId = uiconfId
         return self
     }
@@ -116,7 +116,7 @@ import KalturaNetKit
     /// - Parameter referrer: the app referrer
     /// - Returns: Self
     @discardableResult
-    @nonobjc public func set(referrer: String?) -> Self{
+    @nonobjc public func set(referrer: String?) -> Self {
         self.referrer = referrer
         return self
     }
