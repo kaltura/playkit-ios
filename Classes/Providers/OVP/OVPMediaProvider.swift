@@ -74,7 +74,8 @@ import KalturaNetKit
     @objc public var sessionProvider: SessionProvider?
     @objc public var entryId: String?
     @objc public var uiconfId: NSNumber?
-    public var executor: RequestExecutor? // TODO: make @objc if needed in the future
+    @objc public var referrer: String?
+    public var executor: RequestExecutor?
     
     public override init() {}
     
@@ -101,20 +102,31 @@ import KalturaNetKit
     }
     
     /**
+     uiconfId - UI Configuration id
+     */
+    @discardableResult
+    @nonobjc public func set(uiconfId: NSNumber?) -> Self {
+        self.uiconfId = uiconfId
+        return self
+    }
+    
+    
+    /// set the provider referrer
+    ///
+    /// - Parameter referrer: the app referrer
+    /// - Returns: Self
+    @discardableResult
+    @nonobjc public func set(referrer: String?) -> Self {
+        self.referrer = referrer
+        return self
+    }
+    
+    /**
      executor - which resposible for the network, it can be set to
      */
     @discardableResult
     @nonobjc public func set(executor: RequestExecutor?) -> Self {
         self.executor = executor
-        return self
-    }
-    
-    /**
-     uiconfId - UI Configuration id
-     */
-    @discardableResult
-    @nonobjc public func set(uiconfId: NSNumber?) -> Self{
-        self.uiconfId = uiconfId
         return self
     }
     
@@ -176,7 +188,8 @@ import KalturaNetKit
             // Request for Entry playback data in order to build sources to play
             let getPlaybackContext =  OVPBaseEntryService.getPlaybackContext(baseURL: loadInfo.apiServerURL,
                                                                              ks: token,
-                                                                             entryID: loadInfo.entryId)
+                                                                             entryID: loadInfo.entryId,
+                                                                             referrer: self.referrer)
             
             let metadataRequest = OVPBaseEntryService.metadata(baseURL: loadInfo.apiServerURL, ks: token, entryID: loadInfo.entryId)
             
