@@ -28,6 +28,7 @@ class OVPEntry: OVPBaseObject {
     var duration: TimeInterval = 0
     var name: String?
     var type: Int?
+    var tags: String?
     
     
     let idKey = "id"
@@ -37,6 +38,7 @@ class OVPEntry: OVPBaseObject {
     let durationKey = "duration"
     let nameKey = "name"
     let typeKey = "type"
+    let tagsKey = "tags"
     
     required init?(json: Any) {
         
@@ -58,6 +60,6 @@ class OVPEntry: OVPBaseObject {
         self.duration = jsonObject[durationKey].double ?? 0
         self.name = jsonObject[nameKey].string
         self.type = jsonObject[typeKey].int
-        
+        self.tags = jsonObject[tagsKey].string
     }
 }

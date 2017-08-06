@@ -235,23 +235,6 @@ class AVPlayerEngine: AVPlayer {
 }
 
 /************************************************************/
-// MARK: - iOS Only
-/************************************************************/
-
-#if os(iOS)
-    extension AVPlayerEngine {
-        
-        @available(iOS 9.0, *)
-        func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-            guard let playerLayer = self.playerLayer else { return nil }
-            let pip = AVPictureInPictureController(playerLayer: playerLayer)
-            pip?.delegate = delegate
-            return pip
-        }
-    }
-#endif
-
-/************************************************************/
 // MARK: - App State Handling
 /************************************************************/
 

@@ -35,6 +35,7 @@ class PlayerLoader: PlayerDecoratorBase {
         
         self.concreatePlayerController = playerController
         var player: Player = playerController
+        
         // initial creation of play session id adapter will update session id in prepare if needed
         player.settings.contentRequestAdapter = KalturaPlaybackRequestAdapter()
         
@@ -50,9 +51,11 @@ class PlayerLoader: PlayerDecoratorBase {
                     decorator = d
                     player = d
                 }
+                
                 loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
             }
         }
+        
         setPlayer(player)
     }
     

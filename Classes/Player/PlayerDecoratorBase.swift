@@ -25,7 +25,7 @@ import AVKit
         }
     }
 
-    weak public var mediaEntry: MediaEntry? {
+    weak public var mediaEntry: PKMediaEntry? {
         return self.player.mediaEntry
     }
     
@@ -139,17 +139,3 @@ import AVKit
         self.player.selectTrack(trackId: trackId)
     }
 }
-
-/************************************************************/
-// MARK: - iOS Only
-/************************************************************/
-
-#if os(iOS)
-    extension PlayerDecoratorBase {
-        
-        @available(iOS 9.0, *)
-        open func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-            return self.player.createPiPController(with: delegate)
-        }
-    }
-#endif

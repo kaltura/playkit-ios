@@ -1,7 +1,7 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license, unless a different license for a 
+// Licensed under the AGPLv3 license, unless a different license for a
 // particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
@@ -9,18 +9,20 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
+import AVKit
 
-class PlayerController: NSObject, Player, PlayerSettings {
-    
+class AVPlayerWrapper: NSObject, PlayerEngine, PlayerSettings {
     var onEventBlock: ((PKEvent) -> Void)?
     
     weak var delegate: PlayerDelegate?
     
-    fileprivate var currentPlayer: PlayerEngine!
-    fileprivate var assetHandlerType: AssetHandler.Type!
+    fileprivate var currentPlayer: AVPlayerEngine
     
+    /// the asset to prepare and pass to the player engine to start buffering.
+    private var assetToPrepare: AVURLAsset?
     /// the current selected media source
-    fileprivate var selectedSource: PKMediaSource?
+    fileprivate var preferredMediaSource: PKMediaSource?
     /// the current handler for the selected source
     fileprivate var assetHandler: AssetHandler?
     /// the current media config that was set
@@ -55,6 +57,16 @@ class PlayerController: NSObject, Player, PlayerSettings {
         set { self.currentPlayer.currentPosition = newValue }
     }
     
+    public var currentPosition: TimeInterval {
+        get { return self.currentPlayer.currentPosition }
+        set { self.currentPlayer.currentPosition = newValue }
+    }
+    
+    public var startPosition: TimeInterval {
+        get { return self.currentPlayer.startPosition }
+        set { self.currentPlayer.startPosition = newValue }
+    }
+ 
     public var currentAudioTrack: String? {
         return self.currentPlayer.currentAudioTrack
     }
@@ -84,11 +96,9 @@ class PlayerController: NSObject, Player, PlayerSettings {
     var mediaSessionUUID: UUID?
     
     public override init() {
-        // Since currentPlayer is PlayerEngine! 
-        // Dafault Wrapper creation for safety
-        self.currentPlayer = DefaultPlayerWrapper()
-        
+        self.currentPlayer = AVPlayerEngine()
         super.init()
+        
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.trace("postEvent:: \(event)")
             self?.onEventBlock?(event)
@@ -100,35 +110,38 @@ class PlayerController: NSObject, Player, PlayerSettings {
     let reachability = PKReachability()
     var shouldRefresh: Bool = false
     
-    func setMedia(from mediaConfig: MediaConfig) {
-        self.mediaConfig = mediaConfig
-        
-        // get the preferred media source and post source selected event
-        guard let (selectedSource, handlerType) = SourceSelector.selectSource(from: mediaConfig.mediaEntry) else { return }
-        self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: selectedSource))
-        self.selectedSource = selectedSource
-        self.assetHandlerType = handlerType
-        
-        // update the media source request adapter with new media uuid if using kaltura request adapter
-        var pms = selectedSource
-        self.updateRequestAdapterIfExists(in: &pms)
-        
-        if (mediaConfig.mediaEntry.vrData != nil) {
-            //TODO:: reflection with vr player wrapper
-            // TODO on vr if reflection fails add throws
-            self.currentPlayer = AVPlayerWrapper()
-        } else {
-            if let view = self.view as? PlayerView {
-                self.currentPlayer.view = view
+    /// Load media on player
+    func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type) {
+        //todo::
+        // build the asset from the selected source
+        // TODO:: media sec fix no !
+        self.assetHandler = AssetBuilder.build(from: mediaSource!, using: handlerType) { error, asset in
+            if asset != nil {
+                self.assetToPrepare = asset
             }
-            self.currentPlayer = AVPlayerWrapper()
+            // send signal when assetToPrepare is set
+            self.prepareSemaphore.signal()
         }
-        
-        self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: self.assetHandlerType)
     }
     
-    func prepare(_ mediaConfig: MediaConfig) {
-        self.currentPlayer.prepare(mediaConfig)
+    func prepare(_ MediaConfig: MediaConfig) {
+        // set background thread to make sure main thread is not stuck while waiting
+        DispatchQueue.global().async {
+            // wait till assetToPrepare is set
+            self.prepareSemaphore.wait()
+            
+            guard let assetToPrepare = self.assetToPrepare else { return }
+            
+            if let startTime = self.mediaConfig?.startTime {
+                self.currentPlayer.startPosition = startTime
+            }
+            
+            self.currentPlayer.asset = assetToPrepare
+            
+            if DRMSupport.widevineClassicHandler != nil {
+                self.addAssetRefreshObservers()
+            }
+        }
     }
     
     func play() {
@@ -182,36 +195,16 @@ class PlayerController: NSObject, Player, PlayerSettings {
 }
 
 /************************************************************/
-// MARK: - Private
-/************************************************************/
-
-extension PlayerController {
-    
-    /// Updates the request adapter if it is kaltura type
-    fileprivate func updateRequestAdapterIfExists(in mediaSource: inout PKMediaSource) {
-        // configure media sources content request adapter if kaltura request adapter exists
-        if let _ = self.contentRequestAdapter as? KalturaPlaybackRequestAdapter {
-            // create new media session uuid
-            self.mediaSessionUUID = UUID()
-            // update the request adapter with the updated session id
-            self.contentRequestAdapter!.updateRequestAdapter(withPlayer: self)
-            // configure media source with the adapter
-            mediaSource.contentRequestAdapter = self.contentRequestAdapter!
-        }
-    }
-}
-
-/************************************************************/
 // MARK: - Reachability & Application States Handling
 /************************************************************/
 
-extension PlayerController {
+extension AVPlayerWrapper {
     
     private func shouldRefreshAsset() {
-        guard let selectedSource = self.selectedSource,
+        guard let preferredMediaSource = self.preferredMediaSource,
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
-        refreshableHandler.shouldRefreshAsset(mediaSource: selectedSource) { [unowned self] (shouldRefresh) in
+        refreshableHandler.shouldRefreshAsset(mediaSource: preferredMediaSource) { [unowned self] (shouldRefresh) in
             if shouldRefresh {
                 self.shouldRefresh = true
             }
@@ -219,11 +212,11 @@ extension PlayerController {
     }
     
     private func refreshAsset() {
-        guard let selectedSource = self.selectedSource,
+        guard let preferredMediaSource = self.preferredMediaSource,
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
         self.currentPlayer.startPosition = self.currentPlayer.currentPosition
-        refreshableHandler.refreshAsset(mediaSource: selectedSource)
+        refreshableHandler.refreshAsset(mediaSource: preferredMediaSource)
     }
     
     func addAssetRefreshObservers() {
@@ -257,7 +250,7 @@ extension PlayerController {
     // Application States Handling
     private func addAppStateChangeObserver() {
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(PlayerController.applicationDidBecomeActive),
+                                               selector: #selector(AVPlayerWrapper.applicationDidBecomeActive),
                                                name: .UIApplicationDidBecomeActive,
                                                object: nil)
     }

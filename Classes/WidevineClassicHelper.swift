@@ -63,7 +63,7 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
     /************************************************************/
     
     class WidevineClassicHelper {
-        static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
+        static func registerLocalAsset(_ assetUri: String!, mediaSource: PKMediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
             PKLog.info("registerLocalAsset")
             
             WidevineClassicCDM.setEventBlock({ (event: KCDMEventType, data: [AnyHashable : Any]?) in
@@ -174,7 +174,7 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
             WidevineClassicCDM.playLocalAsset(assetUri, readyToPlay: block)
         }
         
-        static func extractLicenseUri(mediaSource: MediaSource) -> (String?, PKError?) {
+        static func extractLicenseUri(mediaSource: PKMediaSource) -> (String?, PKError?) {
             guard let drmData = mediaSource.drmData?.first, let licenseUri = drmData.licenseUri  else {
                 PKLog.error("Invalid DRM Data")
                 return (nil, WidevineClassicError.invalidDRMData)
@@ -187,7 +187,7 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
     internal class WidevineClassicHelper {
         static let fatalMsg = "PlayKitWV is not contained on Podfile"
         
-        static func registerLocalAsset(_ assetUri: String!, mediaSource: MediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
+        static func registerLocalAsset(_ assetUri: String!, mediaSource: PKMediaSource!, refresh: Bool, callback: @escaping LocalAssetRegistrationBlock) {
             fatalError(fatalMsg)
         }
         
@@ -211,7 +211,7 @@ typealias LocalAssetStatusBlock = (Error?, TimeInterval, TimeInterval) -> Void
             fatalError(fatalMsg)
         }
         
-        static func extractLicenseUri(mediaSource: MediaSource) -> (String?, PKError?) {
+        static func extractLicenseUri(mediaSource: PKMediaSource) -> (String?, PKError?) {
             fatalError(fatalMsg)
         }
     }
