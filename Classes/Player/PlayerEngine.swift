@@ -19,4 +19,7 @@ public protocol PlayerEngine: BasicPlayer {
     
     /// The player's current time.
     var currentPosition: TimeInterval {get set}
+    
+    /// Load media on player
+    func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type)
 }

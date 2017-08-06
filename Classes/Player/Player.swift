@@ -9,8 +9,6 @@
 // ===================================================================================================
 
 import UIKit
-import AVFoundation
-import AVKit
 
 @objc public protocol PlayerDelegate {
     func playerShouldPlayAd(_ player: Player) -> Bool
@@ -26,16 +24,13 @@ import AVKit
     @objc weak var delegate: PlayerDelegate? { get set }
     
     /// The player's associated media entry.
-    @objc weak var mediaEntry: MediaEntry? { get }
+    @objc weak var mediaEntry: PKMediaEntry? { get }
     
     /// the player's settings
     @objc var settings: PlayerSettings { get }
     
     /// The player's session id. the `sessionId` is initialized when the player loads.
     @objc var sessionId: String { get }
-    
-    /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
-    @objc func prepare(_ config: MediaConfig)
 
     /// Add Observation to relevant event.
     @objc func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void)
@@ -51,12 +46,6 @@ import AVKit
     
     /// Update Plugin Config
     @objc func updatePluginConfig(pluginName: String, config: Any)
-    
-    #if os(iOS)
-    /// Create PiP Controller
-    @available(iOS 9.0, *)
-    @objc func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
-    #endif
 }
 
 public protocol PlayerDecoratorProvider {

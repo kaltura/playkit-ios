@@ -118,7 +118,7 @@ import KalturaNetKit
         return self
     }
     
-    public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void){
+    public func loadMedia(callback: @escaping (PKMediaEntry?, Error?) -> Void){
         
         // session provider is required in order to have the base url and the partner id
         guard let sessionProvider = self.sessionProvider else {
@@ -140,7 +140,7 @@ import KalturaNetKit
         self.startLoading(loadInfo: loaderInfo, callback: callback)
     }
     
-    func startLoading(loadInfo: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) -> Void {
+    func startLoading(loadInfo: LoaderInfo, callback: @escaping (PKMediaEntry?, Error?) -> Void) -> Void {
         
         loadInfo.sessionProvider.loadKS { (resKS, error) in
             
@@ -233,7 +233,7 @@ import KalturaNetKit
                         }
                     }
 
-                    var mediaSources: [MediaSource] = [MediaSource]()
+                    var mediaSources: [PKMediaSource] = [PKMediaSource]()
                     sources.forEach { (source: OVPSource) in
                         //detecting the source type
                         let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
@@ -258,7 +258,7 @@ import KalturaNetKit
                         let drmData = self.buildDRMParams(drm: source.drm)
                         
                         //creating media source with the above data
-                        let mediaSource: MediaSource = MediaSource(id: "\(entry.id)_\(String(source.deliveryProfileId))")
+                        let mediaSource: PKMediaSource = PKMediaSource(id: "\(entry.id)_\(String(source.deliveryProfileId))")
                         mediaSource.drmData = drmData
                         mediaSource.contentUrl = url
                         mediaSource.mediaFormat = format
@@ -266,12 +266,12 @@ import KalturaNetKit
                     }
                     
                     let metaDataItems = self.getMetadata(metadataList: metadataList)
-                 
-                    //creating media entry with the above sources
-                    let mediaEntry: MediaEntry = MediaEntry(id: entry.id)
+                
+                    let mediaEntry: PKMediaEntry = PKMediaEntry(id: entry.id)
                     mediaEntry.duration = entry.duration
                     mediaEntry.sources = mediaSources
                     mediaEntry.metadata = metaDataItems
+                    mediaEntry.tags = entry.tags
                     callback(mediaEntry, nil)
                 })
             

@@ -95,7 +95,7 @@ public extension PKEvent {
     }
     
     /// Content url, PKEvent Data Accessor
-    @objc public var mediaSource: MediaSource? {
-        return self.data?[EventDataKeys.mediaSource] as? MediaSource
+    @objc public var mediaSource: PKMediaSource? {
+        return self.data?[EventDataKeys.mediaSource] as? PKMediaSource
     }
 }

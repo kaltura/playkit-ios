@@ -13,23 +13,23 @@ import Foundation
 /// A `MediaConfig` object defines behavior and info to use when preparing a `Player` object.
 @objc public class MediaConfig: NSObject {
 
-    @objc public var mediaEntry: MediaEntry
+    @objc public var mediaEntry: PKMediaEntry
     @objc public var startTime: TimeInterval = 0
     
     @objc public override var description: String {
         return "Media config, mediaEntry: \(self.mediaEntry)\nstartTime: \(self.startTime)"
     }
     
-    @objc public init(mediaEntry: MediaEntry, startTime: TimeInterval = 0) {
+    @objc public init(mediaEntry: PKMediaEntry, startTime: TimeInterval = 0) {
         self.mediaEntry = mediaEntry
         self.startTime = startTime
     }
     
-    @objc public static func config(mediaEntry: MediaEntry) -> MediaConfig {
+    @objc public static func config(mediaEntry: PKMediaEntry) -> MediaConfig {
         return MediaConfig.init(mediaEntry: mediaEntry)
     }
     
-    @objc public static func config(mediaEntry: MediaEntry, startTime: TimeInterval) -> MediaConfig {
+    @objc public static func config(mediaEntry: PKMediaEntry, startTime: TimeInterval) -> MediaConfig {
         return MediaConfig.init(mediaEntry: mediaEntry, startTime: startTime)
     }
     

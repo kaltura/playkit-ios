@@ -50,9 +50,12 @@ import Foundation
     /// send seek action for the player.
     @objc func seek(to time: TimeInterval)
     
+    /// Select Track
+    @objc func selectTrack(trackId: String)
+    
     /// Release player resources.
     @objc func destroy()
     
-    /// Select Track
-    @objc func selectTrack(trackId: String)
+    /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
+    @objc func prepare(_ config: MediaConfig)
 }
