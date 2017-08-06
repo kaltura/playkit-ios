@@ -16,8 +16,8 @@ class PlayerController: NSObject, Player, PlayerSettings {
     
     weak var delegate: PlayerDelegate?
     
-    fileprivate var currentPlayer: PlayerEngine!
-    fileprivate var assetHandlerType: AssetHandler.Type!
+    fileprivate var currentPlayer: PlayerEngine
+    fileprivate var assetHandlerType: AssetHandler.Type?
     
     /// the current selected media source
     fileprivate var selectedSource: PKMediaSource?
@@ -124,7 +124,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
             self.currentPlayer = AVPlayerWrapper()
         }
         
-        self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: self.assetHandlerType)
+        self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: handlerType)
     }
     
     func prepare(_ mediaConfig: MediaConfig) {

@@ -17,7 +17,7 @@ enum SourceType {
     case m3u8
     case wvm
     
-    var asStr: String {
+    var asString: String {
         switch self {
         case .mp3:
             return "mp3"
@@ -44,7 +44,7 @@ class SourceSelector {
         // Preference: Local, HLS, FPS*, MP4, WVM*, MP3
         
         if let source = sources.first(where: {$0 is LocalMediaSource}) {
-            if source.fileExt == SourceType.wvm.asStr {
+            if source.fileExt == SourceType.wvm.asString {
                 return (source, DRMSupport.widevineClassicHandler!)
             } else {
                 return (source, defaultHandler)
@@ -52,24 +52,24 @@ class SourceSelector {
         }
         
         if DRMSupport.fairplay {
-            if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asStr}) {
+            if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asString}) {
                 return (source, defaultHandler)
             }
         } else {
-            if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asStr && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
+            if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asString && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
                 return (source, defaultHandler)
             }
         }
         
-        if let source = sources.first(where: {$0.fileExt == SourceType.mp4.asStr}) {
+        if let source = sources.first(where: {$0.fileExt == SourceType.mp4.asString}) {
             return (source, defaultHandler)
         }
         
-        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt == SourceType.wvm.asStr}) {
+        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt == SourceType.wvm.asString}) {
             return (source, DRMSupport.widevineClassicHandler!)
         }
         
-        if let source = sources.first(where: {$0.fileExt == SourceType.mp3.asStr}) {
+        if let source = sources.first(where: {$0.fileExt == SourceType.mp3.asString}) {
             return (source, defaultHandler)
         }
         

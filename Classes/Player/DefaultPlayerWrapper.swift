@@ -83,11 +83,6 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
-    public var sessionId: String {
-        printInvocationWarning("\(#function)")
-        return ""
-    }
-    
     public var rate: Float {
         printInvocationWarning("\(#function)")
         return 0.0

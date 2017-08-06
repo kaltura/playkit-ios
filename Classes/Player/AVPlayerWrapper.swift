@@ -12,10 +12,8 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class AVPlayerWrapper: NSObject, PlayerEngine, PlayerSettings {
+class AVPlayerWrapper: NSObject, PlayerEngine {
     var onEventBlock: ((PKEvent) -> Void)?
-    
-    weak var delegate: PlayerDelegate?
     
     fileprivate var currentPlayer: AVPlayerEngine
     
@@ -29,12 +27,6 @@ class AVPlayerWrapper: NSObject, PlayerEngine, PlayerSettings {
     private var mediaConfig: MediaConfig?
     /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
-    
-    var contentRequestAdapter: PKRequestParamsAdapter?
-    
-    var settings: PlayerSettings {
-        return self
-    }
     
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
@@ -84,16 +76,9 @@ class AVPlayerWrapper: NSObject, PlayerEngine, PlayerSettings {
         }
     }
     
-    public var sessionId: String {
-        return self.sessionUUID.uuidString + ":" + (self.mediaSessionUUID?.uuidString ?? "")
-    }
-    
     public var rate: Float {
         return self.currentPlayer.rate
     }
-    
-    let sessionUUID = UUID()
-    var mediaSessionUUID: UUID?
     
     public override init() {
         self.currentPlayer = AVPlayerEngine()
@@ -164,33 +149,13 @@ class AVPlayerWrapper: NSObject, PlayerEngine, PlayerSettings {
         self.currentPlayer.currentPosition = time
     }
     
-    func destroy() {
-        self.currentPlayer.destroy()
-        self.removeAssetRefreshObservers()
-    }
-    
-    func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
-        //Assert.shouldNeverHappen();
-    }
-    
-    func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
-        //Assert.shouldNeverHappen();
-    }
-    
-    func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
-        //Assert.shouldNeverHappen();
-    }
-    
-    func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
-        //Assert.shouldNeverHappen();
-    }
-    
     public func selectTrack(trackId: String) {
         self.currentPlayer.selectTrack(trackId: trackId)
     }
     
-    public func updatePluginConfig(pluginName: String, config: Any) {
-        //Assert.shouldNeverHappen();
+    func destroy() {
+        self.currentPlayer.destroy()
+        self.removeAssetRefreshObservers()
     }
 }
 
