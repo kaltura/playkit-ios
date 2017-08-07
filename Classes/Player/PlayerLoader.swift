@@ -59,9 +59,9 @@ class PlayerLoader: PlayerDecoratorBase {
         setPlayer(player)
     }
     
-    override func prepare(_ config: MediaConfig) {
+    override func prepare(_ config: MediaConfig) throws {
         self.concreatePlayerController?.setMedia(from: config)
-        super.prepare(config)
+        try super.prepare(config)
         // update all loaded plugins with media config
         for (pluginName, loadedPlugin) in loadedPlugins {
             PKLog.trace("Preparing plugin", pluginName)

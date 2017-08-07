@@ -109,7 +109,7 @@ class AVPlayerWrapper: NSObject, PlayerEngine {
         }
     }
     
-    func prepare(_ MediaConfig: MediaConfig) {
+    func prepare(_ MediaConfig: MediaConfig) throws {
         // set background thread to make sure main thread is not stuck while waiting
         DispatchQueue.global().async {
             // wait till assetToPrepare is set

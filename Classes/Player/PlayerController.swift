@@ -19,13 +19,13 @@ class PlayerController: NSObject, Player, PlayerSettings {
     fileprivate var currentPlayer: PlayerEngine
     fileprivate var assetHandlerType: AssetHandler.Type?
     
-    /// the current selected media source
+    /// Current selected media source
     fileprivate var selectedSource: PKMediaSource?
-    /// the current handler for the selected source
+    /// Current handler for the selected source
     fileprivate var assetHandler: AssetHandler?
-    /// the current media config that was set
+    /// Current media config that was set
     private var mediaConfig: MediaConfig?
-    /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
+    /// A semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
     var contentRequestAdapter: PKRequestParamsAdapter?
@@ -64,12 +64,8 @@ class PlayerController: NSObject, Player, PlayerSettings {
     }
     
     public weak var view: PlayerView? {
-        get {
-            return self.currentPlayer.view
-        }
-        set {
-            self.currentPlayer.view = newValue
-        }
+        get { return self.currentPlayer.view }
+        set { self.currentPlayer.view = newValue }
     }
     
     public var sessionId: String {
@@ -113,22 +109,27 @@ class PlayerController: NSObject, Player, PlayerSettings {
         var pms = selectedSource
         self.updateRequestAdapterIfExists(in: &pms)
         
+        // Take saved view from DefaultPlayerWrapper
+        // Must be called before `self.currentPlayer` reference is changed
+        let playerView = self.currentPlayer.view
+        self.createPlayerWrapper(mediaConfig)
+        // After Setting PlayerWrapper set  saved player's view
+        self.currentPlayer.view = playerView
+        self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: handlerType)
+    }
+    
+    private func createPlayerWrapper(_ mediaConfig: MediaConfig) {
         if (mediaConfig.mediaEntry.vrData != nil) {
             //TODO:: reflection with vr player wrapper
             // TODO on vr if reflection fails add throws
             self.currentPlayer = AVPlayerWrapper()
         } else {
-            if let view = self.view as? PlayerView {
-                self.currentPlayer.view = view
-            }
             self.currentPlayer = AVPlayerWrapper()
         }
-        
-        self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: handlerType)
     }
     
-    func prepare(_ mediaConfig: MediaConfig) {
-        self.currentPlayer.prepare(mediaConfig)
+    func prepare(_ mediaConfig: MediaConfig) throws {
+        try self.currentPlayer.prepare(mediaConfig)
     }
     
     func play() {

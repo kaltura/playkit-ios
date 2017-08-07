@@ -57,5 +57,5 @@ import Foundation
     @objc func destroy()
     
     /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
-    @objc func prepare(_ config: MediaConfig)
+    @objc func prepare(_ config: MediaConfig) throws
 }
