@@ -75,12 +75,13 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
+    /// Save view reference till prepare
+    private var _view: PlayerView?
     public weak var view: PlayerView? {
         get {
-            printInvocationWarning("\(#function)")
-            return nil
+            return self._view
         }
-        set { printInvocationWarning("\(#function)") }
+        set { self._view = newValue }
     }
     
     public var rate: Float {

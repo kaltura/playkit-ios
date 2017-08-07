@@ -79,8 +79,8 @@ import AVKit
         return self.player.rate
     }
     
-    open func prepare(_ config: MediaConfig) {
-        return self.player.prepare(config)
+    open func prepare(_ config: MediaConfig) throws {
+        return try self.player.prepare(config)
     }
     
     public func setPlayer(_ player: Player!) {
