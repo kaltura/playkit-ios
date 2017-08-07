@@ -79,8 +79,12 @@ import AVKit
         return self.player.rate
     }
     
+    @objc public var loadedTimeRanges: [PKTimeRange]? {
+        return self.player.loadedTimeRanges
+    }
+    
     open func prepare(_ config: MediaConfig) throws {
-        return try self.player.prepare(config)
+        try self.player.prepare(config)
     }
     
     public func setPlayer(_ player: Player!) {

@@ -12,7 +12,11 @@ import Foundation
 
 /// `PKRequestParamsDecorator` used for getting updated request info
 @objc public protocol PKRequestParamsAdapter {
-    func updateRequestAdapter(withPlayer player: Player)
+    /// Called when need to update the request adapter with information from the player.
+    /// Use this to update the adapter with any information available from the player.
+    /// 
+    /// For example, when media session id changes.
+    func updateRequestAdapter(with player: Player)
     func adapt(requestParams: PKRequestParams) -> PKRequestParams
 }
 

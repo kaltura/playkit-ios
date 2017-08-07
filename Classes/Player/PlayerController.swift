@@ -76,6 +76,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
         return self.currentPlayer.rate
     }
     
+    public var loadedTimeRanges: [PKTimeRange]? {
+        return self.currentPlayer.loadedTimeRanges
+    }
+    
     let sessionUUID = UUID()
     var mediaSessionUUID: UUID?
     
@@ -98,6 +102,8 @@ class PlayerController: NSObject, Player, PlayerSettings {
     
     func setMedia(from mediaConfig: MediaConfig) throws {
         self.mediaConfig = mediaConfig
+        // create new media session uuid
+        self.mediaSessionUUID = UUID()
         
         // get the preferred media source and post source selected event
         guard let (selectedSource, handlerType) = SourceSelector.selectSource(from: mediaConfig.mediaEntry) else { return }
@@ -107,7 +113,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
         
         // update the media source request adapter with new media uuid if using kaltura request adapter
         var pms = selectedSource
-        self.updateRequestAdapterIfExists(in: &pms)
+        self.updateRequestAdapter(in: &pms)
         
         // Take saved view from DefaultPlayerWrapper
         // Must be called before `self.currentPlayer` reference is changed
@@ -190,17 +196,14 @@ class PlayerController: NSObject, Player, PlayerSettings {
 /************************************************************/
 
 extension PlayerController {
-    
-    /// Updates the request adapter if it is kaltura type
-    fileprivate func updateRequestAdapterIfExists(in mediaSource: inout PKMediaSource) {
-        // configure media sources content request adapter if kaltura request adapter exists
-        if let _ = self.contentRequestAdapter as? KalturaPlaybackRequestAdapter {
-            // create new media session uuid
-            self.mediaSessionUUID = UUID()
+    /// Updates the request adapter if one exists
+    fileprivate func updateRequestAdapter(in mediaSource: inout PKMediaSource) {
+        // configure media sources content request adapter if request adapter exists
+        if let adapter = self.contentRequestAdapter {
             // update the request adapter with the updated session id
-            self.contentRequestAdapter!.updateRequestAdapter(withPlayer: self)
+            adapter.updateRequestAdapter(with: self)
             // configure media source with the adapter
-            mediaSource.contentRequestAdapter = self.contentRequestAdapter!
+            mediaSource.contentRequestAdapter = adapter
         }
     }
 }
@@ -250,7 +253,9 @@ extension PlayerController {
             PKLog.warning("network unreachable")
         }
         reachability.onReachable = { [unowned self] reachability in
-            self.handleRefreshAsset()
+            if self.shouldRefresh {
+                self.handleRefreshAsset()
+            }
         }
     }
     
@@ -277,9 +282,7 @@ extension PlayerController {
     }
     
     private func handleRefreshAsset() {
-        if self.shouldRefresh {
-            self.shouldRefresh = false
-            self.refreshAsset()
-        }
+        self.shouldRefresh = false
+        self.refreshAsset()
     }
 }

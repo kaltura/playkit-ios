@@ -71,9 +71,10 @@ class AVPlayerEngine: AVPlayer {
         set {
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
-            super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [unowned self] (isSeeked: Bool) in
+            super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [weak self] (isSeeked: Bool) in
+                guard let strongSelf = self else { return }
                 if isSeeked {
-                    self.post(event: PlayerEvent.Seeked())
+                    strongSelf.post(event: PlayerEvent.Seeked())
                     PKLog.debug("seeked")
                 } else {
                     PKLog.error("seek faild")

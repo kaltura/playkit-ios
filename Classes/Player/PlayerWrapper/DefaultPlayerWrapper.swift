@@ -75,6 +75,11 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
+    public var loadedTimeRanges: [PKTimeRange]? {
+        printInvocationWarning("\(#function)")
+        return nil
+    }
+    
     /// Save view reference till prepare
     private var _view: PlayerView?
     public weak var view: PlayerView? {

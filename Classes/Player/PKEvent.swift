@@ -47,6 +47,7 @@ public extension PKEvent {
         static let error = "error"
         static let metadata = "metadata"
         static let mediaSource = "mediaSource"
+        static let timeRanges = "timeRanges"
     }
     
     // MARK: Player Data Accessors
@@ -97,5 +98,10 @@ public extension PKEvent {
     /// Content url, PKEvent Data Accessor
     @objc public var mediaSource: PKMediaSource? {
         return self.data?[EventDataKeys.mediaSource] as? PKMediaSource
+    }
+    
+    /// Content url, PKEvent Data Accessor
+    @objc public var timeRanges: [PKTimeRange]? {
+        return self.data?[EventDataKeys.timeRanges] as? [PKTimeRange]
     }
 }

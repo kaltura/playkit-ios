@@ -8,14 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-//
-//  OVPEntry.swift
-//  Pods
-//
-//  Created by Rivka Peleg on 28/11/2016.
-//
-//
-
 import UIKit
 import SwiftyJSON
 

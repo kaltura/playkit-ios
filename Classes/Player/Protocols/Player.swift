@@ -51,5 +51,3 @@ import UIKit
 public protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
-
-
