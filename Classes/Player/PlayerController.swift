@@ -96,7 +96,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     let reachability = PKReachability()
     var shouldRefresh: Bool = false
     
-    func setMedia(from mediaConfig: MediaConfig) {
+    func setMedia(from mediaConfig: MediaConfig) throws {
         self.mediaConfig = mediaConfig
         
         // get the preferred media source and post source selected event
@@ -112,17 +112,20 @@ class PlayerController: NSObject, Player, PlayerSettings {
         // Take saved view from DefaultPlayerWrapper
         // Must be called before `self.currentPlayer` reference is changed
         let playerView = self.currentPlayer.view
-        self.createPlayerWrapper(mediaConfig)
+        try self.createPlayerWrapper(mediaConfig)
         // After Setting PlayerWrapper set  saved player's view
         self.currentPlayer.view = playerView
         self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: handlerType)
     }
     
-    private func createPlayerWrapper(_ mediaConfig: MediaConfig) {
+    private func createPlayerWrapper(_ mediaConfig: MediaConfig) throws {
         if (mediaConfig.mediaEntry.vrData != nil) {
-            //TODO:: reflection with vr player wrapper
-            // TODO on vr if reflection fails add throws
-            self.currentPlayer = AVPlayerWrapper()
+            guard let vrPlayerWrapper = NSClassFromString("VRPlayerWrapper") as? VRPlayerEngine else {
+                PKLog.error("VRPlayerWrapper does not exist")
+                throw PlayerError.missingDependency.asNSError
+            }
+            
+            self.currentPlayer = vrPlayerWrapper
         } else {
             self.currentPlayer = AVPlayerWrapper()
         }
