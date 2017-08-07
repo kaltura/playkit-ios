@@ -110,9 +110,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
         self.updateRequestAdapterIfExists(in: &pms)
         
         // Take saved view from DefaultPlayerWrapper
+        // Must be called before `self.currentPlayer` reference is changed
         let playerView = self.currentPlayer.view
         self.createPlayerWrapper(mediaConfig)
-        // After Setting PlayerWrapper set player's view
+        // After Setting PlayerWrapper set  saved player's view
         self.currentPlayer.view = playerView
         self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: handlerType)
     }
