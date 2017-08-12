@@ -23,7 +23,10 @@ extension AVPlayerEngine {
             #keyPath(currentItem.status),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
-            #keyPath(currentItem.timedMetadata)
+            #keyPath(currentItem.isPlaybackBufferFull),
+            #keyPath(currentItem.loadedTimeRanges),
+            #keyPath(currentItem.timedMetadata),
+            #keyPath(currentItem.preferredForwardBufferDuration) // FIXME: remove later
         ]
     }
     
@@ -42,6 +45,45 @@ extension AVPlayerEngine {
         NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: self.currentItem?.timebase)
+        
+        // Add time observer
+        self.addTimeObserver()
+    }
+    
+    func addTimeObserver() {
+        let interval = CMTime(seconds: self.periodicObserverInterval, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        let queue = periodicTimeObserverDispatchQueue
+        self.timeObserverToken = self.addPeriodicTimeObserver(forInterval: interval, queue: queue) { [weak self] observedTime in
+            guard let strongSelf = self else { return }
+            let time = CMTimeGetSeconds(observedTime)
+            let timeDifference = time - strongSelf.lastObservedTime
+            // update play time only if difference is less than interval seconds + 0.5 second,
+            // otherwise there was probably a seek, 0.5 second is just a margin error in case the periodic observer was delayed.
+            if abs(timeDifference) < strongSelf.periodicObserverInterval + 0.5 {
+                strongSelf.timePlayed += timeDifference
+            }
+            strongSelf.lastObservedTime = time
+            
+            let forwardBufferLogicObservedTimeDifference = time - strongSelf.forwardBufferLogicObservedTime
+            // calculate forward buffer size only every 10 seconds of viewing has passed and after video started playing
+            if let settings = strongSelf.assetSettings?.dataUsageSettings, #available(iOS 10.0, *), strongSelf.timePlayed > 1, forwardBufferLogicObservedTimeDifference > 10 {
+                strongSelf.forwardBufferLogicObservedTime = time
+                switch settings.forwardBufferMode {
+                case .userEngagement:
+                    let bufferLogicType = ForwardBufferLogic.LogicType.userEngagementAndDuration(engagement: strongSelf.timePlayed, duration: strongSelf.duration)
+                    let preferredForwardBufferDuration = strongSelf.forwardBufferLogic?.getDuration(for: bufferLogicType)
+                    PKLog.info("new forward buffer duration: \(String(describing: preferredForwardBufferDuration))")
+                    strongSelf.currentItem?.preferredForwardBufferDuration = preferredForwardBufferDuration ?? 0
+                case .duration, .durationCustom:
+                    let bufferLogicType = ForwardBufferLogic.LogicType.duration(duration: strongSelf.duration)
+                    let preferredForwardBufferDuration = strongSelf.forwardBufferLogic?.getDuration(for: bufferLogicType)
+                    PKLog.info("new forward buffer duration: \(String(describing: preferredForwardBufferDuration))")
+                    strongSelf.currentItem?.preferredForwardBufferDuration = preferredForwardBufferDuration ?? 0
+                case .custom: strongSelf.currentItem?.preferredForwardBufferDuration = settings.preferredForwardBufferDuration
+                case .none: strongSelf.currentItem?.preferredForwardBufferDuration = 0
+                }
+            }
+        }
     }
     
     func removeObservers() {
@@ -61,6 +103,12 @@ extension AVPlayerEngine {
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: nil)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
+        
+        // remove time observer
+        if let timeObserverToken = self.timeObserverToken {
+            self.removeTimeObserver(timeObserverToken)
+            self.timeObserverToken = nil
+        }
     }
     
     func onAccessLogEntryNotification(notification: Notification) {
@@ -119,6 +167,12 @@ extension AVPlayerEngine {
         switch keyPath {
         case #keyPath(currentItem.playbackLikelyToKeepUp): self.handleLikelyToKeepUp()
         case #keyPath(currentItem.playbackBufferEmpty): self.handleBufferEmptyChange()
+        case #keyPath(currentItem.isPlaybackBufferFull): PKLog.debug("Buffer Full")
+        case #keyPath(currentItem.loadedTimeRanges):
+            guard let loadedTimeRanges = self.currentItem?.loadedTimeRanges else { return }
+            // convert values to PKTimeRange
+            let timeRanges = loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
+            self.post(event: PlayerEvent.LoadedTimeRanges(timeRanges: timeRanges))
         case #keyPath(rate): self.handleRate()
         case #keyPath(status):
             guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerStatus = AVPlayerStatus(rawValue: statusChange.intValue) else {
@@ -134,6 +188,7 @@ extension AVPlayerEngine {
             }
             self.handle(playerItemStatus: newPlayerItemStatus)
         case #keyPath(currentItem.timedMetadata): self.handleTimedMedia()
+        case #keyPath(currentItem.preferredForwardBufferDuration): print("\(String(describing: change?[.newKey] as? TimeInterval))")
         default: super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }

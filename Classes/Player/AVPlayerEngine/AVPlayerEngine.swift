@@ -17,7 +17,9 @@ import CoreMedia
 /// It provides the interface to control the player’s behavior such as its ability to play, pause, and seek to various points in the timeline.
 class AVPlayerEngine: AVPlayer {
     
-    // MARK: Player Properties
+    /************************************************************/
+    // MARK: - Properties
+    /************************************************************/
     
     // Attempt load and test these asset keys before playing.
     let assetKeysRequiredToPlay = [
@@ -36,10 +38,56 @@ class AVPlayerEngine: AVPlayer {
     var currentState: PlayerState = PlayerState.idle
     var tracksManager = TracksManager()
     var observerContext = 0
-    
     var onEventBlock: ((PKEvent) -> Void)?
+
+    var forwardBufferLogic: ForwardBufferLogic?
+    /// the last time the forward buffer logic calculated a new buffer size
+    var forwardBufferLogicObservedTime: TimeInterval = 0
     
-    public weak var view: PlayerView? {
+    /************************************************************/
+    // MARK: - Time Observing Properties
+    /************************************************************/
+    
+    /// Used to track the amount of time the player has played the current time (total play time for current item).
+    /// For example, if we played for 10s and seeked 5m forward and watch another 10s the playing is 20s.
+    var timePlayed: TimeInterval = 0
+    var lastObservedTime: TimeInterval = 0
+    var periodicObserverInterval: TimeInterval = 0.5 // TODO: maybe in future allow app to select the interval and post event on messageBus
+    var timeObserverToken: Any?
+    let periodicTimeObserverDispatchQueue = DispatchQueue(label: "com.kaltura.playkit.player.periodic-observer-queue")
+    
+    /************************************************************/
+    // MARK: - Asset Properties
+    /************************************************************/
+    
+    var assetSettings: PKAssetSettings? {
+        didSet {
+            guard let assetSettings = self.assetSettings else { return }
+        
+            switch assetSettings.dataUsageSettings.forwardBufferMode {
+            case .userEngagement, .duration: self.forwardBufferLogic = ForwardBufferLogic()
+            case .durationCustom:
+                self.forwardBufferLogic = ForwardBufferLogic(customDurationDecisionRanges: assetSettings.dataUsageSettings.durationModeCustomRanges)
+            case .custom: break
+            case .none: break
+            }
+            
+            assetSettings.dataUsageSettings.delegate = self
+        }
+    }
+    
+    var asset: PKAsset? {
+        didSet {
+            guard let newAsset = asset else { return }
+            self.asynchronouslyLoadURLAsset(newAsset)
+        }
+    }
+    
+    /************************************************************/
+    // MARK: - Player Properties
+    /************************************************************/
+    
+    weak var view: PlayerView? {
         didSet {
             view?.player = self
         }
@@ -47,13 +95,6 @@ class AVPlayerEngine: AVPlayer {
     
     fileprivate var playerLayer: AVPlayerLayer? {
         return view?.playerLayer
-    }
-
-    var asset: AVURLAsset? {
-        didSet {
-            guard let newAsset = asset else { return }
-            self.asynchronouslyLoadURLAsset(newAsset)
-        }
     }
     
     /// Holds the current time for the current item.
@@ -156,12 +197,17 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    // MARK: Player Methods
+    /************************************************************/
+    // MARK: - Initialization
+    /************************************************************/
     
     override init() {
         PKLog.info("init AVPlayer")
         self.startPosition = 0
         super.init()
+        if #available(iOS 10.0, *) {
+            self.automaticallyWaitsToMinimizeStalling = false
+        }
         self.onEventBlock = nil
         AppStateSubject.shared.add(observer: self)
     }
@@ -171,6 +217,10 @@ class AVPlayerEngine: AVPlayer {
         // removes the observers only on deinit to prevent chances of being removed twice.
         self.removeObservers()
     }
+    
+    /************************************************************/
+    // MARK: - Player Methods
+    /************************************************************/
     
     func stop() {
         PKLog.info("stop player")
@@ -213,7 +263,7 @@ class AVPlayerEngine: AVPlayer {
             self.replaceCurrentItem(with: nil)
         }
     }
-    
+
     func selectTrack(trackId: String) {
         if trackId.isEmpty == false {
             self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
@@ -221,6 +271,10 @@ class AVPlayerEngine: AVPlayer {
             PKLog.error("trackId is nil")
         }
     }
+    
+    /************************************************************/
+    // MARK: - Methods
+    /************************************************************/
     
     func post(event: PKEvent) {
         PKLog.trace("onEvent:: \(String(describing: event))")

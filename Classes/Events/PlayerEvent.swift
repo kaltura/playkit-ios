@@ -52,6 +52,9 @@ import AVFoundation
     @objc public static let timedMetadata: PlayerEvent.Type = TimedMetadata.self
     /// Sent when source was selected.
     @objc public static let sourceSelected: PlayerEvent.Type = SourceSelected.self
+    /// Sent when loaded time ranges was changed, loaded time ranges represent the buffered content.
+    /// could be used to show amount buffered on the playhead UI.
+    @objc public static let loadedTimeRanges: PlayerEvent.Type = LoadedTimeRanges.self
     
     /// Sent when an error occurs in the player that the playback can recover from.
     @objc public static let error: PlayerEvent.Type = Error.self
@@ -117,6 +120,12 @@ import AVFoundation
     class TimedMetadata: PlayerEvent {
         convenience init(metadata: [AVMetadataItem]) {
             self.init([EventDataKeys.metadata: metadata])
+        }
+    }
+    
+    class LoadedTimeRanges: PlayerEvent {
+        convenience init(timeRanges: [PKTimeRange]) {
+            self.init([EventDataKeys.timeRanges: timeRanges])
         }
     }
     

@@ -12,7 +12,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: NSObject, Player, PlayerSettings {
+class PlayerController: NSObject, Player {
     
     var onEventBlock: ((PKEvent) -> Void)?
     
@@ -21,7 +21,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     fileprivate var currentPlayer: AVPlayerEngine
     
     /// the asset to prepare and pass to the player engine to start buffering.
-    private var assetToPrepare: AVURLAsset?
+    private var assetToPrepare: PKAsset?
     /// the current selected media source
     fileprivate var preferredMediaSource: MediaSource?
     /// the current handler for the selected source
@@ -31,11 +31,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
-    var contentRequestAdapter: PKRequestParamsAdapter?
-    
-    var settings: PlayerSettings {
-        return self
-    }
+    private(set) var settings: PKPlayerSettings
     
     public var mediaEntry: MediaEntry? {
         return self.mediaConfig?.mediaEntry
@@ -88,6 +84,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     
     public override init() {
         self.currentPlayer = AVPlayerEngine()
+        self.settings = PlayKitManager.shared.playerSettings.createCopy()
         super.init()
         
         self.currentPlayer.onEventBlock = { [weak self] event in
@@ -116,7 +113,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
         // build the asset from the selected source
         self.assetHandler = AssetBuilder.build(from: preferredMediaSource, using: handlerType) { error, asset in
             if let assetToPrepare = asset {
-                self.assetToPrepare = assetToPrepare
+                self.assetToPrepare = PKAsset(avAsset: assetToPrepare, settings: self.settings)
             }
             // send signal when assetToPrepare is set
             self.prepareSemaphore.signal()
@@ -215,13 +212,13 @@ extension PlayerController {
     /// Updates the request adapter if it is kaltura type
     fileprivate func updateRequestAdapterIfExists(in mediaSource: inout MediaSource) {
         // configure media sources content request adapter if kaltura request adapter exists
-        if let _ = self.contentRequestAdapter as? KalturaPlaybackRequestAdapter {
+        if let _ = self.settings.contentRequestAdapter as? KalturaPlaybackRequestAdapter {
             // create new media session uuid
             self.mediaSessionUUID = UUID()
             // update the request adapter with the updated session id
-            self.contentRequestAdapter!.updateRequestAdapter(withPlayer: self)
+            self.settings.contentRequestAdapter!.updateRequestAdapter(withPlayer: self)
             // configure media source with the adapter
-            mediaSource.contentRequestAdapter = self.contentRequestAdapter!
+            mediaSource.contentRequestAdapter = self.settings.contentRequestAdapter!
         }
     }
 }

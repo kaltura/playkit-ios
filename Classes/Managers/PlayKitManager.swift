@@ -24,13 +24,16 @@ import UIKit
         }
     }
     
+    var pluginRegistry = Dictionary<String, PKPlugin.Type>()
+    
     @objc public static let versionString: String = Bundle(for: PlayKitManager.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     @objc public static let clientTag = "playkit/ios-\(versionString)"
     
     @objc(sharedInstance) public static let shared: PlayKitManager = PlayKitManager()
     
-    var pluginRegistry = Dictionary<String, PKPlugin.Type>()
+    /// Holds the player settings that will apply to all created players (like default values).
+    @objc public let playerSettings = PKPlayerSettings()
     
     /// Loads and returns a player object using a provided configuration.
     ///
