@@ -1,12 +1,13 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
+
 import Foundation
 import AVFoundation
 
@@ -55,7 +56,7 @@ import AVFoundation
     /// Sent when loaded time ranges was changed, loaded time ranges represent the buffered content.
     /// could be used to show amount buffered on the playhead UI.
     @objc public static let loadedTimeRanges: PlayerEvent.Type = LoadedTimeRanges.self
-    
+
     /// Sent when an error occurs in the player that the playback can recover from.
     @objc public static let error: PlayerEvent.Type = Error.self
     /// Sent when a plugin error occurs.
@@ -123,14 +124,6 @@ import AVFoundation
         }
     }
     
-    class LoadedTimeRanges: PlayerEvent {
-        convenience init(timeRanges: [PKTimeRange]) {
-            self.init([EventDataKeys.timeRanges: timeRanges])
-        }
-    }
-    
-    // MARK: - Player Tracks Events
-    
     class TracksAvailable: PlayerEvent {
         convenience init(tracks: PKTracks) {
             self.init([EventDataKeys.tracks: tracks])
@@ -142,13 +135,17 @@ import AVFoundation
             self.init([EventDataKeys.playbackInfo: playbackInfo])
         }
     }
-    
-    // MARK: - Player State Events
 
     class StateChanged: PlayerEvent {
         convenience init(newState: PlayerState, oldState: PlayerState) {
             self.init([EventDataKeys.newState: newState as AnyObject,
                        EventDataKeys.oldState: oldState as AnyObject])
+        }
+    }
+    
+    class LoadedTimeRanges: PlayerEvent {
+        convenience init(timeRanges: [PKTimeRange]) {
+            self.init([EventDataKeys.timeRanges: timeRanges])
         }
     }
 }

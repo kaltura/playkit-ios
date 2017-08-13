@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -31,10 +31,11 @@ class OTTAssetService {
 
 struct PlaybackContextOptions {
 
-    internal var playbackContextType: PlaybackType
-    internal var protocls: [String]
-    internal var assetFileIds: [String]?
-
+    var playbackContextType: PlaybackType
+    var protocls: [String]
+    var assetFileIds: [String]?
+    var referrer: String?
+    
     func toDictionary() -> [String: Any] {
 
         var dict: [String: Any] = [:]
@@ -42,6 +43,9 @@ struct PlaybackContextOptions {
         dict["mediaProtocols"] = protocls
         if let fileIds = self.assetFileIds {
             dict["assetFileIds"] = fileIds.joined(separator: ",")
+        }
+        if let referrer = self.referrer {
+            dict["referrer"] = referrer
         }
         return dict
     }

@@ -8,14 +8,8 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-import UIKit
+import Foundation
 
-extension TimeInterval {
-    
-    func toInt32() -> Int32 {
-        if !self.isNaN && !self.isInfinite {
-            return Int32(self)
-        }
-        return 0
-    }
+protocol KalturaBaseObject {
+    init?(json: Any)
 }

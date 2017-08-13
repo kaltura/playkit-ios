@@ -195,7 +195,7 @@ extension AVPlayerItem {
 // MARK: - PKPlayerSettings
 /************************************************************/
 
-/// `PKPlayerConfig` object used as default configuration values for players.
+/// `PKPlayerSettings` object used as default configuration values for players.
 @objc public class PKPlayerSettings: NSObject, PKAssetSettings {
     
     /// The settings for network data consumption.

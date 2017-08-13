@@ -8,14 +8,14 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-import UIKit
+import Foundation
+import KalturaNetKit
 
-extension TimeInterval {
+//This protocol provides a way to use the response data of the requests are being sent by MediaEntryProvider.
+//For example the response of getPlaybackContext, or additional meta data.
+
+public protocol MediaEntryProviderResponseDelegate: class {
     
-    func toInt32() -> Int32 {
-        if !self.isNaN && !self.isInfinite {
-            return Int32(self)
-        }
-        return 0
-    }
+    func providerGotResponse(sender: MediaEntryProvider?, response: Response) -> Void
+
 }

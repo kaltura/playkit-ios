@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -112,9 +112,10 @@ class AVPlayerEngine: AVPlayer {
         set {
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
-            super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [unowned self] (isSeeked: Bool) in
+            super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [weak self] (isSeeked: Bool) in
+                guard let strongSelf = self else { return }
                 if isSeeked {
-                    self.post(event: PlayerEvent.Seeked())
+                    strongSelf.post(event: PlayerEvent.Seeked())
                     PKLog.debug("seeked")
                 } else {
                     PKLog.error("seek faild")
@@ -205,9 +206,11 @@ class AVPlayerEngine: AVPlayer {
         PKLog.info("init AVPlayer")
         self.startPosition = 0
         super.init()
+
         if #available(iOS 10.0, *) {
             self.automaticallyWaitsToMinimizeStalling = false
         }
+
         self.onEventBlock = nil
         AppStateSubject.shared.add(observer: self)
     }

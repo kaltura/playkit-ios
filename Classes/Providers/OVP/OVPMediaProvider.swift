@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -25,18 +25,57 @@ import KalturaNetKit
         }
     }
     
-    enum OVPMediaProviderError: Error {
+    enum OVPMediaProviderError: PKError {
         case invalidParam(paramName: String)
         case invalidKS
         case invalidParams
         case invalidResponse
         case currentlyProcessingOtherRequest
+        case serverError(code:String, message:String)
+        
+        public static let domain = "com.kaltura.playkit.error.OVPMediaProvider"
+        
+        public static let serverErrorCodeKey = "code"
+        public static let serverErrorMessageKey = "message"
+        
+        public var code: Int {
+            switch self {
+            case .invalidParam: return 0
+            case .invalidKS: return 1
+            case .invalidParams: return 2
+            case .invalidResponse: return 3
+            case .currentlyProcessingOtherRequest: return 4
+            case .serverError: return 5
+            }
+        }
+        
+        public var errorDescription: String {
+            
+            switch self {
+            case .invalidParam(let param): return "Invalid input param: \(param)"
+            case .invalidKS: return "Invalid input ks"
+            case .invalidParams: return "Invalid input params"
+            case .invalidResponse: return "Response data is empty"
+            case .currentlyProcessingOtherRequest: return "Currently Processing Other Request"
+            case .serverError(let code, let message): return "Server Error code: \(code), \n message: \(message)"
+            }
+        }
+        
+        public var userInfo: [String: Any] {
+            switch self {
+            case .serverError(let code, let message): return [PhoenixMediaProviderError.serverErrorCodeKey: code,
+                                                              PhoenixMediaProviderError.serverErrorMessageKey: message]
+            default:
+                return [String: Any]()
+            }
+        }
     }
     
     @objc public var sessionProvider: SessionProvider?
     @objc public var entryId: String?
     @objc public var uiconfId: NSNumber?
-    public var executor: RequestExecutor? // TODO: make @objc if needed in the future
+    @objc public var referrer: String?
+    public var executor: RequestExecutor?
     
     public override init() {}
     
@@ -63,20 +102,31 @@ import KalturaNetKit
     }
     
     /**
+     uiconfId - UI Configuration id
+     */
+    @discardableResult
+    @nonobjc public func set(uiconfId: NSNumber?) -> Self {
+        self.uiconfId = uiconfId
+        return self
+    }
+    
+    
+    /// set the provider referrer
+    ///
+    /// - Parameter referrer: the app referrer
+    /// - Returns: Self
+    @discardableResult
+    @nonobjc public func set(referrer: String?) -> Self {
+        self.referrer = referrer
+        return self
+    }
+    
+    /**
      executor - which resposible for the network, it can be set to
      */
     @discardableResult
     @nonobjc public func set(executor: RequestExecutor?) -> Self {
         self.executor = executor
-        return self
-    }
-    
-    /**
-     uiconfId - UI Configuration id
-     */
-    @discardableResult
-    @nonobjc public func set(uiconfId: NSNumber?) -> Self{
-        self.uiconfId = uiconfId
         return self
     }
     
@@ -138,7 +188,8 @@ import KalturaNetKit
             // Request for Entry playback data in order to build sources to play
             let getPlaybackContext =  OVPBaseEntryService.getPlaybackContext(baseURL: loadInfo.apiServerURL,
                                                                              ks: token,
-                                                                             entryID: loadInfo.entryId)
+                                                                             entryID: loadInfo.entryId,
+                                                                             referrer: self.referrer)
             
             let metadataRequest = OVPBaseEntryService.metadata(baseURL: loadInfo.apiServerURL, ks: token, entryID: loadInfo.entryId)
             
@@ -184,13 +235,19 @@ import KalturaNetKit
                             return
                     }
                     
-                    let masterSourceFlavorId = contextData.flavorAssets?.first( where: {$0.paramsId == 0})
-                    
+                    if let context = contextDataResponse as? OVPPlaybackContext {
+                        if (context.hasBlockAction() != nil) {
+                            if let error = context.hasErrorMessage() {
+                                callback(nil, OVPMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? ""))
+                            } else{
+                                callback(nil, OVPMediaProviderError.serverError(code: "Blocked", message: "Blocked"))
+                            }
+                            return
+                        }
+                    }
+
                     var mediaSources: [MediaSource] = [MediaSource]()
                     sources.forEach { (source: OVPSource) in
-                        //Remove master source flavorId from flavorIds.
-                        source.flavors = source.flavors?.filter({ $0 != masterSourceFlavorId?.id })
-                        
                         //detecting the source type
                         let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
                         //If source type is not supported source will not be created

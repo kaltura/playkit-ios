@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -57,11 +57,14 @@ public enum PhoenixMediaProviderError: PKError {
     case invalidInputParam(param: String)
     case unableToParseData(data: Any)
     case noSourcesFound
-    case serverError(info:String)
+    case serverError(code:String, message:String)
     /// in case the response data is empty
     case emptyResponse
 
     public static let domain = "com.kaltura.playkit.error.PhoenixMediaProvider"
+    
+    public static let serverErrorCodeKey = "code"
+    public static let serverErrorMessageKey = "message"
 
     public var code: Int {
         switch self {
@@ -79,15 +82,19 @@ public enum PhoenixMediaProviderError: PKError {
         case .invalidInputParam(let param): return "Invalid input param: \(param)"
         case .unableToParseData(let data): return "Unable to parse object (data: \(String(describing: data)))"
         case .noSourcesFound: return "No source found to play content"
-        case .serverError(let info): return "Server Error: \(info)"
+        case .serverError(let code, let message): return "Server Error code: \(code), \n message: \(message)"
         case .emptyResponse: return "Response data is empty"
         }
     }
 
     public var userInfo: [String: Any] {
-        return [String: Any]()
+        switch self {
+        case .serverError(let code, let message): return [PhoenixMediaProviderError.serverErrorCodeKey: code,
+                                                          PhoenixMediaProviderError.serverErrorMessageKey: message]
+        default:
+            return [String: Any]()
+        }
     }
-
 }
 
 /************************************************************/
@@ -129,6 +136,8 @@ public enum PhoenixMediaProviderError: PKError {
     @objc public var fileIds: [String]?
     @objc public var playbackContextType: PlaybackContextType = .unknown
     @objc public var networkProtocol: String?
+    @objc public var referrer: String?
+    public weak var responseDelegate: MediaEntryProviderResponseDelegate? = nil
     
     public var executor: RequestExecutor?
 
@@ -197,6 +206,15 @@ public enum PhoenixMediaProviderError: PKError {
         return self
     }
 
+    
+    /// - Parameter referrer: the referrer
+    /// - Returns: Self
+    @discardableResult
+    @nonobjc public func set(referrer: String?) -> Self {
+        self.referrer = referrer
+        return self
+    }
+    
     /// - Parameter executor: executor which will be used to send request.
     ///    default is USRExecutor
     /// - Returns: Self
@@ -205,6 +223,20 @@ public enum PhoenixMediaProviderError: PKError {
         self.executor = executor
         return self
     }
+    
+    
+    /// - Parameter responseDelegate: responseDelegate which will be used to get the response of the requests are being sent by the mediaProvider
+    ///    default is nil
+    /// - Returns: Self
+    @discardableResult
+    @nonobjc public func set(responseDelegate: MediaEntryProviderResponseDelegate?) -> Self {
+        self.responseDelegate = responseDelegate
+        return self
+    }
+
+    
+    
+    
 
     let defaultProtocol = "https"
 
@@ -261,7 +293,7 @@ public enum PhoenixMediaProviderError: PKError {
     /// - Returns: request builder
     func loaderRequestBuilder(ks: String?, loaderInfo: LoaderInfo) -> KalturaRequestBuilder? {
 
-       let playbackContextOptions = PlaybackContextOptions(playbackContextType: loaderInfo.playbackContextType, protocls: [loaderInfo.networkProtocol], assetFileIds: loaderInfo.fileIds)
+       let playbackContextOptions = PlaybackContextOptions(playbackContextType: loaderInfo.playbackContextType, protocls: [loaderInfo.networkProtocol], assetFileIds: loaderInfo.fileIds, referrer: self.referrer)
 
         if let token = ks {
 
@@ -302,6 +334,10 @@ public enum PhoenixMediaProviderError: PKError {
 
             let request = requestBuilder.set(completion: { (response: Response) in
 
+                if let delegate = self.responseDelegate {
+                    delegate.providerGotResponse(sender: self, response: response)
+                }
+                
                 if let error = response.error {
                     // if error is of type `PKError` pass it as `NSError` else pass the `Error` object.
                     callback(nil, (error as? PKError)?.asNSError ?? error)
@@ -325,6 +361,16 @@ public enum PhoenixMediaProviderError: PKError {
                 }
 
                 if let context = playbackContext as? OTTPlaybackContext {
+                    
+                    if(context.hasBlockAction() != nil) {
+                        if let error = context.hasErrorMessage() {
+                            callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
+                        } else{
+                            callback(nil, PhoenixMediaProviderError.serverError(code: "Blocked", message: "Blocked").asNSError)
+                        }
+                        return
+                    }
+                    
                     let media = self.createMediaEntry(loaderInfo: loaderInfo, context: context)
                     if let sources = media.sources, sources.count > 0 {
                        callback(media, nil)
@@ -332,7 +378,7 @@ public enum PhoenixMediaProviderError: PKError {
                         callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                     }
                 } else if let error = playbackContext as? OTTError {
-                    callback(nil, PhoenixMediaProviderError.serverError(info: error.message ?? "Unknown Error").asNSError)
+                    callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
                 } else {
                     callback(nil, PhoenixMediaProviderError.unableToParseData(data: responseData).asNSError)
                 }

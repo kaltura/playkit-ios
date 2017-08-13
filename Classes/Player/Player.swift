@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -52,6 +52,9 @@ import AVKit
 
     /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
     @objc var rate: Float { get }
+    
+    /// Provides a collection of time ranges for which the player has the media data readily available. The ranges provided might be discontinuous.
+    @objc var loadedTimeRanges: [PKTimeRange]? { get }
     
     /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
     @objc func prepare(_ config: MediaConfig)

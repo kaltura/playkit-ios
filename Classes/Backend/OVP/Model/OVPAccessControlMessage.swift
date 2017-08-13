@@ -8,14 +8,25 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-import UIKit
+//
+//  OVPAccessControlMessage.swift
+//  Pods
+//
+//  Created by Eliza Sapir on 06/07/2017.
+//
+//
 
-extension TimeInterval {
+import Foundation
+import SwiftyJSON
+
+
+class OVPAccessControlMessage: OVPBaseObject {
+    var message: String? = nil
+    var code: String? = nil
     
-    func toInt32() -> Int32 {
-        if !self.isNaN && !self.isInfinite {
-            return Int32(self)
-        }
-        return 0
+    required init?(json: Any) {
+        let jsonDict = JSON(json)
+        self.message = jsonDict["message"].string
+        self.code = jsonDict["code"].string
     }
 }

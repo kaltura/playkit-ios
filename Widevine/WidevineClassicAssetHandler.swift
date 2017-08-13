@@ -1,8 +1,8 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license,
-// unless a different license for a particular library is specified in the applicable library path.
+// Licensed under the AGPLv3 license, unless a different license for a 
+// particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
@@ -66,17 +66,13 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
             return
         }
         
-        guard let licenseUri = mediaSource.drmData?.first?.licenseUri else {
-            PKLog.error("Missing licenseUri")
-            return
-        }
-        
-        WidevineClassicHelper.playAsset(contentUrl.absoluteString, withLicenseUri: licenseUri.absoluteString) {  (_ playbackURL:String?)->Void  in
+        // WidevineClassicHandler.playAsset here will cause the stream to be closed and reopened (WV_Stop, WV_Play).
+        // Since we already have LicenseUri no reason to send it again.
+        WidevineClassicHelper.playAsset(contentUrl.absoluteString, withLicenseUri: nil) {  (_ playbackURL: String?) -> Void  in
             if playbackURL == "" {
                 PKLog.error("Invalid media: no url")
                 self.readyCallback?(AssetError.invalidContentUrl(nil), nil)
                 return
-                
             }
             
             guard let playbackURL = playbackURL else {
