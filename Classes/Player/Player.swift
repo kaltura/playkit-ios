@@ -16,11 +16,6 @@ import AVKit
     func playerShouldPlayAd(_ player: Player) -> Bool
 }
 
-/// `PlayerSettings` used for optional `Player` settings.
-@objc public protocol PlayerSettings {
-    var contentRequestAdapter: PKRequestParamsAdapter? { get set }
-}
-
 @objc public protocol Player {
     
     @objc weak var delegate: PlayerDelegate? { get set }
@@ -29,7 +24,7 @@ import AVKit
     @objc weak var mediaEntry: MediaEntry? { get }
     
     /// the player's settings
-    @objc var settings: PlayerSettings { get }
+    @objc var settings: PKPlayerSettings { get }
     
     /// The player's view component.
     @objc weak var view: PlayerView? { get set }

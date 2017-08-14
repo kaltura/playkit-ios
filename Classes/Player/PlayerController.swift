@@ -12,7 +12,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: NSObject, Player, PlayerSettings {
+class PlayerController: NSObject, Player {
     
     var onEventBlock: ((PKEvent) -> Void)?
     
@@ -31,11 +31,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
-    var contentRequestAdapter: PKRequestParamsAdapter?
-    
-    var settings: PlayerSettings {
-        return self
-    }
+    let settings = PKPlayerSettings()
     
     public var mediaEntry: MediaEntry? {
         return self.mediaConfig?.mediaEntry
@@ -219,7 +215,7 @@ extension PlayerController {
     /// Updates the request adapter if one exists
     fileprivate func updateRequestAdapter(in mediaSource: inout MediaSource) {
         // configure media sources content request adapter if request adapter exists
-        if let adapter = self.contentRequestAdapter {
+        if let adapter = self.settings.contentRequestAdapter {
             // update the request adapter with the updated session id
             adapter.updateRequestAdapter(with: self)
             // configure media source with the adapter
