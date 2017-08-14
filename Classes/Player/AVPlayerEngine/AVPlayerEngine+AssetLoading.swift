@@ -18,7 +18,6 @@ extension AVPlayerEngine {
         self.lastTimebaseRate = 0
         // When changing media (loading new asset) we want to reset isFirstReady in order to receive `CanPlay` & `LoadedMetadata` accuratly.
         self.isFirstReady = true
-        
         super.replaceCurrentItem(with: item)
     }
     
@@ -70,7 +69,7 @@ extension AVPlayerEngine {
                     
                     return
                 }
-                    
+                
                 /*
                  We can play this asset. Create a new `AVPlayerItem` and make
                  it our player's current item.

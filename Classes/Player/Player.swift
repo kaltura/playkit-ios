@@ -100,6 +100,29 @@ import AVKit
     /// Update Plugin Config
     @objc func updatePluginConfig(pluginName: String, config: Any)
     
+    /// Adds a periodic time observer with specific interval
+    ///
+    /// - Parameters:
+    ///   - interval: time interval for the periodic invocation.
+    ///   - queue: dispatch queue to observe changes on (nil value will use main).
+    ///   - block: block to handle the observation.
+    @objc func addTimeObserver(interval: TimeInterval, observeOn queue: DispatchQueue?, using block: @escaping (CMTime) -> Void)
+    
+    /// Adds a boundary time observer for the selected boundaries
+    ///
+    /// - Parameters:
+    ///   - boundaries: boundaries objects.
+    ///   - queue: dispatch queue to observe changes on (nil value will use main).
+    ///   - block: block to handle the observation.
+    /// - Attention: if a boundary is crossed while seeking the observation **won't be triggered**.
+    @objc func addTimeBoundaryObserver(boundaries: [PKTimeBoundary], observeOn queue: DispatchQueue?, using block: @escaping () -> Void)
+    
+    /// removes the added time observers (has no effect is no observers were added).
+    @objc func removeTimeObservers()
+    
+    /// removes the added time boundary observers (has no effect is no observers were added).
+    @objc func removeTimeBoundaryObservers()
+    
     #if os(iOS)
     /// Create PiP Controller
     @available(iOS 9.0, *)

@@ -23,7 +23,8 @@ class AVPlayerEngine: AVPlayer {
     let assetKeysRequiredToPlay = [
         "playable",
         "tracks",
-        "hasProtectedContent"
+        "hasProtectedContent",
+        "duration"
     ]
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
