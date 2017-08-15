@@ -95,6 +95,12 @@ class PlayerController: NSObject, Player {
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
+        
+        self.settings.onChange = { [weak self] (settingsType) in
+            switch settingsType {
+            case .preferredPeakBitRate(let preferredPeakBitRate): self?.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+            }
+        }
     }
     
     // Every player that is created should own Reachability instance
@@ -135,7 +141,8 @@ class PlayerController: NSObject, Player {
             if let startTime = self.mediaConfig?.startTime {
                 self.currentPlayer.startPosition = startTime
             }
-            self.currentPlayer.asset = assetToPrepare
+            let asset = PKAsset(avAsset: assetToPrepare, playerSettings: self.settings)
+            self.currentPlayer.asset = asset
             if DRMSupport.widevineClassicHandler != nil {
                 self.addAssetRefreshObservers()
             }

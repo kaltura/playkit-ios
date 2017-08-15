@@ -8,9 +8,21 @@
 
 import Foundation
 
+typealias SettingsChange = ((PlayerSettingsType) -> Void)
+
 @objc public class PKNetworkSettings: NSObject {
     
-    @objc public var preferredPeakBitRate: Double = 0
+    var onChange: SettingsChange?
+    
+    @objc public var preferredPeakBitRate: Double = 0 {
+        didSet {
+            self.onChange?(.preferredPeakBitRate(preferredPeakBitRate))
+        }
+    }
+}
+
+enum PlayerSettingsType {
+    case preferredPeakBitRate(Double)
 }
 
 /************************************************************/
@@ -19,6 +31,12 @@ import Foundation
 
 /// `PKPlayerSettings` object used as default configuration values for players.
 @objc public class PKPlayerSettings: NSObject {
+    
+    var onChange: SettingsChange? {
+        didSet {
+            self.network.onChange = onChange
+        }
+    }
     
     /// The settings for network data consumption.
     @objc public var network = PKNetworkSettings()
