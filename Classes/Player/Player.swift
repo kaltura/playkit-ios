@@ -106,16 +106,16 @@ import AVKit
     ///   - interval: time interval for the periodic invocation.
     ///   - queue: dispatch queue to observe changes on (nil value will use main).
     ///   - block: block to handle the observation.
-    @objc func addTimeObserver(interval: TimeInterval, observeOn queue: DispatchQueue?, using block: @escaping (CMTime) -> Void)
+    @objc func addTimeObserver(interval: TimeInterval, observeOn queue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void)
     
-    /// Adds a boundary time observer for the selected boundaries
+    /// Adds a boundary time observer for the selected boundaries in time (25%, 50% etc.)
     ///
     /// - Parameters:
     ///   - boundaries: boundaries objects.
     ///   - queue: dispatch queue to observe changes on (nil value will use main).
-    ///   - block: block to handle the observation.
+    ///   - block: block to handle the observation with the observed boundary.
     /// - Attention: if a boundary is crossed while seeking the observation **won't be triggered**.
-    @objc func addTimeBoundaryObserver(boundaries: [PKTimeBoundary], observeOn queue: DispatchQueue?, using block: @escaping () -> Void)
+    @objc func addBoundaryObserver(boundaries: [PKBoundary], observeOn queue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void)
     
     /// removes the added time observers (has no effect is no observers were added).
     @objc func removeTimeObservers()

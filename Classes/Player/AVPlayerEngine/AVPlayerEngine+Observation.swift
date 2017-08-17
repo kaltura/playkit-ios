@@ -63,6 +63,39 @@ extension AVPlayerEngine {
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: nil)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
+        self.removeTimeObservers()
+        self.removeTimeBoundaryObservers()
+    }
+    
+    public func addTimeObserver(interval: TimeInterval, observeOn queue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void) {
+        let timeInterval = CMTime(seconds: interval, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        self.timeObservers.append(self.addPeriodicTimeObserver(forInterval: timeInterval, queue: queue ?? DispatchQueue.main) { time in
+            block(time.seconds)
+        })
+    }
+    
+    public func addTimeBoundaryObserver(boundaries: [PKBoundary], observeOn queue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) {
+        var times = [NSValue]()
+        for boundary in boundaries {
+            times.append(NSValue(time: boundary.time))
+        }
+        self.boundaryObservers.append(self.addBoundaryTimeObserver(forTimes: times, queue: DispatchQueue.main) {
+            block(self.currentPosition, (self.currentPosition / self.duration) * 100) // return the boundary that was crossed
+        })
+    }
+    
+    public func removeTimeObservers() {
+        for timeObserver in self.timeObservers {
+            self.removeTimeObserver(timeObserver)
+        }
+        self.timeObservers.removeAll()
+    }
+    
+    public func removeTimeBoundaryObservers() {
+        for timeObserver in self.boundaryObservers {
+            self.removeTimeObserver(timeObserver)
+        }
+        self.boundaryObservers.removeAll()
     }
     
     func onAccessLogEntryNotification(notification: Notification) {

@@ -40,6 +40,10 @@ class AVPlayerEngine: AVPlayer {
     
     var onEventBlock: ((PKEvent) -> Void)?
     
+    /* Time Observation */
+    var timeObservers = [Any]()
+    var boundaryObservers = [Any]()
+    
     public weak var view: PlayerView? {
         didSet {
             view?.player = self

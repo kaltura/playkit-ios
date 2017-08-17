@@ -35,10 +35,6 @@ class PlayerController: NSObject, Player, PlayerSettings {
     /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
-    /* Time Observation */
-    private var timeObservers = [Any]()
-    private var boundaryObservers = [Any]()
-    
     var contentRequestAdapter: PKRequestParamsAdapter?
     
     var settings: PlayerSettings {
@@ -117,11 +113,6 @@ class PlayerController: NSObject, Player, PlayerSettings {
         self.onEventBlock = nil
     }
     
-    deinit {
-        self.removeTimeObservers()
-        self.removeTimeBoundaryObservers()
-    }
-    
     /************************************************************/
     // MARK: - Functions
     /************************************************************/
@@ -190,8 +181,6 @@ class PlayerController: NSObject, Player, PlayerSettings {
     func destroy() {
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
-        self.removeTimeObservers()
-        self.removeTimeBoundaryObservers()
     }
     
     func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
@@ -218,32 +207,20 @@ class PlayerController: NSObject, Player, PlayerSettings {
         //Assert.shouldNeverHappen();
     }
     
-    public func addTimeObserver(interval: TimeInterval, observeOn queue: DispatchQueue? = nil, using block: @escaping (CMTime) -> Void) {
-        let timeInterval = CMTime(seconds: interval, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-        self.timeObservers.append(self.currentPlayer.addPeriodicTimeObserver(forInterval: timeInterval, queue: queue ?? DispatchQueue.main, using: block))
+    public func addTimeObserver(interval: TimeInterval, observeOn queue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) {
+        self.currentPlayer.addTimeObserver(interval: interval, observeOn: queue, using: block)
     }
     
-    public func addTimeBoundaryObserver(boundaries: [PKTimeBoundary], observeOn queue: DispatchQueue? = nil, using block: @escaping () -> Void) {
-        guard let duration = self.currentPlayer.asset?.duration else { return } // must have duration to add boundary observer
-        var times = [NSValue]()
-        for boundary in boundaries {
-            times.append(boundary.boundaryCMTimeValue(usingTime: duration))
-        }
-        self.boundaryObservers.append(self.currentPlayer.addBoundaryTimeObserver(forTimes: times, queue: DispatchQueue.main, using: block))
+    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn queue: DispatchQueue? = nil, using block: @escaping (TimeInterval, Double) -> Void) {
+        try self.currentPlayer.addTimeBoundaryObserver(boundaries: boundaries, observeOn: queue, using: block)
     }
     
     public func removeTimeObservers() {
-        for timeObserver in self.timeObservers {
-            self.currentPlayer.removeTimeObserver(timeObserver)
-        }
-        self.timeObservers.removeAll()
+        self.currentPlayer.removeTimeObservers()
     }
     
     public func removeTimeBoundaryObservers() {
-        for timeObserver in self.boundaryObservers {
-            self.currentPlayer.removeTimeObserver(timeObserver)
-        }
-        self.boundaryObservers.removeAll()
+        self.currentPlayer.removeTimeBoundaryObservers()
     }
 }
 
