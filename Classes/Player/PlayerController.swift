@@ -126,12 +126,12 @@ class PlayerController: NSObject, Player, PlayerSettings {
     
     private func createPlayerWrapper(_ mediaConfig: MediaConfig) throws {
         if (mediaConfig.mediaEntry.vrData != nil) {
-            guard let vrPlayerWrapper = NSClassFromString("VRPlayerWrapper") as? VRPlayerEngine else {
+            guard let vrPlayerWrapper = NSClassFromString("PlayKitVR.VRPlayerWrapper") as? VRPlayerEngine.Type else {
                 PKLog.error("VRPlayerWrapper does not exist")
                 throw PlayerError.missingDependency.asNSError
             }
             
-            self.currentPlayer = vrPlayerWrapper
+            self.currentPlayer = vrPlayerWrapper.init(delegate: self.delegate)
         } else {
             self.currentPlayer = AVPlayerWrapper()
         }

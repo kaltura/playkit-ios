@@ -9,7 +9,8 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 public protocol VRPlayerEngine: PlayerEngine {
-
+    init(delegate: PlayerDelegate?)
 }

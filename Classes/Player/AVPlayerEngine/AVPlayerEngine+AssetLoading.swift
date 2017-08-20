@@ -13,7 +13,7 @@ import AVFoundation
 
 extension AVPlayerEngine {
     
-    override func replaceCurrentItem(with item: AVPlayerItem?) {
+    override public func replaceCurrentItem(with item: AVPlayerItem?) {
         // when changing asset reset last timebase
         self.lastTimebaseRate = 0
         // When changing media (loading new asset) we want to reset isFirstReady in order to receive `CanPlay` & `LoadedMetadata` accuratly.
