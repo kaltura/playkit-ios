@@ -12,10 +12,10 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class AVPlayerWrapper: NSObject, PlayerEngine {
-    var onEventBlock: ((PKEvent) -> Void)?
+open class AVPlayerWrapper: NSObject, PlayerEngine {
+    public var onEventBlock: ((PKEvent) -> Void)?
     
-    fileprivate var currentPlayer: AVPlayerEngine
+    public var currentPlayer: AVPlayerEngine
     
     /// the asset to prepare and pass to the player engine to start buffering.
     private var assetToPrepare: AVURLAsset?
@@ -100,7 +100,7 @@ class AVPlayerWrapper: NSObject, PlayerEngine {
     var shouldRefresh: Bool = false
     
     /// Load media on player
-    func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type) {
+    public func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type) {
         //todo::
         // build the asset from the selected source
         // TODO:: media sec fix no !
@@ -113,7 +113,7 @@ class AVPlayerWrapper: NSObject, PlayerEngine {
         }
     }
     
-    func prepare(_ MediaConfig: MediaConfig) throws {
+    public func prepare(_ MediaConfig: MediaConfig) throws {
         // set background thread to make sure main thread is not stuck while waiting
         DispatchQueue.global().async {
             // wait till assetToPrepare is set
@@ -133,23 +133,23 @@ class AVPlayerWrapper: NSObject, PlayerEngine {
         }
     }
     
-    func play() {
+    public func play() {
         self.currentPlayer.play()
     }
     
-    func pause() {
+    public func pause() {
         self.currentPlayer.pause()
     }
     
-    func resume() {
+    public func resume() {
         self.currentPlayer.play()
     }
     
-    func stop() {
+    public func stop() {
         self.currentPlayer.stop()
     }
     
-    func seek(to time: TimeInterval) {
+    public func seek(to time: TimeInterval) {
         self.currentPlayer.currentPosition = time
     }
     
@@ -157,7 +157,7 @@ class AVPlayerWrapper: NSObject, PlayerEngine {
         self.currentPlayer.selectTrack(trackId: trackId)
     }
     
-    func destroy() {
+    public func destroy() {
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
     }

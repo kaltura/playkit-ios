@@ -15,7 +15,7 @@ import CoreMedia
 
 /// An AVPlayerEngine is a controller used to manage the playback and timing of a media asset.
 /// It provides the interface to control the player’s behavior such as its ability to play, pause, and seek to various points in the timeline.
-class AVPlayerEngine: AVPlayer {
+public class AVPlayerEngine: AVPlayer {
     
     // MARK: Player Properties
     
@@ -181,7 +181,7 @@ class AVPlayerEngine: AVPlayer {
         self.post(event: PlayerEvent.Stopped())
     }
     
-    override func pause() {
+    override public func pause() {
         // makes sure play/pause call is made on the main thread (calling on background thread has unpredictable behaviours)
         DispatchQueue.main.async {
             if self.rate > 0 {
@@ -192,7 +192,7 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    override func play() {
+    override public func play() {
         // makes sure play/pause call is made on the main thread (calling on background thread has unpredictable behaviours)
         DispatchQueue.main.async {
             if self.rate == 0 {
@@ -241,7 +241,7 @@ class AVPlayerEngine: AVPlayer {
 
 extension AVPlayerEngine: AppStateObservable {
  
-    var observations: Set<NotificationObservation> {
+    public var observations: Set<NotificationObservation> {
         return [
             NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
                 PKLog.debug("player: \(self)\n will terminate, destroying...")

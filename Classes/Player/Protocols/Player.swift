@@ -11,7 +11,7 @@
 import UIKit
 
 @objc public protocol PlayerDelegate {
-    func playerShouldPlayAd(_ player: Player) -> Bool
+    @objc optional func shouldAddPlayerViewController(_ vc: UIViewController)
 }
 
 /// `PlayerSettings` used for optional `Player` settings.
