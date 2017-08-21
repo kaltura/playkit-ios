@@ -1,7 +1,7 @@
 <!-- If you are raising a bug playing a stream, you must fill out the following or your issue may not be responded to. For features or improvements, you may delete this. -->
 ##### Prerequisites
-- [ ] Have you checked for duplicate [issues](https://github.com/kaltura/playkit-ios-vr/issues): ______
-- [ ] Which Player [version](https://github.com/kaltura/playkit-ios-vr/releases) are you using: ______
+- [ ] Have you checked for duplicate [issues](https://github.com/kaltura/playkit-ios/issues): ______
+- [ ] Which Player [version](https://github.com/kaltura/playkit-ios/releases) are you using: ______
 - [ ] Can you reproduce the issue with our latest release version: ______
 - [ ] Can you reproduce the issue with the latest code from master: ______
 - [ ] What devices and OS versions are you using: ______
