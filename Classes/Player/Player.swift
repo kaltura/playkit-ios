@@ -104,24 +104,24 @@ import AVKit
     ///
     /// - Parameters:
     ///   - interval: time interval for the periodic invocation.
-    ///   - queue: dispatch queue to observe changes on (nil value will use main).
+    ///   - dispatchQueue: dispatch queue to observe changes on (nil value will use main).
     ///   - block: block to handle the observation.
-    @objc func addTimeObserver(interval: TimeInterval, observeOn queue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void)
+    @objc func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void)
     
     /// Adds a boundary time observer for the selected boundaries in time (25%, 50% etc.)
     ///
     /// - Parameters:
     ///   - boundaries: boundaries objects.
-    ///   - queue: dispatch queue to observe changes on (nil value will use main).
+    ///   - dispatchQueue: dispatch queue to observe changes on (nil value will use main).
     ///   - block: block to handle the observation with the observed boundary.
     /// - Attention: if a boundary is crossed while seeking the observation **won't be triggered**.
-    @objc func addBoundaryObserver(boundaries: [PKBoundary], observeOn queue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void)
+    @objc func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void)
     
     /// removes the added time observers (has no effect is no observers were added).
-    @objc func removeTimeObservers()
+    @objc func removePeriodicObservers()
     
     /// removes the added time boundary observers (has no effect is no observers were added).
-    @objc func removeTimeBoundaryObservers()
+    @objc func removeBoundaryObservers()
     
     #if os(iOS)
     /// Create PiP Controller

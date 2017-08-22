@@ -143,20 +143,20 @@ import AVKit
         self.player.selectTrack(trackId: trackId)
     }
     
-    public func addTimeObserver(interval: TimeInterval, observeOn queue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) {
-        self.player.addTimeObserver(interval: interval, observeOn: queue, using: block)
+    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) {
+        self.player.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
     }
     
-    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn queue: DispatchQueue? = nil, using block: @escaping (TimeInterval, Double) -> Void) {
-        try self.player.addBoundaryObserver(boundaries: boundaries, observeOn: queue, using: block)
+    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval, Double) -> Void) {
+        self.player.addBoundaryObserver(boundaries: boundaries, observeOn: dispatchQueue, using: block)
     }
     
-    public func removeTimeObservers() {
-        self.player.removeTimeObservers()
+    public func removePeriodicObservers() {
+        self.player.removePeriodicObservers()
     }
     
-    public func removeTimeBoundaryObservers() {
-        self.player.removeTimeBoundaryObservers()
+    public func removeBoundaryObservers() {
+        self.player.removeBoundaryObservers()
     }
 }
 

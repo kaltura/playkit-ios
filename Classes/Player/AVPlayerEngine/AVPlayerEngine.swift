@@ -41,8 +41,7 @@ class AVPlayerEngine: AVPlayer {
     var onEventBlock: ((PKEvent) -> Void)?
     
     /* Time Observation */
-    var timeObservers = [Any]()
-    var boundaryObservers = [Any]()
+    var timeObserver: TimeObserver!
     
     public weak var view: PlayerView? {
         didSet {
@@ -169,6 +168,7 @@ class AVPlayerEngine: AVPlayer {
         self.startPosition = 0
         super.init()
         self.onEventBlock = nil
+        self.timeObserver = TimeObserver(timeProvider: self)
         AppStateSubject.shared.add(observer: self)
     }
     
@@ -176,6 +176,7 @@ class AVPlayerEngine: AVPlayer {
         PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
         // removes the observers only on deinit to prevent chances of being removed twice.
         self.removeObservers()
+        self.timeObserver.stopTimer()
     }
     
     func stop() {

@@ -10,7 +10,7 @@ import Foundation
 import CoreMedia
 
 @objc public protocol PKBoundary {
-    var time: CMTime { get }
+    var time: TimeInterval { get }
 }
 
 /// `PKBoundaryFactory` factory class used to create boundary objects easily.
@@ -35,16 +35,16 @@ import CoreMedia
 @objc public class PKPercentageTimeBoundary: NSObject, PKBoundary {
     
     /// The time to set the boundary on.
-    public let time: CMTime
+    public let time: TimeInterval
     
     /// Creates a new `PKPercentageTimeBoundary` object from %.
     /// - Attention: boundary value should be between 1 and 100 otherwise will use default values!
     @objc public init(boundary: Int, duration: TimeInterval) {
         switch boundary {
-        case 1...100: self.time = CMTimeMultiplyByFloat64(CMTimeMakeWithSeconds(duration, 1), Float64(boundary)/Float64(100))
-        case Int.min...0: self.time = CMTimeMultiplyByFloat64(CMTimeMakeWithSeconds(duration, 1), Float64(1)/Float64(100))
-        case 101...Int.max: self.time = CMTimeMultiplyByFloat64(CMTimeMakeWithSeconds(duration, 1), Float64(100)/Float64(100))
-        default: self.time = CMTimeMultiplyByFloat64(CMTimeMakeWithSeconds(duration, 1), Float64(0)/Float64(100))
+        case 1...100: self.time = duration * TimeInterval(boundary) / TimeInterval(100)
+        case Int.min...0: self.time = 0
+        case 101...Int.max: self.time = duration
+        default: self.time = 0
         }
     }
 }
@@ -53,17 +53,17 @@ import CoreMedia
 @objc public class PKTimeBoundary: NSObject, PKBoundary {
     
     /// The time to set the boundary on.
-    public let time: CMTime
+    public let time: TimeInterval
     
     /// Creates a new `PKTimeBoundary` object from seconds.
     /// - Attention: boundary value should be between 0 and duration otherwise will use default values!
     @objc public init(boundaryTime: TimeInterval, duration: TimeInterval) {
         if boundaryTime <= 0 {
-            self.time = CMTimeMakeWithSeconds(0, 1)
+            self.time = 0
         } else if boundaryTime >= duration {
-            self.time = CMTimeMakeWithSeconds(duration, 1)
+            self.time = duration
         } else {
-            self.time = CMTimeMakeWithSeconds(boundaryTime, 1)
+            self.time = boundaryTime
         }
     }
 }

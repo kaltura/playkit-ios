@@ -207,20 +207,20 @@ class PlayerController: NSObject, Player, PlayerSettings {
         //Assert.shouldNeverHappen();
     }
     
-    public func addTimeObserver(interval: TimeInterval, observeOn queue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) {
-        self.currentPlayer.addTimeObserver(interval: interval, observeOn: queue, using: block)
+    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) {
+        self.currentPlayer.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
     }
     
-    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn queue: DispatchQueue? = nil, using block: @escaping (TimeInterval, Double) -> Void) {
-        try self.currentPlayer.addTimeBoundaryObserver(boundaries: boundaries, observeOn: queue, using: block)
+    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) {
+        self.currentPlayer.addBoundaryObserver(times: boundaries.map { $0.time }, observeOn: dispatchQueue, using: block)
     }
     
-    public func removeTimeObservers() {
-        self.currentPlayer.removeTimeObservers()
+    public func removePeriodicObservers() {
+        self.currentPlayer.removePeriodicObservers()
     }
     
-    public func removeTimeBoundaryObservers() {
-        self.currentPlayer.removeTimeBoundaryObservers()
+    public func removeBoundaryObservers() {
+        self.currentPlayer.removeBoundaryObservers()
     }
 }
 

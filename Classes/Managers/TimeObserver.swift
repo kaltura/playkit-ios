@@ -1,0 +1,287 @@
+//
+//  TimeObserver.swift
+//  Pods
+//
+//  Created by Gal Orlanczyk on 21/08/2017.
+//
+//
+
+import Foundation
+
+protocol TimeProvider: class {
+    var currentPosition: TimeInterval { get }
+    var duration: TimeInterval { get }
+}
+
+public protocol TimeMonitor {
+    /// Adds a periodic observer if one is already available for the selected interval replaces it.
+    func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval) -> Void)
+    /// Adds a boundary observers if one of the times is already available for the selected time replaces it.
+    func addBoundaryObserver(times: [TimeInterval], observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval, Double) -> Void)
+    /// Removes all the periodic observers.
+    func removePeriodicObservers()
+    /// Removes all the boundary observers.
+    func removeBoundaryObservers()
+}
+
+class PeriodicObservation: Hashable {
+    let interval: Int
+    var observations: [TimeObservation]
+    
+    init(interval: Int, observations: [TimeObservation]) {
+        self.interval = interval
+        self.observations = observations
+    }
+    
+    var hashValue: Int {
+        return self.interval
+    }
+    
+    public static func ==(lhs: PeriodicObservation, rhs: PeriodicObservation) -> Bool {
+        return lhs.interval == rhs.interval
+    }
+}
+
+struct TimeObservation {
+    let block: (TimeInterval) -> Void
+    let dispatchQueue: DispatchQueue
+}
+
+struct BoundaryObservation {
+    let block: (TimeInterval, Double) -> Void
+    let dispatchQueue: DispatchQueue
+}
+
+class TimeObserver: TimeMonitor {
+    
+    let interval: Int = 100
+    let dispatchTimeInterval: DispatchTimeInterval = .milliseconds(100)
+    /// the dispatch queue that we will receive the event block on.
+    let dispatchQueue = DispatchQueue(label: "com.kaltura.playkit.time-observer")
+    /// The timer source that will be used to fire the events.
+    var dispatchTimer: DispatchSourceTimer?
+    
+    /// all boundary observations, mapped by time in [millis: observation]
+    var boundaryObservations = [Int64: [BoundaryObservation]]() {
+        didSet {
+            self.startStopTimer()
+        }
+    }
+    /// The next closest boundary to cross, updates on stop/seek/boundary crossed.
+    var nextBoundary: (time: Int64, observations: [BoundaryObservation])?
+    
+    /// all periodic observations (set of unique intervals)
+    var periodicObservations = Set<PeriodicObservation>() {
+        didSet {
+            self.startStopTimer()
+        }
+    }
+    /// mapping betweeen an interval and his relevant observations.
+    /// used to track numerous timer cycles using only 1 timer.
+    /// for example 2 timers: 1s interval and 2s interval, when the 2s interval arrives we need to invoke both handlers.
+    var periodicObservationsMap = [Int: [PeriodicObservation]]()
+    
+    /// the highest interval we have in the observations used to reset the cycles.
+    var maxInterval: Int = 0
+    /// number of cycles we observed, used to invoke multiple intervals with one timer.
+    var cycles: Int = 1
+    var lastObservedTime: TimeInterval = -1 // TODO: update this on every seek ended
+    weak var timeProvider: TimeProvider?
+    
+    init(timeProvider: TimeProvider) {
+        self.timeProvider = timeProvider
+    }
+    
+    deinit {
+        self.stopTimer()
+    }
+    
+    func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval) -> Void) {
+        // calculate interval in millis and remove reminder to make sure intervals are in 100ms gaps
+        let intervalMs = Int(interval * 1000) - (Int(interval * 1000) % 100)
+        let dispatch = dispatchQueue ?? DispatchQueue.main
+        if periodicObservations.count == 0 { // first observation just add
+            self.maxInterval = intervalMs
+            let periodicObservation = PeriodicObservation(interval: intervalMs, observations: [TimeObservation(block: eventHandler, dispatchQueue: dispatch)])
+            self.periodicObservations.insert(periodicObservation)
+            self.periodicObservationsMap[intervalMs] = [periodicObservation]
+        } else if let periodicObservations = self.periodicObservationsMap[intervalMs] { // we already have this interval
+            // get the observation with same interval
+            let periodicObservation = periodicObservations.first(where: { $0.interval == intervalMs })
+            // add the observation
+            periodicObservation?.observations.append(TimeObservation(block: eventHandler, dispatchQueue: dispatch))
+        } else { // not the first and we don't have this interval yet
+            if intervalMs > self.maxInterval {
+                self.maxInterval = intervalMs
+            }
+            self.periodicObservations.insert(PeriodicObservation(interval: intervalMs, observations: [TimeObservation(block: eventHandler, dispatchQueue: dispatch)]))
+            self.updatePeriodicObservationsMap()
+        }
+    }
+    
+    func addBoundaryObserver(times: [TimeInterval], observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval, Double) -> Void) {
+        for time in times {
+            // We need to make boundaries within the interval difference stack together to make sure we call them together when needed.
+            // We do this by making the time be fixed to the upper value of the interval.
+            // For example: 1.234 will turn to 1.3, 10.578 will turn into 10.6.
+            let timeMs = Int64(time * 1000) // the time millis in Int
+            let fixedTime: Int64 = timeMs % Int64(interval) == 0 ? timeMs : timeMs - (timeMs % Int64(interval)) + Int64(interval)
+            
+            let observation = BoundaryObservation(block: eventHandler, dispatchQueue: dispatchQueue ?? DispatchQueue.main)
+            // if we already have boundary observations for this time
+            if var boundaryObservations = self.boundaryObservations[fixedTime] {
+                boundaryObservations.append(observation)
+                self.boundaryObservations[fixedTime] = boundaryObservations
+            } else { // first observation
+                self.boundaryObservations[fixedTime] = [observation]
+            }
+        }
+        self.updateNextBoundary()
+        print(self.boundaryObservations)
+    }
+    
+    func removePeriodicObservers() {
+        self.periodicObservations.removeAll()
+        self.updatePeriodicObservationsMap()
+    }
+    
+    func removeBoundaryObservers() {
+        self.boundaryObservations.removeAll()
+        self.nextBoundary = nil
+    }
+    
+    private func updatePeriodicObservationsMap() {
+        var periodicObservationsMap = [Int: [PeriodicObservation]]()
+        let sortedPeriodicObservations = self.periodicObservations.sorted(by: { $0.0.interval < $0.1.interval })
+        // update periodic observation to be sorted so next sort will be faster
+        self.periodicObservations = Set(sortedPeriodicObservations)
+        // update max interval
+        guard let lastPeriodicPbservationInterval = sortedPeriodicObservations.last?.interval else { return }
+        self.maxInterval = lastPeriodicPbservationInterval
+        // update the periodic observation map
+        for interval in stride(from: sortedPeriodicObservations.first!.interval, through: self.maxInterval, by: self.interval) {
+            // all the items to add
+            var itemsToAdd = [PeriodicObservation]()
+            for periodicObservation in sortedPeriodicObservations {
+                if interval % periodicObservation.interval == 0 {
+                    itemsToAdd.append(periodicObservation)
+                }
+            }
+            periodicObservationsMap[interval] = itemsToAdd
+        }
+        self.periodicObservationsMap = periodicObservationsMap
+    }
+    
+    func startTimer() {
+        // reset the timer
+        if let dispatchTimer = self.dispatchTimer {
+            dispatchTimer.cancel()
+        }
+        // create the timer
+        self.dispatchTimer = DispatchSource.makeTimerSource(flags: DispatchSource.TimerFlags(rawValue: 0), queue: dispatchQueue)
+        // set interval
+        self.dispatchTimer!.scheduleRepeating(deadline: .now(), interval: dispatchTimeInterval)
+        // set last reported time to current time before timer handler starts
+        self.lastObservedTime = self.timeProvider?.currentPosition ?? 0
+        // set event handler
+        self.dispatchTimer!.setEventHandler { [weak self] in
+            guard let strongSelf = self, let timeProvider = strongSelf.timeProvider else { return }
+            // take a snapshot of the current time to use for all checks
+            let currentTime = timeProvider.currentPosition
+            let currentTimePercentage = timeProvider.currentPosition / timeProvider.duration
+            // make sure current time is not equal last observed time
+            guard currentTime != strongSelf.lastObservedTime else {
+                // update next boundary only once when we found out current time hasn't changed.
+                if strongSelf.cycles > 1 {
+                    strongSelf.updateNextBoundary()
+                }
+                // player stopped for some reason (paused/buffering/seeking/ended)
+                strongSelf.cycles = 1
+                return
+            }
+            // check periodic observations for current cycle
+            strongSelf.handlePeriodicObservations(currentTime: currentTime)
+            // if the difference between current time and last observed is greater then the threshold,
+            // we probably had a seek and we shouldn't handle boundary observation
+            let lastObservedTimeGap = currentTime - strongSelf.lastObservedTime
+            if abs(lastObservedTimeGap) < (Double(strongSelf.interval / 100) * 2) { // jump is lower then threshold
+                // check boundary observations
+                strongSelf.handleBoundaryObservations(currentTime: currentTime, currentTimePercentage: currentTimePercentage)
+            } else if lastObservedTimeGap < 0 { // seeked backward
+                strongSelf.updateNextBoundary()
+            } else { // seeked forward
+                strongSelf.updateNextBoundary()
+            }
+            // update cycles count
+            strongSelf.cycles += 1
+            // if we reached the highest cycle reset
+            if strongSelf.cycles > strongSelf.maxInterval / strongSelf.interval {
+                strongSelf.cycles = 1
+            }
+            // update last observed time
+            strongSelf.lastObservedTime = currentTime
+        }
+        // start the timer
+        dispatchTimer!.resume()
+    }
+    
+    func stopTimer() {
+        if let dispatchTimer = dispatchTimer {
+            dispatchTimer.cancel()
+        }
+        self.cycles = 1
+    }
+    
+    /// starts or stops the timer according to observations count, if no observations left stops the timer, 
+    private func startStopTimer() {
+        if self.periodicObservations.count == 0 && self.boundaryObservations.count == 0 {
+            self.stopTimer()
+        } else if self.dispatchTimer == nil {
+            self.startTimer()
+        }
+    }
+    
+    private func handlePeriodicObservations(currentTime: TimeInterval) {
+        if let periodicObservations = self.periodicObservationsMap[self.interval * self.cycles] {
+            for periodicObservation in periodicObservations {
+                for observation in periodicObservation.observations {
+                    observation.dispatchQueue.async {
+                        observation.block(currentTime)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func handleBoundaryObservations(currentTime: TimeInterval, currentTimePercentage: Double) {
+        if let nextBoundary = self.nextBoundary, nextBoundary.time >= Int64(self.lastObservedTime * 1000) && nextBoundary.time <= Int64(currentTime * 1000) {
+            for observation in nextBoundary.observations {
+                observation.block(currentTime, currentTimePercentage)
+            }
+            self.updateNextBoundary()
+        }
+    }
+    
+    private func removePeriodicObservation(interval: Int) {
+        if let periodicObservationToRemove = self.periodicObservations.first(where: { $0.interval == interval }) {
+            self.periodicObservations.remove(periodicObservationToRemove)
+            self.updatePeriodicObservationsMap()
+        }
+    }
+    
+    private func updateNextBoundary() {
+        guard let currentTime = self.timeProvider?.currentPosition else { return }
+        var nextBoundary: (gap: Int64, boundaryTime: Int64, observations: [BoundaryObservation])? = nil
+        for (boundaryTime, observations) in self.boundaryObservations {
+            let gap = boundaryTime - Int64(currentTime * 1000)
+            if nextBoundary == nil && gap > 0 {
+                nextBoundary = (gap, boundaryTime, observations)
+            } else if let nextB = nextBoundary, gap < nextB.gap && gap > 0 {
+                nextBoundary = (gap, boundaryTime, observations)
+            }
+        }
+        guard let nextB = nextBoundary else { return }
+        self.nextBoundary = (nextB.boundaryTime, nextB.observations)
+        print(String(describing: self.nextBoundary)) // FIXME: remove after tests
+    }
+}
