@@ -29,7 +29,7 @@ import AVKit
         return self.player.mediaEntry
     }
     
-    public var settings: PlayerSettings {
+    public var settings: PKPlayerSettings {
         return self.player.settings
     }
     

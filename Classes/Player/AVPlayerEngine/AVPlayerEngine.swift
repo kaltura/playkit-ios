@@ -53,7 +53,7 @@ class AVPlayerEngine: AVPlayer {
         return view?.playerLayer
     }
 
-    var asset: AVURLAsset? {
+    var asset: PKAsset? {
         didSet {
             guard let newAsset = asset else { return }
             self.asynchronouslyLoadURLAsset(newAsset)

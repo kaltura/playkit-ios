@@ -12,7 +12,7 @@ import Foundation
 import AVFoundation
 import AVKit
 
-class PlayerController: NSObject, Player, PlayerSettings {
+class PlayerController: NSObject, Player {
     
     /************************************************************/
     // MARK: - Properties
@@ -35,11 +35,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
-    var contentRequestAdapter: PKRequestParamsAdapter?
-    
-    var settings: PlayerSettings {
-        return self
-    }
+    let settings = PKPlayerSettings()
     
     public var mediaEntry: MediaEntry? {
         return self.mediaConfig?.mediaEntry
@@ -111,6 +107,12 @@ class PlayerController: NSObject, Player, PlayerSettings {
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
+        
+        self.settings.onChange = { [weak self] (settingsType) in
+            switch settingsType {
+            case .preferredPeakBitRate(let preferredPeakBitRate): self?.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+            }
+        }
     }
     
     /************************************************************/
@@ -151,7 +153,8 @@ class PlayerController: NSObject, Player, PlayerSettings {
             if let startTime = self.mediaConfig?.startTime {
                 self.currentPlayer.startPosition = startTime
             }
-            self.currentPlayer.asset = assetToPrepare
+            let asset = PKAsset(avAsset: assetToPrepare, playerSettings: self.settings)
+            self.currentPlayer.asset = asset
             if DRMSupport.widevineClassicHandler != nil {
                 self.addAssetRefreshObservers()
             }
@@ -247,7 +250,7 @@ extension PlayerController {
     /// Updates the request adapter if one exists
     fileprivate func updateRequestAdapter(in mediaSource: inout MediaSource) {
         // configure media sources content request adapter if request adapter exists
-        if let adapter = self.contentRequestAdapter {
+        if let adapter = self.settings.contentRequestAdapter {
             // update the request adapter with the updated session id
             adapter.updateRequestAdapter(with: self)
             // configure media source with the adapter
