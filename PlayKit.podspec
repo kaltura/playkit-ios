@@ -34,7 +34,7 @@ end
 
 s.subspec 'YouboraPlugin' do |ssp|
     ssp.source_files = 'Plugins/Youbora'
-    ssp.dependency 'Youbora-AVPlayer/dynamic', '5.3.5'
+    ssp.dependency 'Youbora-AVPlayer/dynamic', '5.4.5'
     ssp.dependency 'PlayKit/Core'
     ssp.dependency 'PlayKit/AnalyticsCommon'
 end
