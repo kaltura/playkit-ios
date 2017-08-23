@@ -52,6 +52,17 @@ struct BoundaryObservation {
     let dispatchQueue: DispatchQueue
 }
 
+/// `TimeObserver` is used to observe time changes both periodic and boundary.
+/// 
+/// For performance reasons we are using one timer with 100ms interval as our base
+/// and only timers in 100ms intervals can be used for example 0.5s 1s 1.1s are good.
+/// In case and interval is not divisable by 100ms we will round it down for example: 1.565s will be changed to 1.5s interval.
+///
+/// Using 100ms interval gives us error margin of 100ms at most.
+///
+/// In order to not go over all the observation every time we are building a special dictionary
+/// with interval values and the related boundary/periodic observers, 
+/// this way only one fetch is made which is between O(1) and O(log n) where n is number of observations.
 class TimeObserver: TimeMonitor {
     
     let interval: Int = 100
@@ -103,7 +114,9 @@ class TimeObserver: TimeMonitor {
     
     func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval) -> Void) {
         // calculate interval in millis and remove reminder to make sure intervals are in 100ms gaps
-        let intervalMs = Int(interval * 1000) - (Int(interval * 1000) % 100)
+        var intervalMs = Int(interval * 1000) - (Int(interval * 1000) % 100)
+        // make sure intervalMs is not 0 if 0 give 100 instead.
+        intervalMs = intervalMs == 0 ? 100 : intervalMs
         let dispatch = dispatchQueue ?? DispatchQueue.main
         if periodicObservations.count == 0 { // first observation just add
             self.maxInterval = intervalMs
