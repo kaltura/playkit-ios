@@ -103,7 +103,7 @@ import AVKit
     ///   - block: block to handle the observation.
     @objc func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void)
     
-    /// Adds a boundary time observer for the selected boundaries in time (25%, 50% etc.)
+    /// Adds a boundary time observer for the selected boundaries in time (25%, 50%, 30s etc.)
     ///
     /// - Parameters:
     ///   - boundaries: boundaries objects.

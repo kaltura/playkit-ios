@@ -70,7 +70,9 @@ class AVPlayerEngine: AVPlayer {
         get {
             let position = self.currentTime() - self.rangeStart
             PKLog.trace("get currentPosition: \(position)")
-            return CMTimeGetSeconds(position)
+            let time = CMTimeGetSeconds(position)
+            // time could be NaN in some rare cases make sure we don't return NaN and return 0 otherwise.
+            return time.isNaN ? 0 : time
         }
         set {
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)

@@ -189,7 +189,9 @@ class TimeObserver: TimeMonitor {
             // take a snapshot of the current time to use for all checks
             let currentTime = timeProvider.currentPosition
             let currentTimePercentage = timeProvider.currentPosition / timeProvider.duration
-            // make sure current time is not equal last observed time
+            // only handle when current time is greater then 0, if we have 0 it means nothing to handle.
+            guard currentTime > 0 else { return }
+            // make sure current time is not equal last observed time (means we were stopped or paused or seeked)
             guard currentTime != strongSelf.lastObservedTime else {
                 // update next boundary only once when we found out current time hasn't changed.
                 if strongSelf.cycles > 1 {
