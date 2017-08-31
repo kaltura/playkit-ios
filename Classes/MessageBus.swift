@@ -25,6 +25,14 @@ private struct Observation {
     private var observations = [String: [Observation]]()
     private let dispatchQueue = DispatchQueue(label: "com.kaltura.playkit.message-bus")
     
+    @objc public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
+        self.addObserver(observer, events: [event], block: block)
+    }
+    
+    @objc public func addObserver(_ observer: AnyObject, event: PKEvent.Type, observeOn dispatchQueue: DispatchQueue, block: @escaping (PKEvent) -> Void) {
+        self.addObserver(observer, events: [event], observeOn: dispatchQueue, block: block)
+    }
+    
     @objc public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
         self.add(observer: observer, events: events, block: block)
     }

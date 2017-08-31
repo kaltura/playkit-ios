@@ -40,4 +40,8 @@ import AVFoundation
         let observedBitrate = logEvent.observedBitrate
         self.init(bitrate: bitrate, indicatedBitrate: indicatedBitrate, observedBitrate: observedBitrate)
     }
+    
+    public override var description: String {
+        return "bitrate: \(self.bitrate), indicatedBitrate: \(self.indicatedBitrate), observedBitrate: \(self.observedBitrate)"
+    }
 }

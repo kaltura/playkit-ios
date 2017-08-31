@@ -43,7 +43,7 @@ import UIKit
     ///
     /// - Parameter config: The configuration object to load the player with.
     /// - Returns: A player loaded using the provided configuration.
-    @objc public func loadPlayer(pluginConfig: PluginConfig?) throws -> Player {
+    @objc public func loadPlayer(pluginConfig: PKPluginConfigs?) throws -> Player {
         let loader = PlayerLoader()
         try loader.load(pluginConfig: pluginConfig)
         return loader

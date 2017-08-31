@@ -12,76 +12,105 @@ import Foundation
 
 /// The position type of the ad according to the content timeline.
 @objc public enum AdPositionType: Int {
-    case preRoll
-    case midRoll
-    case postRoll
+    case pre
+    case mid
+    case post
+    
+    var asString: String {
+        switch self {
+        case .pre: return "pre"
+        case .mid: return "mid"
+        case .post: return "post"
+        }
+    }
 }
 
 /// `PKAdInfo` represents ad information.
 @objc public class PKAdInfo: NSObject {
     
-    @objc public var duration: TimeInterval
     @objc public var title: String
     /// The position of the pod in the content in seconds. Pre-roll returns 0,
     /// post-roll returns -1 and mid-rolls return the scheduled time of the pod.
     @objc public var timeOffset: TimeInterval
-    
-    @objc public var adDescription: String
-    @objc public var isSkippable: Bool
-    @objc public var contentType: String
+    /// The ad duration.
+    @objc public var duration: TimeInterval
+    /// the ad description
+    @objc public var adDescription: String?
+    @objc public var skipOffset: NSNumber?
+    /// The ad id from the vast respone
     @objc public var adId: String
     /// The source ad server information included in the ad response.
     @objc public var adSystem: String
-    @objc public var height: Int
-    @objc public var width: Int
     /// Total number of ads in the pod this ad belongs to. Will be 1 for standalone ads.
     @objc public var totalAds: Int
     /// The position of this ad within an ad pod. Will be 1 for standalone ads.
-    @objc public var adPosition: Int
-    @objc public var isBumper: Bool
-    // The index of the pod, where pre-roll pod is 0, mid-roll pods are 1 .. N
-    // and the post-roll is -1.
-    @objc public var podIndex: Int
-    
+    @objc public var position: Int
     /// returns the position type of the ad (pre, mid, post)
-    @objc public var positionType: AdPositionType {
+    @objc public let positionType: AdPositionType
+    
+    public init(description: String?,
+         duration: TimeInterval,
+         title: String,
+         skipOffset: NSNumber?,
+         adId: String,
+         adSystem: String,
+         totalAds: Int,
+         position: Int,
+         timeOffset: TimeInterval) {
+        
+        self.adDescription = description
+        self.duration = duration
+        self.title = title
+        self.skipOffset = skipOffset
+        self.adId = adId
+        self.adSystem = adSystem
+        self.totalAds = totalAds
+        self.position = position
+        self.timeOffset = timeOffset
+        
         if timeOffset > 0 {
-            return .midRoll
+            self.positionType = .mid
         } else if timeOffset < 0 {
-            return .postRoll
+            self.positionType = .post
         } else {
-            return .preRoll
+            self.positionType = .pre
         }
     }
     
-    public init(adDescription: String,
-         adDuration: TimeInterval,
-         title: String,
-         isSkippable: Bool,
-         contentType: String,
-         adId: String,
-         adSystem: String,
-         height: Int,
-         width: Int,
-         totalAds: Int,
-         adPosition: Int,
-         timeOffset: TimeInterval,
-         isBumper: Bool,
-         podIndex: Int) {
-        
-        self.adDescription = adDescription
-        self.duration = adDuration
-        self.title = title
-        self.isSkippable = isSkippable
-        self.contentType = contentType
-        self.adId = adId
-        self.adSystem = adSystem
-        self.height = height
-        self.width = width
-        self.totalAds = totalAds
-        self.adPosition = adPosition
-        self.timeOffset = timeOffset
-        self.isBumper = isBumper
-        self.podIndex = podIndex
+    public override var description: String {
+        return "id: \(self.adId), title: \(self.title), timeOffset: \(self.timeOffset), duration: \(self.duration), position: (\(self.position), \(self.positionType.asString)), totalAds: \(self.totalAds), adSystem: \(self.adSystem), skipOffset: \(String(describing: self.skipOffset))"
     }
 }
+
+@objc public enum PKAdEndedReasonType: Int {
+    /// ad has completed
+    case completed
+    /// ad was skipped
+    case skipped
+    /// when ad failed and error url was given back.
+    case adError
+    
+    var asString: String {
+        switch self {
+        case .completed: return "completed"
+        case .skipped: return "skipped"
+        case .adError: return "adError"
+        }
+    }
+}
+
+@objc public class PKAdEndedReason: NSObject {
+    
+    @objc public var reasonType: PKAdEndedReasonType
+    @objc public let offset: NSNumber?
+    
+    @objc public init(reasonType: PKAdEndedReasonType, offset: NSNumber?) {
+        self.reasonType = reasonType
+        self.offset = offset
+    }
+    
+    public override var description: String {
+        return "reason: \(self.reasonType.asString), offset: \(String(describing: offset))"
+    }
+}
+

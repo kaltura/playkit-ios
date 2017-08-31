@@ -48,28 +48,30 @@ extension MediaConfig: NSCopying {
 }
 
 /// A `PluginConfig` object defines config to use when loading a plugin object.
-@objc public class PluginConfig: NSObject {
+@objc public class PKPluginConfigs: NSObject {
     /// Plugins config dictionary holds [plugin name : plugin config]
-    @objc public var config: [String: Any]
+    @objc public var configs = [String: Any]()
     
     public override var description: String {
-        return "Plugin config:\n\(self.config)"
+        return "Plugin config: \(self.configs)"
     }
     
-    @objc public init(config: [String: Any]) {
-        self.config = config
+    /// adds a config on the provided plugin name.
+    @objc public func add(pluginName: String, config: Any) {
+        self.configs[pluginName] = config
     }
     
-    /// Private init.
-    private override init() {
-        fatalError("Private initializer, use `init(config:)`")
+    /// remove config from the provided plugin name.
+    @objc public func remove(pluginName: String) {
+        self.configs[pluginName] = nil
     }
 }
 
-extension PluginConfig: NSCopying {
+extension PKPluginConfigs: NSCopying {
     
     public func copy(with zone: NSZone? = nil) -> Any {
-        let copy = PluginConfig(config: self.config)
+        let copy = PKPluginConfigs()
+        copy.configs = self.configs
         return copy
     }
 }

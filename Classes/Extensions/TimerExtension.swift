@@ -34,7 +34,7 @@ public extension Timer {
     }
     
     /// starts the timer on the selected RunLoop (default is `.current`) with the provided modes.
-    func start(runLoop: RunLoop = .current, modes: RunLoopMode...) {
+    func start(runLoop: RunLoop = .main, modes: RunLoopMode...) {
         let modes = modes.isEmpty ? [.defaultRunLoopMode] : modes
         
         for mode in modes {

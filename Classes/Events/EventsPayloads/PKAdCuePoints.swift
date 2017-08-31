@@ -33,4 +33,8 @@ import Foundation
     @objc public var hasPostRoll: Bool {
         return self.cuePoints.filter { $0 < 0 }.count > 0 // post-roll ads values = -1
     }
+    
+    public override var description: String {
+        return "adCuePoints: \(self.cuePoints)"
+    }
 }

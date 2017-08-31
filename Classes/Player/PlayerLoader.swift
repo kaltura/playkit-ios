@@ -25,7 +25,7 @@ class PlayerLoader: PlayerDecoratorBase {
     var messageBus = MessageBus()
     var concreatePlayerController: PlayerController?
     
-    func load(pluginConfig: PluginConfig?) throws {
+    func load(pluginConfig: PKPluginConfigs?) throws {
         var playerController: PlayerController
         
         playerController = PlayerController()
@@ -38,7 +38,7 @@ class PlayerLoader: PlayerDecoratorBase {
         // initial creation of play session id adapter will update session id in prepare if needed
         player.settings.contentRequestAdapter = KalturaPlaybackRequestAdapter()
         
-        if let pluginConfigs = pluginConfig?.config {
+        if let pluginConfigs = pluginConfig?.configs {
             for pluginName in pluginConfigs.keys {
                 let pluginConfig = pluginConfigs[pluginName]
                 let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
