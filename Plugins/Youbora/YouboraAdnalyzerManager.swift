@@ -75,9 +75,9 @@ extension YouboraAdnalyzerManager {
     override func getAdPosition() -> String! {
         if let adInfo = self.adInfo {
             switch adInfo.positionType {
-            case .preRoll: return "pre"
-            case .midRoll: return "mid"
-            case .postRoll: return "post"
+            case .pre: return "pre"
+            case .mid: return "mid"
+            case .post: return "post"
             }
         } else {
             return super.getAdPosition()
@@ -115,15 +115,15 @@ extension YouboraAdnalyzerManager {
         return [
             AdEvent.adLoaded,
             AdEvent.adStarted,
-            AdEvent.adComplete,
+            AdEvent.adEnded,
             AdEvent.adResumed,
             AdEvent.adPaused,
-            AdEvent.adDidProgressToTime,
+            AdEvent.adProgress,
             AdEvent.adSkipped,
             AdEvent.adStartedBuffering,
             AdEvent.adPlaybackReady,
             AdEvent.adsRequested,
-            AdEvent.adDidRequestContentResume
+            AdEvent.adBreakEnded
         ]
     }
     
@@ -139,7 +139,7 @@ extension YouboraAdnalyzerManager {
                     // update ad info with the new loaded event
                     self?.adInfo = event.adInfo
                     // if ad is preroll make sure to call /start event before /adStart
-                    if let positionType = event.adInfo?.positionType, positionType == .preRoll {
+                    if let positionType = event.adInfo?.positionType, positionType == .pre {
                         self?.plugin.playHandler()
                     }
                     self?.playAdHandler()
@@ -148,7 +148,7 @@ extension YouboraAdnalyzerManager {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     self?.joinAdHandler()
                 }
-            case let e where e.self == AdEvent.adComplete:
+            case let e where e.self == AdEvent.adEnded:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     self?.endedAdHandler()
                     self?.adInfo = nil
@@ -166,7 +166,7 @@ extension YouboraAdnalyzerManager {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     self?.pauseAdHandler()
                 }
-            case let e where e.self == AdEvent.adDidProgressToTime:
+            case let e where e.self == AdEvent.adProgress:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     // update ad playhead with new data
                     self?.adPlayhead = event.adMediaTime?.doubleValue
@@ -189,7 +189,7 @@ extension YouboraAdnalyzerManager {
                 }
             // when ad request the content to resume (finished or error) 
             // make sure to send /adStop event and clear the info.
-            case let e where e.self == AdEvent.adDidRequestContentResume:
+            case let e where e.self == AdEvent.adBreakEnded:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     self?.endedAdHandler()
                     self?.adInfo = nil

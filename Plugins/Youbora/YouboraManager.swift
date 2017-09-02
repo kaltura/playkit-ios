@@ -146,7 +146,7 @@ extension YouboraManager {
             PlayerEvent.stateChanged,
             PlayerEvent.sourceSelected,
             PlayerEvent.error,
-            AdEvent.adCuePointsUpdate,
+            AdEvent.adCuePoints,
             AdEvent.allAdsCompleted
         ]
     }
@@ -239,7 +239,7 @@ extension YouboraManager {
                         strongSelf.errorHandler(withCode: "\(error.code)", message: error.localizedDescription, andErrorMetadata: error.description)
                     }
                 }
-            case let e where e.self == AdEvent.adCuePointsUpdate:
+            case let e where e.self == AdEvent.adCuePoints:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     if let hasPostRoll = event.adCuePoints?.hasPostRoll, hasPostRoll == true {
                         self?.shouldDelayEndedHandler = true
