@@ -361,21 +361,15 @@ public enum PhoenixMediaProviderError: PKError {
                 }
 
                 if let context = playbackContext as? OTTPlaybackContext {
-                    
-                    if(context.hasBlockAction() != nil) {
-                        if let error = context.hasErrorMessage() {
-                            callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
-                        } else{
-                            callback(nil, PhoenixMediaProviderError.serverError(code: "Blocked", message: "Blocked").asNSError)
+                    let tuple = PhoenixMediaProvider.createMediaEntry(assetId: loaderInfo.assetId, fileIds: loaderInfo.fileIds, formats: loaderInfo.formats, context: context)
+                    if let error = tuple.1 {
+                        callback(nil, error)
+                    } else if let media = tuple.0 {
+                        if let sources = media.sources, sources.count > 0 {
+                            callback(media, nil)
+                        } else {
+                            callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                         }
-                        return
-                    }
-                    
-                    let media = self.createMediaEntry(loaderInfo: loaderInfo, context: context)
-                    if let sources = media.sources, sources.count > 0 {
-                       callback(media, nil)
-                    } else {
-                        callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                     }
                 } else if let error = playbackContext as? OTTError {
                     callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
@@ -389,7 +383,7 @@ public enum PhoenixMediaProviderError: PKError {
     }
 
     /// Sorting and filtering source accrding to file formats or file ids
-    func sortedAndFilterSources(by fileIds: [String]?, or fileFormats: [String]?, sources: [OTTPlaybackSource]) -> [OTTPlaybackSource] {
+    static func sortedAndFilterSources(by fileIds: [String]?, or fileFormats: [String]?, sources: [OTTPlaybackSource]) -> [OTTPlaybackSource] {
 
         let orderedSources = sources.filter({ (source: OTTPlaybackSource) -> Bool in
              if let formats = fileFormats {
@@ -420,10 +414,17 @@ public enum PhoenixMediaProviderError: PKError {
 
     }
 
-    func createMediaEntry(loaderInfo: LoaderInfo, context: OTTPlaybackContext) -> MediaEntry {
+    static public func createMediaEntry(assetId: String, fileIds: [String]?, formats: [String]?, context: OTTPlaybackContext) -> (MediaEntry?, NSError?) {
 
-        let mediaEntry = MediaEntry(id: loaderInfo.assetId)
-        let sortedSources = self.sortedAndFilterSources(by: loaderInfo.fileIds, or: loaderInfo.formats, sources: context.sources)
+        if context.hasBlockAction() != nil {
+            if let error = context.hasErrorMessage() {
+                return (nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
+            }
+            return (nil, PhoenixMediaProviderError.serverError(code: "Blocked", message: "Blocked").asNSError)
+        }
+        
+        let mediaEntry = MediaEntry(id: assetId)
+        let sortedSources = sortedAndFilterSources(by: fileIds, or: formats, sources: context.sources)
 
         var maxDuration: Float = 0.0
         let mediaSources =  sortedSources.flatMap { (source: OTTPlaybackSource) -> MediaSource? in
@@ -437,7 +438,7 @@ public enum PhoenixMediaProviderError: PKError {
             if let drmData = source.drm, drmData.count > 0 {
                 drm = drmData.flatMap({ (drmData: OTTDrmData) -> DRMParams? in
 
-                    let scheme = self.convertScheme(scheme: drmData.scheme)
+                    let scheme = convertScheme(scheme: drmData.scheme)
                     guard FormatsHelper.supportedSchemes.contains(scheme) else {
                         return nil
                     }
@@ -472,12 +473,12 @@ public enum PhoenixMediaProviderError: PKError {
         mediaEntry.sources = mediaSources
         mediaEntry.duration = TimeInterval(maxDuration)
 
-        return mediaEntry
+        return (mediaEntry, nil)
 
     }
 
     // Mapping between server scheme and local definision of scheme
-    func convertScheme(scheme: String) -> DRMParams.Scheme {
+    static func convertScheme(scheme: String) -> DRMParams.Scheme {
             switch (scheme) {
             case "WIDEVINE_CENC":
                 return .widevineCenc
