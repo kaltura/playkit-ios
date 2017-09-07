@@ -9,9 +9,16 @@
 // ===================================================================================================
 
 import Foundation
-import AVFoundation
 
-public protocol VRPlayerEngine: PlayerEngine {
-    init(delegate: PlayerDelegate?)
-    func setVRModeEnabled(_ isEnabled: Bool)
+@objc public class PKVRController: NSObject, PKController {
+    var currentPlayer: VRPlayerEngine?
+    
+    required public init(player: PlayerEngine?) {
+        self.currentPlayer = player as? VRPlayerEngine
+    }
+    
+    /// Enable VR Mode - For stereo display for Google's Cardboard
+    @objc public func setVRModeEnabled(_ isEnabled: Bool) {
+        self.currentPlayer?.setVRModeEnabled(isEnabled)
+    }
 }

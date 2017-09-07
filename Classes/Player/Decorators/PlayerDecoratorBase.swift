@@ -142,4 +142,10 @@ import AVKit
     public func selectTrack(trackId: String) {
         self.player.selectTrack(trackId: trackId)
     }
+    
+    public func getController(type: PKController.Type) -> PKController? {
+        return self.player.getController(type: type)
+    }
+    
+    
 }

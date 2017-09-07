@@ -11,6 +11,7 @@
 import UIKit
 
 @objc public protocol PlayerDelegate {
+    @objc func playerShouldPlayAd(_ player: Player) -> Bool
     @objc optional func shouldAddPlayerViewController(_ vc: UIViewController)
 }
 
@@ -46,6 +47,9 @@ import UIKit
     
     /// Update Plugin Config
     @objc func updatePluginConfig(pluginName: String, config: Any)
+    
+    /// Getter for playkit controllers.
+    @objc func getController(type: PKController.Type) -> PKController?
 }
 
 public protocol PlayerDecoratorProvider {

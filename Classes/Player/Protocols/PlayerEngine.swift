@@ -10,7 +10,7 @@
 
 import Foundation
 
-public protocol PlayerEngine: BasicPlayer {
+@objc public protocol PlayerEngine: BasicPlayer {
     /// Fired when some event is triggred.
     var onEventBlock: ((PKEvent) -> Void)? { get set }
     

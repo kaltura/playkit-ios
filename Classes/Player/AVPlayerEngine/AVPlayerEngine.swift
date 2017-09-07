@@ -62,7 +62,7 @@ public class AVPlayerEngine: AVPlayer {
     /// In addition, keep in mind that because the duration is calcaulated from `seekableTimeRanges`
     /// in live streams there could be a chance that current time will be bigger than the duration
     /// because the current segment wasn't yet added to the seekable time ranges.
-    var currentPosition: TimeInterval {
+    public var currentPosition: TimeInterval {
         get {
             let position = self.currentTime() - self.rangeStart
             PKLog.trace("get currentPosition: \(position)")
@@ -173,7 +173,7 @@ public class AVPlayerEngine: AVPlayer {
         self.removeObservers()
     }
     
-    func stop() {
+    public func stop() {
         PKLog.info("stop player")
         self.pause()
         self.seek(to: kCMTimeZero)
@@ -203,7 +203,7 @@ public class AVPlayerEngine: AVPlayer {
         }
     }
     
-    func destroy() {
+    public func destroy() {
         // make sure to call destroy on main thread synchronously. 
         // this make sure everything will be cleared without any race conditions
         DispatchQueue.main.async {
@@ -215,7 +215,7 @@ public class AVPlayerEngine: AVPlayer {
         }
     }
     
-    func selectTrack(trackId: String) {
+    public func selectTrack(trackId: String) {
         if trackId.isEmpty == false {
             self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
         } else {

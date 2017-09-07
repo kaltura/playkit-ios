@@ -67,7 +67,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         return self.currentPlayer.currentTextTrack
     }
     
-    public weak var view: PlayerView? {
+    open weak var view: PlayerView? {
         get {
             return self.currentPlayer.view
         }

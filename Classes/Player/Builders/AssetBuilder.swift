@@ -20,7 +20,7 @@ class AssetBuilder {
     }
 }
 
-public protocol AssetHandler {
+@objc public protocol AssetHandler {
     init()
     func buildAsset(mediaSource: PKMediaSource, readyCallback: @escaping (Error?, AVURLAsset?) -> Void)
 }

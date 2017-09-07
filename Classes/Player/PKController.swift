@@ -8,10 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-import Foundation
-import AVFoundation
-
-public protocol VRPlayerEngine: PlayerEngine {
-    init(delegate: PlayerDelegate?)
-    func setVRModeEnabled(_ isEnabled: Bool)
+@objc public protocol PKController {
+    init(player: PlayerEngine?)
 }

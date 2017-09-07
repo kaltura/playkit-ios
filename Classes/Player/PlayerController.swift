@@ -189,6 +189,14 @@ class PlayerController: NSObject, Player, PlayerSettings {
     public func updatePluginConfig(pluginName: String, config: Any) {
         //Assert.shouldNeverHappen();
     }
+    
+    public func getController(type: PKController.Type) -> PKController? {
+        if type is PKVRController.Type && self.currentPlayer is VRPlayerEngine {
+            return PKVRController(player: self.currentPlayer)
+        }
+        
+        return nil
+    }
 }
 
 /************************************************************/
