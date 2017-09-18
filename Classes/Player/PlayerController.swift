@@ -144,6 +144,7 @@ class PlayerController: NSObject, Player {
             let asset = PKAsset(avAsset: assetToPrepare, playerSettings: self.settings)
             self.currentPlayer.asset = asset
             if DRMSupport.widevineClassicHandler != nil {
+                self.removeAssetRefreshObservers()
                 self.addAssetRefreshObservers()
             }
         }
