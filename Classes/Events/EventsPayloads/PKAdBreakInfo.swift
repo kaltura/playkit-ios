@@ -52,7 +52,7 @@ import Foundation
     /// ad break has been discarded by calling discardAdBreak().
     case discarded
     /// when vast was failed and we got error url.
-    case vastError
+    case vastEmpty
     /// ad break ended because of an error.
     case error
     
@@ -60,7 +60,7 @@ import Foundation
         switch self {
         case .completed: return "completed"
         case .discarded: return "discarded"
-        case .vastError: return "vastError"
+        case .vastEmpty: return "vastEmpty"
         case .error: return "error"
         }
     }

@@ -60,7 +60,7 @@ private struct Observation {
                 let typeId = NSStringFromClass(et)
                 
                 if let array = observations[typeId] {
-                    observations[typeId] = array.filter { $0.observer! !== observer }
+                    observations[typeId] = array.filter { $0.observer !== observer }
                 } else {
                     PKLog.debug("removeObserver:: array is empty")
                 }

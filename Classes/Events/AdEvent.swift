@@ -17,7 +17,7 @@ import Foundation
     /************************************************************/
     
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePoints, adFirstQuartile, adLoaded, errorLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTouched, adThirdQuartile, adProgress, adRequestContentPause, adRequestContentResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, requestTimedOut
+        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePoints, adFirstQuartile, adLoaded, errorLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTouched, adThirdQuartile, adProgress, contentPauseRequested, contentResumeRequested, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adsRequestTimedOut
     ]
     
     /// An ad break is pending to be played, should pause content player at this point.
@@ -44,14 +44,14 @@ import Foundation
     /// Sent when ad finished buffering and ready for playback
     @objc public static let adPlaybackReady: AdEvent.Type = AdPlaybackReady.self
     /// Sent when the ads request timed out.
-    @objc public static let requestTimedOut: AdEvent.Type = RequestTimedOut.self
+    @objc public static let adsRequestTimedOut: AdEvent.Type = AdsRequestTimedOut.self
     /// delivered when ads request was sent.
     @objc public static let adsRequested: AdEvent.Type = AdsRequested.self
     
     /// Ad requested the content to pause (before ad starts playing)
-    @objc public static let adRequestContentPause: AdEvent.Type = AdRequestContentPause.self
+    @objc public static let contentPauseRequested: AdEvent.Type = ContentPauseRequested.self
     /// Ad requested content resume (when finished playing ads or when error occurs and playback needs to continue)
-    @objc public static let adRequestContentResume: AdEvent.Type = AdRequestContentResume.self
+    @objc public static let contentResumeRequested: AdEvent.Type = ContentResumeRequested.self
     @objc public static let webOpenerEvent: AdEvent.Type = WebOpenerEvent.self
     @objc public static let adWebOpenerWillOpenExternalBrowser: AdEvent.Type = AdWebOpenerWillOpenExternalBrowser.self
     @objc public static let adWebOpenerWillOpenInAppBrowser: AdEvent.Type = AdWebOpenerWillOpenInAppBrowser.self
@@ -86,7 +86,7 @@ import Foundation
     
     /// `AdBreakPending` represents an ad break is pending to be played.
     public class AdBreakPending: AdEvent {
-        public convenience init(adBreakInfo: PKAdBreakInfo) {
+        public convenience init(adBreakInfo: [PKAdBreakInfo]) {
             self.init([AdEventDataKeys.adBreakInfo: adBreakInfo])
         }
     }
@@ -186,14 +186,23 @@ import Foundation
         }
     }
     
-    public class AdRequestContentPause: AdEvent {}
-    public class AdRequestContentResume: AdEvent {}
+    public class ContentPauseRequested: AdEvent {}
+    public class ContentResumeRequested: AdEvent {}
     
     /// Sent when the ads request timed out.
-    public class RequestTimedOut: AdEvent {}
+    public class AdsRequestTimedOut: AdEvent {}
     
     /// delivered when ads request was sent.
     public class AdsRequested: AdEvent {
+        public convenience init(adTagUrl: String) {
+            self.init([AdEventDataKeys.adTagUrl: adTagUrl])
+        }
+    }
+    
+    /// `AdsAndContentEnded` sent when both ads and content has completed playing.
+    /// - important: even if some ads were skipped by seeking when the content has ended 
+    /// and post-roll was played (only if we had one) we send this event.
+    public class AdsAndContentEnded: AdEvent {
         public convenience init(adTagUrl: String) {
             self.init([AdEventDataKeys.adTagUrl: adTagUrl])
         }

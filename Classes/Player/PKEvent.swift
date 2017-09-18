@@ -22,7 +22,7 @@ import AVFoundation
         self.namespace = self.getEventNamespace()
     }
     
-    private(set) var namespace: String = ""
+    public private(set) var namespace: String = ""
     
     private func getEventNamespace() -> String {
         var namespace = ""
