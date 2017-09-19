@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import CoreMedia
 
+/// `PKBoundary` used as abstract for boundary types (% and time).
 @objc public protocol PKBoundary {
     var time: TimeInterval { get }
 }

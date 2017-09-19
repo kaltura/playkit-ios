@@ -95,6 +95,16 @@ import AVKit
     /// Update Plugin Config
     @objc func updatePluginConfig(pluginName: String, config: Any)
     
+    #if os(iOS)
+    /// Create PiP Controller
+    @available(iOS 9.0, *)
+    @objc func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
+    #endif
+    
+    /************************************************************/
+    // MARK: - Time Observation
+    /************************************************************/
+    
     /// Adds a periodic time observer with specific interval
     ///
     /// - Parameters:
@@ -106,27 +116,19 @@ import AVKit
     /// Adds a boundary time observer for the selected boundaries in time (25%, 50%, 30s etc.)
     ///
     /// - Parameters:
-    ///   - boundaries: boundaries objects.
+    ///   - boundaries: boundary objects.
     ///   - dispatchQueue: dispatch queue to observe changes on (nil value will use main).
     ///   - block: block to handle the observation with the observed boundary.
     /// - Attention: if a boundary is crossed while seeking the observation **won't be triggered**.
     @objc func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void)
     
-    /// removes the added time observers (has no effect is no observers were added).
+    /// removes the added time observers (has no effect if no observers were added).
     @objc func removePeriodicObservers()
     
-    /// removes the added time boundary observers (has no effect is no observers were added).
+    /// removes the added time boundary observers (has no effect if no observers were added).
     @objc func removeBoundaryObservers()
-    
-    #if os(iOS)
-    /// Create PiP Controller
-    @available(iOS 9.0, *)
-    @objc func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
-    #endif
 }
 
 public protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
-
-

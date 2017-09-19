@@ -190,37 +190,28 @@ class AVPlayerEngine: AVPlayer {
     }
     
     override func pause() {
-        // makes sure play/pause call is made on the main thread (calling on background thread has unpredictable behaviours)
-        DispatchQueue.main.async {
-            if self.rate > 0 {
-                // Playing, so pause.
-                PKLog.debug("pause player")
-                super.pause()
-            }
+        if self.rate > 0 {
+            // Playing, so pause.
+            PKLog.debug("pause player")
+            super.pause()
         }
     }
     
     override func play() {
-        // makes sure play/pause call is made on the main thread (calling on background thread has unpredictable behaviours)
-        DispatchQueue.main.async {
-            if self.rate == 0 {
-                PKLog.debug("play player")
-                self.post(event: PlayerEvent.Play())
-                super.play()
-            }
+        if self.rate == 0 {
+            PKLog.debug("play player")
+            self.post(event: PlayerEvent.Play())
+            super.play()
         }
     }
     
     func destroy() {
-        // make sure to call destroy on main thread synchronously. 
-        // this make sure everything will be cleared without any race conditions
-        DispatchQueue.main.async {
-            PKLog.info("destroy player")
-            self.onEventBlock = nil
-            // removes app state observer
-            AppStateSubject.shared.remove(observer: self)
-            self.replaceCurrentItem(with: nil)
-        }
+        PKLog.info("destroy player")
+        self.timeObserver.stopTimer()
+        self.onEventBlock = nil
+        // removes app state observer
+        AppStateSubject.shared.remove(observer: self)
+        self.replaceCurrentItem(with: nil)
     }
     
     func selectTrack(trackId: String) {

@@ -14,9 +14,9 @@ protocol TimeProvider: class {
 }
 
 public protocol TimeMonitor {
-    /// Adds a periodic observer if one is already available for the selected interval replaces it.
+    /// Adds a periodic observer.
     func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval) -> Void)
-    /// Adds a boundary observers if one of the times is already available for the selected time replaces it.
+    /// Adds a boundary observer.
     func addBoundaryObserver(times: [TimeInterval], observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval, Double) -> Void)
     /// Removes all the periodic observers.
     func removePeriodicObservers()
@@ -37,7 +37,7 @@ struct PeriodicObservation: Hashable {
         return self.interval
     }
     
-    public static func ==(lhs: PeriodicObservation, rhs: PeriodicObservation) -> Bool {
+    public static func == (lhs: PeriodicObservation, rhs: PeriodicObservation) -> Bool {
         return lhs.interval == rhs.interval
     }
 }
@@ -96,7 +96,7 @@ class TimeObserver: TimeMonitor {
     var maxInterval: Int = 0
     /// number of cycles we observed, used to invoke multiple intervals with one timer.
     var cycles: Int = 1
-    var lastObservedTime: TimeInterval = -1 // TODO: update this on every seek ended
+    var lastObservedTime: TimeInterval = -1
     weak var timeProvider: TimeProvider?
     
     init(timeProvider: TimeProvider) {
