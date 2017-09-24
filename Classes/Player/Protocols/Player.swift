@@ -11,14 +11,14 @@
 import UIKit
 
 @objc public protocol PlayerDelegate {
-    @objc func playerShouldPlayAd(_ player: Player) -> Bool
+    @objc optional func playerShouldPlayAd(_ player: Player) -> Bool
     @objc optional func shouldAddPlayerViewController(_ vc: UIViewController)
 }
 
-/// `PlayerSettings` used for optional `Player` settings.
-@objc public protocol PlayerSettings {
-    var contentRequestAdapter: PKRequestParamsAdapter? { get set }
-}
+///// `PlayerSettings` used for optional `Player` settings.
+//@objc public protocol PKPlayerSettings {
+//    var contentRequestAdapter: PKRequestParamsAdapter? { get set }
+//}
 
 @objc public protocol Player: BasicPlayer {
     
@@ -28,7 +28,7 @@ import UIKit
     @objc weak var mediaEntry: PKMediaEntry? { get }
     
     /// the player's settings
-    @objc var settings: PlayerSettings { get }
+    @objc var settings: PKPlayerSettings { get }
     
     /// The player's session id. the `sessionId` is initialized when the player loads.
     @objc var sessionId: String { get }

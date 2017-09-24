@@ -11,7 +11,22 @@
 import Foundation
 import AVFoundation
 
+/// A State is an enum of different player states
+@objc public enum ViewState: Int {
+    /// Sent when player's view state panorama.
+    case panorama
+    /// Sent when player's view state vr.
+    case stereo
+    /// Sent when player's view state errored.
+    case error
+    /// Sent when player's view state unknown.
+    case unknown = -1
+}
+
 public protocol VRPlayerEngine: PlayerEngine {
     init(delegate: PlayerDelegate?)
+    var currentViewState: ViewState { get }
+    var isEnabled: Bool { get set }
     func setVRModeEnabled(_ isEnabled: Bool)
+    func centerViewPoint()
 }

@@ -11,14 +11,7 @@
 import Foundation
 
 class DefaultPlayerWrapper: NSObject, PlayerEngine {
-    /// Fired when some event is triggred.
-    var onEventBlock: ((PKEvent) -> Void)? {
-        get {
-            printInvocationWarning("\(#function)")
-            return nil
-        }
-        set { printInvocationWarning("\(#function)") }
-    }
+    var onEventBlock: ((PKEvent) -> Void)?
 
     public var duration: Double {
         printInvocationWarning("\(#function)")
@@ -81,13 +74,7 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
     }
     
     /// Save view reference till prepare
-    private var _view: PlayerView?
-    public weak var view: PlayerView? {
-        get {
-            return self._view
-        }
-        set { self._view = newValue }
-    }
+    public weak var view: PlayerView?
     
     public var rate: Float {
         printInvocationWarning("\(#function)")

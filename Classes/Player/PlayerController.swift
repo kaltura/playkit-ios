@@ -10,7 +10,7 @@
 
 import Foundation
 
-class PlayerController: NSObject, Player, PlayerSettings {
+class PlayerController: NSObject, Player {
     
     var onEventBlock: ((PKEvent) -> Void)?
     
@@ -28,11 +28,7 @@ class PlayerController: NSObject, Player, PlayerSettings {
     /// A semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
-    var contentRequestAdapter: PKRequestParamsAdapter?
-    
-    var settings: PlayerSettings {
-        return self
-    }
+    let settings = PKPlayerSettings()
     
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
@@ -115,11 +111,16 @@ class PlayerController: NSObject, Player, PlayerSettings {
         var pms = selectedSource
         self.updateRequestAdapter(in: &pms)
         
+        // Take saved eventBlock from DefaultPlayerWrapper
+        // Must be called before `self.currentPlayer` reference is changed
+        let eventBlock = self.currentPlayer.onEventBlock
+        
         // Take saved view from DefaultPlayerWrapper
         // Must be called before `self.currentPlayer` reference is changed
         let playerView = self.currentPlayer.view
         try self.createPlayerWrapper(mediaConfig)
-        // After Setting PlayerWrapper set  saved player's view
+        // After Setting PlayerWrapper set  saved player's params
+        self.currentPlayer.onEventBlock = eventBlock
         self.currentPlayer.view = playerView
         self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: handlerType)
     }
@@ -134,6 +135,10 @@ class PlayerController: NSObject, Player, PlayerSettings {
             self.currentPlayer = vrPlayerWrapper.init(delegate: self.delegate)
         } else {
             self.currentPlayer = AVPlayerWrapper()
+        }
+        
+        if let currentPlayer = self.currentPlayer as? AVPlayerWrapper {
+            currentPlayer.settings = self.settings
         }
     }
     
@@ -207,7 +212,7 @@ extension PlayerController {
     /// Updates the request adapter if one exists
     fileprivate func updateRequestAdapter(in mediaSource: inout PKMediaSource) {
         // configure media sources content request adapter if request adapter exists
-        if let adapter = self.contentRequestAdapter {
+        if let adapter = self.settings.contentRequestAdapter {
             // update the request adapter with the updated session id
             adapter.updateRequestAdapter(with: self)
             // configure media source with the adapter

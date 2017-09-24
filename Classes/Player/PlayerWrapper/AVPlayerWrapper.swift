@@ -27,6 +27,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     private var mediaConfig: MediaConfig?
     /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
+    var settings: PKPlayerSettings?
     
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
@@ -93,6 +94,17 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
+        
+        guard let settings = self.settings else {
+            PKLog.error("settings are not set")
+            return
+        }
+        
+        settings.onChange = { (settingsType) in
+            switch settingsType {
+            case .preferredPeakBitRate(let preferredPeakBitRate): self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+            }
+        }
     }
     
     // Every player that is created should own Reachability instance
@@ -125,7 +137,13 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 self.currentPlayer.startPosition = startTime
             }
             
-            self.currentPlayer.asset = assetToPrepare
+            guard let settings = self.settings else {
+                PKLog.error("settings are not set")
+                return
+            }
+            
+            let asset = PKAsset(avAsset: assetToPrepare, playerSettings: settings)
+            self.currentPlayer.asset = asset
             
             if DRMSupport.widevineClassicHandler != nil {
                 self.addAssetRefreshObservers()
@@ -157,7 +175,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         self.currentPlayer.selectTrack(trackId: trackId)
     }
     
-    public func destroy() {
+    open func destroy() {
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
     }
