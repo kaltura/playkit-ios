@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
 s.name             = 'PlayKit'
-s.version          = '3.1.3'
+s.version          = '3.2.0'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 s.homepage         = 'https://github.com/kaltura/playkit-ios'
 s.license          = { :type => 'AGPLv3', :text => 'AGPLv3' }
@@ -34,7 +34,7 @@ end
 
 s.subspec 'YouboraPlugin' do |ssp|
     ssp.source_files = 'Plugins/Youbora'
-    ssp.dependency 'Youbora-AVPlayer/dynamic', '5.3.5'
+    ssp.dependency 'Youbora-AVPlayer/dynamic', '5.4.5'
     ssp.dependency 'PlayKit/Core'
     ssp.dependency 'PlayKit/AnalyticsCommon'
 end
