@@ -35,7 +35,7 @@ class AVPlayerEngine: AVPlayer {
     var isFirstReady = true
     var currentState: PlayerState = PlayerState.idle
     var tracksManager = TracksManager()
-    var observerContext = 0
+    static var observerContext = 0
     
     var onEventBlock: ((PKEvent) -> Void)?
     
