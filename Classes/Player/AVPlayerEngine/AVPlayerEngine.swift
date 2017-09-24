@@ -23,7 +23,8 @@ class AVPlayerEngine: AVPlayer {
     let assetKeysRequiredToPlay = [
         "playable",
         "tracks",
-        "hasProtectedContent"
+        "hasProtectedContent",
+        "duration"
     ]
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
@@ -38,6 +39,9 @@ class AVPlayerEngine: AVPlayer {
     static var observerContext = 0
     
     var onEventBlock: ((PKEvent) -> Void)?
+    
+    /* Time Observation */
+    var timeObserver: TimeObserver!
     
     public weak var view: PlayerView? {
         didSet {
@@ -66,7 +70,9 @@ class AVPlayerEngine: AVPlayer {
         get {
             let position = self.currentTime() - self.rangeStart
             PKLog.trace("get currentPosition: \(position)")
-            return CMTimeGetSeconds(position)
+            let time = CMTimeGetSeconds(position)
+            // time could be NaN in some rare cases make sure we don't return NaN and return 0 otherwise.
+            return time.isNaN ? 0 : time
         }
         set {
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
@@ -164,6 +170,7 @@ class AVPlayerEngine: AVPlayer {
         self.startPosition = 0
         super.init()
         self.onEventBlock = nil
+        self.timeObserver = TimeObserver(timeProvider: self)
         AppStateSubject.shared.add(observer: self)
     }
     
@@ -171,6 +178,9 @@ class AVPlayerEngine: AVPlayer {
         PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
         // removes the observers only on deinit to prevent chances of being removed twice.
         self.removeObservers()
+        self.timeObserver.stopTimer()
+        self.timeObserver.removePeriodicObservers()
+        self.timeObserver.removeBoundaryObservers()
     }
     
     func stop() {
@@ -182,37 +192,28 @@ class AVPlayerEngine: AVPlayer {
     }
     
     override func pause() {
-        // makes sure play/pause call is made on the main thread (calling on background thread has unpredictable behaviours)
-        DispatchQueue.main.async {
-            if self.rate > 0 {
-                // Playing, so pause.
-                PKLog.debug("pause player")
-                super.pause()
-            }
+        if self.rate > 0 {
+            // Playing, so pause.
+            PKLog.debug("pause player")
+            super.pause()
         }
     }
     
     override func play() {
-        // makes sure play/pause call is made on the main thread (calling on background thread has unpredictable behaviours)
-        DispatchQueue.main.async {
-            if self.rate == 0 {
-                PKLog.debug("play player")
-                self.post(event: PlayerEvent.Play())
-                super.play()
-            }
+        if self.rate == 0 {
+            PKLog.debug("play player")
+            self.post(event: PlayerEvent.Play())
+            super.play()
         }
     }
     
     func destroy() {
-        // make sure to call destroy on main thread synchronously. 
-        // this make sure everything will be cleared without any race conditions
-        DispatchQueue.main.async {
-            PKLog.info("destroy player")
-            self.onEventBlock = nil
-            // removes app state observer
-            AppStateSubject.shared.remove(observer: self)
-            self.replaceCurrentItem(with: nil)
-        }
+        PKLog.info("destroy player")
+        self.timeObserver.stopTimer()
+        self.onEventBlock = nil
+        // removes app state observer
+        AppStateSubject.shared.remove(observer: self)
+        self.replaceCurrentItem(with: nil)
     }
     
     func selectTrack(trackId: String) {
