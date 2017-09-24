@@ -111,7 +111,8 @@ import AVKit
     ///   - interval: time interval for the periodic invocation.
     ///   - dispatchQueue: dispatch queue to observe changes on (nil value will use main).
     ///   - block: block to handle the observation.
-    @objc func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void)
+    /// - Returns: A uuid token to represent the observation, used to later remove a single observation.
+    @objc func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void) -> UUID
     
     /// Adds a boundary time observer for the selected boundaries in time (25%, 50%, 30s etc.)
     ///
@@ -119,8 +120,15 @@ import AVKit
     ///   - boundaries: boundary objects.
     ///   - dispatchQueue: dispatch queue to observe changes on (nil value will use main).
     ///   - block: block to handle the observation with the observed boundary.
+    /// - Returns: A uuid token to represent the observation, used to later remove a single observation.
     /// - Attention: if a boundary is crossed while seeking the observation **won't be triggered**.
-    @objc func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void)
+    @objc func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) -> UUID
+    
+    /// removes a single periodic observer using the uuid provided when added the observation.
+    @objc func removePeriodicObserver(_ token: UUID)
+    
+    /// removes a single boundary observer using the uuid provided when added the observation.
+    @objc func removeBoundaryObserver(_ token: UUID)
     
     /// removes the added time observers (has no effect if no observers were added).
     @objc func removePeriodicObservers()

@@ -63,8 +63,6 @@ extension AVPlayerEngine {
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: nil)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: nil)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
-        self.removePeriodicObservers()
-        self.removeBoundaryObservers()
     }
     
     func onAccessLogEntryNotification(notification: Notification) {

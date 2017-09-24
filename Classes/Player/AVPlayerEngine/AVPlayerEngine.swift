@@ -179,6 +179,8 @@ class AVPlayerEngine: AVPlayer {
         // removes the observers only on deinit to prevent chances of being removed twice.
         self.removeObservers()
         self.timeObserver.stopTimer()
+        self.timeObserver.removePeriodicObservers()
+        self.timeObserver.removeBoundaryObservers()
     }
     
     func stop() {
