@@ -17,8 +17,8 @@ import Foundation
     /************************************************************/
     
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePoints, adFirstQuartile, adLoaded, errorLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTouched, adThirdQuartile, adProgress, contentPauseRequested, contentResumeRequested, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adsRequestTimedOut
-    ]
+        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePoints, adFirstQuartile, adLoaded, errorLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTouched, adThirdQuartile, adProgress, contentPauseRequested, contentResumeRequested, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adsRequestTimedOut, adBreakStarted, adBreakEnded, error
+    ] // TOOD: add adsPlaybackEnded
     
     /// An ad break is pending to be played, should pause content player at this point.
     @objc public static let adBreakPending: AdEvent.Type = AdBreakPending.self
@@ -58,8 +58,6 @@ import Foundation
     @objc public static let adWebOpenerDidOpenInAppBrowser: AdEvent.Type = AdWebOpenerDidOpenInAppBrowser.self
     @objc public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
     @objc public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
-    
-    
     
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
