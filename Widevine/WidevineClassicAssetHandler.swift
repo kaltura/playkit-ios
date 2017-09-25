@@ -16,7 +16,7 @@ typealias RefreshCallback = (Bool) -> Void
 
 class WidevineClassicAssetHandler: RefreshableAssetHandler {
     
-    var readyCallback: ReadyCallback?
+    var refreshCallback: RefreshCallback?
     
     static let sourceFilter = { (_ src: PKMediaSource) -> Bool in
         
@@ -39,7 +39,12 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         return false
     }
     
+<<<<<<< HEAD
     func shouldRefreshAsset(mediaSource: PKMediaSource, refreshCallback: @escaping RefreshCallback) {
+=======
+    func shouldRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping RefreshCallback) {
+        self.refreshCallback = refreshCallback
+>>>>>>> develop
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
             refreshCallback(false)
@@ -71,25 +76,29 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         WidevineClassicHelper.playAsset(contentUrl.absoluteString, withLicenseUri: nil) {  (_ playbackURL: String?) -> Void  in
             if playbackURL == "" {
                 PKLog.error("Invalid media: no url")
-                self.readyCallback?(AssetError.invalidContentUrl(nil), nil)
+                self.refreshCallback?(false)
                 return
             }
             
             guard let playbackURL = playbackURL else {
                 PKLog.error("Invalid media: no url")
-                self.readyCallback?(AssetError.invalidContentUrl(nil), nil)
+                self.refreshCallback?(false)
                 return
             }
             
             DispatchQueue.main.async {
                 PKLog.debug("widevine classic:: callback url:\(playbackURL)")
-                self.readyCallback?(nil, AVURLAsset(url: URL(string: playbackURL)!))
+                self.refreshCallback?(true)
             }
         }
     }
     
+<<<<<<< HEAD
     internal func buildAsset(mediaSource: PKMediaSource, readyCallback: @escaping ReadyCallback) {
         self.readyCallback = readyCallback
+=======
+    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping ReadyCallback) {
+>>>>>>> develop
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
             readyCallback(AssetError.invalidContentUrl(nil), nil)

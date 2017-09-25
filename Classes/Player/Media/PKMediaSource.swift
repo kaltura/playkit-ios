@@ -19,6 +19,7 @@ import SwiftyJSON
         case wvm
         case mp4
         case mp3
+        case mov
         case unknown
         
         var fileExtension: String {
@@ -29,6 +30,7 @@ import SwiftyJSON
                 case .wvm: return "wvm"
                 case .mp4: return "mp4"
                 case .mp3: return "mp3"
+                case .mov: return "mov"
                 case .unknown: return ""
                 }
             }
@@ -41,6 +43,7 @@ import SwiftyJSON
             case "wvm": return .wvm
             case "mp4": return .mp4
             case "mp3": return .mp3
+            case "mov": return .mov
             default: return .unknown
             }
         }

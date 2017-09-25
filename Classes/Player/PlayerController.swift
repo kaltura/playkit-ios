@@ -12,6 +12,10 @@ import Foundation
 
 class PlayerController: NSObject, Player {
     
+    /************************************************************/
+    // MARK: - Properties
+    /************************************************************/
+    
     var onEventBlock: ((PKEvent) -> Void)?
     
     weak var delegate: PlayerDelegate?
@@ -79,6 +83,14 @@ class PlayerController: NSObject, Player {
     let sessionUUID = UUID()
     var mediaSessionUUID: UUID?
     
+    // Every player that is created should own Reachability instance
+    let reachability = PKReachability()
+    var shouldRefresh: Bool = false
+    
+    /************************************************************/
+    // MARK: - Initialization
+    /************************************************************/
+    
     public override init() {
         // Since currentPlayer is PlayerEngine! 
         // Dafault Wrapper creation for safety
@@ -92,9 +104,9 @@ class PlayerController: NSObject, Player {
         self.onEventBlock = nil
     }
     
-    // Every player that is created should own Reachability instance
-    let reachability = PKReachability()
-    var shouldRefresh: Bool = false
+    /************************************************************/
+    // MARK: - Functions
+    /************************************************************/
     
     func setMedia(from mediaConfig: MediaConfig) throws {
         self.mediaConfig = mediaConfig
@@ -201,6 +213,30 @@ class PlayerController: NSObject, Player {
         }
         
         return nil
+    }
+    
+    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) -> UUID {
+        return self.currentPlayer.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
+    }
+    
+    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
+        return self.currentPlayer.addBoundaryObserver(boundaries: boundaries, observeOn: dispatchQueue, using: block)
+    }
+    
+    func removePeriodicObserver(_ token: UUID) {
+        self.currentPlayer.removePeriodicObserver(token)
+    }
+    
+    func removeBoundaryObserver(_ token: UUID) {
+        self.currentPlayer.removeBoundaryObserver(token)
+    }
+    
+    public func removePeriodicObservers() {
+        self.currentPlayer.removePeriodicObservers()
+    }
+    
+    public func removeBoundaryObservers() {
+        self.currentPlayer.removeBoundaryObservers()
     }
 }
 

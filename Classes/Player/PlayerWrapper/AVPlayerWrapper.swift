@@ -27,8 +27,21 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     private var mediaConfig: MediaConfig?
     /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
-    var settings: PKPlayerSettings?
-    
+    var settings: PKPlayerSettings? {
+        didSet {
+            guard let settings = self.settings else {
+                PKLog.error("settings are not set")
+                return
+            }
+            
+            settings.onChange = { (settingsType) in
+                switch settingsType {
+                case .preferredPeakBitRate(let preferredPeakBitRate): self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+                }
+            }
+        }
+    }
+
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
     }
@@ -94,17 +107,6 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
-        
-        guard let settings = self.settings else {
-            PKLog.error("settings are not set")
-            return
-        }
-        
-        settings.onChange = { (settingsType) in
-            switch settingsType {
-            case .preferredPeakBitRate(let preferredPeakBitRate): self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
-            }
-        }
     }
     
     // Every player that is created should own Reachability instance
@@ -146,6 +148,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             self.currentPlayer.asset = asset
             
             if DRMSupport.widevineClassicHandler != nil {
+                self.removeAssetRefreshObservers()
                 self.addAssetRefreshObservers()
             }
         }
@@ -178,6 +181,30 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     open func destroy() {
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
+    }
+    
+    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void) -> UUID {
+        return self.currentPlayer.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
+    }
+    
+    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
+        return self.currentPlayer.addBoundaryObserver(times: boundaries.map { $0.time }, observeOn: dispatchQueue, using: block)
+    }
+    
+    public func removePeriodicObserver(_ token: UUID) {
+        self.currentPlayer.removePeriodicObserver(token)
+    }
+    
+    public func removeBoundaryObserver(_ token: UUID) {
+        self.currentPlayer.removeBoundaryObserver(token)
+    }
+    
+    public func removePeriodicObservers() {
+        self.currentPlayer.removePeriodicObservers()
+    }
+    
+    public func removeBoundaryObservers() {
+        self.currentPlayer.removeBoundaryObservers()
     }
 }
 

@@ -117,6 +117,32 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
+    func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void) -> UUID {
+        printInvocationWarning("\(#function)")
+        return UUID()
+    }
+    
+    func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
+        printInvocationWarning("\(#function)")
+        return UUID()
+    }
+    
+    func removePeriodicObserver(_ token: UUID) {
+        printInvocationWarning("\(#function)")
+    }
+    
+    func removeBoundaryObserver(_ token: UUID) {
+        printInvocationWarning("\(#function)")
+    }
+    
+    func removePeriodicObservers() {
+        printInvocationWarning("\(#function)")
+    }
+    
+    func removeBoundaryObservers() {
+        printInvocationWarning("\(#function)")
+    }
+    
     private func printInvocationWarning(_ action: String) {
         PKLog.warning("Attempt to invoke \(action) on null instance of the player")
     }
