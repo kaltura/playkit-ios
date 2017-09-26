@@ -17,8 +17,8 @@ import Foundation
     /************************************************************/
     
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePoints, adFirstQuartile, adLoaded, errorLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTouched, adThirdQuartile, adProgress, contentPauseRequested, contentResumeRequested, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adsRequestTimedOut, adBreakStarted, adBreakEnded, error
-    ] // TOOD: add adsPlaybackEnded
+        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePoints, adFirstQuartile, adLoaded, errorLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTouched, adThirdQuartile, adProgress, contentPauseRequested, contentResumeRequested, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adsRequestTimedOut, adBreakStarted, adBreakEnded, error, adsPlaybackEnded
+    ]
     
     /// An ad break is pending to be played, should pause content player at this point.
     @objc public static let adBreakPending: AdEvent.Type = AdBreakPending.self
@@ -26,6 +26,7 @@ import Foundation
     /// An ad break has ended, should resume content at this point.
     @objc public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self
     @objc public static let allAdsCompleted: AdEvent.Type = AllAdsCompleted.self
+    @objc public static let adsPlaybackEnded: AdEvent.Type = AdsPlaybackEnded.self
     @objc public static let adLoaded: AdEvent.Type = AdLoaded.self
     @objc public static let adStarted: AdEvent.Type = AdStarted.self
     @objc public static let adProgress: AdEvent.Type = AdProgress.self
@@ -102,6 +103,11 @@ import Foundation
             self.init([AdEventDataKeys.adBreakInfo: adBreakInfo, AdEventDataKeys.adBreakEndedReason: reason])
         }
     }
+    
+    /// `AdsPlaybackEnded` represents all ads in the current session was played (tells the plugin to resume the content player).
+    /// This event is most useful in cases where multiple vmap ad breaks are on the same time,
+    /// this way we know when the last one was played.
+    public class AdsPlaybackEnded: AdEvent {}
     
     /// `AllAdsCompleted` represents all ads have been played.
     public class AllAdsCompleted: AdEvent {}
