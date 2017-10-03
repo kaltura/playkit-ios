@@ -17,7 +17,7 @@ import Foundation
     /************************************************************/
     
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePoints, adFirstQuartile, adLoaded, errorLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTouched, adThirdQuartile, adProgress, contentPauseRequested, contentResumeRequested, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adsRequestTimedOut, adBreakStarted, adBreakEnded, error, adsPlaybackEnded
+        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePoints, adFirstQuartile, adLoaded, errorLog, adMidpoint, adPaused, adResumed, adStarted, adTouched, adThirdQuartile, adPlaybackProgressed, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adsRequestTimedOut, adBreakStarted, adBreakEnded, error, adsPlaybackEnded
     ]
     
     /// An ad break is pending to be played, should pause content player at this point.
@@ -29,11 +29,10 @@ import Foundation
     @objc public static let adsPlaybackEnded: AdEvent.Type = AdsPlaybackEnded.self
     @objc public static let adLoaded: AdEvent.Type = AdLoaded.self
     @objc public static let adStarted: AdEvent.Type = AdStarted.self
-    @objc public static let adProgress: AdEvent.Type = AdProgress.self
+    @objc public static let adPlaybackProgressed: AdEvent.Type = AdPlaybackProgressed.self
     @objc public static let adEnded: AdEvent.Type = AdEnded.self
     @objc public static let adPaused: AdEvent.Type = AdPaused.self
     @objc public static let adResumed: AdEvent.Type = AdResumed.self
-    @objc public static let adSkipped: AdEvent.Type = AdSkipped.self
     @objc public static let adTouched: AdEvent.Type = AdTouched.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
     @objc public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
@@ -49,10 +48,6 @@ import Foundation
     /// delivered when ads request was sent.
     @objc public static let adsRequested: AdEvent.Type = AdsRequested.self
     
-    /// Ad requested the content to pause (before ad starts playing)
-    @objc public static let contentPauseRequested: AdEvent.Type = ContentPauseRequested.self
-    /// Ad requested content resume (when finished playing ads or when error occurs and playback needs to continue)
-    @objc public static let contentResumeRequested: AdEvent.Type = ContentResumeRequested.self
     @objc public static let webOpenerEvent: AdEvent.Type = WebOpenerEvent.self
     @objc public static let adWebOpenerWillOpenExternalBrowser: AdEvent.Type = AdWebOpenerWillOpenExternalBrowser.self
     @objc public static let adWebOpenerWillOpenInAppBrowser: AdEvent.Type = AdWebOpenerWillOpenInAppBrowser.self
@@ -114,6 +109,9 @@ import Foundation
     
     /// `AdEnded` represents an ad finished playing.
     public class AdEnded: AdEvent {
+        public convenience init(reason: PKAdEndedReason) {
+            self.init([AdEventDataKeys.adEndedReason: reason])
+        }
         public convenience init(adInfo: PKAdInfo, reason: PKAdEndedReason) {
             self.init([AdEventDataKeys.adInfo: adInfo, AdEventDataKeys.adEndedReason: reason])
         }
@@ -144,13 +142,6 @@ import Foundation
     
     /// `AdResumed` represents an ad was resumed.
     public class AdResumed: AdEvent {}
-    
-    /// `AdSkipped` represents an ad was skipped.
-    public class AdSkipped: AdEvent {
-        public convenience init(offset: TimeInterval) {
-            self.init([AdEventDataKeys.offset: NSNumber(value: offset)])
-        }
-    }
     
     /// `AdTouched` represents an ad was touched outside the click through button.
     public class AdTouched: AdEvent {}
@@ -183,15 +174,12 @@ import Foundation
     }
     
     /// The ad timed progress events
-    public class AdProgress: AdEvent {
+    public class AdPlaybackProgressed: AdEvent {
         public convenience init(mediaTime: TimeInterval, totalTime: TimeInterval) {
             self.init([AdEventDataKeys.mediaTime: NSNumber(value: mediaTime),
                        AdEventDataKeys.totalTime: NSNumber(value: totalTime)])
         }
     }
-    
-    public class ContentPauseRequested: AdEvent {}
-    public class ContentResumeRequested: AdEvent {}
     
     /// Sent when the ads request timed out.
     public class AdsRequestTimedOut: AdEvent {}
