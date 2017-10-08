@@ -118,8 +118,7 @@ extension YouboraAdnalyzerManager {
             AdEvent.adEnded,
             AdEvent.adResumed,
             AdEvent.adPaused,
-            AdEvent.adProgress,
-            AdEvent.adSkipped,
+            AdEvent.adPositionUpdated,
             AdEvent.adStartedBuffering,
             AdEvent.adPlaybackReady,
             AdEvent.adsRequested,
@@ -150,7 +149,13 @@ extension YouboraAdnalyzerManager {
                 }
             case let e where e.self == AdEvent.adEnded:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.endedAdHandler()
+                    if let adEndedReason = event.adEndedReason {
+                        switch adEndedReason.reasonType {
+                        case .completed: self?.endedAdHandler()
+                        case .skipped: self?.skipAdHandler()
+                        case .adError: break
+                        }
+                    }
                     self?.adInfo = nil
                 }
             case let e where e.self == AdEvent.adResumed:
@@ -166,14 +171,10 @@ extension YouboraAdnalyzerManager {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     self?.pauseAdHandler()
                 }
-            case let e where e.self == AdEvent.adProgress:
+            case let e where e.self == AdEvent.adPositionUpdated:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     // update ad playhead with new data
                     self?.adPlayhead = event.adMediaTime?.doubleValue
-                }
-            case let e where e.self == AdEvent.adSkipped:
-                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.skipAdHandler()
                 }
             case let e where e.self == AdEvent.adStartedBuffering:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in

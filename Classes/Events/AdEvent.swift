@@ -17,7 +17,8 @@ import Foundation
     /************************************************************/
     
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePoints, adFirstQuartile, adLoaded, errorLog, adMidpoint, adPaused, adResumed, adStarted, adTouched, adThirdQuartile, adPlaybackProgressed, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adsRequestTimedOut, adBreakStarted, adBreakEnded, error, adsPlaybackEnded
+        adBreakPending, allAdsCompleted, adEnded, adClicked, adCuePointsUpdated, firstQuartile, adLoaded, errorLog, midpoint, adPaused, adResumed,
+        adStarted, adTouched, thirdQuartile, adPositionUpdated, adsRequestTimedOut, adBreakStarted, adBreakEnded, error, adsPlaybackEnded
     ]
     
     /// An ad break is pending to be played, should pause content player at this point.
@@ -29,16 +30,16 @@ import Foundation
     @objc public static let adsPlaybackEnded: AdEvent.Type = AdsPlaybackEnded.self
     @objc public static let adLoaded: AdEvent.Type = AdLoaded.self
     @objc public static let adStarted: AdEvent.Type = AdStarted.self
-    @objc public static let adPlaybackProgressed: AdEvent.Type = AdPlaybackProgressed.self
+    @objc public static let adPositionUpdated: AdEvent.Type = AdPositionUpdated.self
     @objc public static let adEnded: AdEvent.Type = AdEnded.self
     @objc public static let adPaused: AdEvent.Type = AdPaused.self
     @objc public static let adResumed: AdEvent.Type = AdResumed.self
     @objc public static let adTouched: AdEvent.Type = AdTouched.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
-    @objc public static let adFirstQuartile: AdEvent.Type = AdFirstQuartile.self
-    @objc public static let adMidpoint: AdEvent.Type = AdMidpoint.self
-    @objc public static let adThirdQuartile: AdEvent.Type = AdThirdQuartile.self
-    @objc public static let adCuePoints: AdEvent.Type = AdCuePoints.self
+    @objc public static let firstQuartile: AdEvent.Type = FirstQuartile.self
+    @objc public static let midpoint: AdEvent.Type = Midpoint.self
+    @objc public static let thirdQuartile: AdEvent.Type = ThirdQuartile.self
+    @objc public static let adCuePointsUpdated: AdEvent.Type = AdCuePointsUpdated.self
     /// Sent when an ad started buffering
     @objc public static let adStartedBuffering: AdEvent.Type = AdStartedBuffering.self
     /// Sent when ad finished buffering and ready for playback
@@ -47,13 +48,6 @@ import Foundation
     @objc public static let adsRequestTimedOut: AdEvent.Type = AdsRequestTimedOut.self
     /// delivered when ads request was sent.
     @objc public static let adsRequested: AdEvent.Type = AdsRequested.self
-    
-    @objc public static let webOpenerEvent: AdEvent.Type = WebOpenerEvent.self
-    @objc public static let adWebOpenerWillOpenExternalBrowser: AdEvent.Type = AdWebOpenerWillOpenExternalBrowser.self
-    @objc public static let adWebOpenerWillOpenInAppBrowser: AdEvent.Type = AdWebOpenerWillOpenInAppBrowser.self
-    @objc public static let adWebOpenerDidOpenInAppBrowser: AdEvent.Type = AdWebOpenerDidOpenInAppBrowser.self
-    @objc public static let adWebOpenerWillCloseInAppBrowser: AdEvent.Type = AdWebOpenerWillCloseInAppBrowser.self
-    @objc public static let adWebOpenerDidCloseInAppBrowser: AdEvent.Type = AdWebOpenerDidCloseInAppBrowser.self
     
     /// Sent when an error occurs.
     @objc public static let error: AdEvent.Type = Error.self
@@ -125,13 +119,13 @@ import Foundation
     }
     
     /// `AdFirstQuartile` ad arrived at first quartile.
-    public class AdFirstQuartile: AdEvent {}
+    public class FirstQuartile: AdEvent {}
     
     /// `AdMidpoint` ad arrived at midpoint.
-    public class AdMidpoint: AdEvent {}
+    public class Midpoint: AdEvent {}
     
     /// `AdThirdQuartile` ad arrived at third quartile.
-    public class AdThirdQuartile: AdEvent {}
+    public class ThirdQuartile: AdEvent {}
     
     /// `AdPaused` represents an ad was paused.
     public class AdPaused: AdEvent {
@@ -153,7 +147,7 @@ import Foundation
     public class AdPlaybackReady: AdEvent {}
     
     // `AdCuePointsUpdate` event is received when ad cue points were updated. only sent when there is more then 0.
-    public class AdCuePoints: AdEvent {
+    public class AdCuePointsUpdated: AdEvent {
         public convenience init(adCuePoints: PKAdCuePoints) {
             self.init([AdEventDataKeys.adCuePoints: adCuePoints])
         }
@@ -174,7 +168,7 @@ import Foundation
     }
     
     /// The ad timed progress events
-    public class AdPlaybackProgressed: AdEvent {
+    public class AdPositionUpdated: AdEvent {
         public convenience init(mediaTime: TimeInterval, totalTime: TimeInterval) {
             self.init([AdEventDataKeys.mediaTime: NSNumber(value: mediaTime),
                        AdEventDataKeys.totalTime: NSNumber(value: totalTime)])
@@ -186,15 +180,6 @@ import Foundation
     
     /// delivered when ads request was sent.
     public class AdsRequested: AdEvent {
-        public convenience init(adTagUrl: String) {
-            self.init([AdEventDataKeys.adTagUrl: adTagUrl])
-        }
-    }
-    
-    /// `AdsAndContentEnded` sent when both ads and content has completed playing.
-    /// - important: even if some ads were skipped by seeking when the content has ended 
-    /// and post-roll was played (only if we had one) we send this event.
-    public class AdsAndContentEnded: AdEvent {
         public convenience init(adTagUrl: String) {
             self.init([AdEventDataKeys.adTagUrl: adTagUrl])
         }

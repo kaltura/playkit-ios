@@ -100,7 +100,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         self.endedHandler()
         self.stopMonitoring()
         // remove ad observers
-        self.messageBus?.removeObserver(self, events: [AdEvent.adCuePoints, AdEvent.allAdsCompleted])
+        self.messageBus?.removeObserver(self, events: [AdEvent.adCuePointsUpdated, AdEvent.allAdsCompleted])
         AppStateSubject.shared.remove(observer: self)
         super.destroy()
     }

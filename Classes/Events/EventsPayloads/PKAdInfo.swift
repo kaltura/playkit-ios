@@ -28,14 +28,16 @@ import Foundation
 /// `PKAdInfo` represents ad information.
 @objc public class PKAdInfo: NSObject {
     
+    /// The title of the ad.
     @objc public var title: String
     /// The position of the pod in the content in seconds. Pre-roll returns 0,
     /// post-roll returns -1 and mid-rolls return the scheduled time of the pod.
     @objc public var timeOffset: TimeInterval
     /// The ad duration.
     @objc public var duration: TimeInterval
-    /// the ad description
+    /// the ad description.
     @objc public var adDescription: String?
+    /// The skip offset, if ad is not skippable will be nil, if ad is skippable and offest isn't available will be -1.
     @objc public var skipOffset: NSNumber?
     /// The ad id from the vast respone
     @objc public var adId: String
