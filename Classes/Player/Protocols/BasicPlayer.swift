@@ -17,9 +17,6 @@ import Foundation
     /// The player's currentState.
     @objc var currentState: PlayerState { get }
     
-    /// Indicates if player is playing.
-    @objc var isPlaying: Bool { get }
-    
     /// The player's view component.
     @objc weak var view: PlayerView? { get set }
     
