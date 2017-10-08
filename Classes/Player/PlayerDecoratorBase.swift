@@ -158,14 +158,6 @@ import AVKit
     public func removeBoundaryObserver(_ token: UUID) {
         self.player.removeBoundaryObserver(token)
     }
-    
-    public func removePeriodicObservers() {
-        self.player.removePeriodicObservers()
-    }
-    
-    public func removeBoundaryObservers() {
-        self.player.removeBoundaryObservers()
-    }
 }
 
 /************************************************************/
