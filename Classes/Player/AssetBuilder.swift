@@ -21,7 +21,7 @@ class AssetBuilder {
         
         let defaultHandler = DefaultAssetHandler.self
         
-        // Preference: Local, HLS, FPS*, MP4, WVM*, MP3
+        // Preference: Local, HLS, FPS*, MP4, WVM*, MP3, MOV
         
         if let source = sources.first(where: {$0 is LocalMediaSource}) {
             if source.fileExt == "wvm" {
@@ -32,24 +32,24 @@ class AssetBuilder {
         }
         
         if DRMSupport.fairplay {
-            if let source = sources.first(where: {$0.fileExt=="m3u8"}) {
+            if let source = sources.first(where: {$0.fileExt == "m3u8"}) {
                 return (source, defaultHandler)
             }
         } else {
-            if let source = sources.first(where: {$0.fileExt=="m3u8" && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
+            if let source = sources.first(where: {$0.fileExt == "m3u8" && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
                 return (source, defaultHandler)
             }
         }
         
-        if let source = sources.first(where: {$0.fileExt=="mp4"}) {
+        if let source = sources.first(where: {$0.fileExt == "mp4"}) {
             return (source, defaultHandler)
         }
         
-        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt=="wvm"}) {
+        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt == "wvm"}) {
             return (source, DRMSupport.widevineClassicHandler!)
         }
         
-        if let source = sources.first(where: {$0.fileExt=="mp3"}) {
+        if let source = sources.first(where: {$0.fileExt == "mp3" || $0.fileExt == "mov"}) {
             return (source, defaultHandler)
         }
         
