@@ -129,12 +129,6 @@ import AVKit
     
     /// removes a single boundary observer using the uuid provided when added the observation.
     @objc func removeBoundaryObserver(_ token: UUID)
-    
-    /// removes the added time observers (has no effect if no observers were added).
-    @objc func removePeriodicObservers()
-    
-    /// removes the added time boundary observers (has no effect if no observers were added).
-    @objc func removeBoundaryObservers()
 }
 
 public protocol PlayerDecoratorProvider {
