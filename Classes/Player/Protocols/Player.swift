@@ -15,19 +15,15 @@ import UIKit
     @objc optional func shouldAddPlayerViewController(_ vc: UIViewController)
 }
 
-///// `PlayerSettings` used for optional `Player` settings.
-//@objc public protocol PKPlayerSettings {
-//    var contentRequestAdapter: PKRequestParamsAdapter? { get set }
-//}
-
 @objc public protocol Player: BasicPlayer {
     
+    /// The player's delegate.
     @objc weak var delegate: PlayerDelegate? { get set }
     
     /// The player's associated media entry.
     @objc weak var mediaEntry: PKMediaEntry? { get }
     
-    /// the player's settings
+    /// The player's settings.
     @objc var settings: PKPlayerSettings { get }
     
     /// The player's session id. the `sessionId` is initialized when the player loads.

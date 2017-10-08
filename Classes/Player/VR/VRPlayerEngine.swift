@@ -11,7 +11,10 @@
 import Foundation
 import AVFoundation
 
-/// A State is an enum of different player states
+/************************************************************/
+// MARK: - ViewState
+/************************************************************/
+
 @objc public enum ViewState: Int {
     /// Sent when player's view state panorama.
     case panorama
@@ -23,10 +26,30 @@ import AVFoundation
     case unknown = -1
 }
 
+/************************************************************/
+// MARK: - VRPlayerEngine
+/************************************************************/
+
+/// `VRPlayerEngine` protocol defines the methods needed to implement in order to work with the vr player engine.
 public protocol VRPlayerEngine: PlayerEngine {
+    /// VRPlayerEngine initializer
+    ///
+    /// - Parameter delegate: object that conforms to PlayerDelegate protocol.
     init(delegate: PlayerDelegate?)
+    
+    /// Current View State
     var currentViewState: ViewState { get }
-    var isEnabled: Bool { get set }
+
+    /// Enable VR Mode - Stereo display for Google's Cardboard.
+    ///
+    /// - Parameter isEnabled: Toggle to enable vr mode.
     func setVRModeEnabled(_ isEnabled: Bool)
+    
+    /// Requests reset of rotation in the next rendering frame.
     func centerViewPoint()
+    
+    /// Creates the orientation indicator view.
+    ///
+    /// - Parameter frame: The frame of orientation indicator view.
+    func createOrientationIndicatorView(frame: CGRect) -> UIView
 }

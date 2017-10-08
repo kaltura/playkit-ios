@@ -10,6 +10,8 @@
 
 import Foundation
 
+
+/// This class will be filled with some relevant properties at the future.
+/// For now this class is allocated and uses as indicator when VR content is detected.
 class VRData {
-    
 }
