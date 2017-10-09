@@ -113,7 +113,8 @@ class AVPlayerEngine: AVPlayer {
         }
         
         PKLog.trace("get duration: \(result)")
-        return result
+        // in some rare cases duration can be nan, in that case we will return 0.
+        return result.isNaN ? 0.0 : result
     }
     
     var isPlaying: Bool {
