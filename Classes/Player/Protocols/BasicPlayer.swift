@@ -80,7 +80,7 @@ import Foundation
     /// - Parameters:
     ///   - boundaries: boundary objects.
     ///   - dispatchQueue: dispatch queue to observe changes on (nil value will use main).
-    ///   - block: block to handle the observation with the observed boundary.
+    ///   - block: block to handle the observation with the observed boundary, block returns (time, boundary percentage).
     /// - Returns: A uuid token to represent the observation, used to later remove a single observation.
     /// - Attention: if a boundary is crossed while seeking the observation **won't be triggered**.
     @objc func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) -> UUID
@@ -90,10 +90,4 @@ import Foundation
     
     /// removes a single boundary observer using the uuid provided when added the observation.
     @objc func removeBoundaryObserver(_ token: UUID)
-    
-    /// removes the added time observers (has no effect if no observers were added).
-    @objc func removePeriodicObservers()
-    
-    /// removes the added time boundary observers (has no effect if no observers were added).
-    @objc func removeBoundaryObservers()
 }
