@@ -41,11 +41,25 @@ import UIKit
     /// Remove Observer for several events.
     @objc func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
     
-    /// Update Plugin Config
+    /// Update Plugin Config.
     @objc func updatePluginConfig(pluginName: String, config: Any)
     
     /// Getter for playkit controllers.
+    ///
+    /// - Parameter type: Required class type.
+    /// - Returns: Relevant controller if exist.
     @objc func getController(type: PKController.Type) -> PKController?
+}
+
+extension Player {
+    
+    /// Getter for playkit controllers.
+    ///
+    /// - Parameter type: Required class type.
+    /// - Returns: Relevant controller if exist.
+    public func getController<T: PKController>(ofType type: T.Type) -> T? {
+        return self.getController(type: type) as? T
+    }
 }
 
 public protocol PlayerDecoratorProvider {
