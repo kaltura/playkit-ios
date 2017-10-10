@@ -90,4 +90,10 @@ import Foundation
     
     /// removes a single boundary observer using the uuid provided when added the observation.
     @objc func removeBoundaryObserver(_ token: UUID)
+    
+    /// removes a single periodic observer using the uuid provided when added the observation.
+    @objc func removePeriodicObservers()
+    
+    /// removes a single boundary observer using the uuid provided when added the observation.
+    @objc func removeBoundaryObservers()
 }
