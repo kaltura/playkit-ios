@@ -113,7 +113,7 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
-    func prepare(_ MediaConfig: MediaConfig) {
+    func prepare(_ mediaConfig: MediaConfig) {
         printInvocationWarning("\(#function)")
     }
     

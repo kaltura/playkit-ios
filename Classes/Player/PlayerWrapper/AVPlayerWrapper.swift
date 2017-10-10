@@ -115,10 +115,13 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     
     /// Load media on player
     public func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type) {
-        //todo::
-        // build the asset from the selected source
-        // TODO:: media sec fix no !
-        self.assetHandler = AssetBuilder.build(from: mediaSource!, using: handlerType) { error, asset in
+
+        guard let mediaSrc = mediaSource else {
+            PKLog.error("Media Source is empty")
+            return
+        }
+        
+        self.assetHandler = AssetBuilder.build(from: mediaSrc, using: handlerType) { error, asset in
             if asset != nil {
                 self.assetToPrepare = asset
             }
@@ -127,7 +130,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         }
     }
     
-    public func prepare(_ MediaConfig: MediaConfig) throws {
+    public func prepare(_ mediaConfig: MediaConfig) throws {
         // set background thread to make sure main thread is not stuck while waiting
         DispatchQueue.global().async {
             // wait till assetToPrepare is set

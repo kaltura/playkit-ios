@@ -16,7 +16,7 @@ class FormatsHelper {
     
    static let supportedSchemes: [DRMParams.Scheme] = [.fairplay, .widevineClassic]
 
-   static func getMediaFormat (format: String, hasDrm: Bool) -> PKMediaSource.MediaFormat {
+   static func getMediaFormat(format: String, hasDrm: Bool) -> PKMediaSource.MediaFormat {
 
             switch format {
             case "applehttp":
