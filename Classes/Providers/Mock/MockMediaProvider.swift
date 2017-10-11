@@ -51,7 +51,7 @@ import SwiftyJSON
          var content: JSON
     }
 
-    @objc public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
+    @objc public func loadMedia(callback: @escaping (PKMediaEntry?, Error?) -> Void) {
 
         guard let id = self.id else {
             callback(nil, MockError.invalidParam(paramName: "id"))
@@ -91,7 +91,7 @@ import SwiftyJSON
             return
         }
 
-        let mediaEntry = MediaEntry(json: jsonObject.object)
+        let mediaEntry = PKMediaEntry(json: jsonObject.object)
         callback(mediaEntry, nil)
     }
 

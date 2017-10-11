@@ -18,7 +18,7 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
     
     var refreshCallback: RefreshCallback?
     
-    static let sourceFilter = { (_ src: MediaSource) -> Bool in
+    static let sourceFilter = { (_ src: PKMediaSource) -> Bool in
         
         // FIXME: extension is not the best criteria here, use format when that's available.
         guard let ext = src.contentUrl?.pathExtension else {
@@ -39,8 +39,9 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         return false
     }
     
-    func shouldRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping RefreshCallback) {
+    func shouldRefreshAsset(mediaSource: PKMediaSource, refreshCallback: @escaping RefreshCallback) {
         self.refreshCallback = refreshCallback
+
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
             refreshCallback(false)
@@ -60,7 +61,7 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         }
     }
     
-    func refreshAsset(mediaSource: MediaSource) {
+    func refreshAsset(mediaSource: PKMediaSource) {
         
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
@@ -89,7 +90,7 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         }
     }
     
-    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping ReadyCallback) {
+    func buildAsset(mediaSource: PKMediaSource, readyCallback: @escaping ReadyCallback) {
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
             readyCallback(AssetError.invalidContentUrl(nil), nil)

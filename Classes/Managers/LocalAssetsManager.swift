@@ -61,7 +61,7 @@ import AVFoundation
         - asset: an AVURLAsset, ready to be downloaded
         - mediaSource: the original source for the asset. mediaSource.contentUrl and asset.url should point at the same file.
     */
-    @objc public func prepareForDownload(asset: AVURLAsset, mediaSource: MediaSource) {
+    @objc public func prepareForDownload(asset: AVURLAsset, mediaSource: PKMediaSource) {
         
         // This function is a noop if no DRM data or DRM is not FairPlay.
         guard let drmData = mediaSource.drmData?.first as? FairPlayDRMParams else {return}
@@ -83,21 +83,21 @@ import AVFoundation
 
     }
 
-    /// Create a MediaSource for a local asset. This allows the player to play a downloaded asset.
-    private func createLocalMediaSource(for assetId: String, localURL: URL) -> MediaSource {
+    /// Create a PKMediaSource for a local asset. This allows the player to play a downloaded asset.
+    private func createLocalMediaSource(for assetId: String, localURL: URL) -> PKMediaSource {
         return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
     }
 
-    /// Create a MediaEntry for a local asset. This is a convenience function that wraps the result of
-    /// `createLocalMediaSource(for:localURL:)` with a MediaEntry.
-    @objc public func createLocalMediaEntry(for assetId: String, localURL: URL) -> MediaEntry {
+    /// Create a PKMediaEntry for a local asset. This is a convenience function that wraps the result of
+    /// `createLocalMediaSource(for:localURL:)` with a PKMediaEntry.
+    @objc public func createLocalMediaEntry(for assetId: String, localURL: URL) -> PKMediaEntry {
         let mediaSource = createLocalMediaSource(for: assetId, localURL: localURL)
-        return MediaEntry.init(assetId, sources: [mediaSource])
+        return PKMediaEntry.init(assetId, sources: [mediaSource])
     }
     
-    /// Get the preferred MediaSource for download purposes. This function takes into account
+    /// Get the preferred PKMediaSource for download purposes. This function takes into account
     /// the capabilities of the device.
-    @objc public func getPreferredDownloadableMediaSource(for mediaEntry: MediaEntry) -> MediaSource? {
+    @objc public func getPreferredDownloadableMediaSource(for mediaEntry: PKMediaEntry) -> PKMediaSource? {
 
         guard let sources = mediaEntry.sources else {
             PKLog.error("no media sources in mediaEntry!")
@@ -129,7 +129,7 @@ import AVFoundation
     }
     
     /// Notifies the SDK that downloading of an asset has finished.
-    public func assetDownloadFinished(location: URL, mediaSource: MediaSource, callback: @escaping (Error?) -> Void) {
+    public func assetDownloadFinished(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
         // FairPlay -- nothing to do
 
         // Widevine
@@ -139,7 +139,7 @@ import AVFoundation
     }
     
     /// Renew Downloaded Asset
-    public func renewDownloadedAsset(location: URL, mediaSource: MediaSource, callback: @escaping (Error?) -> Void) {
+    public func renewDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
         // FairPlay -- nothing to do
         
         // Widevine
@@ -221,8 +221,8 @@ import AVFoundation
 
 extension LocalAssetsManager {
     
-    /// Prepare a MediaEntry for download using AVAssetDownloadTask.
-    public func prepareForDownload(of mediaEntry: MediaEntry) -> (AVURLAsset, MediaSource)? {
+    /// Prepare a PKMediaEntry for download using AVAssetDownloadTask.
+    public func prepareForDownload(of mediaEntry: PKMediaEntry) -> (AVURLAsset, PKMediaSource)? {
         guard let source = getPreferredDownloadableMediaSource(for: mediaEntry) else { return nil }
         guard let url = source.contentUrl else { return nil }
         let avAsset = AVURLAsset(url: url)
@@ -231,7 +231,7 @@ extension LocalAssetsManager {
     }
 }
 
-class LocalMediaSource: MediaSource {
+class LocalMediaSource: PKMediaSource {
     let storage: LocalDataStore
 
     init(storage: LocalDataStore, id: String, localContentUrl: URL) {

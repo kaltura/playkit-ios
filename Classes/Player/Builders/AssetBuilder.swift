@@ -13,7 +13,7 @@ import AVFoundation
 
 class AssetBuilder {
     
-    static func getPreferredMediaSource(from mediaEntry: MediaEntry) -> (MediaSource, AssetHandler.Type)? {
+    static func getPreferredMediaSource(from mediaEntry: PKMediaEntry) -> (PKMediaSource, AssetHandler.Type)? {
         guard let sources = mediaEntry.sources else {
             PKLog.error("no media sources in mediaEntry!")
             return nil
@@ -58,21 +58,21 @@ class AssetBuilder {
     }
     
     // builds the asset from the selected media source
-    static func build(from mediaSource: MediaSource, using assetHandlerType: AssetHandler.Type, readyCallback: @escaping (Error?, AVURLAsset?) -> Void) -> AssetHandler {
+    static func build(from mediaSource: PKMediaSource, using assetHandlerType: AssetHandler.Type, readyCallback: @escaping (Error?, AVURLAsset?) -> Void) -> AssetHandler {
         let handler = assetHandlerType.init()
         handler.buildAsset(mediaSource: mediaSource, readyCallback: readyCallback)
         return handler
     }
 }
 
-protocol AssetHandler {
+@objc public protocol AssetHandler {
     init()
-    func buildAsset(mediaSource: MediaSource, readyCallback: @escaping (Error?, AVURLAsset?) -> Void)
+    func buildAsset(mediaSource: PKMediaSource, readyCallback: @escaping (Error?, AVURLAsset?) -> Void)
 }
 
 protocol RefreshableAssetHandler: AssetHandler {
-    func shouldRefreshAsset(mediaSource: MediaSource, refreshCallback: @escaping (Bool) -> Void)
-    func refreshAsset(mediaSource: MediaSource)
+    func shouldRefreshAsset(mediaSource: PKMediaSource, refreshCallback: @escaping (Bool) -> Void)
+    func refreshAsset(mediaSource: PKMediaSource)
 }
 
 enum AssetError : Error {

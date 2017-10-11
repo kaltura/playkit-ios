@@ -1,30 +1,24 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license, unless a different license for a 
+// Licensed under the AGPLv3 license, unless a different license for a
 // particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-import UIKit
-import AVFoundation
-import AVKit
+import Foundation
 
-@objc public protocol PlayerDelegate {
-    func playerShouldPlayAd(_ player: Player) -> Bool
-}
-
-@objc public protocol Player {
+@objc public protocol BasicPlayer {
+    /// The player's duration.
+    @objc var duration: TimeInterval { get }
     
-    @objc weak var delegate: PlayerDelegate? { get set }
+    /// The player's currentState.
+    @objc var currentState: PlayerState { get }
     
-    /// The player's associated media entry.
-    @objc weak var mediaEntry: MediaEntry? { get }
-    
-    /// the player's settings
-    @objc var settings: PKPlayerSettings { get }
+    /// Indicates if player is playing.
+    @objc var isPlaying: Bool { get }
     
     /// The player's view component.
     @objc weak var view: PlayerView? { get set }
@@ -32,32 +26,17 @@ import AVKit
     /// The current player position.
     @objc var currentTime: TimeInterval { get set }
     
-    /// The player's currentState.
-    @objc var currentState: PlayerState { get }
-    
-    /// The player's duration.
-    @objc var isPlaying: Bool { get }
-    
-    /// The player's duration.
-    @objc var duration: TimeInterval { get }
-    
     /// Get the player's current audio track.
     @objc var currentAudioTrack: String? { get }
     
     /// Get the player's current text track.
     @objc var currentTextTrack: String? { get }
     
-    /// The player's session id. the `sessionId` is initialized when the player loads.
-    @objc var sessionId: String { get }
-
     /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
     @objc var rate: Float { get }
     
     /// Provides a collection of time ranges for which the player has the media data readily available. The ranges provided might be discontinuous.
     @objc var loadedTimeRanges: [PKTimeRange]? { get }
-    
-    /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
-    @objc func prepare(_ config: MediaConfig)
     
     /// send play action for the player.
     @objc func play()
@@ -72,34 +51,16 @@ import AVKit
     @objc func stop()
     
     /// send seek action for the player.
-    @objc func seek(to time: CMTime)
-
-    /// Release player resources.
-    @objc func destroy()
-    
-    /// Add Observation to relevant event.
-    @objc func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void)
-    
-    /// Add Observation to relevant events.
-    @objc func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void)
-    
-    /// Remove Observer for single event.
-    @objc func removeObserver(_ observer: AnyObject, event: PKEvent.Type)
-    
-    /// Remove Observer for several events.
-    @objc func removeObserver(_ observer: AnyObject, events: [PKEvent.Type])
+    @objc func seek(to time: TimeInterval)
     
     /// Select Track
     @objc func selectTrack(trackId: String)
     
-    /// Update Plugin Config
-    @objc func updatePluginConfig(pluginName: String, config: Any)
+    /// Release player resources.
+    @objc func destroy()
     
-    #if os(iOS)
-    /// Create PiP Controller
-    @available(iOS 9.0, *)
-    @objc func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController?
-    #endif
+    /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
+    @objc func prepare(_ config: MediaConfig) throws
     
     /************************************************************/
     // MARK: - Time Observation
@@ -129,8 +90,10 @@ import AVKit
     
     /// removes a single boundary observer using the uuid provided when added the observation.
     @objc func removeBoundaryObserver(_ token: UUID)
-}
-
-public protocol PlayerDecoratorProvider {
-    func getPlayerDecorator() -> PlayerDecoratorBase?
+    
+    /// removes a single periodic observer using the uuid provided when added the observation.
+    @objc func removePeriodicObservers()
+    
+    /// removes a single boundary observer using the uuid provided when added the observation.
+    @objc func removeBoundaryObservers()
 }

@@ -25,7 +25,7 @@ import AVKit
         }
     }
 
-    weak public var mediaEntry: MediaEntry? {
+    weak public var mediaEntry: PKMediaEntry? {
         return self.player.mediaEntry
     }
     
@@ -83,8 +83,8 @@ import AVKit
         return self.player.loadedTimeRanges
     }
     
-    open func prepare(_ config: MediaConfig) {
-        return self.player.prepare(config)
+    open func prepare(_ config: MediaConfig) throws {
+        try self.player.prepare(config)
     }
     
     public func setPlayer(_ player: Player!) {
@@ -107,7 +107,7 @@ import AVKit
         self.player.pause()
     }
     
-    open func seek(to time: CMTime) {
+    open func seek(to time: TimeInterval) {
         self.player.seek(to: time)
     }
     
@@ -143,6 +143,10 @@ import AVKit
         self.player.selectTrack(trackId: trackId)
     }
     
+    public func getController(type: PKController.Type) -> PKController? {
+        return self.player.getController(type: type)
+    }
+    
     public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) -> UUID {
         return self.player.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
     }
@@ -158,18 +162,12 @@ import AVKit
     public func removeBoundaryObserver(_ token: UUID) {
         self.player.removeBoundaryObserver(token)
     }
-}
-
-/************************************************************/
-// MARK: - iOS Only
-/************************************************************/
-
-#if os(iOS)
-    extension PlayerDecoratorBase {
-        
-        @available(iOS 9.0, *)
-        open func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-            return self.player.createPiPController(with: delegate)
-        }
+    
+    public func removePeriodicObservers() {
+        self.player.removePeriodicObservers()
     }
-#endif
+    
+    public func removeBoundaryObservers() {
+         self.player.removeBoundaryObservers()
+    }
+}

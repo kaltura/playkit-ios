@@ -104,7 +104,7 @@ extension AVPlayerEngine {
         self.post(event: PlayerEvent.Ended())
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         PKLog.debug("observeValue:: onEvent/onState")
         
         guard context == &AVPlayerEngine.observerContext else {

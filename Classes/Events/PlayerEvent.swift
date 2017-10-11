@@ -83,7 +83,7 @@ import AVFoundation
     class Seeked: PlayerEvent {}
     
     class SourceSelected: PlayerEvent {
-        convenience init(mediaSource: MediaSource) {
+        convenience init(mediaSource: PKMediaSource) {
             self.init([EventDataKeys.mediaSource: mediaSource])
         }
     }
