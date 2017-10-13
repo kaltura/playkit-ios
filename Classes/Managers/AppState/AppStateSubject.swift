@@ -175,7 +175,7 @@ public func == (lhs: NotificationObservation, rhs: NotificationObservation) -> B
     return lhs.name.rawValue == rhs.name.rawValue
 }
 
-public class AppStateObserver: AnyObject {
+public class AppStateObserver: Any {
     weak var observer: AppStateObservable?
     init(_ observer: AppStateObservable) {
         self.observer = observer

@@ -272,8 +272,7 @@ class AssetLoaderDelegate: NSObject {
         // Check if this reuqest is the result of a potential AVAssetDownloadTask.
         if #available(iOS 10.0, *), shouldPersist {
             // Since this request is the result of an AVAssetDownloadTask, we should get the secure persistent content key.
-            var error: NSError?
-            
+
             /*
              Obtain a persistable content key from a context.
              
@@ -282,31 +281,30 @@ class AssetLoaderDelegate: NSObject {
              
              The value of AVAssetResourceLoadingContentInformationRequest.contentType must be set to AVStreamingKeyDeliveryPersistentContentKeyType when responding with data created with this method.
              */
-            let persistentContentKeyData = resourceLoadingRequest.persistentContentKey(fromKeyVendorResponse: ckcData, options: nil, error: &error)
-            
-            if let error = error {
+
+            do {
+                let persistentContentKeyData = try resourceLoadingRequest.persistentContentKey(fromKeyVendorResponse: ckcData, options: nil)
+                // Save the persistentContentKeyData onto disk for use in the future.
+                PKLog.debug("Saving persistentContentKeyData")
+                self.savePersistentContentKeyData(assetId, persistentContentKeyData)
+
+                guard let dataRequest = resourceLoadingRequest.dataRequest else {
+                    PKLog.error("no data is being requested in loadingRequest")
+                    let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
+                    resourceLoadingRequest.finishLoading(with: error)
+                    self.done?(error)
+                    return
+                }
+                // Provide data to the loading request.
+                dataRequest.respond(with: persistentContentKeyData)
+                resourceLoadingRequest.finishLoading()  // Treat the processing of the request as complete.
+                self.done?(nil)
+            } catch {
                 PKLog.error("Error creating persistent content key: \(error)")
                 resourceLoadingRequest.finishLoading(with: error)
                 self.done?(error)
                 return
             }
-            
-            // Save the persistentContentKeyData onto disk for use in the future.
-            PKLog.debug("Saving persistentContentKeyData")
-            self.savePersistentContentKeyData(assetId, persistentContentKeyData)
-            
-            guard let dataRequest = resourceLoadingRequest.dataRequest else {
-                PKLog.error("no data is being requested in loadingRequest")
-                let error = NSError(domain: AssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
-                resourceLoadingRequest.finishLoading(with: error)
-                self.done?(error)
-                return
-            }
-            // Provide data to the loading request.
-            dataRequest.respond(with: persistentContentKeyData)
-            resourceLoadingRequest.finishLoading()  // Treat the processing of the request as complete.
-            self.done?(nil)
-            
         } else {
             
             guard let dataRequest = resourceLoadingRequest.dataRequest else {
