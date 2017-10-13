@@ -56,14 +56,14 @@ class TracksManager: NSObject {
     }
     
     public func currentAudioTrack(item: AVPlayerItem) -> String? {
-        if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicAudible), let option = item.selectedMediaOption(in: group) {
+        if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.audible), let option = item.selectedMediaOption(in: group) {
             return self.audioTracks?.filter{($0.title == option.displayName)}.first?.id
         }
         return nil
     }
     
     public func currentTextTrack(item: AVPlayerItem) -> String? {
-        if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicLegible) {
+        if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.legible) {
             var displayName: String
             if let option = item.selectedMediaOption(in: group) {
                 displayName = option.displayName
@@ -78,7 +78,7 @@ class TracksManager: NSObject {
     private func handleAudioTracks(item: AVPlayerItem) {
         PKLog.trace("handleAudioTracks")
         
-        item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicAudible)?.options.forEach { (option) in
+        item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.audible)?.options.forEach { (option) in
             
             PKLog.trace("option:: \(option)")
             
@@ -100,7 +100,7 @@ class TracksManager: NSObject {
     private func selectAudioTrack(item: AVPlayerItem, index: Int) {
         PKLog.trace("selectAudioTrack")
         
-        let audioSelectionGroup = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicAudible)
+        let audioSelectionGroup = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.audible)
         var trackIndex = 0
         audioSelectionGroup?.options.forEach { (option) in
             
@@ -117,7 +117,7 @@ class TracksManager: NSObject {
         PKLog.trace("handleTextTracks")
         
         var optionMediaType = ""
-        item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicLegible)?.options.forEach { (option) in
+        item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.legible)?.options.forEach { (option) in
             
             PKLog.trace("option:: \(option)")
             
@@ -143,7 +143,7 @@ class TracksManager: NSObject {
     private func selectTextTrack(item: AVPlayerItem, type: String, index: Int) {
         PKLog.trace("selectTextTrack")
         
-        let textSelectionGroup = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristicLegible)
+        let textSelectionGroup = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.legible)
         
         if index == -1 {
             item.select(nil, in: textSelectionGroup!)

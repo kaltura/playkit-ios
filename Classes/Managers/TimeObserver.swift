@@ -266,7 +266,7 @@ class TimeObserver: TimeMonitor {
         // create the timer
         self.dispatchTimer = DispatchSource.makeTimerSource(flags: DispatchSource.TimerFlags(rawValue: 0), queue: dispatchQueue)
         // set interval
-        self.dispatchTimer!.scheduleRepeating(deadline: .now(), interval: dispatchTimeInterval)
+        self.dispatchTimer!.schedule(deadline: .now(), repeating: dispatchTimeInterval)
         // set last reported time to current time before timer handler starts
         self.lastObservedTime = self.timeProvider?.currentPosition ?? 0
         // set event handler
@@ -327,7 +327,7 @@ class TimeObserver: TimeMonitor {
     
     private func updatePeriodicObservationsMap() {
         var periodicObservationsMap = [Int: [PeriodicObservation]]()
-        let sortedPeriodicObservations = self.periodicObservations.sorted(by: { $0.0.interval < $0.1.interval })
+        let sortedPeriodicObservations = self.periodicObservations.sorted(by: { $0.interval < $1.interval })
         // update periodic observation to be sorted so next sort will be faster
         self.periodicObservations = Set(sortedPeriodicObservations)
         // update max interval
