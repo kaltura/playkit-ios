@@ -83,8 +83,8 @@ import AVKit
         return self.player.loadedTimeRanges
     }
     
-    open func prepare(_ config: MediaConfig) throws {
-        try self.player.prepare(config)
+    open func prepare(_ config: MediaConfig) {
+        self.player.prepare(config)
     }
     
     public func setPlayer(_ player: Player!) {

@@ -108,7 +108,7 @@ class PlayerController: NSObject, Player {
     // MARK: - Functions
     /************************************************************/
     
-    func setMedia(from mediaConfig: MediaConfig) throws {
+    func setMedia(from mediaConfig: MediaConfig) {
         self.mediaConfig = mediaConfig
         // create new media session uuid
         self.mediaSessionUUID = UUID()
@@ -130,18 +130,19 @@ class PlayerController: NSObject, Player {
         // Take saved view from DefaultPlayerWrapper
         // Must be called before `self.currentPlayer` reference is changed
         let playerView = self.currentPlayer.view
-        try self.createPlayerWrapper(mediaConfig)
+        self.createPlayerWrapper(mediaConfig)
+        
         // After Setting PlayerWrapper set  saved player's params
         self.currentPlayer.onEventBlock = eventBlock
         self.currentPlayer.view = playerView
         self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: handlerType)
     }
     
-    private func createPlayerWrapper(_ mediaConfig: MediaConfig) throws {
+    private func createPlayerWrapper(_ mediaConfig: MediaConfig) {
         if (mediaConfig.mediaEntry.vrData != nil) {
             guard let vrPlayerWrapper = NSClassFromString("PlayKitVR.VRPlayerWrapper") as? VRPlayerEngine.Type else {
                 PKLog.error("VRPlayerWrapper does not exist")
-                throw PlayerError.missingDependency.asNSError
+                fatalError("VR library is missing, make sure to add it via Podfile.")
             }
             
             self.currentPlayer = vrPlayerWrapper.init(delegate: self.delegate)
@@ -154,8 +155,8 @@ class PlayerController: NSObject, Player {
         }
     }
     
-    func prepare(_ mediaConfig: MediaConfig) throws {
-        try self.currentPlayer.prepare(mediaConfig)
+    func prepare(_ mediaConfig: MediaConfig) {
+        self.currentPlayer.prepare(mediaConfig)
     }
     
     func play() {
