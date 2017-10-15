@@ -241,7 +241,7 @@ public enum PhoenixMediaProviderError: PKError {
     let defaultProtocol = "https"
 
     /// This  object is created before loading the media in order to make sure all required attributes are set and we are ready to load
-    struct LoaderInfo {
+    public struct LoaderInfo {
         var sessionProvider: SessionProvider
         var assetId: String
         var assetType: AssetObjectType
@@ -361,7 +361,7 @@ public enum PhoenixMediaProviderError: PKError {
                 }
 
                 if let context = playbackContext as? OTTPlaybackContext {
-                    let tuple = PhoenixMediaProvider.createMediaEntry(assetId: loaderInfo.assetId, fileIds: loaderInfo.fileIds, formats: loaderInfo.formats, context: context)
+                    let tuple = PhoenixMediaProvider.createMediaEntry(loaderInfo: loaderInfo, context: context)
                     if let error = tuple.1 {
                         callback(nil, error)
                     } else if let media = tuple.0 {
@@ -413,7 +413,7 @@ public enum PhoenixMediaProviderError: PKError {
         return orderedSources
     }
 
-    static public func createMediaEntry(assetId: String, fileIds: [String]?, formats: [String]?, context: OTTPlaybackContext) -> (PKMediaEntry?, NSError?) {
+    static public func createMediaEntry(loaderInfo: LoaderInfo, context: OTTPlaybackContext) -> (PKMediaEntry?, NSError?) {
 
         if context.hasBlockAction() != nil {
             if let error = context.hasErrorMessage() {
