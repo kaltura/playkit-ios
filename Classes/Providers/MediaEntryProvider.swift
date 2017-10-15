@@ -19,20 +19,20 @@ import UIKit
      - In order to send an informative error in the ResponseElement
      you should implement an error enum with the relevnat errors
     
-     - parameter callback - a block that called on completion and returing response object wich contain the MediaEntry
+     - parameter callback - a block that called on completion and returing response object wich contain the PKMediaEntry
      ```
         // example of usage:
          let cp : MediaEntryProvider =
             CustomMediaEntryProvider(customParameters)
      
          customMediaProvider.loadMedia { 
-            (r:ResponseElement<MediaEntry>) in
+            (r:ResponseElement<PKMediaEntry>) in
              if (r.succedded){
              ...
      ```
      
      */
-    func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void)
+    func loadMedia(callback: @escaping (PKMediaEntry?, Error?) -> Void)
 
     func cancel()
 

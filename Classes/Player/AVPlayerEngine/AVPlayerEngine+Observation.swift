@@ -36,7 +36,7 @@ extension AVPlayerEngine {
         self.isObserved = true
         // Register observers for the properties we want to display.
         for keyPath in observedKeyPaths {
-            addObserver(self, forKeyPath: keyPath, options: [.new, .initial], context: &observerContext)
+            addObserver(self, forKeyPath: keyPath, options: [.new, .initial], context: &AVPlayerEngine.observerContext)
         }
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.didFailToPlayToEndTime(_:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
@@ -55,7 +55,7 @@ extension AVPlayerEngine {
         
         // Un-register observers
         for keyPath in observedKeyPaths {
-            removeObserver(self, forKeyPath: keyPath, context: &observerContext)
+            removeObserver(self, forKeyPath: keyPath, context: &AVPlayerEngine.observerContext)
         }
         
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemFailedToPlayToEndTime, object: nil)
@@ -104,10 +104,10 @@ extension AVPlayerEngine {
         self.post(event: PlayerEvent.Ended())
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         PKLog.debug("observeValue:: onEvent/onState")
         
-        guard context == &observerContext else {
+        guard context == &AVPlayerEngine.observerContext else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
             return
         }

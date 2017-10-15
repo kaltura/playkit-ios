@@ -25,7 +25,7 @@ import AVKit
         }
     }
 
-    weak public var mediaEntry: MediaEntry? {
+    weak public var mediaEntry: PKMediaEntry? {
         return self.player.mediaEntry
     }
     
@@ -83,8 +83,8 @@ import AVKit
         return self.player.loadedTimeRanges
     }
     
-    open func prepare(_ config: MediaConfig) {
-        return self.player.prepare(config)
+    open func prepare(_ config: MediaConfig) throws {
+        try self.player.prepare(config)
     }
     
     public func setPlayer(_ player: Player!) {
@@ -107,7 +107,7 @@ import AVKit
         self.player.pause()
     }
     
-    open func seek(to time: CMTime) {
+    open func seek(to time: TimeInterval) {
         self.player.seek(to: time)
     }
     
@@ -142,18 +142,32 @@ import AVKit
     public func selectTrack(trackId: String) {
         self.player.selectTrack(trackId: trackId)
     }
-}
-
-/************************************************************/
-// MARK: - iOS Only
-/************************************************************/
-
-#if os(iOS)
-    extension PlayerDecoratorBase {
-        
-        @available(iOS 9.0, *)
-        open func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-            return self.player.createPiPController(with: delegate)
-        }
+    
+    public func getController(type: PKController.Type) -> PKController? {
+        return self.player.getController(type: type)
     }
-#endif
+    
+    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) -> UUID {
+        return self.player.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
+    }
+    
+    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
+        return self.player.addBoundaryObserver(boundaries: boundaries, observeOn: dispatchQueue, using: block)
+    }
+    
+    public func removePeriodicObserver(_ token: UUID) {
+        self.player.removePeriodicObserver(token)
+    }
+    
+    public func removeBoundaryObserver(_ token: UUID) {
+        self.player.removeBoundaryObserver(token)
+    }
+    
+    public func removePeriodicObservers() {
+        self.player.removePeriodicObservers()
+    }
+    
+    public func removeBoundaryObservers() {
+         self.player.removeBoundaryObservers()
+    }
+}
