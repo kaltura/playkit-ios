@@ -1,21 +1,23 @@
-// ===================================================================================================
-// Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license, unless a different license for a 
-// particular library is specified in the applicable library path.
+//  PlayerController+TimeMonitor.swift
+//  PlayKit
 //
-// You may obtain a copy of the License at
-// https://www.gnu.org/licenses/agpl-3.0.html
-// ===================================================================================================
+//  Created by Gal Orlanczyk on 15/10/2017.
+//
 
 import Foundation
 
-extension AVPlayerEngine: TimeMonitor, TimeProvider {
+extension PlayerController: TimeMonitor, TimeProvider {
+    
     public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval) -> Void) -> UUID {
         PKLog.debug("add periodic observer with interval: \(interval), on queue: \(String(describing: dispatchQueue))")
         let token = self.timeObserver.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: eventHandler)
         PKLog.debug("periodic observer added with token: \(token.uuidString)")
         return token
+    }
+    
+    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
+        return self.addBoundaryObserver(times: boundaries.map { $0.time }, observeOn: dispatchQueue, using: block)
     }
     
     public func addBoundaryObserver(times: [TimeInterval], observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval, Double) -> Void) -> UUID {
@@ -35,14 +37,13 @@ extension AVPlayerEngine: TimeMonitor, TimeProvider {
         self.timeObserver.removeBoundaryObserver(token)
     }
     
-    public func removePeriodicObservers() {
+    func removePeriodicObservers() {
         PKLog.debug("remove all periodic observers")
         self.timeObserver.removePeriodicObservers()
     }
     
-    public func removeBoundaryObservers() {
+    func removeBoundaryObservers() {
         PKLog.debug("remove all boundary observers")
-
         self.timeObserver.removeBoundaryObservers()
     }
 }

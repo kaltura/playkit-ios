@@ -10,7 +10,7 @@
 
 import Foundation
 
-class PlayerController: NSObject, Player {
+class PlayerController: NSObject, Player {    
     
     /************************************************************/
     // MARK: - Properties
@@ -33,6 +33,9 @@ class PlayerController: NSObject, Player {
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
     let settings = PKPlayerSettings()
+    
+    /* Time Observation */
+    var timeObserver: TimeObserver!
     
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
@@ -97,11 +100,18 @@ class PlayerController: NSObject, Player {
         self.currentPlayer = DefaultPlayerWrapper()
         
         super.init()
+        self.timeObserver = TimeObserver(timeProvider: self)
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.trace("postEvent:: \(event)")
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
+    }
+    
+    deinit {
+        self.timeObserver.stopTimer()
+        self.timeObserver.removePeriodicObservers()
+        self.timeObserver.removeBoundaryObservers()
     }
     
     /************************************************************/
@@ -180,6 +190,9 @@ class PlayerController: NSObject, Player {
     }
     
     func destroy() {
+        self.timeObserver.stopTimer()
+        self.timeObserver.removePeriodicObservers()
+        self.timeObserver.removeBoundaryObservers()
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
     }
@@ -214,30 +227,6 @@ class PlayerController: NSObject, Player {
         }
         
         return nil
-    }
-    
-    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) -> UUID {
-        return self.currentPlayer.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
-    }
-    
-    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
-        return self.currentPlayer.addBoundaryObserver(boundaries: boundaries, observeOn: dispatchQueue, using: block)
-    }
-    
-    func removePeriodicObserver(_ token: UUID) {
-        self.currentPlayer.removePeriodicObserver(token)
-    }
-    
-    func removeBoundaryObserver(_ token: UUID) {
-        self.currentPlayer.removeBoundaryObserver(token)
-    }
-    
-    public func removePeriodicObservers() {
-        self.currentPlayer.removePeriodicObservers()
-    }
-    
-    public func removeBoundaryObservers() {
-        self.currentPlayer.removeBoundaryObservers()
     }
 }
 

@@ -195,30 +195,6 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
     }
-    
-    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void) -> UUID {
-        return self.currentPlayer.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
-    }
-    
-    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
-        return self.currentPlayer.addBoundaryObserver(times: boundaries.map { $0.time }, observeOn: dispatchQueue, using: block)
-    }
-    
-    public func removePeriodicObserver(_ token: UUID) {
-        self.currentPlayer.removePeriodicObserver(token)
-    }
-    
-    public func removeBoundaryObserver(_ token: UUID) {
-        self.currentPlayer.removeBoundaryObserver(token)
-    }
-    
-    public func removePeriodicObservers() {
-        self.currentPlayer.removePeriodicObservers()
-    }
-    
-    public func removeBoundaryObservers() {
-        self.currentPlayer.removeBoundaryObservers()
-    }
 }
 
 /************************************************************/
