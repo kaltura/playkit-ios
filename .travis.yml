@@ -10,6 +10,7 @@ notifications:
   email:
     recipients:
       - noam.tamim@kaltura.com
+      - vadim.kononov@kaltura.com
       - eliza.sapir@kaltura.com
       - gal.orlanczyk@kaltura.com
     on_success: change
