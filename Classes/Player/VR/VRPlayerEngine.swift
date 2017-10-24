@@ -8,16 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-// ===================================================================================================
-// Copyright (C) 2017 Kaltura Inc.
-//
-// Licensed under the AGPLv3 license, unless a different license for a
-// particular library is specified in the applicable library path.
-//
-// You may obtain a copy of the License at
-// https://www.gnu.org/licenses/agpl-3.0.html
-// ===================================================================================================
-
 import Foundation
 import AVFoundation
 
@@ -45,7 +35,7 @@ public protocol VRPlayerEngine: PlayerEngine {
     /// VRPlayerEngine initializer
     ///
     /// - Parameter delegate: object that conforms to PlayerDelegate protocol.
-    init(delegate: PlayerDelegate?)
+    init(delegate: PlayerDelegate)
     
     /// Current View State
     var currentViewState: ViewState { get }
@@ -61,5 +51,5 @@ public protocol VRPlayerEngine: PlayerEngine {
     /// Creates the orientation indicator view.
     ///
     /// - Parameter frame: The frame of orientation indicator view.
-    func createOrientationIndicatorView(frame: CGRect) -> UIView
+    func createOrientationIndicatorView(frame: CGRect) -> UIView?
 }

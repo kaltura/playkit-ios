@@ -145,7 +145,13 @@ class PlayerController: NSObject, Player {
                 fatalError("VR library is missing, make sure to add it via Podfile.")
             }
             
-            self.currentPlayer = vrPlayerWrapper.init(delegate: self.delegate)
+            guard let playerDelegate = self.delegate else {
+                PKLog.info("Please set player delegate otherwise VR Player won't be created.")
+                
+                return
+            }
+            
+            self.currentPlayer = vrPlayerWrapper.init(delegate: playerDelegate)
         } else {
             self.currentPlayer = AVPlayerWrapper()
         }
