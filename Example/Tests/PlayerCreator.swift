@@ -33,7 +33,7 @@ extension PlayerCreator {
         
         // for hls stream use: "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
         let url = URL(fileURLWithPath: Bundle(for: type(of: self)).path(forResource: "big_buck_bunny_short", ofType: "mp4")!)
-        let entry = MediaEntry("test", sources: [MediaSource("test", contentUrl: url)])
+        let entry = PKMediaEntry("test", sources: [PKMediaSource("test", contentUrl: url)])
         let mediaConfig = MediaConfig(mediaEntry: entry)
         do {
             let pluginConfig: PluginConfig?

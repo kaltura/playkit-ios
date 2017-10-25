@@ -103,7 +103,7 @@ class PlayerControllerTest: XCTestCase {
             if type(of: event) == PlayerEvent.playing && isFirstPlay && self.player.isPlaying {
                 isFirstPlay = false
                 // seek to end - 1 second
-                self.player.seek(to: CMTimeMake(Int64(self.player.duration - 2), 1))
+                self.player.seek(to: self.player.duration - 2)
             }
             // should not fire play/pause after ended
             if isEnded {
@@ -136,13 +136,13 @@ class PlayerControllerTest: XCTestCase {
         player.addObserver(self, events: [PlayerEvent.ended]) { info in
             print("ended")
             isEnded = true
-            self.player.seek(to: CMTimeMake(Int64(self.player.duration - 2), 1))
+            self.player.seek(to: self.player.duration - 2)
         }
         player.addObserver(self, events: [PlayerEvent.playing, PlayerEvent.pause]) { event in
             if type(of: event) == PlayerEvent.playing && isFirstPlay && self.player.isPlaying {
                 isFirstPlay = false
                 // seek to end - 2 second
-                self.player.seek(to: CMTimeMake(Int64(self.player.duration - 2), 1))
+                self.player.seek(to: self.player.duration - 2)
             }
             // should fire play/pause after ended + seeked
             if isSeekedAfterEnded {

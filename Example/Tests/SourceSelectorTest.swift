@@ -14,13 +14,13 @@ import AVFoundation
 
 class SourceSelectorTest: XCTestCase {
     
-    let mp4 = MediaSource("mp4", contentUrl: URL(string: "https://example.com/a.mp4"), mediaFormat: .mp4)
-    let hls = MediaSource("hls", contentUrl: URL(string: "https://example.com/hls.m3u8"), mediaFormat: .hls)
-    let fps = MediaSource("fps", contentUrl: URL(string: "https://example.com/fps.m3u8"), mediaFormat: .hls)
-    let wvm = MediaSource("wvm", contentUrl: URL(string: "https://example.com/a.wvm"), mediaFormat: .wvm )
+    let mp4 = PKMediaSource("mp4", contentUrl: URL(string: "https://example.com/a.mp4"), mediaFormat: .mp4)
+    let hls = PKMediaSource("hls", contentUrl: URL(string: "https://example.com/hls.m3u8"), mediaFormat: .hls)
+    let fps = PKMediaSource("fps", contentUrl: URL(string: "https://example.com/fps.m3u8"), mediaFormat: .hls)
+    let wvm = PKMediaSource("wvm", contentUrl: URL(string: "https://example.com/a.wvm"), mediaFormat: .wvm )
     
     func testSelectedSource() {
-        guard let preferredMedia = AssetBuilder.getPreferredMediaSource(from: MediaEntry("e", sources: [mp4, hls, fps])) else {
+        guard let preferredMedia = AssetBuilder.getPreferredMediaSource(from: PKMediaEntry("e", sources: [mp4, hls, fps])) else {
             XCTFail()
             return
         }
