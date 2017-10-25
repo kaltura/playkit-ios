@@ -12,7 +12,6 @@ import UIKit
 
 @objc public protocol PlayerDelegate {
     @objc optional func playerShouldPlayAd(_ player: Player) -> Bool
-    @objc optional func shouldAddPlayerViewController(_ vc: UIViewController)
 }
 
 @objc public protocol Player: BasicPlayer {
