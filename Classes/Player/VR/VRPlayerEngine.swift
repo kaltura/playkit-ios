@@ -35,7 +35,7 @@ public protocol VRPlayerEngine: PlayerEngine {
     /// VRPlayerEngine initializer
     ///
     /// - Parameter delegate: object that conforms to PlayerDelegate protocol.
-    init(delegate: PlayerDelegate)
+    init()
     
     /// Current View State
     var currentViewState: ViewState { get }

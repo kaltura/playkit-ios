@@ -124,7 +124,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     var shouldRefresh: Bool = false
     
     /// Load media on player
-    public func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type) {
+    open func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type) {
 
         guard let mediaSrc = mediaSource else {
             PKLog.error("Media Source is empty")
