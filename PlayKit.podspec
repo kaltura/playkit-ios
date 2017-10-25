@@ -17,6 +17,7 @@ s.subspec 'Core' do |sp|
     sp.dependency 'Log', '1.0'
     sp.dependency 'SwiftyXMLParser', '3.0.3'
     sp.dependency 'KalturaNetKit', '~> 0.0'
+    sp.xcconfig = { 'SWIFT_VERSION' => '4.0' }
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
