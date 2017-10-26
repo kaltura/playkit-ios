@@ -65,7 +65,7 @@ extension AVPlayerEngine {
         NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
-    func onAccessLogEntryNotification(notification: Notification) {
+    @objc func onAccessLogEntryNotification(notification: Notification) {
         if let item = notification.object as? AVPlayerItem, let accessLog = item.accessLog(), let lastEvent = accessLog.events.last {
             if #available(iOS 10.0, tvOS 10.0, *) {
                 PKLog.debug("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
@@ -75,13 +75,13 @@ extension AVPlayerEngine {
         }
     }
     
-    func onErrorLogEntryNotification(notification: Notification) {
+    @objc func onErrorLogEntryNotification(notification: Notification) {
         guard let playerItem = notification.object as? AVPlayerItem, let errorLog = playerItem.errorLog(), let lastEvent = errorLog.events.last else { return }
         PKLog.warning("error description: \(String(describing: lastEvent.errorComment)), error domain: \(lastEvent.errorDomain), error code: \(lastEvent.errorStatusCode)")
         self.post(event: PlayerEvent.ErrorLog(error: PlayerErrorLog(errorLogEvent: lastEvent)))
     }
     
-    func didFailToPlayToEndTime(_ notification: NSNotification) {
+    @objc func didFailToPlayToEndTime(_ notification: NSNotification) {
         let newState = PlayerState.error
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
@@ -93,7 +93,7 @@ extension AVPlayerEngine {
         }
     }
     
-    func didPlayToEndTime(_ notification: NSNotification) {
+    @objc func didPlayToEndTime(_ notification: NSNotification) {
         let newState = PlayerState.ended
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
@@ -163,7 +163,7 @@ extension AVPlayerEngine {
     }
     
     /// Handles changes in player timebase
-    func timebaseChanged(notification: Notification) {
+    @objc func timebaseChanged(notification: Notification) {
         // for some reason timebase rate changed is received on a background thread.
         // in order to check self.rate we must make sure we are on the main thread.
         DispatchQueue.main.async {
