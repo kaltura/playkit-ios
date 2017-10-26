@@ -89,7 +89,7 @@ class MessegeBusTest: XCTestCase {
         var isSeeking = false
         self.player.addObserver(self, events: [PlayerEvent.playing, PlayerEvent.seeking, PlayerEvent.seeked]) { event in
             if type(of: event) == PlayerEvent.playing {
-                self.player.seek(to: CMTimeMakeWithSeconds(3, 1000000))
+                self.player.seek(to: 3)
             } else if type(of: event) == PlayerEvent.seeking {
                 print(self.player.currentTime as Any)
                 if (self.player.currentTime == seekTime){
