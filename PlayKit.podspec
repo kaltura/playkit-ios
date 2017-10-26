@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
 s.name             = 'PlayKit'
-s.version          = '3.2.1'
+s.version          = '3.3.0'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 s.homepage         = 'https://github.com/kaltura/playkit-ios'
 s.license          = { :type => 'AGPLv3', :text => 'AGPLv3' }
@@ -54,7 +54,7 @@ s.subspec 'PhoenixPlugin' do |ssp|
         'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
         'OTHER_LDFLAGS' => '$(inherited)',
         'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
-        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
+        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**'
     }
     ssp.dependency 'PlayKit/Core'
     ssp.dependency 'PlayKit/AnalyticsCommon'
@@ -90,7 +90,7 @@ s.subspec 'AnalyticsCommon' do |ssp|
         'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
         'OTHER_LDFLAGS' => '$(inherited)',
         'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
-        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
+        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**'
     }
     ssp.dependency 'PlayKit/Core'
 end

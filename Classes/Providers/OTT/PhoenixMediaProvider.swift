@@ -103,7 +103,7 @@ public enum PhoenixMediaProviderError: PKError {
 
 /* Description
  
-    Using Session provider will help you create MediaEntry in order to play content with the player
+    Using Session provider will help you create PKMediaEntry in order to play content with the player
     It's requestig the asset data and creating sources with relevant information for ex' contentURL, licenseURL, fiarPlay certificate and etc'
  
     #Example of code
@@ -136,8 +136,8 @@ public enum PhoenixMediaProviderError: PKError {
     @objc public var fileIds: [String]?
     @objc public var playbackContextType: PlaybackContextType = .unknown
     @objc public var networkProtocol: String?
+    public weak var responseDelegate: PKMediaEntryProviderResponseDelegate? = nil
     @objc public var referrer: String?
-    public weak var responseDelegate: MediaEntryProviderResponseDelegate? = nil
     
     public var executor: RequestExecutor?
 
@@ -229,7 +229,7 @@ public enum PhoenixMediaProviderError: PKError {
     ///    default is nil
     /// - Returns: Self
     @discardableResult
-    @nonobjc public func set(responseDelegate: MediaEntryProviderResponseDelegate?) -> Self {
+    @nonobjc public func set(responseDelegate: PKMediaEntryProviderResponseDelegate?) -> Self {
         self.responseDelegate = responseDelegate
         return self
     }
@@ -241,7 +241,7 @@ public enum PhoenixMediaProviderError: PKError {
     let defaultProtocol = "https"
 
     /// This  object is created before loading the media in order to make sure all required attributes are set and we are ready to load
-    struct LoaderInfo {
+    public struct LoaderInfo {
         var sessionProvider: SessionProvider
         var assetId: String
         var assetType: AssetObjectType
@@ -253,7 +253,7 @@ public enum PhoenixMediaProviderError: PKError {
 
     }
 
-    @objc public func loadMedia(callback: @escaping (MediaEntry?, Error?) -> Void) {
+    @objc public func loadMedia(callback: @escaping (PKMediaEntry?, Error?) -> Void) {
         guard let sessionProvider = self.sessionProvider else {
             callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "sessionProvider" ).asNSError )
             return
@@ -322,7 +322,7 @@ public enum PhoenixMediaProviderError: PKError {
     /// - Parameters:
     ///   - loaderInfo: load info
     ///   - callback: completion clousor
-    func startLoad(loaderInfo: LoaderInfo, callback: @escaping (MediaEntry?, Error?) -> Void) {
+    func startLoad(loaderInfo: LoaderInfo, callback: @escaping (PKMediaEntry?, Error?) -> Void) {
         loaderInfo.sessionProvider.loadKS { (ks, error) in
 
             guard let requestBuilder: KalturaRequestBuilder =  self.loaderRequestBuilder( ks: ks, loaderInfo: loaderInfo) else {
@@ -361,21 +361,15 @@ public enum PhoenixMediaProviderError: PKError {
                 }
 
                 if let context = playbackContext as? OTTPlaybackContext {
-                    
-                    if(context.hasBlockAction() != nil) {
-                        if let error = context.hasErrorMessage() {
-                            callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
-                        } else{
-                            callback(nil, PhoenixMediaProviderError.serverError(code: "Blocked", message: "Blocked").asNSError)
+                    let tuple = PhoenixMediaProvider.createMediaEntry(loaderInfo: loaderInfo, context: context)
+                    if let error = tuple.1 {
+                        callback(nil, error)
+                    } else if let media = tuple.0 {
+                        if let sources = media.sources, sources.count > 0 {
+                            callback(media, nil)
+                        } else {
+                            callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                         }
-                        return
-                    }
-                    
-                    let media = self.createMediaEntry(loaderInfo: loaderInfo, context: context)
-                    if let sources = media.sources, sources.count > 0 {
-                       callback(media, nil)
-                    } else {
-                        callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                     }
                 } else if let error = playbackContext as? OTTError {
                     callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
@@ -389,7 +383,7 @@ public enum PhoenixMediaProviderError: PKError {
     }
 
     /// Sorting and filtering source accrding to file formats or file ids
-    func sortedAndFilterSources(by fileIds: [String]?, or fileFormats: [String]?, sources: [OTTPlaybackSource]) -> [OTTPlaybackSource] {
+    static func sortedAndFilterSources(by fileIds: [String]?, or fileFormats: [String]?, sources: [OTTPlaybackSource]) -> [OTTPlaybackSource] {
 
         let orderedSources = sources.filter({ (source: OTTPlaybackSource) -> Bool in
              if let formats = fileFormats {
@@ -417,16 +411,22 @@ public enum PhoenixMediaProviderError: PKError {
         }
 
         return orderedSources
-
     }
 
-    func createMediaEntry(loaderInfo: LoaderInfo, context: OTTPlaybackContext) -> MediaEntry {
+    static public func createMediaEntry(loaderInfo: LoaderInfo, context: OTTPlaybackContext) -> (PKMediaEntry?, NSError?) {
 
-        let mediaEntry = MediaEntry(id: loaderInfo.assetId)
-        let sortedSources = self.sortedAndFilterSources(by: loaderInfo.fileIds, or: loaderInfo.formats, sources: context.sources)
+        if context.hasBlockAction() != nil {
+            if let error = context.hasErrorMessage() {
+                return (nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
+            }
+            return (nil, PhoenixMediaProviderError.serverError(code: "Blocked", message: "Blocked").asNSError)
+        }
+        
+        let mediaEntry = PKMediaEntry(id: loaderInfo.assetId)
+        let sortedSources = sortedAndFilterSources(by: loaderInfo.fileIds, or: loaderInfo.formats, sources: context.sources)
 
         var maxDuration: Float = 0.0
-        let mediaSources =  sortedSources.flatMap { (source: OTTPlaybackSource) -> MediaSource? in
+        let mediaSources =  sortedSources.flatMap { (source: OTTPlaybackSource) -> PKMediaSource? in
 
             let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
             guard  FormatsHelper.supportedFormats.contains(format) else {
@@ -437,7 +437,7 @@ public enum PhoenixMediaProviderError: PKError {
             if let drmData = source.drm, drmData.count > 0 {
                 drm = drmData.flatMap({ (drmData: OTTDrmData) -> DRMParams? in
 
-                    let scheme = self.convertScheme(scheme: drmData.scheme)
+                    let scheme = convertScheme(scheme: drmData.scheme)
                     guard FormatsHelper.supportedSchemes.contains(scheme) else {
                         return nil
                     }
@@ -459,7 +459,7 @@ public enum PhoenixMediaProviderError: PKError {
                 }
             }
 
-            let mediaSource = MediaSource(id: "\(source.id)")
+            let mediaSource = PKMediaSource(id: "\(source.id)")
             mediaSource.contentUrl = source.url
             mediaSource.mediaFormat = format
             mediaSource.drmData = drm
@@ -472,12 +472,11 @@ public enum PhoenixMediaProviderError: PKError {
         mediaEntry.sources = mediaSources
         mediaEntry.duration = TimeInterval(maxDuration)
 
-        return mediaEntry
-
+        return (mediaEntry, nil)
     }
 
     // Mapping between server scheme and local definision of scheme
-    func convertScheme(scheme: String) -> DRMParams.Scheme {
+    static func convertScheme(scheme: String) -> DRMParams.Scheme {
             switch (scheme) {
             case "WIDEVINE_CENC":
                 return .widevineCenc

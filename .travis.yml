@@ -1,5 +1,5 @@
 language: objective-c
-osx_image: xcode8.3
+osx_image: xcode9
 before_install:
   - gem install cocoapods # Since Travis is not always on latest version
 script:
@@ -10,6 +10,7 @@ notifications:
   email:
     recipients:
       - noam.tamim@kaltura.com
+      - vadim.kononov@kaltura.com
       - eliza.sapir@kaltura.com
       - gal.orlanczyk@kaltura.com
     on_success: change

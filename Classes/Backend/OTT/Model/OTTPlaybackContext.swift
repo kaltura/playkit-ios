@@ -11,13 +11,13 @@
 import Foundation
 import SwiftyJSON
 
-class OTTPlaybackContext: OTTBaseObject {
+public class OTTPlaybackContext: OTTBaseObject {
 
     var sources: [OTTPlaybackSource] = []
     var actions: [OTTRuleAction] = []
     var messages: [OTTAccessControlMessage] = []
 
-    required init?(json: Any) {
+    public required init?(json: Any) {
         let jsonObject = JSON(json)
         jsonObject["sources"].array?.forEach { (source: JSON) in
             if let source = OTTPlaybackSource(json: source.object) {
