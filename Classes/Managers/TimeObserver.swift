@@ -19,7 +19,7 @@
 import Foundation
 
 protocol TimeProvider: class {
-    var currentPosition: TimeInterval { get }
+    var currentTime: TimeInterval { get }
     var duration: TimeInterval { get }
 }
 
@@ -268,13 +268,13 @@ class TimeObserver: TimeMonitor {
         // set interval
         self.dispatchTimer!.schedule(deadline: .now(), repeating: dispatchTimeInterval)
         // set last reported time to current time before timer handler starts
-        self.lastObservedTime = self.timeProvider?.currentPosition ?? 0
+        self.lastObservedTime = self.timeProvider?.currentTime ?? 0
         // set event handler
         self.dispatchTimer!.setEventHandler { [weak self] in
             guard let strongSelf = self, let timeProvider = strongSelf.timeProvider else { return }
             // take a snapshot of the current time to use for all checks
-            let currentTime = timeProvider.currentPosition
-            let currentTimePercentage = timeProvider.currentPosition / timeProvider.duration
+            let currentTime = timeProvider.currentTime
+            let currentTimePercentage = timeProvider.currentTime / timeProvider.duration
             // only handle when current time is greater then 0, if we have 0 it means nothing to handle.
             guard currentTime > 0 else { return }
             // make sure current time is not equal last observed time (means we were stopped or paused or seeked)
@@ -378,7 +378,7 @@ class TimeObserver: TimeMonitor {
     }
     
     private func updateNextBoundary() {
-        guard let currentTime = self.timeProvider?.currentPosition else { return }
+        guard let currentTime = self.timeProvider?.currentTime else { return }
         var nextBoundary: (gap: Int64, boundaryTime: Int64, observations: [BoundaryObservation])? = nil
         for (boundaryTime, observations) in self.boundaryObservations {
             let gap = boundaryTime - Int64(currentTime * 1000)
