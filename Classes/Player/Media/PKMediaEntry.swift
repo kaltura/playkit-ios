@@ -45,7 +45,7 @@ import SwiftyJSON
         super.init()
     }
     
-    public init(_ id: String, sources: [PKMediaSource], duration: TimeInterval = 0) {
+    @objc public init(_ id: String, sources: [PKMediaSource], duration: TimeInterval = 0) {
         self.id = id
         self.sources = sources
         self.duration = duration

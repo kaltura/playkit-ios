@@ -37,7 +37,7 @@ import KalturaNetKit
             - partnerId: Kaltura partner id.
             - ks: Kaltura Session token.
      */
-    public init(serverURL: String, partnerId: Int64, ks: String?) {
+    @objc public init(serverURL: String, partnerId: Int64, ks: String?) {
         self.serverURL = serverURL
         self.partnerId = partnerId
         self.ks = ks
