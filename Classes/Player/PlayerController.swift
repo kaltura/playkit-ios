@@ -9,10 +9,8 @@
 // ===================================================================================================
 
 import Foundation
-import AVFoundation
-import AVKit
 
-class PlayerController: NSObject, Player {
+class PlayerController: NSObject, Player {    
     
     /************************************************************/
     // MARK: - Properties
@@ -22,22 +20,24 @@ class PlayerController: NSObject, Player {
     
     weak var delegate: PlayerDelegate?
     
-    fileprivate var currentPlayer: AVPlayerEngine
+    fileprivate var currentPlayer: PlayerEngine
+    fileprivate var assetHandlerType: AssetHandler.Type?
     
-    /// the asset to prepare and pass to the player engine to start buffering.
-    private var assetToPrepare: AVURLAsset?
-    /// the current selected media source
-    fileprivate var preferredMediaSource: MediaSource?
-    /// the current handler for the selected source
+    /// Current selected media source
+    fileprivate var selectedSource: PKMediaSource?
+    /// Current handler for the selected source
     fileprivate var assetHandler: AssetHandler?
-    /// the current media config that was set
+    /// Current media config that was set
     private var mediaConfig: MediaConfig?
-    /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
+    /// A semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
     let settings = PKPlayerSettings()
     
-    public var mediaEntry: MediaEntry? {
+    /* Time Observation */
+    var timeObserver: TimeObserver!
+    
+    public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
     }
     
@@ -67,12 +67,8 @@ class PlayerController: NSObject, Player {
     }
     
     public weak var view: PlayerView? {
-        get {
-            return self.currentPlayer.view
-        }
-        set {
-            self.currentPlayer.view = newValue
-        }
+        get { return self.currentPlayer.view }
+        set { self.currentPlayer.view = newValue }
     }
     
     public var sessionId: String {
@@ -84,7 +80,7 @@ class PlayerController: NSObject, Player {
     }
     
     public var loadedTimeRanges: [PKTimeRange]? {
-        return self.currentPlayer.currentItem?.loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
+        return self.currentPlayer.loadedTimeRanges
     }
     
     let sessionUUID = UUID()
@@ -99,20 +95,23 @@ class PlayerController: NSObject, Player {
     /************************************************************/
     
     public override init() {
-        self.currentPlayer = AVPlayerEngine()
-        super.init()
+        // Since currentPlayer is PlayerEngine! 
+        // Dafault Wrapper creation for safety
+        self.currentPlayer = DefaultPlayerWrapper()
         
+        super.init()
+        self.timeObserver = TimeObserver(timeProvider: self)
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.trace("postEvent:: \(event)")
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
-        
-        self.settings.onChange = { [weak self] (settingsType) in
-            switch settingsType {
-            case .preferredPeakBitRate(let preferredPeakBitRate): self?.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
-            }
-        }
+    }
+    
+    deinit {
+        self.timeObserver.stopTimer()
+        self.timeObserver.removePeriodicObservers()
+        self.timeObserver.removeBoundaryObservers()
     }
     
     /************************************************************/
@@ -125,41 +124,49 @@ class PlayerController: NSObject, Player {
         self.mediaSessionUUID = UUID()
         
         // get the preferred media source and post source selected event
-        guard let (preferredMediaSource, handlerType) = AssetBuilder.getPreferredMediaSource(from: mediaConfig.mediaEntry) else { return }
-        self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: preferredMediaSource))
-        self.preferredMediaSource = preferredMediaSource
+        guard let (selectedSource, handlerType) = SourceSelector.selectSource(from: mediaConfig.mediaEntry) else { return }
+        self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: selectedSource))
+        self.selectedSource = selectedSource
+        self.assetHandlerType = handlerType
         
-        // update the media source request adapter with new media uuid if using request adapter
-        var pms = preferredMediaSource
+        // update the media source request adapter with new media uuid if using kaltura request adapter
+        var pms = selectedSource
         self.updateRequestAdapter(in: &pms)
         
-        // build the asset from the selected source
-        self.assetHandler = AssetBuilder.build(from: preferredMediaSource, using: handlerType) { error, asset in
-            if let assetToPrepare = asset {
-                self.assetToPrepare = assetToPrepare
+        // Take saved eventBlock from DefaultPlayerWrapper
+        // Must be called before `self.currentPlayer` reference is changed
+        let eventBlock = self.currentPlayer.onEventBlock
+        
+        // Take saved view from DefaultPlayerWrapper
+        // Must be called before `self.currentPlayer` reference is changed
+        let playerView = self.currentPlayer.view
+        self.createPlayerWrapper(mediaConfig)
+        
+        // After Setting PlayerWrapper set  saved player's params
+        self.currentPlayer.onEventBlock = eventBlock
+        self.currentPlayer.view = playerView
+        self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: handlerType)
+    }
+    
+    private func createPlayerWrapper(_ mediaConfig: MediaConfig) {
+        if (mediaConfig.mediaEntry.vrData != nil) {
+            guard let vrPlayerWrapper = NSClassFromString("PlayKitVR.VRPlayerWrapper") as? VRPlayerEngine.Type else {
+                PKLog.error("VRPlayerWrapper does not exist")
+                fatalError("VR library is missing, make sure to add it via Podfile.")
             }
-            // send signal when assetToPrepare is set
-            self.prepareSemaphore.signal()
+            
+            self.currentPlayer = vrPlayerWrapper.init()
+        } else {
+            self.currentPlayer = AVPlayerWrapper()
+        }
+        
+        if let currentPlayer = self.currentPlayer as? AVPlayerWrapper {
+            currentPlayer.settings = self.settings
         }
     }
     
-    func prepare(_ config: MediaConfig) {
-        // set background thread to make sure main thread is not stuck while waiting
-        DispatchQueue.global().async {
-            // wait till assetToPrepare is set
-            self.prepareSemaphore.wait()
-            
-            guard let assetToPrepare = self.assetToPrepare else { return }
-            if let startTime = self.mediaConfig?.startTime {
-                self.currentPlayer.startPosition = startTime
-            }
-            let asset = PKAsset(avAsset: assetToPrepare, playerSettings: self.settings)
-            self.currentPlayer.asset = asset
-            if DRMSupport.widevineClassicHandler != nil {
-                self.removeAssetRefreshObservers()
-                self.addAssetRefreshObservers()
-            }
-        }
+    func prepare(_ mediaConfig: MediaConfig) {
+        self.currentPlayer.prepare(mediaConfig)
     }
     
     func play() {
@@ -178,11 +185,14 @@ class PlayerController: NSObject, Player {
         self.currentPlayer.stop()
     }
     
-    func seek(to time: CMTime) {
-        self.currentPlayer.currentPosition = CMTimeGetSeconds(time)
+    func seek(to time: TimeInterval) {
+        self.currentPlayer.currentPosition = time
     }
     
     func destroy() {
+        self.timeObserver.stopTimer()
+        self.timeObserver.removePeriodicObservers()
+        self.timeObserver.removeBoundaryObservers()
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
     }
@@ -211,53 +221,22 @@ class PlayerController: NSObject, Player {
         //Assert.shouldNeverHappen();
     }
     
-    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) -> UUID {
-        return self.currentPlayer.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
-    }
-    
-    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
-        return self.currentPlayer.addBoundaryObserver(times: boundaries.map { $0.time }, observeOn: dispatchQueue, using: block)
-    }
-    
-    func removePeriodicObserver(_ token: UUID) {
-        self.currentPlayer.removePeriodicObserver(token)
-    }
-    
-    func removeBoundaryObserver(_ token: UUID) {
-        self.currentPlayer.removeBoundaryObserver(token)
-    }
-    
-    public func removePeriodicObservers() {
-        self.currentPlayer.removePeriodicObservers()
-    }
-    
-    public func removeBoundaryObservers() {
-        self.currentPlayer.removeBoundaryObservers()
+    public func getController(type: PKController.Type) -> PKController? {
+        if type is PKVRController.Type && self.currentPlayer is VRPlayerEngine {
+            return PKVRController(player: self.currentPlayer)
+        }
+        
+        return nil
     }
 }
-
-/************************************************************/
-// MARK: - iOS Only
-/************************************************************/
-
-#if os(iOS)
-    extension PlayerController {
-        
-        @available(iOS 9.0, *)
-        func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-            return self.currentPlayer.createPiPController(with: delegate)
-        }
-    }
-#endif
 
 /************************************************************/
 // MARK: - Private
 /************************************************************/
 
 extension PlayerController {
-    
     /// Updates the request adapter if one exists
-    fileprivate func updateRequestAdapter(in mediaSource: inout MediaSource) {
+    fileprivate func updateRequestAdapter(in mediaSource: inout PKMediaSource) {
         // configure media sources content request adapter if request adapter exists
         if let adapter = self.settings.contentRequestAdapter {
             // update the request adapter with the updated session id
@@ -275,10 +254,10 @@ extension PlayerController {
 extension PlayerController {
     
     private func shouldRefreshAsset() {
-        guard let preferredMediaSource = self.preferredMediaSource,
+        guard let selectedSource = self.selectedSource,
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
-        refreshableHandler.shouldRefreshAsset(mediaSource: preferredMediaSource) { [unowned self] (shouldRefresh) in
+        refreshableHandler.shouldRefreshAsset(mediaSource: selectedSource) { [unowned self] (shouldRefresh) in
             if shouldRefresh {
                 self.shouldRefresh = true
             }
@@ -286,11 +265,11 @@ extension PlayerController {
     }
     
     private func refreshAsset() {
-        guard let preferredMediaSource = self.preferredMediaSource,
+        guard let selectedSource = self.selectedSource,
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
         self.currentPlayer.startPosition = self.currentPlayer.currentPosition
-        refreshableHandler.refreshAsset(mediaSource: preferredMediaSource)
+        refreshableHandler.refreshAsset(mediaSource: selectedSource)
     }
     
     func addAssetRefreshObservers() {

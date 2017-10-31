@@ -19,7 +19,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     }
     
     /// The key for enabling adnalyzer in the config dictionary
-    public static let enableSmartAdsKey = "enableSmartAds"
+    @objc public static let enableSmartAdsKey = "enableSmartAds"
     
     public static let kaltura = "kaltura"
     

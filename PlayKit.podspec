@@ -54,7 +54,7 @@ s.subspec 'PhoenixPlugin' do |ssp|
         'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
         'OTHER_LDFLAGS' => '$(inherited)',
         'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
-        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
+        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**'
     }
     ssp.dependency 'PlayKit/Core'
     ssp.dependency 'PlayKit/AnalyticsCommon'
@@ -90,7 +90,7 @@ s.subspec 'AnalyticsCommon' do |ssp|
         'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
         'OTHER_LDFLAGS' => '$(inherited)',
         'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
-        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
+        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**'
     }
     ssp.dependency 'PlayKit/Core'
 end

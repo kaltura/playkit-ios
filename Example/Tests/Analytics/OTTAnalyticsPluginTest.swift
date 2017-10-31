@@ -142,7 +142,7 @@ class OTTAnalyticsPluginTest: QuickSpec {
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
                                 player.play()
-                                player.seek(to: CMTimeMake(Int64(player.duration - 1), 1))
+                                player.seek(to: player.duration - 1)
                             }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
                                 expect(analyticsPluginMock.invocationCount.playCount).to(equal(3)) // 3 from player.play()

@@ -229,6 +229,7 @@ public struct PKErrorKeys {
     @objc(AssetNotPlayable) public static let assetNotPlayable = 7001
     @objc(PlayerItemFailed) public static let playerItemFailed = 7002
     @objc(PlayerFailed) public static let playerFailed = 7003
+    @objc(MissingDependency) public static let missingDependency = 7004
     // PlayerErrorLog
     @objc(PlayerItemErrorLogEvent) public static let playerItemErrorLogEvent = 7100
     // PKPluginError

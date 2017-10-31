@@ -15,7 +15,7 @@ import CoreMedia
 
 /// An AVPlayerEngine is a controller used to manage the playback and timing of a media asset.
 /// It provides the interface to control the player’s behavior such as its ability to play, pause, and seek to various points in the timeline.
-class AVPlayerEngine: AVPlayer {
+public class AVPlayerEngine: AVPlayer {
     
     // MARK: Player Properties
     
@@ -40,9 +40,6 @@ class AVPlayerEngine: AVPlayer {
     
     var onEventBlock: ((PKEvent) -> Void)?
     
-    /* Time Observation */
-    var timeObserver: TimeObserver!
-    
     public weak var view: PlayerView? {
         didSet {
             view?.player = self
@@ -66,7 +63,7 @@ class AVPlayerEngine: AVPlayer {
     /// In addition, keep in mind that because the duration is calcaulated from `seekableTimeRanges`
     /// in live streams there could be a chance that current time will be bigger than the duration
     /// because the current segment wasn't yet added to the seekable time ranges.
-    var currentPosition: Double {
+    public var currentPosition: TimeInterval {
         get {
             let position = self.currentTime() - self.rangeStart
             PKLog.trace("get currentPosition: \(position)")
@@ -90,13 +87,13 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    var startPosition: Double {
+    var startPosition: TimeInterval {
         didSet {
             PKLog.debug("set startPosition: \(startPosition)")
         }
     }
     
-    var duration: Double {
+    var duration: TimeInterval {
         guard let currentItem = self.currentItem else { return 0.0 }
         
         var result = CMTimeGetSeconds(currentItem.duration)
@@ -113,7 +110,8 @@ class AVPlayerEngine: AVPlayer {
         }
         
         PKLog.trace("get duration: \(result)")
-        return result
+        // in some rare cases duration can be nan, in that case we will return 0.
+        return result.isNaN ? 0.0 : result
     }
     
     var isPlaying: Bool {
@@ -170,7 +168,6 @@ class AVPlayerEngine: AVPlayer {
         self.startPosition = 0
         super.init()
         self.onEventBlock = nil
-        self.timeObserver = TimeObserver(timeProvider: self)
         AppStateSubject.shared.add(observer: self)
     }
     
@@ -178,12 +175,9 @@ class AVPlayerEngine: AVPlayer {
         PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
         // removes the observers only on deinit to prevent chances of being removed twice.
         self.removeObservers()
-        self.timeObserver.stopTimer()
-        self.timeObserver.removePeriodicObservers()
-        self.timeObserver.removeBoundaryObservers()
     }
     
-    func stop() {
+    public func stop() {
         PKLog.info("stop player")
         self.pause()
         self.seek(to: kCMTimeZero)
@@ -191,7 +185,7 @@ class AVPlayerEngine: AVPlayer {
         self.post(event: PlayerEvent.Stopped())
     }
     
-    override func pause() {
+    override public func pause() {
         if self.rate > 0 {
             // Playing, so pause.
             PKLog.debug("pause player")
@@ -199,7 +193,7 @@ class AVPlayerEngine: AVPlayer {
         }
     }
     
-    override func play() {
+    override public func play() {
         if self.rate == 0 {
             PKLog.debug("play player")
             self.post(event: PlayerEvent.Play())
@@ -209,14 +203,13 @@ class AVPlayerEngine: AVPlayer {
     
     func destroy() {
         PKLog.info("destroy player")
-        self.timeObserver.stopTimer()
         self.onEventBlock = nil
         // removes app state observer
         AppStateSubject.shared.remove(observer: self)
         self.replaceCurrentItem(with: nil)
     }
     
-    func selectTrack(trackId: String) {
+    public func selectTrack(trackId: String) {
         if trackId.isEmpty == false {
             self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
         } else {
@@ -237,29 +230,12 @@ class AVPlayerEngine: AVPlayer {
 }
 
 /************************************************************/
-// MARK: - iOS Only
-/************************************************************/
-
-#if os(iOS)
-    extension AVPlayerEngine {
-        
-        @available(iOS 9.0, *)
-        func createPiPController(with delegate: AVPictureInPictureControllerDelegate) -> AVPictureInPictureController? {
-            guard let playerLayer = self.playerLayer else { return nil }
-            let pip = AVPictureInPictureController(playerLayer: playerLayer)
-            pip?.delegate = delegate
-            return pip
-        }
-    }
-#endif
-
-/************************************************************/
 // MARK: - App State Handling
 /************************************************************/
 
 extension AVPlayerEngine: AppStateObservable {
  
-    var observations: Set<NotificationObservation> {
+    public var observations: Set<NotificationObservation> {
         return [
             NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
                 PKLog.debug("player: \(self)\n will terminate, destroying...")
