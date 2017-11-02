@@ -44,9 +44,9 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 return
             }
             
-            settings.onChange = { (settingsType) in
+            settings.onChange = { [weak self] (settingsType) in
                 switch settingsType {
-                case .preferredPeakBitRate(let preferredPeakBitRate): self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+                case .preferredPeakBitRate(let preferredPeakBitRate): self?.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
                 }
             }
         }
