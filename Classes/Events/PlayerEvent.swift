@@ -45,6 +45,8 @@ import AVFoundation
     @objc public static let seeked: PlayerEvent.Type = Seeked.self
     /// Sent when tracks available.
     @objc public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
+    /// Sent when track has been changed.
+    @objc public static let trackSelected: PlayerEvent.Type = TrackSelected.self
     /// Sent when Playback Params Updated.
     @objc public static let playbackInfo: PlayerEvent.Type = PlaybackInfo.self
     /// Sent when player state is changed.
@@ -127,6 +129,12 @@ import AVFoundation
     class TracksAvailable: PlayerEvent {
         convenience init(tracks: PKTracks) {
             self.init([EventDataKeys.tracks: tracks])
+        }
+    }
+    
+    class TrackSelected: PlayerEvent {
+        convenience init(track: Track) {
+            self.init([EventDataKeys.selectedTrack: track])
         }
     }
     
