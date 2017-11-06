@@ -11,7 +11,12 @@
 import Foundation
 import AVFoundation
 
-class AssetBuilder {
+@objc public protocol AssetHandler {
+    init()
+    func build(from mediaSource: PKMediaSource, readyCallback: @escaping (Error?, AVURLAsset?) -> Void)
+}
+
+extension AssetHandler {
     
     static func getPreferredMediaSource(from mediaEntry: PKMediaEntry) -> (PKMediaSource, AssetHandler.Type)? {
         guard let sources = mediaEntry.sources else {
@@ -56,18 +61,6 @@ class AssetBuilder {
         PKLog.error("no playable media sources!")
         return nil
     }
-    
-    // builds the asset from the selected media source
-    static func build(from mediaSource: PKMediaSource, using assetHandlerType: AssetHandler.Type, readyCallback: @escaping (Error?, AVURLAsset?) -> Void) -> AssetHandler {
-        let handler = assetHandlerType.init()
-        handler.buildAsset(mediaSource: mediaSource, readyCallback: readyCallback)
-        return handler
-    }
-}
-
-@objc public protocol AssetHandler {
-    init()
-    func buildAsset(mediaSource: PKMediaSource, readyCallback: @escaping (Error?, AVURLAsset?) -> Void)
 }
 
 protocol RefreshableAssetHandler: AssetHandler {
