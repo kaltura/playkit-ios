@@ -12,7 +12,7 @@ import Foundation
 import AVFoundation
 
 /// PKEvent
-@objc public class PKEvent: NSObject {
+@objc open class PKEvent: NSObject {
     // Events that have payload must provide it as a dictionary for objective-c compat.
     @objc public let data: [String: Any]?
     
@@ -40,6 +40,7 @@ public extension PKEvent {
     // MARK: - Event Data Keys
     struct EventDataKeys {
         static let duration = "duration"
+        static let targetSeekPosition = "targetSeekPosition"
         static let tracks = "tracks"
         static let selectedTrack = "selectedTrack"
         static let playbackInfo = "playbackInfo"
@@ -56,6 +57,11 @@ public extension PKEvent {
     /// Duration Value, PKEvent Data Accessor
     @objc public var duration: NSNumber? {
         return self.data?[EventDataKeys.duration] as? NSNumber
+    }
+    
+    /// Duration Value, PKEvent Data Accessor
+    @objc public var targetSeekPosition: NSNumber? {
+        return self.data?[EventDataKeys.targetSeekPosition] as? NSNumber
     }
     
     /// Tracks Value, PKEvent Data Accessor
