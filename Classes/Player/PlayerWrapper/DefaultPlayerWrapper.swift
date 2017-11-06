@@ -119,7 +119,7 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
-    func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type) {
+    func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
         printInvocationWarning("\(#function)")
     }
     
