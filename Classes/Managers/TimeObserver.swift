@@ -371,7 +371,9 @@ class TimeObserver: TimeMonitor {
     private func handleBoundaryObservations(currentTime: TimeInterval, currentTimePercentage: Double) {
         if let nextBoundary = self.nextBoundary, nextBoundary.time >= Int64(self.lastObservedTime * 1000) && nextBoundary.time <= Int64(currentTime * 1000) {
             for observation in nextBoundary.observations {
-                observation.block(currentTime, currentTimePercentage)
+                observation.dispatchQueue.async {
+                    observation.block(currentTime, currentTimePercentage)
+                }
             }
             self.updateNextBoundary()
         }
