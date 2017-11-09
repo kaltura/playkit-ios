@@ -21,7 +21,6 @@ class PlayerController: NSObject, Player {
     weak var delegate: PlayerDelegate?
     
     fileprivate var currentPlayer: PlayerEngine
-    fileprivate var assetHandlerType: AssetHandler.Type?
     
     /// Current selected media source
     fileprivate var selectedSource: PKMediaSource?
@@ -124,10 +123,10 @@ class PlayerController: NSObject, Player {
         self.mediaSessionUUID = UUID()
         
         // get the preferred media source and post source selected event
-        guard let (selectedSource, handlerType) = SourceSelector.selectSource(from: mediaConfig.mediaEntry) else { return }
+        guard let (selectedSource, handler) = SourceSelector.selectSource(from: mediaConfig.mediaEntry) else { return }
         self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: selectedSource))
         self.selectedSource = selectedSource
-        self.assetHandlerType = handlerType
+        self.assetHandler = handler
         
         // update the media source request adapter with new media uuid if using kaltura request adapter
         var pms = selectedSource
@@ -145,7 +144,7 @@ class PlayerController: NSObject, Player {
         // After Setting PlayerWrapper set  saved player's params
         self.currentPlayer.onEventBlock = eventBlock
         self.currentPlayer.view = playerView
-        self.currentPlayer.loadMedia(from: self.selectedSource, handlerType: handlerType)
+        self.currentPlayer.loadMedia(from: self.selectedSource, handler: handler)
     }
     
     private func createPlayerWrapper(_ mediaConfig: MediaConfig) {

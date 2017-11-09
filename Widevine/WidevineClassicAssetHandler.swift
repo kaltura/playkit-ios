@@ -90,7 +90,7 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         }
     }
     
-    func buildAsset(mediaSource: PKMediaSource, readyCallback: @escaping ReadyCallback) {
+    func build(from mediaSource: PKMediaSource, readyCallback: @escaping ReadyCallback) {
         guard let contentUrl = mediaSource.contentUrl else {
             PKLog.error("Invalid media: no url")
             readyCallback(AssetError.invalidContentUrl(nil), nil)

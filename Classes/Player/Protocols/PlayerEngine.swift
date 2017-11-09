@@ -31,5 +31,5 @@ import Foundation
     var currentPosition: TimeInterval {get set}
     
     /// Load media on player
-    func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type)
+    func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler)
 }
