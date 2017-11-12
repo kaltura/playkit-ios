@@ -43,7 +43,7 @@ enum SourceType {
 
 /// Selects the preffered media source
 class SourceSelector {
-    static func selectSource(from mediaEntry: PKMediaEntry) -> (PKMediaSource, AssetHandler.Type)? {
+    static func selectSource(from mediaEntry: PKMediaEntry) -> (PKMediaSource, AssetHandler)? {
         guard let sources = mediaEntry.sources else {
             PKLog.error("no media sources in mediaEntry!")
             return nil
@@ -55,32 +55,32 @@ class SourceSelector {
         
         if let source = sources.first(where: {$0 is LocalMediaSource}) {
             if source.fileExt == SourceType.wvm.asString {
-                return (source, DRMSupport.widevineClassicHandler!)
+                return (source, DRMSupport.widevineClassicHandler!.init())
             } else {
-                return (source, defaultHandler)
+                return (source, defaultHandler.init())
             }
         }
         
         if DRMSupport.fairplay {
             if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asString}) {
-                return (source, defaultHandler)
+                return (source, defaultHandler.init())
             }
         } else {
             if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asString && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
-                return (source, defaultHandler)
+                return (source, defaultHandler.init())
             }
         }
         
         if let source = sources.first(where: {$0.fileExt == SourceType.mp4.asString}) {
-            return (source, defaultHandler)
+            return (source, defaultHandler.init())
         }
         
         if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt == SourceType.wvm.asString}) {
-            return (source, DRMSupport.widevineClassicHandler!)
+            return (source, DRMSupport.widevineClassicHandler!.init())
         }
         
         if let source = sources.first(where: {$0.fileExt == SourceType.mp3.asString}) {
-            return (source, defaultHandler)
+            return (source, defaultHandler.init())
         }
         
         PKLog.error("no playable media sources!")

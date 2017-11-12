@@ -41,7 +41,7 @@ class TracksManager: NSObject {
         
     }
     
-    public func selectTrack(item: AVPlayerItem, trackId: String) {
+    public func selectTrack(item: AVPlayerItem, trackId: String) -> Track? {
         PKLog.trace("selectTrack")
         
         let idArr : [String] = trackId.components(separatedBy: ":")
@@ -50,9 +50,16 @@ class TracksManager: NSObject {
         
         if type == audioTypeKey {
             self.selectAudioTrack(item: item, index: index)
+            if let tracks = self.audioTracks, index + 1 >= 0, tracks.count > index + 1 {
+                return self.audioTracks?[index + 1]
+            }
         } else {
             self.selectTextTrack(item: item, type: type, index: index)
+            if let tracks = self.textTracks, index + 1 >= 0, tracks.count > index + 1 {
+                return self.textTracks?[index + 1]
+            }
         }
+        return nil
     }
     
     public func currentAudioTrack(item: AVPlayerItem) -> String? {

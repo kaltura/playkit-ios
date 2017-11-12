@@ -44,9 +44,9 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 return
             }
             
-            settings.onChange = { (settingsType) in
+            settings.onChange = { [weak self] (settingsType) in
                 switch settingsType {
-                case .preferredPeakBitRate(let preferredPeakBitRate): self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+                case .preferredPeakBitRate(let preferredPeakBitRate): self?.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
                 }
             }
         }
@@ -124,14 +124,14 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     var shouldRefresh: Bool = false
     
     /// Load media on player
-    open func loadMedia(from mediaSource: PKMediaSource?, handlerType: AssetHandler.Type) {
+    open func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
 
         guard let mediaSrc = mediaSource else {
             PKLog.error("Media Source is empty")
             return
         }
         
-        self.assetHandler = AssetBuilder.build(from: mediaSrc, using: handlerType) { error, asset in
+        handler.build(from: mediaSrc) { error, asset in
             if asset != nil {
                 self.assetToPrepare = asset
             }

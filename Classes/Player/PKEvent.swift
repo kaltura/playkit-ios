@@ -41,6 +41,7 @@ public extension PKEvent {
     struct EventDataKeys {
         static let duration = "duration"
         static let tracks = "tracks"
+        static let selectedTrack = "selectedTrack"
         static let playbackInfo = "playbackInfo"
         static let oldState = "oldState"
         static let newState = "newState"
@@ -60,6 +61,11 @@ public extension PKEvent {
     /// Tracks Value, PKEvent Data Accessor
     @objc public var tracks: PKTracks? {
         return self.data?[EventDataKeys.tracks] as? PKTracks
+    }
+    
+    /// Selected Track Value, PKEvent Data Accessor
+    @objc public var selectedTrack: Track? {
+        return self.data?[EventDataKeys.selectedTrack] as? Track
     }
     
     /// Current Bitrate Value, PKEvent Data Accessor
