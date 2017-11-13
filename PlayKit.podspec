@@ -19,19 +19,6 @@ s.subspec 'Core' do |sp|
     sp.dependency 'KalturaNetKit', '~> 0.0'
 end
 
-s.subspec 'GoogleCastAddon' do |ssp|
-    ssp.ios.deployment_target = '8.0'
-    ssp.source_files = 'Addons/GoogleCast'
-    ssp.xcconfig = { 
-        'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
-        'OTHER_LDFLAGS' => '$(inherited) -framework "GoogleCast"',
-        'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
-        'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
-    }
-    ssp.dependency 'google-cast-sdk', '3.5'
-    ssp.dependency 'PlayKit/Core'
-end
-
 s.subspec 'WidevineClassic' do |ssp|
   ssp.ios.deployment_target = '8.0'  
   ssp.source_files = 'Widevine'
