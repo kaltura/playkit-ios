@@ -12,7 +12,7 @@ import Foundation
 import AVFoundation
 
 /// PKEvent
-@objc public class PKEvent: NSObject {
+@objc open class PKEvent: NSObject {
     // Events that have payload must provide it as a dictionary for objective-c compat.
     @objc public let data: [String: Any]?
     
@@ -22,7 +22,7 @@ import AVFoundation
         self.namespace = self.getEventNamespace()
     }
     
-    private(set) var namespace: String = ""
+    private(set) public var namespace: String = ""
     
     private func getEventNamespace() -> String {
         var namespace = ""

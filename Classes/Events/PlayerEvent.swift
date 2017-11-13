@@ -100,8 +100,8 @@ import AVFoundation
         }
     }
     
-    class PluginError: PlayerEvent {
-        convenience init(nsError: NSError) {
+    public class PluginError: PlayerEvent {
+        public convenience init(nsError: NSError) {
             self.init([EventDataKeys.error: nsError])
         }
         
