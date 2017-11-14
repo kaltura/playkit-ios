@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import KalturaNetKit
+import PlayKitUtils
 
 /// `KalturaStatsEvent` represents an event reporting from kaltura stats plugin.
 @objc public class KalturaStatsEvent: PKEvent {
@@ -262,7 +263,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
             t.invalidate()
         }
         
-        self.timer = Timer.every(self.interval) {
+        self.timer = PKTimer.every(self.interval) { _ in 
             guard let player = self.player else { return }
             let progress = Float(player.currentTime) / Float(player.duration)
             PKLog.debug("Progress is \(progress)")
