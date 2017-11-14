@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import KalturaNetKit
+import PlayKitUtils
 
 /// `KalturaStatsEvent` represents an event reporting from kaltura stats plugin.
 @objc public class KalturaLiveStatsEvent: PKEvent {
@@ -206,7 +207,7 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         if let t = self.timer {
             t.invalidate()
         }
-        self.timer = Timer.every(self.interval) { [weak self] in
+        self.timer = PKTimer.every(self.interval) { [weak self] _ in
             self?.sendLiveEvent(withBufferTime: self?.bufferTime ?? 0)
             self?.eventIdx += 1
             PKLog.debug("current time: \(String(describing: self?.player?.currentTime)), duration: \(String(describing: self?.player?.duration))")
