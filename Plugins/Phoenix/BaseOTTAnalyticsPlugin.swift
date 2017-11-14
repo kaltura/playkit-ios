@@ -15,7 +15,7 @@ import KalturaNetKit
 public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, AppStateObservable {
     
     /// indicates whether we played for the first time or not.
-    var isFirstPlay: Bool = true
+    public var isFirstPlay: Bool = true
     var intervalOn: Bool = false
     var timer: Timer?
     var interval: TimeInterval = 30
@@ -67,7 +67,7 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
     /************************************************************/
     
     /// default events to register
-    var playerEventsToRegister: [PlayerEvent.Type] {
+    public var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.ended,
             PlayerEvent.error,
@@ -79,7 +79,7 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
         ]
     }
     
-    func registerEvents() {
+    public func registerEvents() {
         PKLog.debug("plugin \(type(of:self)) register to all player events")
         
         self.playerEventsToRegister.forEach { event in

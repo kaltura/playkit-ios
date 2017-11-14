@@ -83,7 +83,8 @@ public class AVPlayerEngine: AVPlayer {
                     PKLog.error("seek faild")
                 }
             }
-            self.post(event: PlayerEvent.Seeking())
+            
+            self.post(event: PlayerEvent.Seeking(targetSeekPosition: CMTimeGetSeconds(newTime)))
         }
     }
     
