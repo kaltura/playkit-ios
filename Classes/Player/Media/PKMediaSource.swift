@@ -24,7 +24,6 @@ import SwiftyJSON
 @objc public class PKMediaSource: NSObject {
     
     @objc public enum MediaFormat: Int {
-        case dash
         case hls
         case wvm
         case mp4
@@ -35,7 +34,6 @@ import SwiftyJSON
         var fileExtension: String {
             get {
                 switch self {
-                case .dash: return "mpd"
                 case .hls: return "m3u8"
                 case .wvm: return "wvm"
                 case .mp4: return "mp4"
@@ -48,7 +46,6 @@ import SwiftyJSON
         
         static func mediaFormat(byfileExtension ext:String) -> MediaFormat{
             switch ext {
-            case "mpd": return .dash
             case "m3u8": return .hls
             case "wvm": return .wvm
             case "mp4": return .mp4

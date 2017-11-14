@@ -57,7 +57,7 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     private var timer: Timer?
     private var config: KalturaLiveStatsPluginConfig!
     /// indicates whether we played for the first time or not.
-    var isFirstPlay: Bool = true
+    public var isFirstPlay: Bool = true
     
     private let interval = 10.0
     
@@ -111,7 +111,7 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     // MARK: - AnalyticsPluginProtocol
     /************************************************************/
     
-    var playerEventsToRegister: [PlayerEvent.Type] {
+    public var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.play,
             PlayerEvent.playing,
@@ -122,7 +122,7 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         ]
     }
     
-    func registerEvents() {
+    public func registerEvents() {
         PKLog.debug("register player events")
         
         self.playerEventsToRegister.forEach { event in

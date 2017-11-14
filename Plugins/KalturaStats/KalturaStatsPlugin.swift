@@ -96,7 +96,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
     var config: KalturaStatsPluginConfig!
     /// indicates whether we played for the first time or not.
-    var isFirstPlay: Bool = true
+    public var isFirstPlay: Bool = true
     
     /************************************************************/
     // MARK: - PKPlugin
@@ -146,7 +146,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     // MARK: - AnalyticsPluginProtocol
     /************************************************************/
     
-    var playerEventsToRegister: [PlayerEvent.Type] {
+    public var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.error,
             PlayerEvent.canPlay,
@@ -156,7 +156,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         ]
     }
     
-    func registerEvents() {
+    public func registerEvents() {
         PKLog.debug("register player events")
         
         self.playerEventsToRegister.forEach { event in

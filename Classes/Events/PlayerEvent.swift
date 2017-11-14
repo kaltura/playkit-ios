@@ -81,7 +81,11 @@ import AVFoundation
     class Play: PlayerEvent {}
     class Pause: PlayerEvent {}
     class Playing: PlayerEvent {}
-    class Seeking: PlayerEvent {}
+    class Seeking: PlayerEvent {
+        convenience init(targetSeekPosition: TimeInterval) {
+            self.init([EventDataKeys.targetSeekPosition: NSNumber(value: targetSeekPosition)])
+        }
+    }
     class Seeked: PlayerEvent {}
     
     class SourceSelected: PlayerEvent {
