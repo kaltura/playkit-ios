@@ -8,37 +8,37 @@ PODS:
     - SwiftyJSON
   - Log (1.0)
   - Nimble (7.0.1)
-  - PlayKit (3.3.0):
-    - PlayKit/Core (= 3.3.0)
-  - PlayKit/AnalyticsCommon (3.3.0):
+  - PlayKit (3.2.x-dev):
+    - PlayKit/Core (= 3.2.x-dev)
+  - PlayKit/AnalyticsCommon (3.2.x-dev):
     - PlayKit/Core
-  - PlayKit/Core (3.3.0):
+  - PlayKit/Core (3.2.x-dev):
     - KalturaNetKit (~> 0.0)
     - Log (= 1.0)
     - SwiftyJSON (= 3.1.4)
     - SwiftyXMLParser (= 3.0.3)
-  - PlayKit/GoogleCastAddon (3.3.0):
+  - PlayKit/GoogleCastAddon (3.2.x-dev):
     - google-cast-sdk (= 3.5)
     - PlayKit/Core
-  - PlayKit/KalturaLiveStatsPlugin (3.3.0):
+  - PlayKit/KalturaLiveStatsPlugin (3.2.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-  - PlayKit/KalturaStatsPlugin (3.3.0):
+  - PlayKit/KalturaStatsPlugin (3.2.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-  - PlayKit/PhoenixPlugin (3.3.0):
+  - PlayKit/PhoenixPlugin (3.2.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-  - PlayKit/YouboraPlugin (3.3.0):
+  - PlayKit/YouboraPlugin (3.2.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-    - Youbora-AVPlayer/dynamic (= 5.4.5)
+    - Youbora-AVPlayer/dynamic (= 5.4.18)
   - Quick (1.1.0)
   - SwiftyJSON (3.1.4)
   - SwiftyXMLParser (3.0.3)
-  - Youbora-AVPlayer/dynamic (5.4.5):
-    - Youbora-YouboraLib/dynamic (= 5.3.10)
-  - Youbora-YouboraLib/dynamic (5.3.10)
+  - Youbora-AVPlayer/dynamic (5.4.18):
+    - Youbora-YouboraLib/dynamic (= 5.4.4)
+  - Youbora-YouboraLib/dynamic (5.4.4)
 
 DEPENDENCIES:
   - Nimble (= 7.0.1)
@@ -59,12 +59,12 @@ SPEC CHECKSUMS:
   KalturaNetKit: d37b3c6fc08da9935677fc547c59b25abc3574a3
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
   Nimble: 657d000e11df8aebe27cdaf9d244de7f30ed87f7
-  PlayKit: 1c60618acd35f46cae48eebc653ea56c78b761ae
+  PlayKit: 0764b474e2778735fabd94d372882984d92e0162
   Quick: dafc587e21eed9f4cab3249b9f9015b0b7a7f71d
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
   SwiftyXMLParser: 9c6cc0310e778266a63d8eba50d9e07925aab0fb
-  Youbora-AVPlayer: 37bba41fcc4ce11ca4f99908ee6824a3bad9dc8b
-  Youbora-YouboraLib: b237581a6cffdc62b8ba7be8c52297236a13921b
+  Youbora-AVPlayer: e824d4332e65825e9e79347bc4990a407b96ca9d
+  Youbora-YouboraLib: 90bfccf52b9e918c5cb8543a5a5c015c0f02c4f2
 
 PODFILE CHECKSUM: e48ea6f293d1ecb696e67f40ef9b8f6b45b5d2a5
 
