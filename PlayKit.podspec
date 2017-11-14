@@ -21,6 +21,7 @@ s.subspec 'Core' do |sp|
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
+    ssp.ios.deployment_target = '9.0'
     ssp.source_files = 'Addons/GoogleCast'
     ssp.xcconfig = { 
         'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
@@ -39,7 +40,8 @@ s.subspec 'YouboraPlugin' do |ssp|
     ssp.dependency 'PlayKit/AnalyticsCommon'
 end
 
-s.subspec 'WidevineClassic' do |ssp| 
+s.subspec 'WidevineClassic' do |ssp|
+  ssp.ios.deployment_target = '9.0'  
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKit/Core'
   #ssp.dependency 'PlayKitWV'
