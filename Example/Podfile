@@ -2,6 +2,8 @@ use_frameworks!
 
 source 'https://github.com/CocoaPods/Specs.git'
 
+platform :ios, '9.0'
+
 abstract_target 'PlayKit' do
     
     pod 'PlayKit', :path => '../../playkit-ios'
