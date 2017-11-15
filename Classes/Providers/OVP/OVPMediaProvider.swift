@@ -63,8 +63,8 @@ import KalturaNetKit
         
         public var userInfo: [String: Any] {
             switch self {
-            case .serverError(let code, let message): return [PhoenixMediaProviderError.serverErrorCodeKey: code,
-                                                              PhoenixMediaProviderError.serverErrorMessageKey: message]
+            case .serverError(let code, let message): return [PKErrorKeys.MediaEntryProviderServerErrorCodeKey: code,
+                                                              PKErrorKeys.MediaEntryProviderServerErrorMessageKey: message]
             default:
                 return [String: Any]()
             }

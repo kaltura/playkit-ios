@@ -10,13 +10,13 @@
 
 import Foundation
 
-class FormatsHelper {
+public class FormatsHelper {
 
-   static let supportedFormats: [PKMediaSource.MediaFormat] = [.hls, .mp4, .wvm, .mp3, .mov]
+   static public let supportedFormats: [PKMediaSource.MediaFormat] = [.hls, .mp4, .wvm, .mp3, .mov]
     
-   static let supportedSchemes: [DRMParams.Scheme] = [.fairplay, .widevineClassic]
+   static public let supportedSchemes: [DRMParams.Scheme] = [.fairplay, .widevineClassic]
 
-   static func getMediaFormat(format: String, hasDrm: Bool) -> PKMediaSource.MediaFormat {
+   static public func getMediaFormat(format: String, hasDrm: Bool) -> PKMediaSource.MediaFormat {
 
             switch format {
             case "applehttp":

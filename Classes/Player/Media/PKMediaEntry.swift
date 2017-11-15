@@ -40,7 +40,7 @@ import SwiftyJSON
     private let mediaTypeKey = "mediaType"
     private let durationKey = "duration"
     
-    internal init(id: String) {
+    @objc public init(id: String) {
         self.id = id
         super.init()
     }
@@ -88,7 +88,7 @@ import SwiftyJSON
 
 @objc open class DRMParams: NSObject {
     
-    public enum Scheme: Int {
+    @objc public enum Scheme: Int {
         case widevineCenc
         case playreadyCenc
         case widevineClassic
@@ -99,7 +99,7 @@ import SwiftyJSON
     var licenseUri: URL?
     var scheme: Scheme
     
-    init(licenseUri: String?, scheme: Scheme) {
+    @objc public init(licenseUri: String?, scheme: Scheme) {
         if let url = licenseUri {
             self.licenseUri = URL(string: url)
         }
@@ -125,7 +125,7 @@ import SwiftyJSON
 public class FairPlayDRMParams: DRMParams {
     var fpsCertificate: Data?
     
-    init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
+    public init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
         super.init(licenseUri: licenseUri, scheme: scheme)
     }
