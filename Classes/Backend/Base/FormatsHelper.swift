@@ -12,7 +12,7 @@ import Foundation
 
 class FormatsHelper {
 
-   static let supportedFormats: [PKMediaSource.MediaFormat] = [.hls, .mp4, .wvm, .mp3, .mov]
+   static let supportedFormats: [PKMediaSource.MediaFormat] = [.hls, .mp4, .wvm, .mp3]
     
    static let supportedSchemes: [DRMParams.Scheme] = [.fairplay, .widevineClassic]
 
