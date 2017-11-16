@@ -43,7 +43,7 @@ import SwiftyJSON
         }
         
         static func mediaFormat(byfileExtension ext:String) -> MediaFormat{
-            switch ext {
+            switch ext.lowercased() {
             case "m3u8": return .hls
             case "wvm": return .wvm
             case "mp4": return .mp4
