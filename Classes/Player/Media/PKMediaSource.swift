@@ -28,7 +28,6 @@ import SwiftyJSON
         case wvm
         case mp4
         case mp3
-        case mov
         case unknown
         
         var fileExtension: String {
@@ -38,7 +37,6 @@ import SwiftyJSON
                 case .wvm: return "wvm"
                 case .mp4: return "mp4"
                 case .mp3: return "mp3"
-                case .mov: return "mov"
                 case .unknown: return ""
                 }
             }
@@ -50,7 +48,8 @@ import SwiftyJSON
             case "wvm": return .wvm
             case "mp4": return .mp4
             case "mp3": return .mp3
-            case "mov": return .mov
+            case "mov": return .mp4
+            case "m4a": return .mp3
             default: return .unknown
             }
         }
@@ -66,7 +65,7 @@ import SwiftyJSON
     @objc public var mimeType: String?
     @objc public var drmData: [DRMParams]?
     @objc public var mediaFormat: MediaFormat = .unknown
-    @objc public var fileExt: String {
+    private var fileExt: String {
         return contentUrl?.pathExtension ?? ""
     }
     
