@@ -48,16 +48,12 @@ class TracksManager: NSObject {
         let type: String = idArr[0]
         let index: Int = Int(idArr[1])!
         
-        if type == audioTypeKey {
+        if let audioTrack = self.audioTracks?.first(where: { $0.id == trackId }) {
             self.selectAudioTrack(item: item, index: index)
-            if let tracks = self.audioTracks, index + 1 >= 0, tracks.count > index + 1 {
-                return self.audioTracks?[index + 1]
-            }
-        } else {
+            return audioTrack
+        } else if let textTrack = self.textTracks?.first(where: { $0.id == trackId }){
             self.selectTextTrack(item: item, type: type, index: index)
-            if let tracks = self.textTracks, index + 1 >= 0, tracks.count > index + 1 {
-                return self.textTracks?[index + 1]
-            }
+            return textTrack
         }
         return nil
     }
@@ -98,7 +94,7 @@ class TracksManager: NSObject {
             }
             
             let trackId = "\(option.mediaType):\(String(index))"
-            let track = Track(id: trackId, title: option.displayName, language: option.extendedLanguageTag)
+            let track = Track(id: trackId, title: option.displayName, type: .audio, language: option.extendedLanguageTag)
             
             self.audioTracks?.append(track)
         }
@@ -138,12 +134,12 @@ class TracksManager: NSObject {
             
             optionMediaType = option.mediaType
             let trackId = "\(optionMediaType):\(String(index))"
-            let track = Track(id: trackId, title: option.displayName, language: option.extendedLanguageTag)
+            let track = Track(id: trackId, title: option.displayName, type: .text, language: option.extendedLanguageTag)
             
             self.textTracks?.append(track)
         }
         if optionMediaType != "" {
-            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: textOffDisplay, language: nil), at: 0)
+            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: textOffDisplay, type: .text, language: nil), at: 0)
         }
     }
     

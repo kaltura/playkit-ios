@@ -10,16 +10,24 @@
 
 import Foundation
 
+internal enum TrackType {
+    case audio
+    case text
+}
+
 @objc public class Track: NSObject {
     @objc public var id: String
     @objc public var title: String
     @objc public var language: String?
     
-    init(id: String, title: String, language: String?) {
+    var type: TrackType
+    
+    init(id: String, title: String, type: TrackType, language: String?) {
         PKLog.debug("init:: id:\(String(describing: id)) title:\(String(describing: title)) language: \(String(describing: language))")
         
         self.id = id
         self.title = title
+        self.type = type
         self.language = language
     }
 }
