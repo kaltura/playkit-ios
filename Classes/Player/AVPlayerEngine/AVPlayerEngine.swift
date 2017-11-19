@@ -213,8 +213,12 @@ public class AVPlayerEngine: AVPlayer {
     public func selectTrack(trackId: String) {
         if trackId.isEmpty == false {
             let selectedTrack = self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
-            if let _ = selectedTrack {
-                self.post(event: PlayerEvent.TrackChanged(track: selectedTrack!))
+            if let selectedTrack = selectedTrack {
+                if selectedTrack.type == .audio {
+                    self.post(event: PlayerEvent.AudioTrackChanged(track: selectedTrack))
+                } else {
+                    self.post(event: PlayerEvent.TextTrackChanged(track: selectedTrack))
+                }
             }
         } else {
             PKLog.error("trackId is nil")
