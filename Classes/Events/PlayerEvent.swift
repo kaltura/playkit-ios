@@ -17,7 +17,7 @@ import AVFoundation
     // All events EXCLUDING error. Assuming error events are treated differently.
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, ended, loadedMetadata,
-        play, pause, playing, seeking, seeked, stateChanged,
+        play, pause, playing, seeking, seeked, stateChanged, playbackInfo,
         tracksAvailable, textTrackChanged, audioTrackChanged, videoTrackChanged, error
     ]
     
