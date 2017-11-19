@@ -12,7 +12,6 @@ import Foundation
 import AVFoundation
 
 class TracksManager: NSObject {
-    let audioTypeKey: String = "soun"
     let textOffDisplay: String = "Off"
     
     private var audioTracks: [Track]?
