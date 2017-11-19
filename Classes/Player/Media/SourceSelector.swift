@@ -54,7 +54,7 @@ class SourceSelector {
         // Preference: Local, HLS, FPS*, MP4, WVM*, MP3
         
         if let source = sources.first(where: {$0 is LocalMediaSource}) {
-            if source.mediaFormat == .wvm {
+            if source.fileExt == SourceType.wvm.asString {
                 return (source, DRMSupport.widevineClassicHandler!.init())
             } else {
                 return (source, defaultHandler.init())
@@ -62,24 +62,24 @@ class SourceSelector {
         }
         
         if DRMSupport.fairplay {
-            if let source = sources.first(where: {$0.mediaFormat == .hls}) {
+            if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asString}) {
                 return (source, defaultHandler.init())
             }
         } else {
-            if let source = sources.first(where: {$0.mediaFormat == .hls && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
+            if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asString && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
                 return (source, defaultHandler.init())
             }
         }
         
-        if let source = sources.first(where: {$0.mediaFormat == .mp4}) {
+        if let source = sources.first(where: {$0.fileExt == SourceType.mp4.asString}) {
             return (source, defaultHandler.init())
         }
         
-        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.mediaFormat == .wvm}) {
+        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt == SourceType.wvm.asString}) {
             return (source, DRMSupport.widevineClassicHandler!.init())
         }
         
-        if let source = sources.first(where: {$0.mediaFormat == .mp3}) {
+        if let source = sources.first(where: {$0.fileExt == SourceType.mp3.asString}) {
             return (source, defaultHandler.init())
         }
         

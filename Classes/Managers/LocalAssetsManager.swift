@@ -107,20 +107,20 @@ import AVFoundation
         // On iOS 10 and up: HLS (clear or FP), MP4, WVM
         // Below iOS10: HLS (only clear), MP4, WVM
         if DRMSupport.fairplayOffline {
-            if let source = sources.first(where: {$0.mediaFormat == .hls}) {
+            if let source = sources.first(where: {$0.fileExt=="m3u8"}) {
                 return source
             }
         } else {
-            if let source = sources.first(where: {$0.mediaFormat == .hls && ($0.drmData == nil || $0.drmData!.isEmpty)}) {
+            if let source = sources.first(where: {$0.fileExt=="m3u8" && ($0.drmData == nil || $0.drmData!.isEmpty)}) {
                 return source
             }
         }
         
-        if let source = sources.first(where: {$0.mediaFormat == .mp4}) {
+        if let source = sources.first(where: {$0.fileExt=="mp4"}) {
             return source
         }
         
-        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.mediaFormat == .wvm}) {
+        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt=="wvm"}) {
             return source
         }
         
@@ -133,7 +133,7 @@ import AVFoundation
         // FairPlay -- nothing to do
 
         // Widevine
-        if mediaSource.mediaFormat == .wvm {
+        if mediaSource.fileExt == "wvm" {
             WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:false, callback: callback)
         }
     }
@@ -143,7 +143,7 @@ import AVFoundation
         // FairPlay -- nothing to do
         
         // Widevine
-        if mediaSource.mediaFormat == .wvm {
+        if mediaSource.fileExt == "wvm" {
             WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:true, callback: callback)
         }
     }

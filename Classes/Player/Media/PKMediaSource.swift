@@ -28,6 +28,7 @@ import SwiftyJSON
         case wvm
         case mp4
         case mp3
+        case mov
         case unknown
         
         var fileExtension: String {
@@ -37,19 +38,19 @@ import SwiftyJSON
                 case .wvm: return "wvm"
                 case .mp4: return "mp4"
                 case .mp3: return "mp3"
+                case .mov: return "mov"
                 case .unknown: return ""
                 }
             }
         }
         
         static func mediaFormat(byfileExtension ext:String) -> MediaFormat{
-            switch ext.lowercased() {
+            switch ext {
             case "m3u8": return .hls
             case "wvm": return .wvm
             case "mp4": return .mp4
             case "mp3": return .mp3
-            case "mov": return .mp4
-            case "m4a": return .mp3
+            case "mov": return .mov
             default: return .unknown
             }
         }
@@ -65,7 +66,7 @@ import SwiftyJSON
     @objc public var mimeType: String?
     @objc public var drmData: [DRMParams]?
     @objc public var mediaFormat: MediaFormat = .unknown
-    private var fileExt: String {
+    @objc public var fileExt: String {
         return contentUrl?.pathExtension ?? ""
     }
     
