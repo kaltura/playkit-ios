@@ -24,36 +24,32 @@ import SwiftyJSON
 @objc public class PKMediaSource: NSObject {
     
     @objc public enum MediaFormat: Int {
-        case dash
         case hls
         case wvm
         case mp4
         case mp3
-        case mov
         case unknown
         
         var fileExtension: String {
             get {
                 switch self {
-                case .dash: return "mpd"
                 case .hls: return "m3u8"
                 case .wvm: return "wvm"
                 case .mp4: return "mp4"
                 case .mp3: return "mp3"
-                case .mov: return "mov"
                 case .unknown: return ""
                 }
             }
         }
         
         static func mediaFormat(byfileExtension ext:String) -> MediaFormat{
-            switch ext {
-            case "mpd": return .dash
+            switch ext.lowercased() {
             case "m3u8": return .hls
             case "wvm": return .wvm
             case "mp4": return .mp4
             case "mp3": return .mp3
-            case "mov": return .mov
+            case "mov": return .mp4
+            case "m4a": return .mp3
             default: return .unknown
             }
         }
@@ -69,7 +65,7 @@ import SwiftyJSON
     @objc public var mimeType: String?
     @objc public var drmData: [DRMParams]?
     @objc public var mediaFormat: MediaFormat = .unknown
-    @objc public var fileExt: String {
+    private var fileExt: String {
         return contentUrl?.pathExtension ?? ""
     }
     
@@ -106,7 +102,9 @@ import SwiftyJSON
         
         self.id = sj[idKey].string ?? UUID().uuidString
         
-        self.contentUrl = sj[contentUrlKey].url
+        super.init()
+        
+        self.setContentUrl(sj[contentUrlKey].url)
         
         if let drmData = sj[drmDataKey].array {
             self.drmData = drmData.flatMap { DRMParams.fromJSON($0) }
@@ -115,8 +113,10 @@ import SwiftyJSON
         if let st = sj[formatTypeKey].int, let mediaFormat = MediaFormat(rawValue: st) {
             self.mediaFormat = mediaFormat
         }
-        
-        super.init()
+    }
+    
+    func setContentUrl(_ url: URL?) {
+        self.contentUrl = url
     }
     
     override public var description: String {

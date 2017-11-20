@@ -72,6 +72,7 @@ extension AVPlayerEngine {
             }
             
             self.post(event: PlayerEvent.PlaybackInfo(playbackInfo: PKPlaybackInfo(logEvent: lastEvent)))
+            self.post(event: PlayerEvent.VideoTrackChanged(bitrate: lastEvent.indicatedBitrate))
         }
     }
     

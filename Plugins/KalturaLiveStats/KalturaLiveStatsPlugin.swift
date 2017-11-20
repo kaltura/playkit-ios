@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import KalturaNetKit
+import PlayKitUtils
 
 /// `KalturaStatsEvent` represents an event reporting from kaltura stats plugin.
 @objc public class KalturaLiveStatsEvent: PKEvent {
@@ -57,7 +58,7 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     private var timer: Timer?
     private var config: KalturaLiveStatsPluginConfig!
     /// indicates whether we played for the first time or not.
-    var isFirstPlay: Bool = true
+    public var isFirstPlay: Bool = true
     
     private let interval = 10.0
     
@@ -111,7 +112,7 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     // MARK: - AnalyticsPluginProtocol
     /************************************************************/
     
-    var playerEventsToRegister: [PlayerEvent.Type] {
+    public var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.play,
             PlayerEvent.playing,
@@ -122,7 +123,7 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         ]
     }
     
-    func registerEvents() {
+    public func registerEvents() {
         PKLog.debug("register player events")
         
         self.playerEventsToRegister.forEach { event in
@@ -206,7 +207,7 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         if let t = self.timer {
             t.invalidate()
         }
-        self.timer = Timer.every(self.interval) { [weak self] in
+        self.timer = PKTimer.every(self.interval) { [weak self] _ in
             self?.sendLiveEvent(withBufferTime: self?.bufferTime ?? 0)
             self?.eventIdx += 1
             PKLog.debug("current time: \(String(describing: self?.player?.currentTime)), duration: \(String(describing: self?.player?.duration))")
