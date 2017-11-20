@@ -13,7 +13,6 @@ import AVFoundation
 import AVKit
 
 @objc open class PlayerDecoratorBase: NSObject, Player {
-    
     fileprivate var player: Player!
     
     public var delegate: PlayerDelegate? {
@@ -31,6 +30,10 @@ import AVKit
     
     public var settings: PKPlayerSettings {
         return self.player.settings
+    }
+    
+    public var mediaInfo: PKMediaInfo {
+        return self.player.mediaInfo
     }
     
     public var currentTime: TimeInterval {

@@ -32,6 +32,7 @@ class PlayerController: NSObject, Player {
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
     let settings = PKPlayerSettings()
+    let mediaInfo = PKMediaInfo()
     
     /* Time Observation */
     var timeObserver: TimeObserver!
@@ -166,6 +167,17 @@ class PlayerController: NSObject, Player {
     
     func prepare(_ mediaConfig: MediaConfig) {
         self.currentPlayer.prepare(mediaConfig)
+        self.setMediaInfoParams()
+    }
+    
+    func setMediaInfoParams() {
+        if let mediaType = self.mediaEntry?.mediaType {
+            self.mediaInfo.type = mediaType
+        }
+        
+        if let mediaFormat = self.selectedSource?.mediaFormat {
+            self.mediaInfo.format = mediaFormat
+        }
     }
     
     func play() {

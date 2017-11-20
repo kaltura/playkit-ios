@@ -12,8 +12,15 @@ import Foundation
 
 public protocol AnalyticsPluginProtocol: PKPlugin {
     
+    /// Indicates if it first play.
     var isFirstPlay: Bool { get set }
+    
+    /// List of events should be handled on plugin.
     var playerEventsToRegister: [PlayerEvent.Type] { get }
     
+    /// Event registrasion based on playerEventsToRegister array.
     func registerEvents()
+    
+    /// unregister all registered events.
+    func unregisterEvents()
 }

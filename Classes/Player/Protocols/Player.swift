@@ -25,6 +25,9 @@ import UIKit
     /// The player's settings.
     @objc var settings: PKPlayerSettings { get }
     
+    /// The current media info.
+    @objc var mediaInfo: PKMediaInfo { get }
+    
     /// The player's session id. the `sessionId` is initialized when the player loads.
     @objc var sessionId: String { get }
 
