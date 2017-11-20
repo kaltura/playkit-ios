@@ -102,7 +102,9 @@ import SwiftyJSON
         
         self.id = sj[idKey].string ?? UUID().uuidString
         
-        self.contentUrl = sj[contentUrlKey].url
+        super.init()
+        
+        self.setContentUrl(sj[contentUrlKey].url)
         
         if let drmData = sj[drmDataKey].array {
             self.drmData = drmData.flatMap { DRMParams.fromJSON($0) }
@@ -111,8 +113,10 @@ import SwiftyJSON
         if let st = sj[formatTypeKey].int, let mediaFormat = MediaFormat(rawValue: st) {
             self.mediaFormat = mediaFormat
         }
-        
-        super.init()
+    }
+    
+    func setContentUrl(_ url: URL?) {
+        self.contentUrl = url
     }
     
     override public var description: String {
