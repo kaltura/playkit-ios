@@ -10,7 +10,7 @@
 
 import Foundation
 
-protocol AnalyticsPluginProtocol: PKPlugin {
+public protocol AnalyticsPluginProtocol: PKPlugin {
     
     var isFirstPlay: Bool { get set }
     var playerEventsToRegister: [PlayerEvent.Type] { get }

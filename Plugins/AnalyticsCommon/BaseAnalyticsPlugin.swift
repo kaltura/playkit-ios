@@ -19,7 +19,7 @@ import Foundation
     
     var config: AnalyticsConfig?
     /// indicates whether we played for the first time or not.
-    var isFirstPlay: Bool = true
+    public var isFirstPlay: Bool = true
     
     /************************************************************/
     // MARK: - PKPlugin
@@ -62,11 +62,11 @@ import Foundation
     /************************************************************/
     
     /// default events to register
-    var playerEventsToRegister: [PlayerEvent.Type] {
+    public var playerEventsToRegister: [PlayerEvent.Type] {
         fatalError("abstract property should be overriden in subclass")
     }
     
-    func registerEvents() {
+    public func registerEvents() {
         fatalError("abstract func should be overriden in subclass")
     }
 }
