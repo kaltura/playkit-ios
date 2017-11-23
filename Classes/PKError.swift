@@ -208,6 +208,8 @@ public struct PKErrorKeys {
     static let RootErrorKey = NSUnderlyingErrorKey
     static let RootCodeKey = "rootCode"
     static let RootDomainKey = "rootDomain"
+    public static let MediaEntryProviderServerErrorCodeKey = "code"
+    public static let MediaEntryProviderServerErrorMessageKey = "message"
 }
 
 /************************************************************/

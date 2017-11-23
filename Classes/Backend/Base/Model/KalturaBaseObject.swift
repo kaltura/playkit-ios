@@ -10,6 +10,6 @@
 
 import Foundation
 
-protocol KalturaBaseObject {
+public protocol KalturaBaseObject {
     init?(json: Any)
 }
