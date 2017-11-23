@@ -17,8 +17,8 @@ import AVFoundation
     // All events EXCLUDING error. Assuming error events are treated differently.
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, ended, loadedMetadata,
-        play, pause, playing, seeking, seeked, stateChanged,
-        tracksAvailable, playbackInfo, error
+        play, pause, playing, seeking, seeked, stateChanged, playbackInfo,
+        tracksAvailable, textTrackChanged, audioTrackChanged, videoTrackChanged, error
     ]
     
     // MARK: - Player Events Static Reference
@@ -45,8 +45,12 @@ import AVFoundation
     @objc public static let seeked: PlayerEvent.Type = Seeked.self
     /// Sent when tracks available.
     @objc public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
-    /// Sent when track has been changed.
-    @objc public static let trackChanged: PlayerEvent.Type = TrackChanged.self
+    /// Sent when text track has been changed.
+    @objc public static let textTrackChanged: PlayerEvent.Type = TextTrackChanged.self
+    /// Sent when audio track has been changed.
+    @objc public static let audioTrackChanged: PlayerEvent.Type = AudioTrackChanged.self
+    /// Sent when video track has been changed.
+    @objc public static let videoTrackChanged: PlayerEvent.Type = VideoTrackChanged.self
     /// Sent when Playback Params Updated.
     @objc public static let playbackInfo: PlayerEvent.Type = PlaybackInfo.self
     /// Sent when player state is changed.
@@ -136,18 +140,30 @@ import AVFoundation
         }
     }
     
-    class TrackChanged: PlayerEvent {
+    class TextTrackChanged: PlayerEvent {
         convenience init(track: Track) {
             self.init([EventDataKeys.selectedTrack: track])
         }
     }
     
+    class AudioTrackChanged: PlayerEvent {
+        convenience init(track: Track) {
+            self.init([EventDataKeys.selectedTrack: track])
+        }
+    }
+
+    class VideoTrackChanged: PlayerEvent {
+        convenience init(bitrate: Double) {
+            self.init([EventDataKeys.bitrate: bitrate])
+        }
+    }
+
     class PlaybackInfo: PlayerEvent {
         convenience init(playbackInfo: PKPlaybackInfo) {
             self.init([EventDataKeys.playbackInfo: playbackInfo])
         }
     }
-
+    
     class StateChanged: PlayerEvent {
         convenience init(newState: PlayerState, oldState: PlayerState) {
             self.init([EventDataKeys.newState: newState as AnyObject,

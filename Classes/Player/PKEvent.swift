@@ -50,6 +50,7 @@ public extension PKEvent {
         static let metadata = "metadata"
         static let mediaSource = "mediaSource"
         static let timeRanges = "timeRanges"
+        static let bitrate = "bitrate"
     }
     
     // MARK: Player Data Accessors
@@ -72,6 +73,11 @@ public extension PKEvent {
     /// Selected Track Value, PKEvent Data Accessor
     @objc public var selectedTrack: Track? {
         return self.data?[EventDataKeys.selectedTrack] as? Track
+    }
+    
+    /// Indicated Bitrate, PKEvent Data Accessor
+    @objc public var bitrate: NSNumber? {
+        return self.data?[EventDataKeys.bitrate] as? NSNumber
     }
     
     /// Current Bitrate Value, PKEvent Data Accessor
