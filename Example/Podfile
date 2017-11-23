@@ -7,7 +7,6 @@ platform :ios, '9.0'
 abstract_target 'PlayKit' do
     
     pod 'PlayKit', :path => '../../playkit-ios'
-    pod 'PlayKit/PhoenixPlugin', :path => '../../playkit-ios' 
     pod 'PlayKit/KalturaStatsPlugin', :path => '../../playkit-ios'
     pod 'PlayKit/KalturaLiveStatsPlugin', :path => '../../playkit-ios'
     target 'PlayKit_Example' do
