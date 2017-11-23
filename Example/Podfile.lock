@@ -4,25 +4,25 @@ PODS:
   - KalturaNetKit/Core (0.0.17):
     - SwiftyJSON
   - Log (1.0)
-  - Nimble (7.0.2)
-  - PlayKit (3.2.x-dev):
-    - PlayKit/Core (= 3.2.x-dev)
-  - PlayKit/AnalyticsCommon (3.2.x-dev):
+  - Nimble (7.0.3)
+  - PlayKit (3.3.x-dev):
+    - PlayKit/Core (= 3.3.x-dev)
+  - PlayKit/AnalyticsCommon (3.3.x-dev):
     - PlayKit/Core
-  - PlayKit/Core (3.2.x-dev):
+  - PlayKit/Core (3.3.x-dev):
     - KalturaNetKit (~> 0.0)
     - Log (= 1.0)
     - SwiftyJSON (= 3.1.4)
     - SwiftyXMLParser (= 3.0.3)
-  - PlayKit/KalturaLiveStatsPlugin (3.2.x-dev):
+  - PlayKit/KalturaLiveStatsPlugin (3.3.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-  - PlayKit/KalturaStatsPlugin (3.2.x-dev):
+    - PlayKitUtils
+  - PlayKit/KalturaStatsPlugin (3.3.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-  - PlayKit/PhoenixPlugin (3.2.x-dev):
-    - PlayKit/AnalyticsCommon
-    - PlayKit/Core
+    - PlayKitUtils
+  - PlayKitUtils (0.1.3)
   - Quick (1.2.0)
   - SwiftyJSON (3.1.4)
   - SwiftyXMLParser (3.0.3)
@@ -32,7 +32,6 @@ DEPENDENCIES:
   - PlayKit (from `../../playkit-ios`)
   - PlayKit/KalturaLiveStatsPlugin (from `../../playkit-ios`)
   - PlayKit/KalturaStatsPlugin (from `../../playkit-ios`)
-  - PlayKit/PhoenixPlugin (from `../../playkit-ios`)
   - Quick
 
 EXTERNAL SOURCES:
@@ -42,12 +41,13 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   KalturaNetKit: d37b3c6fc08da9935677fc547c59b25abc3574a3
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
-  Nimble: bfe1f814edabba69ff145cb1283e04ed636a67f2
-  PlayKit: 290c23c190bf4ac3722abd908f9a10f4da878256
+  Nimble: 7f5a9c447a33002645a071bddafbfb24ea70e0ac
+  PlayKit: b9303169a4b4ccf0a82a930c63cb209f160c0d09
+  PlayKitUtils: 2f03579f0f1ffbc872050795105b0e5b7302ad7a
   Quick: 58d203b1c5e27fff7229c4c1ae445ad7069a7a08
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
   SwiftyXMLParser: 9c6cc0310e778266a63d8eba50d9e07925aab0fb
 
-PODFILE CHECKSUM: 2c6b8722e33a72de08c38cc13d996c597983a764
+PODFILE CHECKSUM: b4fa7f5760e344eafb4ce9c40cf58136f08680f0
 
 COCOAPODS: 1.3.1

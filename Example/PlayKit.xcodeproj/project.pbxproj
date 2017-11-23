@@ -8,11 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2012AFAC1E4B56D200BBA61C /* big_buck_bunny_short.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 2012AFAB1E4B56D200BBA61C /* big_buck_bunny_short.mp4 */; };
-		2012AFAF1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFAE1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift */; };
-		2012AFB21E4B860B00BBA61C /* PhoenixPluginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFB11E4B860B00BBA61C /* PhoenixPluginTest.swift */; };
 		2012AFB41E4B872300BBA61C /* PlayerCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2012AFB31E4B872300BBA61C /* PlayerCreator.swift */; };
 		20ADCFB11EE983A900B01019 /* KalturaRequestBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20ADCFB01EE983A900B01019 /* KalturaRequestBuilderTest.swift */; };
-		20C02A321EEE90EC00F83B44 /* TVPAPIPluginTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C02A311EEE90EC00F83B44 /* TVPAPIPluginTest.swift */; };
 		20CD64591E4C9697002C9401 /* PluginTestConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CD64581E4C9697002C9401 /* PluginTestConfiguration.swift */; };
 		49AD556D5A90D82F391750B8 /* Pods_PlayKit_PlayKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BF84E8D861C5637BA8624EE /* Pods_PlayKit_PlayKit_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
@@ -24,7 +21,6 @@
 		8460889C1DD1AB1A009E0E7A /* Entries.json in Resources */ = {isa = PBXBuildFile; fileRef = 8460889B1DD1AB1A009E0E7A /* Entries.json */; };
 		BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */; };
 		C23A62D11DF413FF00635FA2 /* MockMediaProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62C91DF412FD00635FA2 /* MockMediaProviderTest.swift */; };
-		C23A62D21DF4140B00635FA2 /* PhoenixMediaProviderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CA1DF412FD00635FA2 /* PhoenixMediaProviderTest.swift */; };
 		C23A62D41DF4141000635FA2 /* MediaEntryProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23A62CF1DF4131700635FA2 /* MediaEntryProviderMock.swift */; };
 		C24770AD1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
 		C24770B01DEDF36900E37C89 /* ovp.multirequest._.1_1h1vsv3z.json in Resources */ = {isa = PBXBuildFile; fileRef = C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */; };
@@ -45,11 +41,8 @@
 
 /* Begin PBXFileReference section */
 		2012AFAB1E4B56D200BBA61C /* big_buck_bunny_short.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = big_buck_bunny_short.mp4; sourceTree = "<group>"; };
-		2012AFAE1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OTTAnalyticsPluginTest.swift; sourceTree = "<group>"; };
-		2012AFB11E4B860B00BBA61C /* PhoenixPluginTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhoenixPluginTest.swift; path = Phoenix/PhoenixPluginTest.swift; sourceTree = "<group>"; };
 		2012AFB31E4B872300BBA61C /* PlayerCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerCreator.swift; sourceTree = "<group>"; };
 		20ADCFB01EE983A900B01019 /* KalturaRequestBuilderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KalturaRequestBuilderTest.swift; path = RequestBuilder/KalturaRequestBuilderTest.swift; sourceTree = "<group>"; };
-		20C02A311EEE90EC00F83B44 /* TVPAPIPluginTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TVPAPIPluginTest.swift; path = TVPAPI/TVPAPIPluginTest.swift; sourceTree = "<group>"; };
 		20CD64581E4C9697002C9401 /* PluginTestConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PluginTestConfiguration.swift; sourceTree = "<group>"; };
 		347179E45954932C0B17A1AF /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		349AFD3D2D9F85463A6A0F41 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
@@ -72,7 +65,6 @@
 		BE76A2A9EC2DDAC016A40200 /* Pods_PlayKit_PlayKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlayKit_PlayKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF5C80811DF0E36500D3E665 /* MessegeBusTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessegeBusTest.swift; sourceTree = "<group>"; };
 		C23A62C91DF412FD00635FA2 /* MockMediaProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockMediaProviderTest.swift; sourceTree = "<group>"; };
-		C23A62CA1DF412FD00635FA2 /* PhoenixMediaProviderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhoenixMediaProviderTest.swift; sourceTree = "<group>"; };
 		C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OVPMediaProviederTest.swift; sourceTree = "<group>"; };
 		C23A62CF1DF4131700635FA2 /* MediaEntryProviderMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaEntryProviderMock.swift; sourceTree = "<group>"; };
 		C24770AC1DEDE72F00E37C89 /* ovp.multirequest._.1_1h1vsv3z.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ovp.multirequest._.1_1h1vsv3z.json; sourceTree = "<group>"; };
@@ -116,38 +108,12 @@
 			path = Video;
 			sourceTree = "<group>";
 		};
-		2012AFAD1E4B85CA00BBA61C /* Analytics */ = {
-			isa = PBXGroup;
-			children = (
-				2012AFAE1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift */,
-				2012AFB01E4B85D600BBA61C /* Phoenix */,
-				20C02A301EEE90B600F83B44 /* TVPAPI */,
-			);
-			path = Analytics;
-			sourceTree = "<group>";
-		};
-		2012AFB01E4B85D600BBA61C /* Phoenix */ = {
-			isa = PBXGroup;
-			children = (
-				2012AFB11E4B860B00BBA61C /* PhoenixPluginTest.swift */,
-			);
-			name = Phoenix;
-			sourceTree = "<group>";
-		};
 		20ADCFAF1EE9832700B01019 /* RequestBuilder */ = {
 			isa = PBXGroup;
 			children = (
 				20ADCFB01EE983A900B01019 /* KalturaRequestBuilderTest.swift */,
 			);
 			name = RequestBuilder;
-			sourceTree = "<group>";
-		};
-		20C02A301EEE90B600F83B44 /* TVPAPI */ = {
-			isa = PBXGroup;
-			children = (
-				20C02A311EEE90EC00F83B44 /* TVPAPIPluginTest.swift */,
-			);
-			name = TVPAPI;
 			sourceTree = "<group>";
 		};
 		20CD64571E4C9697002C9401 /* Helpers */ = {
@@ -207,7 +173,6 @@
 			children = (
 				2012AFB31E4B872300BBA61C /* PlayerCreator.swift */,
 				20CD64571E4C9697002C9401 /* Helpers */,
-				2012AFAD1E4B85CA00BBA61C /* Analytics */,
 				2012AFA91E4B56D200BBA61C /* Resources */,
 				C23A62C81DF412FD00635FA2 /* MediaEntryProvider */,
 				C63FA2AE1DF3F854004030E0 /* PlayerControllerTest.swift */,
@@ -261,7 +226,6 @@
 			children = (
 				20ADCFAF1EE9832700B01019 /* RequestBuilder */,
 				C23A62C91DF412FD00635FA2 /* MockMediaProviderTest.swift */,
-				C23A62CA1DF412FD00635FA2 /* PhoenixMediaProviderTest.swift */,
 				C23A62CB1DF412FD00635FA2 /* OVPMediaProviederTest.swift */,
 				C23A62CF1DF4131700635FA2 /* MediaEntryProviderMock.swift */,
 			);
@@ -430,6 +394,7 @@
 				"${BUILT_PRODUCTS_DIR}/KalturaNetKit/KalturaNetKit.framework",
 				"${BUILT_PRODUCTS_DIR}/Log/Log.framework",
 				"${BUILT_PRODUCTS_DIR}/PlayKit/PlayKit.framework",
+				"${BUILT_PRODUCTS_DIR}/PlayKitUtils/PlayKitUtils.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyXMLParser/SwiftyXMLParser.framework",
 			);
@@ -438,6 +403,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KalturaNetKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Log.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PlayKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PlayKitUtils.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyXMLParser.framework",
 			);
@@ -456,6 +422,7 @@
 				"${BUILT_PRODUCTS_DIR}/KalturaNetKit/KalturaNetKit.framework",
 				"${BUILT_PRODUCTS_DIR}/Log/Log.framework",
 				"${BUILT_PRODUCTS_DIR}/PlayKit/PlayKit.framework",
+				"${BUILT_PRODUCTS_DIR}/PlayKitUtils/PlayKitUtils.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyXMLParser/SwiftyXMLParser.framework",
 				"${BUILT_PRODUCTS_DIR}/Nimble/Nimble.framework",
@@ -466,6 +433,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KalturaNetKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Log.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PlayKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PlayKitUtils.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyXMLParser.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nimble.framework",
@@ -532,12 +500,8 @@
 				C63FA2B01DF3F854004030E0 /* PlayerControllerTest.swift in Sources */,
 				C2D803221E6C09CF00A3DE15 /* SourceSelectorTest.swift in Sources */,
 				20ADCFB11EE983A900B01019 /* KalturaRequestBuilderTest.swift in Sources */,
-				20C02A321EEE90EC00F83B44 /* TVPAPIPluginTest.swift in Sources */,
-				2012AFB21E4B860B00BBA61C /* PhoenixPluginTest.swift in Sources */,
 				BF5C80821DF0E36500D3E665 /* MessegeBusTest.swift in Sources */,
 				2012AFB41E4B872300BBA61C /* PlayerCreator.swift in Sources */,
-				C23A62D21DF4140B00635FA2 /* PhoenixMediaProviderTest.swift in Sources */,
-				2012AFAF1E4B85CA00BBA61C /* OTTAnalyticsPluginTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
