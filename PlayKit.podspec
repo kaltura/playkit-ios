@@ -20,7 +20,7 @@ s.subspec 'Core' do |sp|
 end
 
 s.subspec 'WidevineClassic' do |ssp|
-  ssp.ios.deployment_target = '8.0'  
+  ssp.ios.deployment_target = '9.0'
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKit/Core'
   #ssp.dependency 'PlayKitWV'
