@@ -69,4 +69,8 @@ import Foundation
     public func registerEvents() {
         fatalError("abstract func should be overriden in subclass")
     }
+    
+    public func unregisterEvents() {
+        fatalError("abstract func should be overriden in subclass")
+    }
 }

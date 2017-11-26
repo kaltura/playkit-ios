@@ -146,6 +146,10 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
         }
     }
     
+    public func unregisterEvents() {
+        self.messageBus?.removeObserver(self, events: playerEventsToRegister)
+    }
+    
     /************************************************************/
     // MARK: - OTTAnalyticsPluginProtocol
     /************************************************************/

@@ -33,7 +33,6 @@ extension PKEvent {
 }
 
 public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
-    
     // stats event types
     enum KalturaStatsEventType : Int {
         case widgetLoaded = 1
@@ -225,6 +224,10 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
             default: assertionFailure("all events must be handled")
             }
         }
+    }
+
+    public func unregisterEvents() {
+        self.messageBus?.removeObserver(self, events: playerEventsToRegister)
     }
     
     /************************************************************/

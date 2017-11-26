@@ -13,7 +13,6 @@ import AVFoundation
 import AVKit
 
 @objc open class PlayerDecoratorBase: NSObject, Player {
-    
     fileprivate var player: Player!
     
     public var delegate: PlayerDelegate? {
@@ -31,6 +30,10 @@ import AVKit
     
     public var settings: PKPlayerSettings {
         return self.player.settings
+    }
+    
+    public var mediaFormat: PKMediaSource.MediaFormat {
+        return self.player.mediaFormat
     }
     
     public var currentTime: TimeInterval {
@@ -121,6 +124,10 @@ import AVKit
     
     public func updatePluginConfig(pluginName: String, config: Any) {
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
+    }
+    
+    public func isLive() -> Bool {
+        return self.player.isLive()
     }
     
     public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
