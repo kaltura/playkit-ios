@@ -182,6 +182,10 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         }
     }
     
+    public func unregisterEvents() {
+        self.messageBus?.removeObserver(self, events: playerEventsToRegister)
+    }
+    
     /************************************************************/
     // MARK: - Private
     /************************************************************/
