@@ -32,8 +32,8 @@ import AVKit
         return self.player.settings
     }
     
-    public var mediaInfo: PKMediaInfo {
-        return self.player.mediaInfo
+    public var mediaFormat: PKMediaSource.MediaFormat {
+        return self.player.mediaFormat
     }
     
     public var currentTime: TimeInterval {
@@ -124,6 +124,10 @@ import AVKit
     
     public func updatePluginConfig(pluginName: String, config: Any) {
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
+    }
+    
+    public func isLive() -> Bool {
+        return self.player.isLive()
     }
     
     public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {

@@ -25,8 +25,8 @@ import UIKit
     /// The player's settings.
     @objc var settings: PKPlayerSettings { get }
     
-    /// The current media info.
-    @objc var mediaInfo: PKMediaInfo { get }
+    /// The current media format.
+    @objc var mediaFormat: PKMediaSource.MediaFormat { get }
     
     /// The player's session id. the `sessionId` is initialized when the player loads.
     @objc var sessionId: String { get }
@@ -45,6 +45,12 @@ import UIKit
     
     /// Update Plugin Config.
     @objc func updatePluginConfig(pluginName: String, config: Any)
+    
+    
+    /// Indicates if current media is Live.
+    ///
+    /// - Returns: returns true if it's live.
+    @objc func isLive() -> Bool
     
     /// Getter for playkit controllers.
     ///

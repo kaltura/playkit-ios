@@ -10,7 +10,7 @@
 
 import Foundation
 
-class PlayerController: NSObject, Player {    
+class PlayerController: NSObject, Player {
     
     /************************************************************/
     // MARK: - Properties
@@ -32,7 +32,8 @@ class PlayerController: NSObject, Player {
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
     let settings = PKPlayerSettings()
-    let mediaInfo = PKMediaInfo()
+    
+    var mediaFormat = PKMediaSource.MediaFormat.unknown
     
     /* Time Observation */
     var timeObserver: TimeObserver!
@@ -167,16 +168,9 @@ class PlayerController: NSObject, Player {
     
     func prepare(_ mediaConfig: MediaConfig) {
         self.currentPlayer.prepare(mediaConfig)
-        self.setMediaInfoParams()
-    }
-    
-    func setMediaInfoParams() {
-        if let mediaType = self.mediaEntry?.mediaType {
-            self.mediaInfo.type = mediaType
-        }
         
-        if let mediaFormat = self.selectedSource?.mediaFormat {
-            self.mediaInfo.format = mediaFormat
+        if let source = self.selectedSource {
+            self.mediaFormat = source.mediaFormat
         }
     }
     
@@ -198,6 +192,16 @@ class PlayerController: NSObject, Player {
     
     func seek(to time: TimeInterval) {
         self.currentPlayer.currentPosition = time
+    }
+    
+    func isLive() -> Bool {
+        if let entry = self.mediaEntry {
+            if entry.mediaType == MediaType.live {
+                return true
+            }
+        }
+        
+        return false
     }
     
     func destroy() {
