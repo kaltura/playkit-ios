@@ -13,6 +13,7 @@ import AVFoundation
 import AVKit
 
 @objc open class PlayerDecoratorBase: NSObject, Player {
+    
     fileprivate var player: Player!
     
     public var delegate: PlayerDelegate? {
@@ -79,7 +80,12 @@ import AVKit
     }
     
     public var rate: Float {
-        return self.player.rate
+        get {
+            return self.player.rate
+        }
+        set {
+            self.player.rate = newValue
+        }
     }
     
     @objc public var loadedTimeRanges: [PKTimeRange]? {
