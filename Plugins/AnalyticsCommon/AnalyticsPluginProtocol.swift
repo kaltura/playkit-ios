@@ -10,7 +10,7 @@
 
 import Foundation
 
-public protocol AnalyticsPluginProtocol: PKPlugin {
+@objc public protocol AnalyticsPluginProtocol: PKPlugin {
     
     /// Indicates if it first play.
     var isFirstPlay: Bool { get set }

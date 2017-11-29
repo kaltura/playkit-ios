@@ -171,7 +171,7 @@ import GoogleCast
     }
     
     
-    func validate() throws {
+    internal func validate() throws {
         guard self.contentId != nil else {
             throw BasicCastBuilder.BasicBuilderDataError.missingContentId
         }

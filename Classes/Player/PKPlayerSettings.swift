@@ -55,7 +55,7 @@ enum PlayerSettingsType {
 
 extension PKPlayerSettings: NSCopying {
     
-    public func copy(with zone: NSZone? = nil) -> Any {
+    @objc public func copy(with zone: NSZone? = nil) -> Any {
         return self.createCopy()
     }
 }

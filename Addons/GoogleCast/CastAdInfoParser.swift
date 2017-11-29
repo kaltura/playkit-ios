@@ -19,15 +19,15 @@ import GoogleCast
  1. set 
  
  */
-public class CastAdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
+@objc public class CastAdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegate {
     
     
-    public static let shared = CastAdInfoParser()
+    @objc public static let shared = CastAdInfoParser()
     
     /**
      return A boolean flag indicating whether your receiver is currently playing an ad ot not
      */
-    public func remoteMediaClient(_ client: GCKRemoteMediaClient, shouldSetPlayingAdIn mediaStatus: GCKMediaStatus) -> Bool {
+    @objc public func remoteMediaClient(_ client: GCKRemoteMediaClient, shouldSetPlayingAdIn mediaStatus: GCKMediaStatus) -> Bool {
         
         guard let customData = mediaStatus.customData as? [String: Any], let adsInfo = customData["adsInfo"] as? [String: Any] else {
             PKLog.warning("No Ads info from receiver")
@@ -41,7 +41,7 @@ public class CastAdInfoParser: NSObject, GCKRemoteMediaClientAdInfoParserDelegat
     /**
      A list of playback positions at which the ads occur.
      */
-    public func remoteMediaClient(_ client: GCKRemoteMediaClient, shouldSetAdBreaksIn mediaStatus: GCKMediaStatus) -> [GCKAdBreakInfo]? {
+    @objc public func remoteMediaClient(_ client: GCKRemoteMediaClient, shouldSetAdBreaksIn mediaStatus: GCKMediaStatus) -> [GCKAdBreakInfo]? {
         
         guard let customData = mediaStatus.customData as? [String: Any], let adsInfo = customData["adsInfo"] as? [String: Any] else {
             PKLog.warning("No Ads info from receiver")
