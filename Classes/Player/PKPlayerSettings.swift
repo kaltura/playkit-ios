@@ -43,7 +43,7 @@ enum PlayerSettingsType {
     /// The settings for network data consumption.
     @objc public var network = PKNetworkSettings()
     
-    @objc public var contentRequestAdapter: PKRequestParamsAdapter? = KalturaPlaybackRequestAdapter()
+    @objc public var contentRequestAdapter: PKRequestParamsAdapter?
     
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()
