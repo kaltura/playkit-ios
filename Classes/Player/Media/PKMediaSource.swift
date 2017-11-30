@@ -30,7 +30,7 @@ import SwiftyJSON
         case mp3
         case unknown
         
-        var fileExtension: String {
+        public var fileExtension: String {
             get {
                 switch self {
                 case .hls: return "m3u8"

@@ -25,7 +25,7 @@ import Foundation
     public let url: URL
     public let headers: [String: String]?
     
-    init(url: URL, headers: [String: String]?) {
+    public init(url: URL, headers: [String: String]?) {
         self.url = url
         self.headers = headers
     }
