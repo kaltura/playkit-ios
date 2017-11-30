@@ -77,7 +77,12 @@ class PlayerController: NSObject, Player {
     }
     
     public var rate: Float {
-        return self.currentPlayer.rate
+        get {
+            return self.currentPlayer.rate
+        }
+        set {
+            self.currentPlayer.rate = newValue
+        }
     }
     
     public var loadedTimeRanges: [PKTimeRange]? {
