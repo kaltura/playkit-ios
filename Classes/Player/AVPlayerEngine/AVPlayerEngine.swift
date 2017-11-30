@@ -162,6 +162,17 @@ public class AVPlayerEngine: AVPlayer {
         }
     }
     
+    public override var rate: Float {
+        get {
+            return super.rate
+        }
+        set {
+            if newValue >= 0 {
+                super.rate = newValue
+            }
+        }
+    }
+    
     // MARK: Player Methods
     
     override init() {
