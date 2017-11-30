@@ -25,7 +25,7 @@ import SwiftyJSON
     @objc public var metadata: [String: String]?
    
     var vrData: VRData?
-    var tags: String? {
+    @objc public var tags: String? {
         didSet {
             //creating media entry with the above sources
             let vrKey = "360"

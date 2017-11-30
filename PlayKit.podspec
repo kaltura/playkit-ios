@@ -16,7 +16,6 @@ s.subspec 'Core' do |sp|
     sp.dependency 'SwiftyJSON', '3.1.4'
     sp.dependency 'Log', '1.0'
     sp.dependency 'SwiftyXMLParser', '3.0.3'
-    sp.dependency 'KalturaNetKit', '~> 0.0'
 end
 
 s.subspec 'WidevineClassic' do |ssp|
@@ -39,6 +38,7 @@ s.subspec 'KalturaStatsPlugin' do |ssp|
     ssp.dependency 'PlayKit/Core'
     ssp.dependency 'PlayKit/AnalyticsCommon'
     ssp.dependency 'PlayKitUtils'
+    ssp.dependency 'KalturaNetKit'
 end
 
 s.subspec 'KalturaLiveStatsPlugin' do |ssp|
@@ -52,6 +52,7 @@ s.subspec 'KalturaLiveStatsPlugin' do |ssp|
     ssp.dependency 'PlayKit/Core'
     ssp.dependency 'PlayKit/AnalyticsCommon'
     ssp.dependency 'PlayKitUtils'
+    ssp.dependency 'KalturaNetKit'
 end
 
 s.subspec 'AnalyticsCommon' do |ssp|

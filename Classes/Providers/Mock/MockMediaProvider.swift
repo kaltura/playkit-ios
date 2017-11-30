@@ -11,7 +11,7 @@
 import UIKit
 import SwiftyJSON
 
-@objc public class MockMediaEntryProvider: NSObject, MediaEntryProvider {
+@objc public class MockMediaEntryProvider: NSObject {
 
    public enum MockError: Error {
         case invalidParam(paramName:String)
