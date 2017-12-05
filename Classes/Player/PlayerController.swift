@@ -42,7 +42,10 @@ class PlayerController: NSObject, Player {
         return self.mediaConfig?.mediaEntry
     }
     
-    public var duration: Double {
+    public var duration: TimeInterval {
+        if let mediaType = mediaEntry?.mediaType, mediaType == .live {
+            return self.isDvr ? self.currentPlayer.duration : TimeInterval.infinity
+        }
         return self.currentPlayer.duration
     }
     
@@ -55,8 +58,15 @@ class PlayerController: NSObject, Player {
     }
     
     public var currentTime: TimeInterval {
-        get { return self.currentPlayer.currentPosition }
-        set { self.currentPlayer.currentPosition = newValue }
+        get {
+            if let mediaType = mediaEntry?.mediaType, mediaType == .live {
+                return self.currentPlayer.currentTime - self.duration
+            }
+            return self.currentPlayer.currentPosition
+        }
+        set {
+            self.seek(to: newValue)
+        }
     }
     
     public var currentAudioTrack: String? {
@@ -126,6 +136,7 @@ class PlayerController: NSObject, Player {
     
     func setMedia(from mediaConfig: MediaConfig) {
         self.mediaConfig = mediaConfig
+        
         // create new media session uuid
         self.mediaSessionUUID = UUID()
         
@@ -151,6 +162,7 @@ class PlayerController: NSObject, Player {
         // After Setting PlayerWrapper set  saved player's params
         self.currentPlayer.onEventBlock = eventBlock
         self.currentPlayer.view = playerView
+        self.currentPlayer.mediaConfig = mediaConfig
         self.currentPlayer.loadMedia(from: self.selectedSource, handler: handler)
     }
     
@@ -196,6 +208,13 @@ class PlayerController: NSObject, Player {
     }
     
     func seek(to time: TimeInterval) {
+        if let mediaType = mediaEntry?.mediaType, mediaType == .live {
+            if self.isDvr {
+                let time = time < -self.duration ? -self.duration : time
+                self.currentPlayer.currentTime = self.duration + time
+            }
+            return
+        }
         self.currentPlayer.currentPosition = time
     }
     
@@ -254,9 +273,9 @@ class PlayerController: NSObject, Player {
 // MARK: - Private
 /************************************************************/
 
-extension PlayerController {
+fileprivate extension PlayerController {
     /// Updates the request adapter if one exists
-    fileprivate func updateRequestAdapter(in mediaSource: inout PKMediaSource) {
+    func updateRequestAdapter(in mediaSource: inout PKMediaSource) {
         // configure media sources content request adapter if request adapter exists
         if let adapter = self.settings.contentRequestAdapter {
             // update the request adapter with the updated session id
@@ -264,6 +283,10 @@ extension PlayerController {
             // configure media source with the adapter
             mediaSource.contentRequestAdapter = adapter
         }
+    }
+    
+    var isDvr: Bool {
+        return true // FIXME: add real check for is dvr
     }
 }
 
