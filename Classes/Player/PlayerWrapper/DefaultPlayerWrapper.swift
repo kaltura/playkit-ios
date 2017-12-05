@@ -87,8 +87,11 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
     public weak var view: PlayerView?
     
     public var rate: Float {
-        printInvocationWarning("\(#function)")
-        return 0.0
+        get {
+            printInvocationWarning("\(#function)")
+            return 0.0
+        }
+        set { printInvocationWarning("\(#function)") }
     }
     
     func play() {

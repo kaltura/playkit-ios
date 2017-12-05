@@ -1,14 +1,14 @@
 Pod::Spec.new do |s|
 
 s.name             = 'PlayKit'
-s.version          = '3.3.4'
+s.version          = '3.3.5'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 s.homepage         = 'https://github.com/kaltura/playkit-ios'
 s.license          = { :type => 'AGPLv3', :text => 'AGPLv3' }
 s.author           = { 'Kaltura' => 'community@kaltura.com' }
 s.source           = { :git => 'https://github.com/kaltura/playkit-ios.git', :tag => 'v' + s.version.to_s }
 
-s.ios.deployment_target = '9.0'
+s.ios.deployment_target = '8.0'
 s.tvos.deployment_target = '9.0'
 
 s.subspec 'Core' do |sp|
@@ -17,11 +17,11 @@ s.subspec 'Core' do |sp|
     sp.dependency 'Log', '1.0'
     sp.dependency 'SwiftyXMLParser', '3.0.3'
     sp.dependency 'KalturaNetKit', '~> 0.0'
-    sp.dependency 'PlayKitUtils', '0.1.3'
+    sp.dependency 'PlayKitUtils', '0.1.4'
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
-    ssp.ios.deployment_target = '9.0'
+    ssp.ios.deployment_target = '8.0'
     ssp.source_files = 'Addons/GoogleCast'
     ssp.xcconfig = { 
         'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
@@ -41,7 +41,7 @@ s.subspec 'YouboraPlugin' do |ssp|
 end
 
 s.subspec 'WidevineClassic' do |ssp|
-  ssp.ios.deployment_target = '9.0'  
+  ssp.ios.deployment_target = '8.0'  
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKit/Core'
   #ssp.dependency 'PlayKitWV'
