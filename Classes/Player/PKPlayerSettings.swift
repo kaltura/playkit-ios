@@ -8,14 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-//
-//  PKPlayerSettings.swift
-//  Pods
-//
-//  Created by Gal Orlanczyk on 14/08/2017.
-//
-//
-
 import Foundation
 
 typealias SettingsChange = ((PlayerSettingsType) -> Void)

@@ -10,7 +10,7 @@
 
 import Foundation
 
-class PlayerController: NSObject, Player {    
+class PlayerController: NSObject, Player {
     
     /************************************************************/
     // MARK: - Properties
@@ -32,6 +32,8 @@ class PlayerController: NSObject, Player {
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
     let settings = PKPlayerSettings()
+    
+    var mediaFormat = PKMediaSource.MediaFormat.unknown
     
     /* Time Observation */
     var timeObserver: TimeObserver!
@@ -75,7 +77,12 @@ class PlayerController: NSObject, Player {
     }
     
     public var rate: Float {
-        return self.currentPlayer.rate
+        get {
+            return self.currentPlayer.rate
+        }
+        set {
+            self.currentPlayer.rate = newValue
+        }
     }
     
     public var loadedTimeRanges: [PKTimeRange]? {
@@ -166,6 +173,10 @@ class PlayerController: NSObject, Player {
     
     func prepare(_ mediaConfig: MediaConfig) {
         self.currentPlayer.prepare(mediaConfig)
+        
+        if let source = self.selectedSource {
+            self.mediaFormat = source.mediaFormat
+        }
     }
     
     func play() {
@@ -186,6 +197,16 @@ class PlayerController: NSObject, Player {
     
     func seek(to time: TimeInterval) {
         self.currentPlayer.currentPosition = time
+    }
+    
+    func isLive() -> Bool {
+        if let entry = self.mediaEntry {
+            if entry.mediaType == MediaType.live {
+                return true
+            }
+        }
+        
+        return false
     }
     
     func destroy() {

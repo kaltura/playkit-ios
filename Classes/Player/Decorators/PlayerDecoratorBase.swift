@@ -33,6 +33,10 @@ import AVKit
         return self.player.settings
     }
     
+    public var mediaFormat: PKMediaSource.MediaFormat {
+        return self.player.mediaFormat
+    }
+    
     public var currentTime: TimeInterval {
         get {
             return self.player.currentTime
@@ -76,7 +80,12 @@ import AVKit
     }
     
     public var rate: Float {
-        return self.player.rate
+        get {
+            return self.player.rate
+        }
+        set {
+            self.player.rate = newValue
+        }
     }
     
     @objc public var loadedTimeRanges: [PKTimeRange]? {
@@ -121,6 +130,10 @@ import AVKit
     
     public func updatePluginConfig(pluginName: String, config: Any) {
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
+    }
+    
+    public func isLive() -> Bool {
+        return self.player.isLive()
     }
     
     public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {

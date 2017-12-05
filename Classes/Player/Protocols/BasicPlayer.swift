@@ -43,7 +43,7 @@ import Foundation
     @objc var currentTextTrack: String? { get }
     
     /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
-    @objc var rate: Float { get }
+    @objc var rate: Float { get set }
     
     /// Provides a collection of time ranges for which the player has the media data readily available. The ranges provided might be discontinuous.
     @objc var loadedTimeRanges: [PKTimeRange]? { get }
