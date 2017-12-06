@@ -59,8 +59,8 @@ class PlayerController: NSObject, Player {
     
     public var currentTime: TimeInterval {
         get {
-            if let mediaType = mediaEntry?.mediaType, mediaType == .live {
-                return self.currentPlayer.currentTime - self.duration
+            if self.currentPlayer.currentPosition != TimeInterval.infinity && self.currentPlayer.currentPosition > self.duration {
+                return self.duration
             }
             return self.currentPlayer.currentPosition
         }
@@ -172,7 +172,6 @@ class PlayerController: NSObject, Player {
                 PKLog.error("VRPlayerWrapper does not exist")
                 fatalError("VR library is missing, make sure to add it via Podfile.")
             }
-            
             self.currentPlayer = vrPlayerWrapper.init()
         } else {
             self.currentPlayer = AVPlayerWrapper()
@@ -208,13 +207,6 @@ class PlayerController: NSObject, Player {
     }
     
     func seek(to time: TimeInterval) {
-        if let mediaType = mediaEntry?.mediaType, mediaType == .live {
-            if self.isDvr {
-                let time = time < -self.duration ? -self.duration : time
-                self.currentPlayer.currentTime = self.duration + time
-            }
-            return
-        }
         self.currentPlayer.currentPosition = time
     }
     
