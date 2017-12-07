@@ -43,9 +43,6 @@ class PlayerController: NSObject, Player {
     }
     
     public var duration: TimeInterval {
-        if let mediaType = mediaEntry?.mediaType, mediaType == .live {
-            return self.isDvr ? self.currentPlayer.duration : TimeInterval.infinity
-        }
         return self.currentPlayer.duration
     }
     
@@ -275,10 +272,6 @@ fileprivate extension PlayerController {
             // configure media source with the adapter
             mediaSource.contentRequestAdapter = adapter
         }
-    }
-    
-    var isDvr: Bool {
-        return true // FIXME: add real check for is dvr
     }
 }
 
