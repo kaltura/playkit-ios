@@ -33,10 +33,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     fileprivate var preferredMediaSource: PKMediaSource?
     /// the current handler for the selected source
     fileprivate var assetHandler: AssetHandler?
-    /// the current media config that was set
-    private var mediaConfig: MediaConfig?
+    
     /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
+    
     var settings: PKPlayerSettings? {
         didSet {
             guard let settings = self.settings else {
@@ -52,6 +52,9 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         }
     }
 
+    /// the current media config that was set
+    public  var mediaConfig: MediaConfig?
+    
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
     }
