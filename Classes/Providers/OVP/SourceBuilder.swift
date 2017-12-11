@@ -10,9 +10,7 @@
 
 import UIKit
 
-class SourceBuilder {
-
-        
+class SourceBuilder {  
     var baseURL: String?
     var partnerId: Int64?
     var ks: String?

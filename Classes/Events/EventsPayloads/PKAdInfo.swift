@@ -54,7 +54,7 @@ import Foundation
         }
     }
     
-    public init(adDescription: String,
+    @objc public init(adDescription: String,
          adDuration: TimeInterval,
          title: String,
          isSkippable: Bool,

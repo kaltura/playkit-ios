@@ -16,8 +16,8 @@ import Foundation
     /// Use this to update the adapter with any information available from the player.
     /// 
     /// For example, when media session id changes.
-    func updateRequestAdapter(with player: Player)
-    func adapt(requestParams: PKRequestParams) -> PKRequestParams
+    @objc func updateRequestAdapter(with player: Player)
+    @objc func adapt(requestParams: PKRequestParams) -> PKRequestParams
 }
 
 @objc public class PKRequestParams: NSObject {
@@ -25,7 +25,7 @@ import Foundation
     public let url: URL
     public let headers: [String: String]?
     
-    init(url: URL, headers: [String: String]?) {
+    @objc init(url: URL, headers: [String: String]?) {
         self.url = url
         self.headers = headers
     }
