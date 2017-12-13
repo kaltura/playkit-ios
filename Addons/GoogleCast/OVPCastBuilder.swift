@@ -16,7 +16,7 @@ import UIKit
  TVPAPICastBuilder this component will help you to comunicate with Kaltura-custom-receiver with OVP-Kaltura Server.
  
  */
-public class OVPCastBuilder: BasicCastBuilder{
+@objc public class OVPCastBuilder: BasicCastBuilder{
     
     internal var ks: String?
     
@@ -25,7 +25,7 @@ public class OVPCastBuilder: BasicCastBuilder{
      The ks which represent the user key, used by the Kaltura Web Player
      */
     @discardableResult
-    public func set(ks:String?) -> Self {
+    @objc public func set(ks:String?) -> Self {
         
         guard ks != nil,
             ks?.isEmpty == false

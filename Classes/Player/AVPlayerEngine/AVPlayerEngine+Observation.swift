@@ -188,7 +188,12 @@ extension AVPlayerEngine {
     
     private func handle(status: AVPlayerStatus) {
         switch status {
-        case .readyToPlay: PKLog.debug("player is ready to play player items")
+        case .readyToPlay:
+            PKLog.debug("player is ready to play player items")
+            if self.startPosition > 0 {
+                self.currentPosition = self.startPosition
+                self.startPosition = 0
+            }
         case .failed:
             PKLog.error("player failed you must recreate the player instance")
             if let error = (self.error as NSError?) {
@@ -202,11 +207,6 @@ extension AVPlayerEngine {
         switch status {
         case .readyToPlay:
             let newState = PlayerState.ready
-            
-            if self.startPosition > 0 {
-                self.currentPosition = self.startPosition
-                self.startPosition = 0
-            }
             
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
