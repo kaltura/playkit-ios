@@ -10,6 +10,7 @@
 
 import KalturaNetKit
 import PlayKitUtils
+import SwiftyJSON
 
 /// `KalturaStatsEvent` represents an event reporting from kaltura stats plugin.
 @objc public class KalturaLiveStatsEvent: PKEvent {
@@ -68,12 +69,34 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-        guard let config = pluginConfig as? KalturaLiveStatsPluginConfig else {
+        
+        var _config: KalturaLiveStatsPluginConfig?
+        if let json = pluginConfig as? JSON {
+            _config = parse(json: json)
+        } else {
+            _config = pluginConfig as? KalturaLiveStatsPluginConfig
+        }
+        
+        guard let config = _config else {
             PKLog.error("missing plugin config or wrong plugin class type")
-            throw PKPluginError.missingPluginConfig(pluginName: KalturaLiveStatsPlugin.pluginName)
+            throw PKPluginError.missingPluginConfig(pluginName: KalturaLiveStatsPlugin.pluginName).asNSError
         }
         self.config = config
         self.registerEvents()
+    }
+    
+    private func parse(json: JSON) -> KalturaLiveStatsPluginConfig? {
+        guard let jsonDictionary = json.dictionary else { return nil }
+        guard let entryId = jsonDictionary["entryId"]?.string,
+            let partnerId = jsonDictionary["partnerId"]?.int else { return nil }
+        
+        let config = KalturaLiveStatsPluginConfig(entryId: entryId, partnerId: partnerId)
+        
+        if let baseUrl = jsonDictionary["baseUrl"]?.string, baseUrl != "" {
+            config.baseUrl = baseUrl
+        }
+        
+        return config
     }
     
     public override func onUpdateMedia(mediaConfig: MediaConfig) {
