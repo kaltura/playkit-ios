@@ -12,7 +12,8 @@ import Foundation
 import AVFoundation
 
 public class TracksManager: NSObject {
-    let textOffDisplay: String = "Off"
+    
+    static let textOffDisplay: String = "Off"
     
     private var audioTracks: [Track]?
     private var textTracks: [Track]?
@@ -70,7 +71,7 @@ public class TracksManager: NSObject {
             if let option = item.selectedMediaOption(in: group) {
                 displayName = option.displayName
             } else {
-                displayName = textOffDisplay
+                displayName = TracksManager.textOffDisplay
             }
             return self.textTracks?.filter{($0.title == displayName)}.first?.id
         }
@@ -138,7 +139,7 @@ public class TracksManager: NSObject {
             self.textTracks?.append(track)
         }
         if optionMediaType != "" {
-            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: textOffDisplay, type: .text, language: nil), at: 0)
+            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: TracksManager.textOffDisplay, type: .text, language: nil), at: 0)
         }
     }
     
