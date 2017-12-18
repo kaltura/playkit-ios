@@ -83,7 +83,6 @@ public class AVPlayerEngine: AVPlayer {
                     PKLog.error("seek faild")
                 }
             }
-            
             self.post(event: PlayerEvent.Seeking(targetSeekPosition: CMTimeGetSeconds(newTime)))
         }
     }
@@ -222,8 +221,9 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func selectTrack(trackId: String) {
+        guard let currentItem = self.currentItem else { return }
         if trackId.isEmpty == false {
-            let selectedTrack = self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
+            let selectedTrack = self.tracksManager.selectTrack(item: currentItem, trackId: trackId)
             if let selectedTrack = selectedTrack {
                 if selectedTrack.type == .audio {
                     self.post(event: PlayerEvent.AudioTrackChanged(track: selectedTrack))

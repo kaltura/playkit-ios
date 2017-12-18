@@ -8,14 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-//
-//  PKAsset.swift
-//  Pods
-//
-//  Created by Gal Orlanczyk on 15/08/2017.
-//
-//
-
 import Foundation
 import AVFoundation
 

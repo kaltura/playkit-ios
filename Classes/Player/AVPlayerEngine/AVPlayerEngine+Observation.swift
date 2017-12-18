@@ -188,7 +188,12 @@ extension AVPlayerEngine {
     
     private func handle(status: AVPlayerStatus) {
         switch status {
-        case .readyToPlay: PKLog.debug("player is ready to play player items")
+        case .readyToPlay:
+            PKLog.debug("player is ready to play player items")
+            if self.startPosition > 0 {
+                self.currentPosition = self.startPosition
+                self.startPosition = 0
+            }
         case .failed:
             PKLog.error("player failed you must recreate the player instance")
             if let error = (self.error as NSError?) {
@@ -203,26 +208,16 @@ extension AVPlayerEngine {
         case .readyToPlay:
             let newState = PlayerState.ready
             
-            if self.startPosition > 0 {
-                self.currentPosition = self.startPosition
-                self.startPosition = 0
-            }
-            
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
             if self.isFirstReady {
                 self.isFirstReady = false
-                
-                // There is an issue with AVPlayer that when we select a track right after state is `.readyToPlay`
-                // AVPlayer ignores this selection and doesn't display the subtitles up until a later point in time.
-                // To resolve this internally we send `TracksAvailable` event **with a delay**.
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
-                        self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
-                    })
-                }
-                
+                // handle tracks, send event and handle selection mode.
+                self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+                    self.handleTracksSelection(tracks)
+                    self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
+                })
                 // when player item is readyToPlay for the first time it is safe to assume we have a valid duration.
                 if let duration = self.currentItem?.duration, !CMTIME_IS_INDEFINITE(duration) {
                     PKLog.debug("duration in seconds: \(CMTimeGetSeconds(duration))")
@@ -252,5 +247,55 @@ extension AVPlayerEngine {
         guard let currentItem = self.currentItem else { return }
         guard let metadata = currentItem.timedMetadata else { return }
         self.post(event: PlayerEvent.TimedMetadata(metadata: metadata))
+    }
+    
+    private func handleTracksSelection(_ tracks: PKTracks) {
+        
+        func handleAutoMode(for tracks: [Track]?) {
+            guard let languageCode = Locale.current.languageCode else { return }
+            guard let track = tracks?.first(where: { (track) -> Bool in
+                if let trackLanguageCode = track.language {
+                    let canonicalLanguageIdentifier = Locale.canonicalLanguageIdentifier(from: trackLanguageCode)
+                    return languageCode == trackLanguageCode || languageCode == canonicalLanguageIdentifier
+                }
+                return false
+            }) else { return }
+            self.selectTrack(trackId: track.id)
+        }
+        
+        func handleSelectionMode(for tracks: [Track]?, language: String?, title: String?) {
+            switch (language, title) {
+            case let (.some(trackLanguage), .some(trackTitle)):
+                guard let track = tracks?.first(where: { $0.language == trackLanguage && $0.title == trackTitle }) else { return }
+                self.selectTrack(trackId: track.id)
+            case let (.some(trackLanguage), nil):
+                guard let track = tracks?.first(where: { $0.language == trackLanguage }) else { return }
+                self.selectTrack(trackId: track.id)
+            case let (nil, .some(trackTitle)):
+                guard let track = tracks?.first(where: { $0.title == trackTitle }) else { return }
+                self.selectTrack(trackId: track.id)
+            default: break
+            }
+        }
+    
+        guard let trackSelection = self.asset?.playerSettings.trackSelection else { return }
+        // handle text selection mode, default is to turn subtitles off.
+        switch trackSelection.textSelectionMode {
+        case .default:
+            guard let track = tracks.textTracks?.first(where: { $0.title == TracksManager.textOffDisplay && $0.language == nil }) else { return }
+            self.selectTrack(trackId: track.id)
+        case .auto:
+            handleAutoMode(for: tracks.textTracks)
+        case .selection:
+            handleSelectionMode(for: tracks.textTracks, language: trackSelection.textSelectionLanguage, title: trackSelection.textSelectionTitle)
+        }
+        // handle audio selection mode, default is to let AVPlayer decide.
+        switch trackSelection.audioSelectionMode {
+        case .default: break
+        case .auto:
+            handleAutoMode(for: tracks.audioTracks)
+        case .selection:
+            handleSelectionMode(for: tracks.audioTracks, language: trackSelection.audioSelectionLanguage, title: trackSelection.audioSelectionTitle)
+        }
     }
 }

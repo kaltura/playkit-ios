@@ -52,7 +52,7 @@ import SwiftyJSON
         super.init()
     }
     
-    public init(json: Any) {
+    @objc public init(json: Any) {
         
         let jsonObject = json as? JSON ?? JSON(json)
         
@@ -73,7 +73,7 @@ import SwiftyJSON
         super.init()
     }
     
-    override public var description: String {
+    @objc override public var description: String {
         get {
             return "id : \(self.id), sources: \(String(describing: self.sources))"
         }
@@ -123,9 +123,9 @@ import SwiftyJSON
 }
 
 public class FairPlayDRMParams: DRMParams {
-    var fpsCertificate: Data?
+    @objc var fpsCertificate: Data?
     
-    public init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
+    @objc init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
         super.init(licenseUri: licenseUri, scheme: scheme)
     }

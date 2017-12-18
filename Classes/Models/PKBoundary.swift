@@ -8,14 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-//
-//  PKTimeBoundary.swift
-//  Pods
-//
-//  Created by Gal Orlanczyk on 13/08/2017.
-//
-//
-
 import Foundation
 
 /// `PKBoundary` used as abstract for boundary types (% and time).
@@ -63,7 +55,7 @@ import Foundation
 @objc public class PKTimeBoundary: NSObject, PKBoundary {
     
     /// The time to set the boundary on.
-    public let time: TimeInterval
+    @objc public let time: TimeInterval
     
     /// Creates a new `PKTimeBoundary` object from seconds.
     /// - Attention: boundary value should be between 0 and duration otherwise will use default values!
