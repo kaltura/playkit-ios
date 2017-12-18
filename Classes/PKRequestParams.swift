@@ -25,7 +25,7 @@ import Foundation
     public let url: URL
     public let headers: [String: String]?
     
-    @objc init(url: URL, headers: [String: String]?) {
+    @objc public init(url: URL, headers: [String: String]?) {
         self.url = url
         self.headers = headers
     }

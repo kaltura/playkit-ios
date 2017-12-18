@@ -125,7 +125,7 @@ import SwiftyJSON
 public class FairPlayDRMParams: DRMParams {
     @objc var fpsCertificate: Data?
     
-    @objc init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
+    @objc public init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
         super.init(licenseUri: licenseUri, scheme: scheme)
     }
