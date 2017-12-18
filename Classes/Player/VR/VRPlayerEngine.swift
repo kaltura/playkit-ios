@@ -31,7 +31,7 @@ import AVFoundation
 /************************************************************/
 
 /// `VRPlayerEngine` protocol defines the methods needed to implement in order to work with the vr player engine.
-public protocol VRPlayerEngine: PlayerEngine {
+@objc public protocol VRPlayerEngine: PlayerEngine {
     /// VRPlayerEngine initializer
     ///
     /// - Parameter delegate: object that conforms to PlayerDelegate protocol.

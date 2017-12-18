@@ -23,6 +23,23 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     }
 }
 
+@objc public enum TrackSelectionMode: Int {
+    case `default`
+    case auto
+    case selection
+}
+
+@objc public class PKTrackSelectionSettings: NSObject {
+    // text selection settings
+    @objc public var textSelectionMode: TrackSelectionMode = .default
+    @objc public var textSelectionLanguage: String?
+    @objc public var textSelectionTitle: String?
+    // audio selection settings
+    @objc public var audioSelectionMode: TrackSelectionMode = .default
+    @objc public var audioSelectionLanguage: String?
+    @objc public var audioSelectionTitle: String?
+}
+
 enum PlayerSettingsType {
     case preferredPeakBitRate(Double)
 }
@@ -42,12 +59,14 @@ enum PlayerSettingsType {
     
     /// The settings for network data consumption.
     @objc public var network = PKNetworkSettings()
+    @objc public var trackSelection = PKTrackSelectionSettings()
     
     @objc public var contentRequestAdapter: PKRequestParamsAdapter? = KalturaPlaybackRequestAdapter()
     
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()
         copy.network = self.network
+        copy.trackSelection = self.trackSelection
         copy.contentRequestAdapter = self.contentRequestAdapter
         return copy
     }
@@ -55,7 +74,7 @@ enum PlayerSettingsType {
 
 extension PKPlayerSettings: NSCopying {
     
-    public func copy(with zone: NSZone? = nil) -> Any {
+    @objc public func copy(with zone: NSZone? = nil) -> Any {
         return self.createCopy()
     }
 }

@@ -43,7 +43,7 @@ import KalturaNetKit
         self.ks = ks
     }
     
-    public func loadKS(completion: @escaping (String?, Error?) -> Void) {
+    @objc public func loadKS(completion: @escaping (String?, Error?) -> Void) {
         completion(ks, nil)
     }
 }
