@@ -70,4 +70,8 @@ import UIKit
             PKLog.minLevel = logLevel.toLoggerLevel
         }
     }
+    
+    @objc public func pluginClass(by name: String) -> PKPlugin.Type? {
+        return pluginRegistry[name]
+    }
 }

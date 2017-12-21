@@ -10,6 +10,7 @@
 
 import UIKit
 import AVFoundation
+import SwiftyJSON
 
 /// The `PKPlugin` protocol defines all the properties and methods required to define a plugin object.
 @objc public protocol PKPlugin {
@@ -33,3 +34,12 @@ import AVFoundation
 @objc public protocol PKPluginWarmUp {
     static func warmUp()
 }
+
+@objc public protocol PKPluginParse {
+    static func parse(json: Any?) -> Any?
+}
+
+@objc public protocol PKPluginConfig {
+    func merge(config: Any?) -> Any
+}
+
