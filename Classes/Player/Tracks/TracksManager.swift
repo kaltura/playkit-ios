@@ -11,9 +11,9 @@
 import Foundation
 import AVFoundation
 
-class TracksManager: NSObject {
-    let audioTypeKey: String = "soun"
-    let textOffDisplay: String = "Off"
+public class TracksManager: NSObject {
+    
+    static let textOffDisplay: String = "Off"
     
     private var audioTracks: [Track]?
     private var textTracks: [Track]?
@@ -41,41 +41,37 @@ class TracksManager: NSObject {
         
     }
     
-    public func selectTrack(item: AVPlayerItem, trackId: String) -> Track? {
+    @objc public func selectTrack(item: AVPlayerItem, trackId: String) -> Track? {
         PKLog.trace("selectTrack")
         
         let idArr : [String] = trackId.components(separatedBy: ":")
         let type: String = idArr[0]
         let index: Int = Int(idArr[1])!
         
-        if type == audioTypeKey {
+        if let audioTrack = self.audioTracks?.first(where: { $0.id == trackId }) {
             self.selectAudioTrack(item: item, index: index)
-            if let tracks = self.audioTracks, index + 1 >= 0, tracks.count > index + 1 {
-                return self.audioTracks?[index + 1]
-            }
-        } else {
+            return audioTrack
+        } else if let textTrack = self.textTracks?.first(where: { $0.id == trackId }){
             self.selectTextTrack(item: item, type: type, index: index)
-            if let tracks = self.textTracks, index + 1 >= 0, tracks.count > index + 1 {
-                return self.textTracks?[index + 1]
-            }
+            return textTrack
         }
         return nil
     }
     
-    public func currentAudioTrack(item: AVPlayerItem) -> String? {
+    @objc public func currentAudioTrack(item: AVPlayerItem) -> String? {
         if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.audible), let option = item.selectedMediaOption(in: group) {
             return self.audioTracks?.filter{($0.title == option.displayName)}.first?.id
         }
         return nil
     }
     
-    public func currentTextTrack(item: AVPlayerItem) -> String? {
+    @objc public func currentTextTrack(item: AVPlayerItem) -> String? {
         if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.legible) {
             var displayName: String
             if let option = item.selectedMediaOption(in: group) {
                 displayName = option.displayName
             } else {
-                displayName = textOffDisplay
+                displayName = TracksManager.textOffDisplay
             }
             return self.textTracks?.filter{($0.title == displayName)}.first?.id
         }
@@ -98,7 +94,7 @@ class TracksManager: NSObject {
             }
             
             let trackId = "\(option.mediaType):\(String(index))"
-            let track = Track(id: trackId, title: option.displayName, language: option.extendedLanguageTag)
+            let track = Track(id: trackId, title: option.displayName, type: .audio, language: option.extendedLanguageTag)
             
             self.audioTracks?.append(track)
         }
@@ -138,12 +134,12 @@ class TracksManager: NSObject {
             
             optionMediaType = option.mediaType
             let trackId = "\(optionMediaType):\(String(index))"
-            let track = Track(id: trackId, title: option.displayName, language: option.extendedLanguageTag)
+            let track = Track(id: trackId, title: option.displayName, type: .text, language: option.extendedLanguageTag)
             
             self.textTracks?.append(track)
         }
         if optionMediaType != "" {
-            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: textOffDisplay, language: nil), at: 0)
+            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: TracksManager.textOffDisplay, type: .text, language: nil), at: 0)
         }
     }
     

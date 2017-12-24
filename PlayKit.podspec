@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
 s.name             = 'PlayKit'
-s.version          = '3.2.x-dev'
+s.version          = '3.3.x-dev'
 s.summary          = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 s.homepage         = 'https://github.com/kaltura/playkit-ios'
 s.license          = { :type => 'AGPLv3', :text => 'AGPLv3' }
@@ -17,6 +17,7 @@ s.subspec 'Core' do |sp|
     sp.dependency 'Log', '1.0'
     sp.dependency 'SwiftyXMLParser', '3.0.3'
     sp.dependency 'KalturaNetKit', '~> 0.0'
+    sp.dependency 'PlayKitUtils', '0.1.4'
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|

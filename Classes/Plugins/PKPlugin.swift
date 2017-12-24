@@ -12,7 +12,7 @@ import UIKit
 import AVFoundation
 
 /// The `PKPlugin` protocol defines all the properties and methods required to define a plugin object.
-public protocol PKPlugin {
+@objc public protocol PKPlugin {
     /// The plugin name.
     static var pluginName: String { get }
 
@@ -30,6 +30,6 @@ public protocol PKPlugin {
     func destroy()
 }
 
-public protocol PKPluginWarmUp {
+@objc public protocol PKPluginWarmUp {
     static func warmUp()
 }

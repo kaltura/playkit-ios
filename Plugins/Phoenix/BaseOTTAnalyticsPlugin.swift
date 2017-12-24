@@ -10,12 +10,13 @@
 
 import Foundation
 import KalturaNetKit
+import PlayKitUtils
 
 /// class `BaseOTTAnalyticsPlugin` is a base plugin object used for OTT analytics plugin subclasses
 public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, AppStateObservable {
     
     /// indicates whether we played for the first time or not.
-    var isFirstPlay: Bool = true
+    public var isFirstPlay: Bool = true
     var intervalOn: Bool = false
     var timer: Timer?
     var interval: TimeInterval = 30
@@ -67,7 +68,7 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
     /************************************************************/
     
     /// default events to register
-    var playerEventsToRegister: [PlayerEvent.Type] {
+    public var playerEventsToRegister: [PlayerEvent.Type] {
         return [
             PlayerEvent.ended,
             PlayerEvent.error,
@@ -79,7 +80,7 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
         ]
     }
     
-    func registerEvents() {
+    public func registerEvents() {
         PKLog.debug("plugin \(type(of:self)) register to all player events")
         
         self.playerEventsToRegister.forEach { event in
@@ -145,6 +146,10 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
         }
     }
     
+    public func unregisterEvents() {
+        self.messageBus?.removeObserver(self, events: playerEventsToRegister)
+    }
+    
     /************************************************************/
     // MARK: - OTTAnalyticsPluginProtocol
     /************************************************************/
@@ -192,7 +197,7 @@ extension BaseOTTAnalyticsPlugin {
         // media hit should fire on every time we start the timer.
         self.sendProgressEvent()
         
-        self.timer = Timer.every(self.interval) { [weak self] in
+        self.timer = PKTimer.every(self.interval) { [weak self] _ in
             PKLog.debug("timerHit")
             self?.sendProgressEvent()
         }

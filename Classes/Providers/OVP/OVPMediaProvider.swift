@@ -77,7 +77,7 @@ import KalturaNetKit
     @objc public var referrer: String?
     public var executor: RequestExecutor?
     
-    public override init() {}
+    @objc public override init() {}
     
     @objc public init(_ sessionProvider: SessionProvider) {
         self.sessionProvider = sessionProvider
@@ -130,7 +130,7 @@ import KalturaNetKit
         return self
     }
     
-    public func loadMedia(callback: @escaping (PKMediaEntry?, Error?) -> Void){
+    @objc public func loadMedia(callback: @escaping (PKMediaEntry?, Error?) -> Void){
         
         // session provider is required in order to have the base url and the partner id
         guard let sessionProvider = self.sessionProvider else {
@@ -373,11 +373,11 @@ import KalturaNetKit
         return playURL
     }
     
-    public func cancel(){
+    @objc public func cancel(){
         
     }
     
-    public func convertScheme(name: String) -> DRMParams.Scheme {
+    @objc public func convertScheme(name: String) -> DRMParams.Scheme {
     
         switch (name) {
         case "drm.WIDEVINE_CENC":

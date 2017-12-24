@@ -41,7 +41,7 @@ import Foundation
 
 extension MediaConfig: NSCopying {
     
-    public func copy(with zone: NSZone? = nil) -> Any {
+    @objc public func copy(with zone: NSZone? = nil) -> Any {
         let copy = MediaConfig(mediaEntry: self.mediaEntry, startTime: self.startTime)
         return copy
     }
@@ -52,7 +52,7 @@ extension MediaConfig: NSCopying {
     /// Plugins config dictionary holds [plugin name : plugin config]
     @objc public var configs = [String: Any]()
     
-    public override var description: String {
+    @objc public override var description: String {
         return "Plugin config: \(self.configs)"
     }
     
@@ -69,7 +69,7 @@ extension MediaConfig: NSCopying {
 
 extension PKPluginConfigs: NSCopying {
     
-    public func copy(with zone: NSZone? = nil) -> Any {
+    @objc public func copy(with zone: NSZone? = nil) -> Any {
         let copy = PKPluginConfigs()
         copy.configs = self.configs
         return copy

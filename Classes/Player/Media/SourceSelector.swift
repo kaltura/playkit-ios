@@ -8,16 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-// ===================================================================================================
-// Copyright (C) 2017 Kaltura Inc.
-//
-// Licensed under the AGPLv3 license, unless a different license for a
-// particular library is specified in the applicable library path.
-//
-// You may obtain a copy of the License at
-// https://www.gnu.org/licenses/agpl-3.0.html
-// ===================================================================================================
-
 import Foundation
 
 /// Media Source Type
@@ -54,7 +44,7 @@ class SourceSelector {
         // Preference: Local, HLS, FPS*, MP4, WVM*, MP3
         
         if let source = sources.first(where: {$0 is LocalMediaSource}) {
-            if source.fileExt == SourceType.wvm.asString {
+            if source.mediaFormat == .wvm {
                 return (source, DRMSupport.widevineClassicHandler!.init())
             } else {
                 return (source, defaultHandler.init())
@@ -62,24 +52,24 @@ class SourceSelector {
         }
         
         if DRMSupport.fairplay {
-            if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asString}) {
+            if let source = sources.first(where: {$0.mediaFormat == .hls}) {
                 return (source, defaultHandler.init())
             }
         } else {
-            if let source = sources.first(where: {$0.fileExt == SourceType.m3u8.asString && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
+            if let source = sources.first(where: {$0.mediaFormat == .hls && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
                 return (source, defaultHandler.init())
             }
         }
         
-        if let source = sources.first(where: {$0.fileExt == SourceType.mp4.asString}) {
+        if let source = sources.first(where: {$0.mediaFormat == .mp4}) {
             return (source, defaultHandler.init())
         }
         
-        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.fileExt == SourceType.wvm.asString}) {
+        if DRMSupport.widevineClassic, let source = sources.first(where: {$0.mediaFormat == .wvm}) {
             return (source, DRMSupport.widevineClassicHandler!.init())
         }
         
-        if let source = sources.first(where: {$0.fileExt == SourceType.mp3.asString}) {
+        if let source = sources.first(where: {$0.mediaFormat == .mp3}) {
             return (source, defaultHandler.init())
         }
         

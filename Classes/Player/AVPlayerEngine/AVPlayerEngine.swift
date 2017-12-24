@@ -83,7 +83,7 @@ public class AVPlayerEngine: AVPlayer {
                     PKLog.error("seek faild")
                 }
             }
-            self.post(event: PlayerEvent.Seeking())
+            self.post(event: PlayerEvent.Seeking(targetSeekPosition: CMTimeGetSeconds(newTime)))
         }
     }
     
@@ -161,6 +161,17 @@ public class AVPlayerEngine: AVPlayer {
         }
     }
     
+    public override var rate: Float {
+        get {
+            return super.rate
+        }
+        set {
+            if newValue >= 0 {
+                super.rate = newValue
+            }
+        }
+    }
+    
     // MARK: Player Methods
     
     override init() {
@@ -210,10 +221,15 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func selectTrack(trackId: String) {
+        guard let currentItem = self.currentItem else { return }
         if trackId.isEmpty == false {
-            let selectedTrack = self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
-            if let _ = selectedTrack {
-                self.post(event: PlayerEvent.TrackChanged(track: selectedTrack!))
+            let selectedTrack = self.tracksManager.selectTrack(item: currentItem, trackId: trackId)
+            if let selectedTrack = selectedTrack {
+                if selectedTrack.type == .audio {
+                    self.post(event: PlayerEvent.AudioTrackChanged(track: selectedTrack))
+                } else {
+                    self.post(event: PlayerEvent.TextTrackChanged(track: selectedTrack))
+                }
             }
         } else {
             PKLog.error("trackId is nil")

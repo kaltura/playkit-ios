@@ -21,8 +21,11 @@
 import Foundation
 
 class DefaultPlayerWrapper: NSObject, PlayerEngine {
+    
     var onEventBlock: ((PKEvent) -> Void)?
 
+    var mediaConfig: MediaConfig?
+    
     public var duration: Double {
         printInvocationWarning("\(#function)")
         return 0.0
@@ -87,8 +90,11 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
     public weak var view: PlayerView?
     
     public var rate: Float {
-        printInvocationWarning("\(#function)")
-        return 0.0
+        get {
+            printInvocationWarning("\(#function)")
+            return 0.0
+        }
+        set { printInvocationWarning("\(#function)") }
     }
     
     func play() {

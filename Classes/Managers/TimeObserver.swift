@@ -8,14 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-//
-//  TimeObserver.swift
-//  Pods
-//
-//  Created by Gal Orlanczyk on 21/08/2017.
-//
-//
-
 import Foundation
 
 protocol TimeProvider: class {

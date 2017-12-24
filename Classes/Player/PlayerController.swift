@@ -10,7 +10,7 @@
 
 import Foundation
 
-class PlayerController: NSObject, Player {    
+class PlayerController: NSObject, Player {
     
     /************************************************************/
     // MARK: - Properties
@@ -33,6 +33,8 @@ class PlayerController: NSObject, Player {
     
     let settings = PKPlayerSettings()
     
+    var mediaFormat = PKMediaSource.MediaFormat.unknown
+    
     /* Time Observation */
     var timeObserver: TimeObserver!
     
@@ -40,7 +42,7 @@ class PlayerController: NSObject, Player {
         return self.mediaConfig?.mediaEntry
     }
     
-    public var duration: Double {
+    public var duration: TimeInterval {
         return self.currentPlayer.duration
     }
     
@@ -53,8 +55,15 @@ class PlayerController: NSObject, Player {
     }
     
     public var currentTime: TimeInterval {
-        get { return self.currentPlayer.currentPosition }
-        set { self.currentPlayer.currentPosition = newValue }
+        get {
+            if self.currentPlayer.currentPosition != TimeInterval.infinity && self.currentPlayer.currentPosition > self.duration {
+                return self.duration
+            }
+            return self.currentPlayer.currentPosition
+        }
+        set {
+            self.seek(to: newValue)
+        }
     }
     
     public var currentAudioTrack: String? {
@@ -75,7 +84,12 @@ class PlayerController: NSObject, Player {
     }
     
     public var rate: Float {
-        return self.currentPlayer.rate
+        get {
+            return self.currentPlayer.rate
+        }
+        set {
+            self.currentPlayer.rate = newValue
+        }
     }
     
     public var loadedTimeRanges: [PKTimeRange]? {
@@ -119,6 +133,7 @@ class PlayerController: NSObject, Player {
     
     func setMedia(from mediaConfig: MediaConfig) {
         self.mediaConfig = mediaConfig
+        
         // create new media session uuid
         self.mediaSessionUUID = UUID()
         
@@ -144,6 +159,7 @@ class PlayerController: NSObject, Player {
         // After Setting PlayerWrapper set  saved player's params
         self.currentPlayer.onEventBlock = eventBlock
         self.currentPlayer.view = playerView
+        self.currentPlayer.mediaConfig = mediaConfig
         self.currentPlayer.loadMedia(from: self.selectedSource, handler: handler)
     }
     
@@ -153,7 +169,6 @@ class PlayerController: NSObject, Player {
                 PKLog.error("VRPlayerWrapper does not exist")
                 fatalError("VR library is missing, make sure to add it via Podfile.")
             }
-            
             self.currentPlayer = vrPlayerWrapper.init()
         } else {
             self.currentPlayer = AVPlayerWrapper()
@@ -166,6 +181,10 @@ class PlayerController: NSObject, Player {
     
     func prepare(_ mediaConfig: MediaConfig) {
         self.currentPlayer.prepare(mediaConfig)
+        
+        if let source = self.selectedSource {
+            self.mediaFormat = source.mediaFormat
+        }
     }
     
     func play() {
@@ -186,6 +205,16 @@ class PlayerController: NSObject, Player {
     
     func seek(to time: TimeInterval) {
         self.currentPlayer.currentPosition = time
+    }
+    
+    func isLive() -> Bool {
+        if let entry = self.mediaEntry {
+            if entry.mediaType == MediaType.live {
+                return true
+            }
+        }
+        
+        return false
     }
     
     func destroy() {
@@ -233,9 +262,9 @@ class PlayerController: NSObject, Player {
 // MARK: - Private
 /************************************************************/
 
-extension PlayerController {
+fileprivate extension PlayerController {
     /// Updates the request adapter if one exists
-    fileprivate func updateRequestAdapter(in mediaSource: inout PKMediaSource) {
+    func updateRequestAdapter(in mediaSource: inout PKMediaSource) {
         // configure media sources content request adapter if request adapter exists
         if let adapter = self.settings.contentRequestAdapter {
             // update the request adapter with the updated session id

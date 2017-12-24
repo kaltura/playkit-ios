@@ -50,15 +50,15 @@ import Foundation
     /// returns the position type of the ad (pre, mid, post)
     @objc public let positionType: AdPositionType
     
-    public init(description: String?,
-         duration: TimeInterval,
-         title: String,
-         skipOffset: NSNumber?,
-         adId: String,
-         adSystem: String,
-         totalAds: Int,
-         position: Int,
-         timeOffset: TimeInterval) {
+    @objc public init(description: String?,
+                      duration: TimeInterval,
+                      title: String,
+                      skipOffset: NSNumber?,
+                      adId: String,
+                      adSystem: String,
+                      totalAds: Int,
+                      position: Int,
+                      timeOffset: TimeInterval) {
         
         self.adDescription = description
         self.duration = duration
