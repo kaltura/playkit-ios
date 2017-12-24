@@ -76,7 +76,7 @@ import KalturaNetKit
     @objc public var uiconfId: NSNumber?
     @objc public var referrer: String?
     /// this codec will be filtered out of the sources
-    @objc public var codecFilterType: CodecType = .h265
+    @objc public var codecFilterType: CodecType = .h265 // FIXME: change to unknown when finished
     public var executor: RequestExecutor?
     
     @objc public override init() {}
@@ -413,7 +413,7 @@ import KalturaNetKit
     // FIXME: remove later when server will support
     private func createMockHEVCFlavorAssets() -> [OVPFlavorAsset] {
         var flavorAssets = [OVPFlavorAsset]()
-        let flavourParamsIds: [Int] = [
+        /*let flavourParamsIds: [Int] = [
             1801461, 1801471, 1801481, 1801491, 1801501,
             1801511, 1801521, 1801531, 1801541, 1801551
         ]
@@ -424,10 +424,14 @@ import KalturaNetKit
         let videoCodecId = [
             "hvc1", "hev1", "hev1", "hev1", "hev1",
             "hev1", "hev1", "hev1", "hev1", "hev1"
+        ]*/
+        let flavourParamsIds: [Int] = [
+            1801461, 1801471, 1801481, 1801491, 1801501,
+            1801511, 1801521, 1801531, 1801541, 1801551
         ]
-        /*let flavourParamsIds: [Int] = [1801461, 1801471, 1801481, 1801491, 1801501]
-        let ids: [String] = ["0_,e8rbw59u", "0_uf2z04po", "0_oipic3cp", "0_pyy89j5i", "0_8o51rwag"]
-        let videoCodecId = ["hvc1", "hvc1", "hvc1", "hvc1", "hvc1"]*/
+        let ids: [String] = ["1_97gcgcvp", "1_k16lg2vk", "1_5nd5pdll", "1_9c4gmx27", "1_evmlpxcb", "1_06oeliup", "1_xauvzenw", "1_zakwbwgr", "1_52ji29by", "1_1qaxjo6g"]
+        let videoCodecId = ["hvc1", "hvc1", "hvc1", "hvc1", "hvc1", "hvc1","hvc1","hvc1","hvc1","hvc1"]
+        
         let fileExt = "mp4"
         for i in 0..<ids.count {
             flavorAssets.append(OVPFlavorAsset(id: ids[i], tags: nil, fileExt: fileExt, paramsId: flavourParamsIds[i], videoCodecId: videoCodecId[i]))
