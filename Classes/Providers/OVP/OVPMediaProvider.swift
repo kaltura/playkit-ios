@@ -75,6 +75,8 @@ import KalturaNetKit
     @objc public var entryId: String?
     @objc public var uiconfId: NSNumber?
     @objc public var referrer: String?
+    /// this codec will be filtered out of the sources
+    @objc public var codecFilterType: CodecType = .h265
     public var executor: RequestExecutor?
     
     @objc public override init() {}
@@ -118,6 +120,12 @@ import KalturaNetKit
     @discardableResult
     @nonobjc public func set(referrer: String?) -> Self {
         self.referrer = referrer
+        return self
+    }
+    
+    @discardableResult
+    @nonobjc public func set(codecFilterType: CodecType) -> Self {
+        self.codecFilterType = codecFilterType
         return self
     }
     
@@ -226,13 +234,20 @@ import KalturaNetKit
                     guard let mainResponseData = mainResponse as? OVPList,
                         let entry = mainResponseData.objects?.last as? OVPEntry,
                         let contextData = contextDataResponse as? OVPPlaybackContext,
-                        let sources = contextData.sources,
                         let metadataListObject = metaData as? OVPList,
                         let metadataList = metadataListObject.objects as? [OVPMetadata]
                         else {
                             PKLog.debug("Response is not containing Entry info or playback data")
                             callback(nil, OVPMediaProviderError.invalidResponse)
                             return
+                    }
+                    
+                    // FIXME: remove later when bug on server will be fixed
+                    let hevcFlavorAssets = self.createMockHEVCFlavorAssets()
+                    let flavorAssetsIds = hevcFlavorAssets.map { $0.id }
+                    contextData.flavorAssets.append(contentsOf: hevcFlavorAssets)
+                    for i in 0..<contextData.sources.count {
+                        contextData.sources[i].flavors?.append(contentsOf: flavorAssetsIds)
                     }
                     
                     if let context = contextDataResponse as? OVPPlaybackContext {
@@ -245,9 +260,12 @@ import KalturaNetKit
                             return
                         }
                     }
-
+                    
+                    // filter sources flavors by codec
+                    self.filterFlavors(in: &contextData.sources, using: contextData.flavorAssets, by: self.codecFilterType)
+                    
                     var mediaSources: [PKMediaSource] = [PKMediaSource]()
-                    sources.forEach { (source: OVPSource) in
+                    contextData.sources.forEach { (source: OVPSource) in
                         //detecting the source type
                         let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
                         //If source type is not supported source will not be created
@@ -261,9 +279,8 @@ import KalturaNetKit
                                 ksForURL = widgetSession.ks
                             }
                         }
-
-                        let playURL: URL? = self.playbackURL(loadInfo: loadInfo, source: source, ks: ksForURL)
-                        guard let url = playURL else {
+                        
+                        guard let url = self.playbackURL(loadInfo: loadInfo, source: source, ks: ksForURL) else {
                             PKLog.error("failed to create play url from source, discarding source:\(entry.id),\(source.deliveryProfileId), \(source.format)")
                             return
                         }
@@ -390,6 +407,49 @@ import KalturaNetKit
             return .fairplay
         default:
             return .unknown
+        }
+    }
+    
+    // FIXME: remove later when server will support
+    private func createMockHEVCFlavorAssets() -> [OVPFlavorAsset] {
+        var flavorAssets = [OVPFlavorAsset]()
+        let flavourParamsIds: [Int] = [
+            1801461, 1801471, 1801481, 1801491, 1801501,
+            1801511, 1801521, 1801531, 1801541, 1801551
+        ]
+        let ids: [String] = [
+            "1_d7jw3gbk", "1_fduia2v4", "1_o1ig9jsv", "1_o4ie2x2k", "1_w54aa8p6",
+            "1_nrb2moco", "1_bosauf1r", "1_443y41aa", "1_kzhtg2pw", "1_kjsn9ymv"
+        ]
+        let videoCodecId = [
+            "hvc1", "hev1", "hev1", "hev1", "hev1",
+            "hev1", "hev1", "hev1", "hev1", "hev1"
+        ]
+        /*let flavourParamsIds: [Int] = [1801461, 1801471, 1801481, 1801491, 1801501]
+        let ids: [String] = ["0_,e8rbw59u", "0_uf2z04po", "0_oipic3cp", "0_pyy89j5i", "0_8o51rwag"]
+        let videoCodecId = ["hvc1", "hvc1", "hvc1", "hvc1", "hvc1"]*/
+        let fileExt = "mp4"
+        for i in 0..<ids.count {
+            flavorAssets.append(OVPFlavorAsset(id: ids[i], tags: nil, fileExt: fileExt, paramsId: flavourParamsIds[i], videoCodecId: videoCodecId[i]))
+        }
+        return flavorAssets
+    }
+    
+    private func filterFlavors(in sources: inout [OVPSource], using flavorAssets: [OVPFlavorAsset], by codecFilterType: CodecType) {
+        switch codecFilterType {
+        case .h264, .h265:
+            for (i,source) in sources.enumerated() {
+                guard var flavors = source.flavors else { continue }
+                for j in (1..<flavors.count).reversed() {
+                    guard let flavorAsset = flavorAssets.first(where: { $0.id == flavors[j] }) else { continue }
+                    if flavorAsset.codecType != codecFilterType {
+                        flavors.remove(at: j)
+                    }
+                }
+                // update the flavors with the new ones
+                sources[i].flavors = flavors
+            }
+        case .unknown: return
         }
     }
 }

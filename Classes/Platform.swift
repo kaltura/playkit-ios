@@ -11,7 +11,14 @@
 import Foundation
 import VideoToolbox
 
+enum DecodeType: Int {
+    case hardware
+    case software
+    case unavailable
+}
+
 enum Platform {
+    
     static let isSimulator: Bool = {
         var isSim = false
         #if arch(i386) || arch(x86_64)
@@ -21,11 +28,11 @@ enum Platform {
     }()
     
     /// indicates if the current device supports hardware decode for HEVC, available only for iOS 11 and above.
-    static let isHardwareDecodeSupportedHEVC: Bool = {
+    static let isDecodeSupportedHEVC: DecodeType = {
         if #available(iOS 11.0, *) {
-            return VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC)
+            return VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC) ? .hardware : .software
         } else { // HEVC is supported only for iOS 11 devices
-            return false
+            return .unavailable
         }
     }()
 }

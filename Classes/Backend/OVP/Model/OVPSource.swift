@@ -20,7 +20,6 @@ class OVPSource: OVPBaseObject {
     var url: URL?
     var drm: [OVPDRM]?
     
-    
     let deliveryProfileIdKey = "deliveryProfileId"
     let formatKey = "format"
     let protocolsKey = "protocols"
@@ -41,7 +40,7 @@ class OVPSource: OVPBaseObject {
         
         self.deliveryProfileId = id
         self.format = format
-        if let protocols = jsonObject[protocolsKey].string{
+        if let protocols = jsonObject[protocolsKey].string {
             self.protocols = protocols.components(separatedBy: ",")
         }
         
@@ -49,12 +48,11 @@ class OVPSource: OVPBaseObject {
             self.flavors = flavors.components(separatedBy: ",")
         }
         
-        if let url = jsonObject[urlKey].url{
+        if let url = jsonObject[urlKey].url {
             self.url = url
         }
         
-        if let drmArray = jsonObject[drmKey].array{
-            
+        if let drmArray = jsonObject[drmKey].array {
             var drmObjects: [OVPDRM] = [OVPDRM]()
             for drmJSON in drmArray{
                 if let object = OVPDRM(json: drmJSON.object){
@@ -64,7 +62,5 @@ class OVPSource: OVPBaseObject {
             }
             self.drm = drmObjects
         }
-        
     }
-    
 }
