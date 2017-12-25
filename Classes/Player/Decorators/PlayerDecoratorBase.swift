@@ -152,6 +152,10 @@ import AVKit
         //Assert.shouldNeverHappen();
     }
     
+    public func setTokenReplacer(_ replacer: TokenReplacer) {
+        //Assert.shouldNeverHappen();
+    }
+    
     public func selectTrack(trackId: String) {
         self.player.selectTrack(trackId: trackId)
     }

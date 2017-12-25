@@ -111,6 +111,12 @@ class PlayerLoader: PlayerDecoratorBase {
         messageBus.removeObserver(observer, events: events)
     }
     
+    public override func setTokenReplacer(_ replacer: TokenReplacer) {
+        for loadedPlugin in loadedPlugins.values {
+            loadedPlugin.plugin.tokenReplacer = replacer
+        }
+    }
+    
     public override func updatePluginConfig(pluginName: String, config: Any) {
         guard let loadedPlugin: LoadedPlugin = loadedPlugins[pluginName] else {
             PKLog.debug("There is no such plugin: \(pluginName)");

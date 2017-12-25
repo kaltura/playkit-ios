@@ -86,6 +86,8 @@ import UIKit
     
     /// removes a single boundary observer using the uuid provided when added the observation.
     @objc func removeBoundaryObserver(_ token: UUID)
+
+    @objc func setTokenReplacer(_ replacer: TokenReplacer)
 }
 
 extension Player {
@@ -101,4 +103,8 @@ extension Player {
 
 public protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
+}
+
+@objc public protocol TokenReplacer {
+    func replace(expression: String) -> String
 }

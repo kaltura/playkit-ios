@@ -20,6 +20,7 @@ import Foundation
 
     @objc public weak var player: Player?
     @objc public weak var messageBus: MessageBus?
+    @objc public weak var tokenReplacer: TokenReplacer?
     
     @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         PKLog.info("initializing plugin \(type(of:self))")

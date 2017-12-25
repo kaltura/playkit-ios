@@ -21,6 +21,8 @@ import SwiftyJSON
     weak var player: Player? { get }
     /// The messageBus associated with the plugin
     weak var messageBus: MessageBus? { get }
+    /// The TokenReplacer associated with the plugin
+    weak var tokenReplacer: TokenReplacer? { get set }
     /// On first load. used for doing initialization for the first time with the media config.
     init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws
     /// On update media. used to update the plugin with new media config when available.
