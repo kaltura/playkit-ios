@@ -38,4 +38,3 @@ import SwiftyJSON
 @objc public protocol PKPluginMerge {
     static func merge(uiConf: Any, appConf: Any) -> Any?
 }
-
