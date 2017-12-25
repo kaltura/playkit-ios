@@ -35,11 +35,7 @@ import SwiftyJSON
     static func warmUp()
 }
 
-@objc public protocol PKPluginParse {
-    static func parse(json: Any?) -> Any?
-}
-
-@objc public protocol PKPluginConfig {
-    func merge(config: Any?) -> Any
+@objc public protocol PKPluginMerge {
+    static func merge(uiConf: Any, appConf: Any) -> Any?
 }
 
