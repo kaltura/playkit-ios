@@ -184,7 +184,7 @@ class PlayerController: NSObject, Player {
         } else {
             if self.currentPlayer is AVPlayerWrapper { // do not create new if current player is already vr player
                 isCreated = false
-            } else  {
+            } else {
                 self.currentPlayer = AVPlayerWrapper()
                 isCreated = true
             }
