@@ -41,8 +41,8 @@ extension AVPlayerEngine {
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.didFailToPlayToEndTime(_:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.didPlayToEndTime(_:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: self.currentItem?.timebase)
     }
     
@@ -58,31 +58,38 @@ extension AVPlayerEngine {
             removeObserver(self, forKeyPath: keyPath, context: &AVPlayerEngine.observerContext)
         }
         
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemFailedToPlayToEndTime, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
     @objc func onAccessLogEntryNotification(notification: Notification) {
-        if let item = notification.object as? AVPlayerItem, let accessLog = item.accessLog(), let lastEvent = accessLog.events.last {
+        if let playerItem = notification.object as? AVPlayerItem, let accessLog = playerItem.accessLog(),
+            let lastEvent = accessLog.events.last, playerItem === self.currentItem {
             if #available(iOS 10.0, tvOS 10.0, *) {
                 PKLog.debug("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
             }
             
             self.post(event: PlayerEvent.PlaybackInfo(playbackInfo: PKPlaybackInfo(logEvent: lastEvent)))
-            self.post(event: PlayerEvent.VideoTrackChanged(bitrate: lastEvent.indicatedBitrate))
+            if self.lastIndicatedBitrate != lastEvent.indicatedBitrate {
+                self.lastIndicatedBitrate = lastEvent.indicatedBitrate
+                self.post(event: PlayerEvent.VideoTrackChanged(bitrate: lastEvent.indicatedBitrate))
+            }
         }
     }
     
     @objc func onErrorLogEntryNotification(notification: Notification) {
-        guard let playerItem = notification.object as? AVPlayerItem, let errorLog = playerItem.errorLog(), let lastEvent = errorLog.events.last else { return }
+        guard let playerItem = notification.object as? AVPlayerItem, let errorLog = playerItem.errorLog(),
+            let lastEvent = errorLog.events.last, playerItem === self.currentItem else { return }
         PKLog.warning("error description: \(String(describing: lastEvent.errorComment)), error domain: \(lastEvent.errorDomain), error code: \(lastEvent.errorStatusCode)")
         self.post(event: PlayerEvent.ErrorLog(error: PlayerErrorLog(errorLogEvent: lastEvent)))
     }
     
     @objc func didFailToPlayToEndTime(_ notification: NSNotification) {
+        // post notification only for current player item.
+        guard let notificationObject = notification.object as? AVPlayerItem, notificationObject === self.currentItem else { return }
         let newState = PlayerState.error
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
@@ -95,6 +102,8 @@ extension AVPlayerEngine {
     }
     
     @objc func didPlayToEndTime(_ notification: NSNotification) {
+        // post notification only for current player item.
+        guard let notificationObject = notification.object as? AVPlayerItem, notificationObject === self.currentItem else { return }
         let newState = PlayerState.ended
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
