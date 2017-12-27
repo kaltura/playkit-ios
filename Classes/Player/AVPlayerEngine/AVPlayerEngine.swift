@@ -29,7 +29,8 @@ public class AVPlayerEngine: AVPlayer {
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
     var lastTimebaseRate: Float64 = 0
-    var lastBitrate: Double = 0
+    /// The last indicated bitrate observed can tell what is the last video track bitrate that was used.
+    var lastIndicatedBitrate: Double = 0
     var isObserved: Bool = false
     /// Indicates if player item was changed to state: `readyToPlay` at least once.
     /// Used to post `CanPlay` event once on first `readyToPlay`.

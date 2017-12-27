@@ -18,6 +18,7 @@ extension AVPlayerEngine {
         self.lastTimebaseRate = 0
         // When changing media (loading new asset) we want to reset isFirstReady in order to receive `CanPlay` & `LoadedMetadata` accuratly.
         self.isFirstReady = true
+        self.lastIndicatedBitrate = 0
         super.replaceCurrentItem(with: item)
     }
     
