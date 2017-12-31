@@ -154,29 +154,46 @@ class PlayerController: NSObject, Player {
         // Take saved view from DefaultPlayerWrapper
         // Must be called before `self.currentPlayer` reference is changed
         let playerView = self.currentPlayer.view
-        self.createPlayerWrapper(mediaConfig)
         
-        // After Setting PlayerWrapper set  saved player's params
-        self.currentPlayer.onEventBlock = eventBlock
-        self.currentPlayer.view = playerView
-        self.currentPlayer.mediaConfig = mediaConfig
+        // if create player wrapper returns yes meaning a new wrapper was created, otherwise same wrapper as last time is used.
+        if self.createPlayerWrapper(mediaConfig) {
+            // After Setting PlayerWrapper set saved player's params
+            self.currentPlayer.onEventBlock = eventBlock
+            self.currentPlayer.view = playerView
+            self.currentPlayer.mediaConfig = mediaConfig
+        }
+        
         self.currentPlayer.loadMedia(from: self.selectedSource, handler: handler)
     }
     
-    private func createPlayerWrapper(_ mediaConfig: MediaConfig) {
+    /// creates the wrapper if we haven't created it yet, otherwise uses the same instance we have.
+    /// - Returns: true if a new player was created and false if wrapper already exists.
+    private func createPlayerWrapper(_ mediaConfig: MediaConfig) -> Bool {
+        let isCreated: Bool
         if (mediaConfig.mediaEntry.vrData != nil) {
-            guard let vrPlayerWrapper = NSClassFromString("PlayKitVR.VRPlayerWrapper") as? VRPlayerEngine.Type else {
-                PKLog.error("VRPlayerWrapper does not exist")
-                fatalError("VR library is missing, make sure to add it via Podfile.")
+            if type(of: self.currentPlayer) is VRPlayerEngine.Type { // do not create new if current player is already vr player
+                isCreated = false
+            } else {
+                guard let vrPlayerWrapper = NSClassFromString("PlayKitVR.VRPlayerWrapper") as? VRPlayerEngine.Type else {
+                    PKLog.error("VRPlayerWrapper does not exist")
+                    fatalError("VR library is missing, make sure to add it via Podfile.")
+                }
+                self.currentPlayer = vrPlayerWrapper.init()
+                isCreated = true
             }
-            self.currentPlayer = vrPlayerWrapper.init()
         } else {
-            self.currentPlayer = AVPlayerWrapper()
+            if self.currentPlayer is AVPlayerWrapper { // do not create new if current player is already vr player
+                isCreated = false
+            } else {
+                self.currentPlayer = AVPlayerWrapper()
+                isCreated = true
+            }
         }
         
         if let currentPlayer = self.currentPlayer as? AVPlayerWrapper {
             currentPlayer.settings = self.settings
         }
+        return isCreated
     }
     
     func prepare(_ mediaConfig: MediaConfig) {
