@@ -112,7 +112,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         
         var _config: KalturaStatsPluginConfig?
         if let json = pluginConfig as? JSON {
-            _config = parse(json: json)
+            _config = KalturaStatsPluginConfig.parse(json: json)
         } else {
             _config = pluginConfig as? KalturaStatsPluginConfig
         }
@@ -123,28 +123,6 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         }
         self.config = config
         self.registerEvents()
-    }
-
-    private func parse(json: JSON) -> KalturaStatsPluginConfig? {
-        guard let jsonDictionary = json.dictionary else { return nil }
-        
-        guard let uiconfId = jsonDictionary["uiconfId"]?.int,
-            let entryId = jsonDictionary["entryId"]?.string,
-            let partnerId = jsonDictionary["partnerId"]?.int else { return nil }
-        
-        let config = KalturaStatsPluginConfig(uiconfId: uiconfId, partnerId: partnerId, entryId: entryId)
-        
-        if let baseUrl = jsonDictionary["baseUrl"]?.string, baseUrl != "" {
-            config.baseUrl = baseUrl
-        }
-        if let userId = jsonDictionary["userId"]?.string {
-            config.userId = userId
-        }
-        if let contextId = jsonDictionary["contextId"]?.int {
-            config.contextId = contextId
-        }
-        
-        return config
     }
     
     public override func onUpdateMedia(mediaConfig: MediaConfig) {

@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import UIKit
+import SwiftyJSON
 
 @objc public class AnalyticsConfig: NSObject {
     
@@ -17,4 +18,18 @@ import UIKit
     @objc public init(params: [String: Any]) {
         self.params = params
     }
+    
+    public static func parse(json: JSON) -> AnalyticsConfig? {
+        var _params: [String : Any]?
+        do {
+            _params = try JSONSerialization.jsonObject(with: json.rawData(), options: [JSONSerialization.ReadingOptions.mutableContainers, JSONSerialization.ReadingOptions.mutableLeaves]) as? [String : Any]
+        } catch {
+            return nil
+        }
+        guard let params = _params else {
+            return nil
+        }
+        return AnalyticsConfig(params: params)
+    }
+    
 }

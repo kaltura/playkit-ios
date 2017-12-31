@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import Foundation
+import SwiftyJSON
 
 @objc public class KalturaStatsPluginConfig: NSObject {
     
@@ -29,5 +30,27 @@ import Foundation
         self.uiconfId = uiconfId
         self.partnerId = partnerId
         self.entryId = entryId
+    }
+    
+    public static func parse(json: JSON) -> KalturaStatsPluginConfig? {
+        guard let jsonDictionary = json.dictionary else { return nil }
+        
+        guard let uiconfId = jsonDictionary["uiconfId"]?.int,
+            let entryId = jsonDictionary["entryId"]?.string,
+            let partnerId = jsonDictionary["partnerId"]?.int else { return nil }
+        
+        let config = KalturaStatsPluginConfig(uiconfId: uiconfId, partnerId: partnerId, entryId: entryId)
+        
+        if let baseUrl = jsonDictionary["baseUrl"]?.string, baseUrl != "" {
+            config.baseUrl = baseUrl
+        }
+        if let userId = jsonDictionary["userId"]?.string {
+            config.userId = userId
+        }
+        if let contextId = jsonDictionary["contextId"]?.int {
+            config.contextId = contextId
+        }
+        
+        return config
     }
 }
