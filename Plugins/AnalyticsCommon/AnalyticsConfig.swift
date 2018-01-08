@@ -20,9 +20,9 @@ import SwiftyJSON
     }
     
     public static func parse(json: JSON) -> AnalyticsConfig? {
-        var _params: [String : Any]?
+        var _params: [String: Any]?
         do {
-            _params = try JSONSerialization.jsonObject(with: json.rawData(), options: [JSONSerialization.ReadingOptions.mutableContainers, JSONSerialization.ReadingOptions.mutableLeaves]) as? [String : Any]
+            _params = try JSONSerialization.jsonObject(with: json.rawData(), options: [JSONSerialization.ReadingOptions.mutableContainers, JSONSerialization.ReadingOptions.mutableLeaves]) as? [String: Any]
         } catch {
             return nil
         }
