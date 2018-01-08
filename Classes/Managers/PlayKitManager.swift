@@ -43,9 +43,9 @@ import UIKit
     ///
     /// - Parameter config: The configuration object to load the player with.
     /// - Returns: A player loaded using the provided configuration.
-    @objc public func loadPlayer(pluginConfig: PluginConfig?) throws -> Player {
+    @objc public func loadPlayer(pluginConfig: PluginConfig?, tokenReplacer: TokenReplacer? = nil) throws -> Player {
         let loader = PlayerLoader()
-        try loader.load(pluginConfig: pluginConfig)
+        try loader.load(pluginConfig: pluginConfig, tokenReplacer: tokenReplacer)
         return loader
     }
     
@@ -56,12 +56,12 @@ import UIKit
         pluginRegistry[pluginClass.pluginName] = pluginClass
     }
     
-    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) throws -> PKPlugin {
+    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus, tokenReplacer: TokenReplacer?) throws -> PKPlugin {
         guard let pluginClass = pluginRegistry[name] else {
             PKLog.error("plugin with name: \(name) doesn't exist in pluginRegistry")
             throw PKPluginError.failedToCreatePlugin(pluginName: name).asNSError
         }
-        return try pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+        return try pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus, tokenReplacer: tokenReplacer)
     }
     
     /// sets the logging level for our logger.

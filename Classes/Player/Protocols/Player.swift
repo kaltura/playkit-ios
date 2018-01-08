@@ -86,8 +86,6 @@ import UIKit
     
     /// removes a single boundary observer using the uuid provided when added the observation.
     @objc func removeBoundaryObserver(_ token: UUID)
-
-    @objc func setTokenReplacer(_ replacer: TokenReplacer)
 }
 
 extension Player {

@@ -265,11 +265,7 @@ class PlayerController: NSObject, Player {
     public func updatePluginConfig(pluginName: String, config: Any) {
         //Assert.shouldNeverHappen();
     }
-    
-    func setTokenReplacer(_ replacer: TokenReplacer) {
-        //Assert.shouldNeverHappen();
-    }
-    
+        
     public func getController(type: PKController.Type) -> PKController? {
         if type is PKVRController.Type && self.currentPlayer is VRPlayerEngine {
             return PKVRController(player: self.currentPlayer)

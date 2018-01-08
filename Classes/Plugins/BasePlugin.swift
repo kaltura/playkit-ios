@@ -22,10 +22,11 @@ import Foundation
     @objc public weak var messageBus: MessageBus?
     @objc public weak var tokenReplacer: TokenReplacer?
     
-    @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
+    @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus, tokenReplacer: TokenReplacer?) throws {
         PKLog.info("initializing plugin \(type(of:self))")
         self.player = player
         self.messageBus = messageBus
+        self.tokenReplacer = tokenReplacer
     }
     
     @objc open func onUpdateMedia(mediaConfig: MediaConfig) {

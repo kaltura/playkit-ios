@@ -25,8 +25,8 @@ import Foundation
     // MARK: - PKPlugin
     /************************************************************/
     
-    @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
-        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+    @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus, tokenReplacer: TokenReplacer?) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus, tokenReplacer: tokenReplacer)
         if let aConfig = pluginConfig as? AnalyticsConfig {
             self.config = aConfig
         } else {

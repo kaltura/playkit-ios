@@ -25,7 +25,7 @@ class PlayerLoader: PlayerDecoratorBase {
     var messageBus = MessageBus()
     var concreatePlayerController: PlayerController?
     
-    func load(pluginConfig: PluginConfig?) throws {
+    func load(pluginConfig: PluginConfig?, tokenReplacer: TokenReplacer?) throws {
         var playerController: PlayerController
         
         playerController = PlayerController()
@@ -38,8 +38,8 @@ class PlayerLoader: PlayerDecoratorBase {
         
         if let pluginConfigs = pluginConfig?.config {
             for pluginName in pluginConfigs.keys {
-                let pluginConfig = pluginConfigs[pluginName]
-                let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
+                let _pluginConfig = pluginConfigs[pluginName]
+                let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: _pluginConfig, messageBus: self.messageBus, tokenReplacer: tokenReplacer)
                 
                 var decorator: PlayerDecoratorBase? = nil
                 
@@ -109,12 +109,6 @@ class PlayerLoader: PlayerDecoratorBase {
     
     public override func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         messageBus.removeObserver(observer, events: events)
-    }
-    
-    public override func setTokenReplacer(_ replacer: TokenReplacer) {
-        for loadedPlugin in loadedPlugins.values {
-            loadedPlugin.plugin.tokenReplacer = replacer
-        }
     }
     
     public override func updatePluginConfig(pluginName: String, config: Any) {

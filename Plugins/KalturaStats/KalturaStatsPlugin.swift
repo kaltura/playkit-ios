@@ -107,8 +107,8 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         return "KalturaStatsPlugin"
     }
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
-        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus, tokenReplacer: TokenReplacer?) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus, tokenReplacer: tokenReplacer)
         
         var _config: KalturaStatsPluginConfig?
         if let json = pluginConfig as? JSON {
