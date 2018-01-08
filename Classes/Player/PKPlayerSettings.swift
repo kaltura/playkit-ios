@@ -27,6 +27,15 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     case `default`
     case auto
     case selection
+    
+    public init(_ mode: String) {
+        switch mode {
+        case "DEFAULT": self = .default
+        case "AUTO": self = .auto
+        case "SELECTION": self = .selection
+        default: self = .default
+        }
+    }
 }
 
 @objc public class PKTrackSelectionSettings: NSObject {
