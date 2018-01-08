@@ -42,11 +42,9 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     // text selection settings
     @objc public var textSelectionMode: TrackSelectionMode = .default
     @objc public var textSelectionLanguage: String?
-    @objc public var textSelectionTitle: String?
     // audio selection settings
     @objc public var audioSelectionMode: TrackSelectionMode = .default
     @objc public var audioSelectionLanguage: String?
-    @objc public var audioSelectionTitle: String?
 }
 
 enum PlayerSettingsType {
