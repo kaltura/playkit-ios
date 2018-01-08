@@ -272,19 +272,9 @@ extension AVPlayerEngine {
             self.selectTrack(trackId: track.id)
         }
         
-        func handleSelectionMode(for tracks: [Track]?, language: String?, title: String?) {
-            switch (language, title) {
-            case let (.some(trackLanguage), .some(trackTitle)):
-                guard let track = tracks?.first(where: { $0.language == trackLanguage && $0.title == trackTitle }) else { return }
-                self.selectTrack(trackId: track.id)
-            case let (.some(trackLanguage), nil):
-                guard let track = tracks?.first(where: { $0.language == trackLanguage }) else { return }
-                self.selectTrack(trackId: track.id)
-            case let (nil, .some(trackTitle)):
-                guard let track = tracks?.first(where: { $0.title == trackTitle }) else { return }
-                self.selectTrack(trackId: track.id)
-            default: break
-            }
+        func handleSelectionMode(for tracks: [Track]?, language: String?) {
+            guard let track = tracks?.first(where: { $0.language == language }) else { return }
+            self.selectTrack(trackId: track.id)
         }
     
         guard let trackSelection = self.asset?.playerSettings.trackSelection else { return }
@@ -296,7 +286,7 @@ extension AVPlayerEngine {
         case .auto:
             handleAutoMode(for: tracks.textTracks)
         case .selection:
-            handleSelectionMode(for: tracks.textTracks, language: trackSelection.textSelectionLanguage, title: trackSelection.textSelectionTitle)
+            handleSelectionMode(for: tracks.textTracks, language: trackSelection.textSelectionLanguage)
         }
         // handle audio selection mode, default is to let AVPlayer decide.
         switch trackSelection.audioSelectionMode {
@@ -304,7 +294,7 @@ extension AVPlayerEngine {
         case .auto:
             handleAutoMode(for: tracks.audioTracks)
         case .selection:
-            handleSelectionMode(for: tracks.audioTracks, language: trackSelection.audioSelectionLanguage, title: trackSelection.audioSelectionTitle)
+            handleSelectionMode(for: tracks.audioTracks, language: trackSelection.audioSelectionLanguage)
         }
     }
 }
