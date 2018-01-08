@@ -38,8 +38,8 @@ class PlayerLoader: PlayerDecoratorBase {
         
         if let pluginConfigs = pluginConfig?.config {
             for pluginName in pluginConfigs.keys {
-                let _pluginConfig = pluginConfigs[pluginName]
-                let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: _pluginConfig, messageBus: self.messageBus, tokenReplacer: tokenReplacer)
+                let pluginConfig = pluginConfigs[pluginName]
+                let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus, tokenReplacer: tokenReplacer)
                 
                 var decorator: PlayerDecoratorBase? = nil
                 

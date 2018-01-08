@@ -67,8 +67,8 @@ public class KalturaLiveStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     // MARK: - PKPlugin
     /************************************************************/
     
-    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
-        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+    public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus, tokenReplacer: TokenReplacer?) throws {
+        try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus, tokenReplacer: tokenReplacer)
         
         var _config: KalturaLiveStatsPluginConfig?
         if let json = pluginConfig as? JSON {
