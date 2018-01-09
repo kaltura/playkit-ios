@@ -24,26 +24,26 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
 }
 
 @objc public enum TrackSelectionMode: Int {
-    case `default`
+    case off
     case auto
     case selection
     
     public init(_ mode: String) {
         switch mode {
-        case "DEFAULT": self = .default
+        case "OFF": self = .off
         case "AUTO": self = .auto
         case "SELECTION": self = .selection
-        default: self = .default
+        default: self = .off
         }
     }
 }
 
 @objc public class PKTrackSelectionSettings: NSObject {
     // text selection settings
-    @objc public var textSelectionMode: TrackSelectionMode = .default
+    @objc public var textSelectionMode: TrackSelectionMode = .off
     @objc public var textSelectionLanguage: String?
     // audio selection settings
-    @objc public var audioSelectionMode: TrackSelectionMode = .default
+    @objc public var audioSelectionMode: TrackSelectionMode = .off
     @objc public var audioSelectionLanguage: String?
 }
 

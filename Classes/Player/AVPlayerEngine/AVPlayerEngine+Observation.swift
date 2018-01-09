@@ -280,7 +280,7 @@ extension AVPlayerEngine {
         guard let trackSelection = self.asset?.playerSettings.trackSelection else { return }
         // handle text selection mode, default is to turn subtitles off.
         switch trackSelection.textSelectionMode {
-        case .default:
+        case .off:
             guard let track = tracks.textTracks?.first(where: { $0.title == TracksManager.textOffDisplay && $0.language == nil }) else { return }
             self.selectTrack(trackId: track.id)
         case .auto:
@@ -290,7 +290,7 @@ extension AVPlayerEngine {
         }
         // handle audio selection mode, default is to let AVPlayer decide.
         switch trackSelection.audioSelectionMode {
-        case .default: break
+        case .off: break
         case .auto:
             handleAutoMode(for: tracks.audioTracks)
         case .selection:
