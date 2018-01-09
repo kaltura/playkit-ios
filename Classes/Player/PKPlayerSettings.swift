@@ -36,6 +36,14 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
         default: self = .off
         }
     }
+    
+    public var asString: String {
+        switch self {
+        case .off: return "OFF"
+        case .auto: return "AUTO"
+        case .selection: return "SELECTION"
+        }
+    }
 }
 
 @objc public class PKTrackSelectionSettings: NSObject {
