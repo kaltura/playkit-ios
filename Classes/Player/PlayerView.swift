@@ -54,4 +54,27 @@ import AVFoundation
         player.view = playerView
         return playerView
     }
+    
+    public func getLastFrame(completionHandler: @escaping (UIImage?, Error?) -> Void) {
+        guard let asset = self.player?.currentItem?.asset else {
+            completionHandler(nil, nil)
+            return
+        }
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.requestedTimeToleranceBefore = kCMTimeZero
+        imageGenerator.requestedTimeToleranceAfter = kCMTimeZero
+        imageGenerator.appliesPreferredTrackTransform = true
+        DispatchQueue.global().async {
+            do {
+                let cgImage = try imageGenerator.copyCGImage(at: asset.duration, actualTime: nil)
+                completionHandler(UIImage(cgImage: cgImage), nil)
+            } catch {
+                completionHandler(nil, error)
+            }
+        }
+    }
+    
+    deinit {
+        PKLog.debug("player view deinitialized...")
+    }
 }
