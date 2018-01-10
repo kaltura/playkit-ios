@@ -308,8 +308,8 @@ class TimeObserver: TimeMonitor {
     func stopTimer() {
         if let dispatchTimer = dispatchTimer {
             dispatchTimer.cancel()
-            self.dispatchTimer = nil
         }
+        self.dispatchTimer = nil
         self.cycles = 1
     }
     
