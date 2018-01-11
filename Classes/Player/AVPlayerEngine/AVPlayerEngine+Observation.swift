@@ -43,7 +43,7 @@ extension AVPlayerEngine {
         NotificationCenter.default.addObserver(self, selector: #selector(self.didPlayToEndTime(_:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: self.currentItem?.timebase)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
     func removeObservers() {
@@ -272,39 +272,29 @@ extension AVPlayerEngine {
             self.selectTrack(trackId: track.id)
         }
         
-        func handleSelectionMode(for tracks: [Track]?, language: String?, title: String?) {
-            switch (language, title) {
-            case let (.some(trackLanguage), .some(trackTitle)):
-                guard let track = tracks?.first(where: { $0.language == trackLanguage && $0.title == trackTitle }) else { return }
-                self.selectTrack(trackId: track.id)
-            case let (.some(trackLanguage), nil):
-                guard let track = tracks?.first(where: { $0.language == trackLanguage }) else { return }
-                self.selectTrack(trackId: track.id)
-            case let (nil, .some(trackTitle)):
-                guard let track = tracks?.first(where: { $0.title == trackTitle }) else { return }
-                self.selectTrack(trackId: track.id)
-            default: break
-            }
+        func handleSelectionMode(for tracks: [Track]?, language: String?) {
+            guard let track = tracks?.first(where: { $0.language == language }) else { return }
+            self.selectTrack(trackId: track.id)
         }
     
         guard let trackSelection = self.asset?.playerSettings.trackSelection else { return }
         // handle text selection mode, default is to turn subtitles off.
         switch trackSelection.textSelectionMode {
-        case .default:
+        case .off:
             guard let track = tracks.textTracks?.first(where: { $0.title == TracksManager.textOffDisplay && $0.language == nil }) else { return }
             self.selectTrack(trackId: track.id)
         case .auto:
             handleAutoMode(for: tracks.textTracks)
         case .selection:
-            handleSelectionMode(for: tracks.textTracks, language: trackSelection.textSelectionLanguage, title: trackSelection.textSelectionTitle)
+            handleSelectionMode(for: tracks.textTracks, language: trackSelection.textSelectionLanguage)
         }
         // handle audio selection mode, default is to let AVPlayer decide.
         switch trackSelection.audioSelectionMode {
-        case .default: break
+        case .off: break
         case .auto:
             handleAutoMode(for: tracks.audioTracks)
         case .selection:
-            handleSelectionMode(for: tracks.audioTracks, language: trackSelection.audioSelectionLanguage, title: trackSelection.audioSelectionTitle)
+            handleSelectionMode(for: tracks.audioTracks, language: trackSelection.audioSelectionLanguage)
         }
     }
 }
