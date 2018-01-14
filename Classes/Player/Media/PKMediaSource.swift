@@ -42,7 +42,7 @@ import SwiftyJSON
             }
         }
         
-        static func mediaFormat(byfileExtension ext:String) -> MediaFormat{
+        static func mediaFormat(byfileExtension ext: String) -> MediaFormat {
             switch ext.lowercased() {
             case "m3u8": return .hls
             case "wvm": return .wvm
@@ -93,7 +93,7 @@ import SwiftyJSON
         self.id = id
         self.contentUrl = contentUrl
         self.drmData = drmData
-        self.mediaFormat = mediaFormat
+        self.mediaFormat = mediaFormat == .unknown ? MediaFormat.mediaFormat(byfileExtension: contentUrl?.pathExtension ?? "") : mediaFormat
     }
     
     @objc public init(json: Any) {
