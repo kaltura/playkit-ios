@@ -260,12 +260,20 @@ extension AVPlayerEngine {
     
     private func handleTracksSelection(_ tracks: PKTracks) {
         
+        func checkLanguageCode(current currentLanguageCode: String?, against languageCodeToCompare: String?) -> Bool {
+            if let current = currentLanguageCode, let againstCode = languageCodeToCompare {
+                let currentCanonicalLanguageIdentifier = Locale.canonicalLanguageIdentifier(from: current)
+                let againstCanonicalLanguageIdentifier = Locale.canonicalLanguageIdentifier(from: againstCode)
+                return current == againstCode || current == againstCanonicalLanguageIdentifier || currentCanonicalLanguageIdentifier == againstCode
+            }
+            return false
+        }
+        
         func handleAutoMode(for tracks: [Track]?) {
             guard let languageCode = Locale.current.languageCode else { return }
             guard let track = tracks?.first(where: { (track) -> Bool in
                 if let trackLanguageCode = track.language {
-                    let canonicalLanguageIdentifier = Locale.canonicalLanguageIdentifier(from: trackLanguageCode)
-                    return languageCode == trackLanguageCode || languageCode == canonicalLanguageIdentifier
+                    return checkLanguageCode(current: languageCode, against: trackLanguageCode)
                 }
                 return false
             }) else { return }
@@ -273,7 +281,7 @@ extension AVPlayerEngine {
         }
         
         func handleSelectionMode(for tracks: [Track]?, language: String?) {
-            guard let track = tracks?.first(where: { $0.language == language }) else { return }
+            guard let track = tracks?.first(where: { checkLanguageCode(current: language, against: $0.language) }) else { return }
             self.selectTrack(trackId: track.id)
         }
     
