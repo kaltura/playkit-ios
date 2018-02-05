@@ -182,7 +182,11 @@ class PlayerController: NSObject, Player {
                 isCreated = true
             }
         } else {
-            if self.currentPlayer is AVPlayerWrapper { // do not create new if current player is already vr player
+            if type(of: self.currentPlayer) is VRPlayerEngine.Type {
+                self.currentPlayer.destroy()
+                self.currentPlayer = AVPlayerWrapper()
+                isCreated = true
+            } else if self.currentPlayer is AVPlayerWrapper { // do not create new if current player is already vr player
                 isCreated = false
             } else {
                 self.currentPlayer = AVPlayerWrapper()
