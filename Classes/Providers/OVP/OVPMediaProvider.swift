@@ -262,7 +262,7 @@ import KalturaNetKit
                             }
                         }
 
-                        let playURL: URL? = self.playbackURL(loadInfo: loadInfo, source: source, ks: ksForURL)
+                        let playURL: URL? = self.playbackURL(entryId: entry.id, loadInfo: loadInfo, source: source, ks: ksForURL)
                         guard let url = playURL else {
                             PKLog.error("failed to create play url from source, discarding source:\(entry.id),\(source.deliveryProfileId), \(source.format)")
                             return
@@ -347,7 +347,7 @@ import KalturaNetKit
     }
     
     // building the url with the SourceBuilder class
-    private func playbackURL(loadInfo: LoaderInfo, source: OVPSource, ks: String?) -> URL? {
+    private func playbackURL(entryId: String, loadInfo: LoaderInfo, source: OVPSource, ks: String?) -> URL? {
         
         let formatType = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
         var playURL: URL? = nil
@@ -357,7 +357,7 @@ import KalturaNetKit
             let sourceBuilder: SourceBuilder = SourceBuilder()
                 .set(baseURL: loadInfo.sessionProvider.serverURL)
                 .set(format: source.format)
-                .set(entryId: loadInfo.entryId)
+                .set(entryId: entryId)
                 .set(uiconfId: loadInfo.uiconfId?.int64Value)
                 .set(flavors: source.flavors)
                 .set(partnerId: loadInfo.sessionProvider.partnerId)
