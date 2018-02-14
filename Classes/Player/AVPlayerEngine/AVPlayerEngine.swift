@@ -29,7 +29,8 @@ public class AVPlayerEngine: AVPlayer {
 
     /// Keeps reference on the last timebase rate in order to post events accuratly.
     var lastTimebaseRate: Float64 = 0
-    var lastBitrate: Double = 0
+    /// The last indicated bitrate observed can tell what is the last video track bitrate that was used.
+    var lastIndicatedBitrate: Double = 0
     var isObserved: Bool = false
     /// Indicates if player item was changed to state: `readyToPlay` at least once.
     /// Used to post `CanPlay` event once on first `readyToPlay`.
@@ -83,7 +84,6 @@ public class AVPlayerEngine: AVPlayer {
                     PKLog.error("seek faild")
                 }
             }
-            
             self.post(event: PlayerEvent.Seeking(targetSeekPosition: CMTimeGetSeconds(newTime)))
         }
     }
@@ -222,8 +222,9 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func selectTrack(trackId: String) {
+        guard let currentItem = self.currentItem else { return }
         if trackId.isEmpty == false {
-            let selectedTrack = self.tracksManager.selectTrack(item: self.currentItem!, trackId: trackId)
+            let selectedTrack = self.tracksManager.selectTrack(item: currentItem, trackId: trackId)
             if let selectedTrack = selectedTrack {
                 if selectedTrack.type == .audio {
                     self.post(event: PlayerEvent.AudioTrackChanged(track: selectedTrack))

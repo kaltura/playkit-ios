@@ -41,9 +41,9 @@ extension AVPlayerEngine {
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.didFailToPlayToEndTime(_:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.didPlayToEndTime(_:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: self.currentItem?.timebase)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
     func removeObservers() {
@@ -58,31 +58,38 @@ extension AVPlayerEngine {
             removeObserver(self, forKeyPath: keyPath, context: &AVPlayerEngine.observerContext)
         }
         
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemFailedToPlayToEndTime, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: nil)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
     @objc func onAccessLogEntryNotification(notification: Notification) {
-        if let item = notification.object as? AVPlayerItem, let accessLog = item.accessLog(), let lastEvent = accessLog.events.last {
+        if let playerItem = notification.object as? AVPlayerItem, let accessLog = playerItem.accessLog(),
+            let lastEvent = accessLog.events.last, playerItem === self.currentItem {
             if #available(iOS 10.0, tvOS 10.0, *) {
                 PKLog.debug("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
             }
             
             self.post(event: PlayerEvent.PlaybackInfo(playbackInfo: PKPlaybackInfo(logEvent: lastEvent)))
-            self.post(event: PlayerEvent.VideoTrackChanged(bitrate: lastEvent.indicatedBitrate))
+            if self.lastIndicatedBitrate != lastEvent.indicatedBitrate {
+                self.lastIndicatedBitrate = lastEvent.indicatedBitrate
+                self.post(event: PlayerEvent.VideoTrackChanged(bitrate: lastEvent.indicatedBitrate))
+            }
         }
     }
     
     @objc func onErrorLogEntryNotification(notification: Notification) {
-        guard let playerItem = notification.object as? AVPlayerItem, let errorLog = playerItem.errorLog(), let lastEvent = errorLog.events.last else { return }
+        guard let playerItem = notification.object as? AVPlayerItem, let errorLog = playerItem.errorLog(),
+            let lastEvent = errorLog.events.last, playerItem === self.currentItem else { return }
         PKLog.warning("error description: \(String(describing: lastEvent.errorComment)), error domain: \(lastEvent.errorDomain), error code: \(lastEvent.errorStatusCode)")
         self.post(event: PlayerEvent.ErrorLog(error: PlayerErrorLog(errorLogEvent: lastEvent)))
     }
     
     @objc func didFailToPlayToEndTime(_ notification: NSNotification) {
+        // post notification only for current player item.
+        guard let notificationObject = notification.object as? AVPlayerItem, notificationObject === self.currentItem else { return }
         let newState = PlayerState.error
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
@@ -95,6 +102,8 @@ extension AVPlayerEngine {
     }
     
     @objc func didPlayToEndTime(_ notification: NSNotification) {
+        // post notification only for current player item.
+        guard let notificationObject = notification.object as? AVPlayerItem, notificationObject === self.currentItem else { return }
         let newState = PlayerState.ended
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
@@ -188,7 +197,12 @@ extension AVPlayerEngine {
     
     private func handle(status: AVPlayerStatus) {
         switch status {
-        case .readyToPlay: PKLog.debug("player is ready to play player items")
+        case .readyToPlay:
+            PKLog.debug("player is ready to play player items")
+            if self.startPosition > 0 {
+                self.currentPosition = self.startPosition
+                self.startPosition = 0
+            }
         case .failed:
             PKLog.error("player failed you must recreate the player instance")
             if let error = (self.error as NSError?) {
@@ -203,26 +217,16 @@ extension AVPlayerEngine {
         case .readyToPlay:
             let newState = PlayerState.ready
             
-            if self.startPosition > 0 {
-                self.currentPosition = self.startPosition
-                self.startPosition = 0
-            }
-            
             self.postStateChange(newState: newState, oldState: self.currentState)
             self.currentState = newState
             
             if self.isFirstReady {
                 self.isFirstReady = false
-                
-                // There is an issue with AVPlayer that when we select a track right after state is `.readyToPlay`
-                // AVPlayer ignores this selection and doesn't display the subtitles up until a later point in time.
-                // To resolve this internally we send `TracksAvailable` event **with a delay**.
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
-                        self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
-                    })
-                }
-                
+                // handle tracks, send event and handle selection mode.
+                self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+                    self.handleTracksSelection(tracks)
+                    self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
+                })
                 // when player item is readyToPlay for the first time it is safe to assume we have a valid duration.
                 if let duration = self.currentItem?.duration, !CMTIME_IS_INDEFINITE(duration) {
                     PKLog.debug("duration in seconds: \(CMTimeGetSeconds(duration))")
@@ -252,5 +256,53 @@ extension AVPlayerEngine {
         guard let currentItem = self.currentItem else { return }
         guard let metadata = currentItem.timedMetadata else { return }
         self.post(event: PlayerEvent.TimedMetadata(metadata: metadata))
+    }
+    
+    private func handleTracksSelection(_ tracks: PKTracks) {
+        
+        func checkLanguageCode(current currentLanguageCode: String?, against languageCodeToCompare: String?) -> Bool {
+            if let current = currentLanguageCode, let againstCode = languageCodeToCompare {
+                let currentCanonicalLanguageIdentifier = Locale.canonicalLanguageIdentifier(from: current)
+                let againstCanonicalLanguageIdentifier = Locale.canonicalLanguageIdentifier(from: againstCode)
+                return current == againstCode || current == againstCanonicalLanguageIdentifier || currentCanonicalLanguageIdentifier == againstCode
+            }
+            return false
+        }
+        
+        func handleAutoMode(for tracks: [Track]?) {
+            guard let languageCode = Locale.current.languageCode else { return }
+            guard let track = tracks?.first(where: { (track) -> Bool in
+                if let trackLanguageCode = track.language {
+                    return checkLanguageCode(current: languageCode, against: trackLanguageCode)
+                }
+                return false
+            }) else { return }
+            self.selectTrack(trackId: track.id)
+        }
+        
+        func handleSelectionMode(for tracks: [Track]?, language: String?) {
+            guard let track = tracks?.first(where: { checkLanguageCode(current: language, against: $0.language) }) else { return }
+            self.selectTrack(trackId: track.id)
+        }
+    
+        guard let trackSelection = self.asset?.playerSettings.trackSelection else { return }
+        // handle text selection mode, default is to turn subtitles off.
+        switch trackSelection.textSelectionMode {
+        case .off:
+            guard let track = tracks.textTracks?.first(where: { $0.title == TracksManager.textOffDisplay && $0.language == nil }) else { return }
+            self.selectTrack(trackId: track.id)
+        case .auto:
+            handleAutoMode(for: tracks.textTracks)
+        case .selection:
+            handleSelectionMode(for: tracks.textTracks, language: trackSelection.textSelectionLanguage)
+        }
+        // handle audio selection mode, default is to let AVPlayer decide.
+        switch trackSelection.audioSelectionMode {
+        case .off: break
+        case .auto:
+            handleAutoMode(for: tracks.audioTracks)
+        case .selection:
+            handleSelectionMode(for: tracks.audioTracks, language: trackSelection.audioSelectionLanguage)
+        }
     }
 }

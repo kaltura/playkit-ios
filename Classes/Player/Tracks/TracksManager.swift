@@ -11,8 +11,9 @@
 import Foundation
 import AVFoundation
 
-class TracksManager: NSObject {
-    let textOffDisplay: String = "Off"
+public class TracksManager: NSObject {
+    
+    static let textOffDisplay: String = "Off"
     
     private var audioTracks: [Track]?
     private var textTracks: [Track]?
@@ -40,7 +41,7 @@ class TracksManager: NSObject {
         
     }
     
-    public func selectTrack(item: AVPlayerItem, trackId: String) -> Track? {
+    @objc public func selectTrack(item: AVPlayerItem, trackId: String) -> Track? {
         PKLog.trace("selectTrack")
         
         let idArr : [String] = trackId.components(separatedBy: ":")
@@ -57,20 +58,20 @@ class TracksManager: NSObject {
         return nil
     }
     
-    public func currentAudioTrack(item: AVPlayerItem) -> String? {
+    @objc public func currentAudioTrack(item: AVPlayerItem) -> String? {
         if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.audible), let option = item.selectedMediaOption(in: group) {
             return self.audioTracks?.filter{($0.title == option.displayName)}.first?.id
         }
         return nil
     }
     
-    public func currentTextTrack(item: AVPlayerItem) -> String? {
+    @objc public func currentTextTrack(item: AVPlayerItem) -> String? {
         if let group = item.asset.mediaSelectionGroup(forMediaCharacteristic: AVMediaCharacteristic.legible) {
             var displayName: String
             if let option = item.selectedMediaOption(in: group) {
                 displayName = option.displayName
             } else {
-                displayName = textOffDisplay
+                displayName = TracksManager.textOffDisplay
             }
             return self.textTracks?.filter{($0.title == displayName)}.first?.id
         }
@@ -138,7 +139,7 @@ class TracksManager: NSObject {
             self.textTracks?.append(track)
         }
         if optionMediaType != "" {
-            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: textOffDisplay, type: .text, language: nil), at: 0)
+            self.textTracks?.insert(Track(id: "\(optionMediaType):-1", title: TracksManager.textOffDisplay, type: .text, language: nil), at: 0)
         }
     }
     

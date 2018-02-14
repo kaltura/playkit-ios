@@ -8,14 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-//
-//  PKTimeRange.swift
-//  Pods
-//
-//  Created by Gal Orlanczyk on 24/07/2017.
-//
-//
-
 import Foundation
 import CoreMedia
 
@@ -24,7 +16,7 @@ import CoreMedia
     @objc public let end: TimeInterval
     @objc public let duration: TimeInterval
     
-    public override var description: String {
+    @objc public override var description: String {
         return "[\(String(describing: type(of: self)))] - start: \(self.start), end: \(self.end), duration: \(self.duration)"
     }
     

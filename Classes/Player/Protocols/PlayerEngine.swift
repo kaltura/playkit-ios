@@ -25,10 +25,12 @@ import Foundation
     var onEventBlock: ((PKEvent) -> Void)? { get set }
     
     /// The player's start time.
-    var startPosition: TimeInterval {get set}
+    var startPosition: TimeInterval { get set }
     
     /// The player's current time.
-    var currentPosition: TimeInterval {get set}
+    var currentPosition: TimeInterval { get set }
+    
+    var mediaConfig: MediaConfig? { get set }
     
     /// Load media on player
     func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler)

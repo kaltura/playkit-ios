@@ -95,7 +95,7 @@ import SwiftyJSON
         callback(mediaEntry, nil)
     }
 
-    public func cancel() {
+    @objc public func cancel() {
 
     }
 }

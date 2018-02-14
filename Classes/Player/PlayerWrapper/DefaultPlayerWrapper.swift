@@ -21,8 +21,11 @@
 import Foundation
 
 class DefaultPlayerWrapper: NSObject, PlayerEngine {
+    
     var onEventBlock: ((PKEvent) -> Void)?
 
+    var mediaConfig: MediaConfig?
+    
     public var duration: Double {
         printInvocationWarning("\(#function)")
         return 0.0

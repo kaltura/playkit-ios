@@ -8,14 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-//
-//  TimeObserver.swift
-//  Pods
-//
-//  Created by Gal Orlanczyk on 21/08/2017.
-//
-//
-
 import Foundation
 
 protocol TimeProvider: class {
@@ -316,8 +308,8 @@ class TimeObserver: TimeMonitor {
     func stopTimer() {
         if let dispatchTimer = dispatchTimer {
             dispatchTimer.cancel()
-            self.dispatchTimer = nil
         }
+        self.dispatchTimer = nil
         self.cycles = 1
     }
     
