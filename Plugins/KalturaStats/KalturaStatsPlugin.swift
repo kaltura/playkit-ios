@@ -104,7 +104,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
     /************************************************************/
     
     public override class var pluginName: String {
-        return "KalturaStatsPlugin"
+        return "kalturaStats"
     }
     
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus, tokenReplacer: TokenReplacer?) throws {
