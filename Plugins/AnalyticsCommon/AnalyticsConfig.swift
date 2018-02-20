@@ -20,16 +20,32 @@ import SwiftyJSON
     }
     
     public static func parse(json: JSON) -> AnalyticsConfig? {
-        var _params: [String: Any]?
+        var _dict: [String: Any]?
         do {
-            _params = try JSONSerialization.jsonObject(with: json.rawData(), options: [JSONSerialization.ReadingOptions.mutableContainers, JSONSerialization.ReadingOptions.mutableLeaves]) as? [String: Any]
+            _dict = try JSONSerialization.jsonObject(with: json.rawData(), options: [JSONSerialization.ReadingOptions.mutableContainers, JSONSerialization.ReadingOptions.mutableLeaves]) as? [String: Any]
         } catch {
             return nil
         }
-        guard let params = _params else {
+        guard let params = _dict?["options"] as? [String : Any] else {
             return nil
         }
         return AnalyticsConfig(params: params)
     }
     
+    public func merge(config: AnalyticsConfig) -> AnalyticsConfig {
+        params = merge(left: params, right: config.params)
+        return self
+    }
+    
+    func merge(left: [String : Any], right: [String : Any]) -> [String : Any] {
+        var result = left
+        for (key, value) in right {
+            if let rightDict = value as? [String : Any], let leftDict = left[key] as? [String : Any] {
+                result[key] = merge(left: leftDict, right: rightDict)
+            } else {
+                result[key] = value
+            }
+        }
+        return result
+    }
 }
