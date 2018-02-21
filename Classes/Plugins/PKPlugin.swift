@@ -36,5 +36,32 @@ import SwiftyJSON
 }
 
 @objc public protocol PKPluginMerge {
-    static func merge(uiConf: Any, appConf: Any) -> Any?
+    static func parse(json: Any) -> PKPluginConfigMerge?
+    static func cast(uiConf: Any) -> PKPluginConfigMerge?
+}
+
+extension PKPluginMerge {
+    static public func merge(uiConf: Any, appConf: Any) -> Any? {
+        var uiConfig: PKPluginConfigMerge?
+        if uiConf is JSON {
+            uiConfig = parse(json: uiConf)
+        } else {
+            uiConfig = cast(uiConf: uiConf)
+        }
+        guard uiConfig != nil else { return appConf }
+        
+        var appConfig: PKPluginConfigMerge?
+        if appConf is JSON {
+            appConfig = parse(json: appConf)
+        } else {
+            appConfig = cast(uiConf: appConf)
+        }
+        guard appConfig != nil else { return uiConfig }
+        
+        return uiConfig?.merge(config: appConfig!)
+    }
+}
+
+@objc public protocol PKPluginConfigMerge {
+    func merge(config: PKPluginConfigMerge) -> PKPluginConfigMerge
 }

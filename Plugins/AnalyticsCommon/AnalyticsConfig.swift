@@ -11,7 +11,7 @@
 import UIKit
 import SwiftyJSON
 
-@objc public class AnalyticsConfig: NSObject {
+@objc public class AnalyticsConfig: NSObject, PKPluginConfigMerge {
     
     @objc public var params: [String: Any]
     
@@ -32,8 +32,10 @@ import SwiftyJSON
         return AnalyticsConfig(params: params)
     }
     
-    public func merge(config: AnalyticsConfig) -> AnalyticsConfig {
-        params = merge(left: params, right: config.params)
+    public func merge(config: PKPluginConfigMerge) -> PKPluginConfigMerge {
+        if let config = config as? AnalyticsConfig {
+            params = merge(left: params, right: config.params)
+        }
         return self
     }
     
