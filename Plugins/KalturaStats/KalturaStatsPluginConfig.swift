@@ -23,11 +23,13 @@ import Foundation
     @objc public var baseUrl: String
     @objc public var userId: String?
     @objc public var contextId: Int = -1 // need to be greater then 0 to be valid
+    @objc public var hasKanalony: Bool
     
-    @objc public init(uiconfId: Int, partnerId: Int, entryId: String) {
+    @objc public init(uiconfId: Int, partnerId: Int, entryId: String, hasKanalony: Bool) {
         self.baseUrl = defaultBaseUrl
         self.uiconfId = uiconfId
         self.partnerId = partnerId
         self.entryId = entryId
+        self.hasKanalony = hasKanalony
     }
 }

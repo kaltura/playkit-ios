@@ -30,11 +30,12 @@ internal class OVPStatsService {
             isSeek: isSeek,
             contextId: config.contextId,
             appId: config.applicationId,
-            userId: config.userId
+            userId: config.userId,
+            hasKanalony: config.hasKanalony
         )
     }
     
-    static func get(baseURL: String, partnerId: String, eventType: Int, clientVer: String, duration: Float, sessionId: String, position: Int32, uiConfId: Int, entryId: String, widgetId: String, isSeek: Bool, referrer: String = "", contextId: Int, appId: String?, userId: String?) -> KalturaRequestBuilder? {
+    static func get(baseURL: String, partnerId: String, eventType: Int, clientVer: String, duration: Float, sessionId: String, position: Int32, uiConfId: Int, entryId: String, widgetId: String, isSeek: Bool, referrer: String = "", contextId: Int, appId: String?, userId: String?, hasKanalony: Bool) -> KalturaRequestBuilder? {
         
         if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: nil, action: nil) {
             request
@@ -45,6 +46,7 @@ internal class OVPStatsService {
                 .setParam(key: "format", value: "1")
                 .setParam(key: "ignoreNull", value: "1")
                 .setParam(key: "action", value: "collect")
+                .setParam(key: "hasKanalony", value: hasKanalony.description)
                 .setParam(key: "event:eventType", value: "\(eventType)")
                 .setParam(key: "event:clientVer", value: "\(clientVer)")
                 .setParam(key: "event:currentPoint", value: "\(position)")
