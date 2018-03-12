@@ -17,6 +17,12 @@ import SwiftyJSON
     case unknown
 }
 
+fileprivate let idKey = "id"
+fileprivate let sourcesKey = "sources"
+fileprivate let mediaTypeKey = "mediaType"
+fileprivate let durationKey = "duration"
+
+
 @objc public class PKMediaEntry: NSObject {
     @objc public var id: String
     @objc public var sources: [PKMediaSource]?
@@ -34,11 +40,6 @@ import SwiftyJSON
             }
         }
     }
-    
-    private let idKey = "id"
-    private let sourcesKey = "sources"
-    private let mediaTypeKey = "mediaType"
-    private let durationKey = "duration"
     
     internal init(id: String) {
         self.id = id
