@@ -195,11 +195,17 @@ import AVFoundation
         fatalError("Private initializer, use a factory or `init(directory:)`")
     }
     
-    @objc public init(directory: FileManager.SearchPathDirectory) throws {
+    static func storageDir(_ directory: FileManager.SearchPathDirectory = .libraryDirectory) throws -> URL {
         let baseDir = try FileManager.default.url(for: directory, in: .userDomainMask, appropriateFor: nil, create: false)
-        self.storageDirectory = baseDir.appendingPathComponent(DefaultLocalDataStore.pkLocalDataStore, isDirectory: true)
+        let storageDirectory = baseDir.appendingPathComponent(DefaultLocalDataStore.pkLocalDataStore, isDirectory: true)
         
-        try FileManager.default.createDirectory(at: self.storageDirectory, withIntermediateDirectories: true, attributes: nil)
+        try FileManager.default.createDirectory(at: storageDirectory, withIntermediateDirectories: true, attributes: nil)
+        
+        return storageDirectory
+    }
+    
+    @objc public init(directory: FileManager.SearchPathDirectory) throws {
+        try self.storageDirectory = type(of: self).storageDir(directory)
     }
     
     private func file(_ key: String) -> URL {
@@ -228,6 +234,12 @@ extension LocalAssetsManager {
         let avAsset = AVURLAsset(url: url)
         prepareForDownload(asset: avAsset, mediaSource: source)
         return (avAsset, source)
+    }
+}
+
+extension LocalAssetsManager {
+    public func fetchFairPlayLicense(for mediaSource: PKMediaSource, id: String) {
+        ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(for: "entry-\(id)", mediaSource: mediaSource)
     }
 }
 
