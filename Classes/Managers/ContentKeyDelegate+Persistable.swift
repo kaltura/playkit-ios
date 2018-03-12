@@ -1,13 +1,6 @@
-/*
- Copyright (C) 2017 Apple Inc. All Rights Reserved.
- See LICENSE.txt for this sample’s licensing information
- 
- Abstract:
- This extension on `ContentKeyDelegate` implements the `AVContentKeySessionDelegate` protocol methods related to persistable content keys.
- */
-
 import AVFoundation
 
+@available(iOS 10.3, *)
 extension ContentKeyDelegate {
     
     /*
@@ -143,15 +136,6 @@ extension ContentKeyDelegate {
         // TODO: unify with download mode?
         try fetchAndSaveLicense(with: keyRequest)
         
-    }
-    
-    /// Deletes all the persistable content keys on disk for a specific `Asset`.
-    ///
-    /// - Parameter asset: The `Asset` value to remove keys for.
-    func deleteAllPeristableContentKeys(forAsset asset: Asset) {
-        if let contentKeyIdentifier = asset.id {
-            deletePeristableContentKey(withContentKeyIdentifier: contentKeyIdentifier)
-        }
     }
     
     /// Deletes a persistable key for a given content key identifier.

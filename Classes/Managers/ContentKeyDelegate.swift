@@ -1,18 +1,7 @@
-/*
- Copyright (C) 2017 Apple Inc. All Rights Reserved.
- See LICENSE.txt for this sample’s licensing information
- 
- Abstract:
- `ContentKeyDelegate` is a class that implements the `AVContentKeySessionDelegate` protocol to respond to content key requests using FairPlay Streaming.
- */
-
 import AVFoundation
 import SwiftyJSON
 
-class Asset {
-    let id: String? = nil
-}
-
+@available(iOS 10.3, *)
 class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
     // MARK: Types

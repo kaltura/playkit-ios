@@ -8,6 +8,7 @@
 
 import AVFoundation
 
+@available(iOS 10.3, *)
 class ContentKeyManager {
     
     // MARK: Types.
