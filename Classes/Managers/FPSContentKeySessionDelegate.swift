@@ -4,7 +4,7 @@ import SwiftyJSON
 @available(iOS 10.3, *)
 class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         
-    var assetHelpersMap = [String: FairPlayLicenseHelper]()
+    var assetHelpersMap = [String: FPSLicenseHelper]()
     
     func contentKeySession(_ session: AVContentKeySession, didProvide keyRequest: AVContentKeyRequest) {
         try? handleContentKeyRequest(keyRequest: keyRequest) // TODO
@@ -62,7 +62,7 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         // Add your code here to handle errors.
     }
     
-    func assetHelper(_ keyIdentifier: Any?) -> FairPlayLicenseHelper? {
+    func assetHelper(_ keyIdentifier: Any?) -> FPSLicenseHelper? {
         guard let id = keyIdentifier as? String else { return nil }
         return assetHelpersMap[id]
     }
