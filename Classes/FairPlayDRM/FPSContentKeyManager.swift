@@ -38,7 +38,7 @@ class FPSContentKeyManager {
         let skdURL = "skd://" + assetId
         
         do {
-            let helper = try FPSLicenseHelper(assetId: assetId, params: drmParams, forceDownload: true)
+            let helper = try FPSLicenseHelper(assetId: assetId, params: drmParams, shouldPersist: true, forceDownload: true)
             contentKeyDelegate.assetHelpersMap[skdURL] = helper
         } catch {
             return /// TODOerr

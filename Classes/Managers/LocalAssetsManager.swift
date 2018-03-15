@@ -14,7 +14,7 @@ import AVFoundation
 /// Manage local (downloaded) assets.
 @objc public class LocalAssetsManager: NSObject {
     let storage: LocalDataStore
-    var delegates = Set<AssetLoaderDelegate>()
+    var delegates = Set<FPSAssetLoaderDelegate>()
     
     private override init() {
         fatalError("Private initializer, use one of the factory methods")
@@ -73,7 +73,7 @@ import AVFoundation
             return
         }
         
-        let resourceLoaderDelegate = AssetLoaderDelegate.configureDownload(asset: asset, drmData: drmData, storage: storage)
+        let resourceLoaderDelegate = FPSAssetLoaderDelegate.configureDownload(asset: asset, drmData: drmData, storage: storage)
         
         self.delegates.update(with: resourceLoaderDelegate)
         

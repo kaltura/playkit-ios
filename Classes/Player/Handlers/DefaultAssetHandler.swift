@@ -13,7 +13,7 @@ import AVFoundation
 
 class DefaultAssetHandler: AssetHandler {
     
-    var assetLoaderDelegate: AssetLoaderDelegate?
+    var assetLoaderDelegate: FPSAssetLoaderDelegate?
     var avAsset: AVURLAsset?
     
     required init() {
@@ -37,7 +37,7 @@ class DefaultAssetHandler: AssetHandler {
             
             
             if #available(iOS 10.0, *) {
-                self.assetLoaderDelegate = AssetLoaderDelegate.configureLocalPlay(asset: asset, storage: localSource.storage)
+                self.assetLoaderDelegate = FPSAssetLoaderDelegate.configureLocalPlay(asset: asset, storage: localSource.storage)
             } else {
                 // On earlier versions, this will only work for non-FairPlay content.
                 PKLog.warning("Preparing local asset in iOS<10:", contentUrl)
@@ -70,7 +70,7 @@ class DefaultAssetHandler: AssetHandler {
 
         let asset = AVURLAsset(url: playbackUrl, options: assetOptions)
         
-        self.assetLoaderDelegate = AssetLoaderDelegate.configureRemotePlay(asset: asset, drmData: fpsData)
+        self.assetLoaderDelegate = FPSAssetLoaderDelegate.configureRemotePlay(asset: asset, drmData: fpsData)
         
         self.avAsset = asset  
         readyCallback(nil, self.avAsset)
