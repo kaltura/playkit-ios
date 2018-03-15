@@ -1,20 +1,12 @@
-/*
- Copyright (C) 2017 Apple Inc. All Rights Reserved.
- See LICENSE.txt for this sample’s licensing information
- 
- Abstract:
- The `ContentKeyManager` class configures the instance of `AVContentKeySession` to use for requesting content keys securely for playback or offline use.
- */
-
 import AVFoundation
 
 @available(iOS 10.3, *)
-class ContentKeyManager {
+class FPSContentKeyManager {
     
     // MARK: Types.
     
     /// The singleton for `ContentKeyManager`.
-    static let shared: ContentKeyManager = ContentKeyManager()
+    static let shared: FPSContentKeyManager = FPSContentKeyManager()
     
     // MARK: Properties.
     
@@ -25,7 +17,7 @@ class ContentKeyManager {
      The instance of `ContentKeyDelegate` which conforms to `AVContentKeySessionDelegate` and is used to respond to content key requests from
      the `AVContentKeySession`
      */
-    let contentKeyDelegate: ContentKeyDelegate
+    let contentKeyDelegate: FPSContentKeySessionDelegate
     
     /// The DispatchQueue to use for delegate callbacks.
     let contentKeyDelegateQueue = DispatchQueue(label: "com.example.apple-samplecode.HLSCatalog.ContentKeyDelegateQueue")
@@ -35,8 +27,23 @@ class ContentKeyManager {
     private init() {
         let storageUrl = try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         contentKeySession = AVContentKeySession(keySystem: .fairPlayStreaming, storageDirectoryAt: storageUrl)
-        contentKeyDelegate = ContentKeyDelegate()
+        contentKeyDelegate = FPSContentKeySessionDelegate()
         
         contentKeySession.setDelegate(contentKeyDelegate, queue: contentKeyDelegateQueue)
+    }
+    
+    func requestPersistableContentKeys(for assetId: String, mediaSource: PKMediaSource) {
+        
+        let drmParams = mediaSource.drmData?.first as! FairPlayDRMParams
+        let skdURL = "skd://" + assetId
+        
+        do {
+            let helper = try FPSLicenseHelper(assetId: assetId, params: drmParams, forceDownload: true)
+            contentKeyDelegate.assetHelpersMap[skdURL] = helper
+        } catch {
+            return /// TODOerr
+        }
+        
+        contentKeySession.processContentKeyRequest(withIdentifier: skdURL, initializationData: nil, options: nil)
     }
 }

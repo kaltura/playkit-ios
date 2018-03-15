@@ -13,12 +13,6 @@ import AVFoundation
 import SwiftyJSON
 
 
-enum FairPlayError : Error {
-    case emptyServerResponse
-    case malformedServerResponse
-    case noCKCInResponse
-    case malformedCKCInResponse
-}
 
 class AssetLoaderDelegate: NSObject {
     
@@ -27,9 +21,6 @@ class AssetLoaderDelegate: NSObject {
     
     /// Error domain for errors being thrown in the process of getting a CKC.
     static let errorDomain = "AssetLoaderDelegate"
-    
-    /// Notification for when the persistent content key has been saved to disk.
-    static let didPersistContentKeyNotification = NSNotification.Name(rawValue: "handleAssetLoaderDelegateDidPersistContentKeyNotification")
     
     /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
     fileprivate static let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")

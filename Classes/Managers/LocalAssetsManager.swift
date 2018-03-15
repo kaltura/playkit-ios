@@ -240,7 +240,7 @@ extension LocalAssetsManager {
 @available(iOS 10.3, *)
 extension LocalAssetsManager {
     public func fetchFairPlayLicense(for mediaSource: PKMediaSource, id: String) {
-        ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(for: "entry-\(id)", mediaSource: mediaSource)
+        FPSContentKeyManager.shared.requestPersistableContentKeys(for: "entry-\(id)", mediaSource: mediaSource)
     }
 }
 
