@@ -1,15 +1,9 @@
-//
-//  FPSLicenseHelper.swift
-//  PlayKit
-//
-//  Created by Noam Tamim on 14/03/2018.
-//
 
 import Foundation
 import AVFoundation
 import SwiftyJSON
 
-enum FairPlayError : Error {
+enum FairPlayError: Error {
     case emptyServerResponse
     case malformedServerResponse
     case noCKCInResponse
@@ -50,20 +44,6 @@ class FPSLicenseHelper {
         self.shouldPersist = true
    }
     
-//    @available(iOS 10.3, *)
-//    convenience init(keyIdentifier: Any?, params: FairPlayDRMParams) throws {
-//        self.ini
-//        try self.init(assetId: FPSLicenseHelper.getAssetId(keyIdentifier: keyIdentifier), params: params, shouldPersist: )
-//    }
-    
-    @available(iOS 10.3, *)
-    func requestPersistableContentKeys() {
-        let skdURL = "skd://" + assetId
-        
-        FPSContentKeyManager.shared.contentKeySession.processContentKeyRequest(withIdentifier: skdURL, initializationData: nil, options: nil)
-    }
-
-    
     @available(iOS 10.3, *)
     static func getAssetId(_ keyRequest: AVContentKeyRequest) throws -> String {
         return try getAssetId(keyIdentifier: keyRequest.identifier)
@@ -84,7 +64,7 @@ class FPSLicenseHelper {
         request.httpBody = spcData.base64EncodedData()
         request.httpMethod = "POST"
         
-        PKLog.debug("Sending SPC to server");
+        PKLog.debug("Sending SPC to server")
         var response: URLResponse?
         let data = try NSURLConnection.sendSynchronousRequest(request, returning: &response)
         let ckc = try self.parseServerResponse(data: data)
@@ -115,7 +95,7 @@ class FPSLicenseHelper {
         return ckc
     }
 
-    func fetchLicense(resourceLoadingRequest: AVAssetResourceLoadingRequest, usePersistence: Bool, done: (Error?)->Void) throws {
+    func fetchLicense(resourceLoadingRequest: AVAssetResourceLoadingRequest, usePersistence: Bool, done: (Error?) -> Void) throws {
         // Check if we have an existing key on disk for this asset.
         let keyLocation = FairPlayUtils.urlForPersistableContentKey(withContentKeyIdentifier: assetId)
         
@@ -171,7 +151,7 @@ class FPSLicenseHelper {
         }
     }
 
-    func handleCKCData(_ resourceLoadingRequest: AVAssetResourceLoadingRequest, ckcData: Data, done: (Error?)->Void) {
+    func handleCKCData(_ resourceLoadingRequest: AVAssetResourceLoadingRequest, ckcData: Data, done: (Error?) -> Void) {
         
         // Check if this reuqest is the result of a potential AVAssetDownloadTask.
         if #available(iOS 10.0, *), shouldPersist {
@@ -225,7 +205,7 @@ class FPSLicenseHelper {
     }
     
     @available(iOS 10.3, *)
-    func fetchLicense(contentKeyRequest: AVContentKeyRequest, done: @escaping ()->Void) throws {
+    func fetchLicense(contentKeyRequest: AVContentKeyRequest, done: @escaping () -> Void) throws {
         let assetId = self.assetId
         let keyLocation = FairPlayUtils.urlForPersistableContentKey(withContentKeyIdentifier: assetId)
         

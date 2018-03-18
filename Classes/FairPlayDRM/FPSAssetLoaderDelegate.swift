@@ -29,7 +29,7 @@ class FPSAssetLoaderDelegate: NSObject {
     
     private let drmData: FairPlayDRMParams?
     
-    var done: ((Error?)->Void)?
+    var done: ((Error?) -> Void)?
     
     var shouldPersist: Bool {
         return storage != nil

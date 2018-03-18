@@ -32,9 +32,10 @@ class FPSContentKeyManager {
         contentKeySession.setDelegate(contentKeyDelegate, queue: contentKeyDelegateQueue)
     }
     
-    func requestPersistableContentKeys(for assetId: String, mediaSource: PKMediaSource) {
+    func requestPersistableContentKeys(for mediaSource: PKMediaSource, with assetId: String) {
         
-        let drmParams = mediaSource.drmData?.first as! FairPlayDRMParams
+        guard let drmParams = mediaSource.drmData?.first as? FairPlayDRMParams else { fatalError("Not a FairPlay source") }
+
         let skdURL = "skd://" + assetId
         
         do {
