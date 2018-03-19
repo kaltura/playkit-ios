@@ -19,9 +19,6 @@ class FPSAssetLoaderDelegate: NSObject {
     /// The URL scheme for FPS content.
     static let customScheme = "skd"
     
-    /// Error domain for errors being thrown in the process of getting a CKC.
-    static let errorDomain = "AssetLoaderDelegate"
-    
     /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
     fileprivate static let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
     
@@ -83,13 +80,6 @@ class FPSAssetLoaderDelegate: NSObject {
             if resourceLoadingRequest.contentInformationRequest != nil {
                 resourceLoadingRequest.contentInformationRequest!.contentType = AVStreamingKeyDeliveryPersistentContentKeyType
             }
-            else {
-                PKLog.error("Unable to set contentType on contentInformationRequest.")
-                let error = NSError(domain: FPSAssetLoaderDelegate.errorDomain, code: -1, userInfo: nil)
-                resourceLoadingRequest.finishLoading(with: error)
-                self.done?(error)
-                return
-            }
         }
         
         var helper: FPSLicenseHelper
@@ -99,7 +89,7 @@ class FPSAssetLoaderDelegate: NSObject {
             helper = FPSLicenseHelper(assetId: assetIDString)
         }
         
-        try! helper.fetchLicense(resourceLoadingRequest: resourceLoadingRequest, usePersistence: shouldPersist) { (error) in
+        try! helper.fetchLicense(resourceLoadingRequest: resourceLoadingRequest) { (error) in
             // TODO
         }
     }

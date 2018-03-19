@@ -77,7 +77,7 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
             return
         }
         
-        try helper.fetchLicense(contentKeyRequest: keyRequest) { 
+        try helper.fetchLicense(contentKeyRequest: keyRequest) { error in 
             // TODO?
             PKLog.debug("Done handleStreamingContentKeyRequest for \(helper.assetId)")
             self.assetHelpersMap.removeValue(forKey: helper.assetId)

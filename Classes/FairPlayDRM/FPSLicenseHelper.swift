@@ -10,7 +10,88 @@ enum FairPlayError: Error {
     case malformedCKCInResponse
     case noLicenseURL
     case noAppCertificate
+    case invalidKeyRequest
 }
+
+
+protocol FPSContentKeyHandler {
+    func getSPC(cert: Data, id: String, options: [String : Any]?, callback: @escaping (Data?, Error?) -> Void)
+    func processContentKeyResponse(_ keyResponse: Data)
+    func processContentKeyResponseError(_ error: Error)
+    func respondByRequestingPersistableContentKeyRequest()
+    func persistableContentKey(fromKeyVendorResponse keyVendorResponse: Data, options: [String : Any]?) throws -> Data
+}
+
+@available(iOS 9.0, *)
+class FPSResourceLoadingKeyRequest: FPSContentKeyHandler {
+    let request: AVAssetResourceLoadingRequest
+    init(_ request: AVAssetResourceLoadingRequest) {
+        self.request = request
+    }
+    
+    func getSPC(cert: Data, id: String, options: [String : Any]?, callback: @escaping (Data?, Error?) -> Void) {
+        do {
+            let spc = try request.streamingContentKeyRequestData(forApp: cert, contentIdentifier: id.data(using: .utf8)!, options: options)
+            callback(spc, nil)
+        } catch {
+            callback(nil, error)
+        }
+    }
+    
+    func processContentKeyResponse(_ keyResponse: Data) {
+        guard let dataRequest = request.dataRequest else { 
+            request.finishLoading(with: FairPlayError.invalidKeyRequest)
+            return
+        }
+
+        dataRequest.respond(with: keyResponse)
+        request.finishLoading()
+    }
+    
+    func processContentKeyResponseError(_ error: Error) {
+        request.finishLoading(with: error)
+    }
+    
+    func respondByRequestingPersistableContentKeyRequest() {
+        fatalError("Invalid state")
+    }
+    
+    func persistableContentKey(fromKeyVendorResponse keyVendorResponse: Data, options: [String : Any]?) throws -> Data {
+        return try request.persistentContentKey(fromKeyVendorResponse: keyVendorResponse, options: options)
+    }
+}
+
+@available(iOS 10.3, *)
+class FPSContentKeyRequest: FPSContentKeyHandler {
+    let request: AVContentKeyRequest
+    init(_ request: AVContentKeyRequest) {
+        self.request = request
+    }
+    
+    func getSPC(cert: Data, id: String, options: [String : Any]?, callback: @escaping (Data?, Error?) -> Void) {
+        request.makeStreamingContentKeyRequestData(forApp: cert, contentIdentifier: id.data(using: .utf8)!, options: options, completionHandler: callback)
+    }
+    
+    func processContentKeyResponse(_ keyResponse: Data) {
+        request.processContentKeyResponse(AVContentKeyResponse(fairPlayStreamingKeyResponseData: keyResponse))
+    }
+    
+    func processContentKeyResponseError(_ error: Error) {
+        request.processContentKeyResponseError(error)
+    }
+    
+    func respondByRequestingPersistableContentKeyRequest() {
+        request.respondByRequestingPersistableContentKeyRequest()
+    }
+    
+    func persistableContentKey(fromKeyVendorResponse keyVendorResponse: Data, options: [String : Any]?) throws -> Data {
+        if let request = self.request as? AVPersistableContentKeyRequest {
+            return try request.persistableContentKey(fromKeyVendorResponse: keyVendorResponse, options: options)
+        }
+        fatalError("Invalid state")
+    }
+}
+
 
 
 class FPSLicenseHelper {
@@ -55,9 +136,7 @@ class FPSLicenseHelper {
         return assetId
     }
     
-    func performCKCRequest(_ spcData: Data) throws -> Data {
-        
-        guard let url = self.licenseUrl else { throw FairPlayError.noLicenseURL }
+    func performCKCRequest(_ spcData: Data, url: URL, callback: @escaping (Data?, Error?) -> Void) {
         
         var request = URLRequest(url: url)
         request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
@@ -65,10 +144,18 @@ class FPSLicenseHelper {
         request.httpMethod = "POST"
         
         PKLog.debug("Sending SPC to server")
-        var response: URLResponse?
-        let data = try NSURLConnection.sendSynchronousRequest(request, returning: &response)
-        let ckc = try self.parseServerResponse(data: data)
-        return ckc
+        let startTime = Date.timeIntervalSinceReferenceDate
+        let dataTask = URLSession.shared.dataTask(with: request, completionHandler: {(data: Data?, response: URLResponse?, error: Error?) -> Void in
+            do {
+                let endTime: Double = Date.timeIntervalSinceReferenceDate
+                PKLog.debug("Got response in \(endTime-startTime) sec")
+                let ckc = try self.parseServerResponse(data: data)
+                callback(ckc,nil)
+            } catch let e {
+                callback(nil,e)
+            }
+        })
+        dataTask.resume()
     }
 
     func parseServerResponse(data: Data?) throws -> Data {
@@ -95,17 +182,15 @@ class FPSLicenseHelper {
         return ckc
     }
 
-    func fetchLicense(resourceLoadingRequest: AVAssetResourceLoadingRequest, usePersistence: Bool, done: (Error?) -> Void) throws {
+    func fetchLicense(resourceLoadingRequest: AVAssetResourceLoadingRequest, done: @escaping (Error?) -> Void) throws {
         // Check if we have an existing key on disk for this asset.
         let keyLocation = FairPlayUtils.urlForPersistableContentKey(withContentKeyIdentifier: assetId)
         
         if !forceDownload && FileManager.default.fileExists(atPath: keyLocation.path) {
-            guard let dataRequest = resourceLoadingRequest.dataRequest else {
-                PKLog.error("Error loading contents of content key file.")
-                let error = NSError(domain: FPSAssetLoaderDelegate.errorDomain, code: -2, userInfo: nil)
-                resourceLoadingRequest.finishLoading(with: error)
-                done(error)
-                return
+            guard let dataRequest = resourceLoadingRequest.dataRequest else { 
+                resourceLoadingRequest.finishLoading(with: FairPlayError.invalidKeyRequest)
+                done(FairPlayError.invalidKeyRequest) 
+                return 
             }
             
             if let storedKey = try? Data.init(contentsOf: keyLocation) {
@@ -119,35 +204,32 @@ class FPSLicenseHelper {
         }
 
         guard let appCert = self.appCertificate else { throw FairPlayError.noAppCertificate }
+        guard let licenseUrl = self.licenseUrl else { throw FairPlayError.noLicenseURL }
         
         var resourceLoadingRequestOptions: [String: AnyObject]? = nil
         
-        if #available(iOS 10.0, *), usePersistence {
+        if #available(iOS 10.0, *), shouldPersist {
             resourceLoadingRequestOptions = [AVAssetResourceLoadingRequestStreamingContentKeyRequestRequiresPersistentKey: true as AnyObject]
         }
         
         let spcData: Data!
         
         do {
-            /*
-             To obtain the Server Playback Context (SPC), we call
-             AVAssetResourceLoadingRequest.streamingContentKeyRequestData(forApp:contentIdentifier:options:)
-             using the information we obtained earlier.
-             */
             spcData = try resourceLoadingRequest.streamingContentKeyRequestData(forApp: appCert, contentIdentifier: assetId.data(using: .utf8)!, options: resourceLoadingRequestOptions)
             PKLog.debug("Got spcData with", spcData.count, "bytes")
         } catch let error as NSError {
-            PKLog.error("Error obtaining key request data: \(error.domain) reason: \(String(describing: error.localizedFailureReason))")
+            PKLog.error("Error obtaining key request data:", error.localizedFailureReason ?? "??")
             resourceLoadingRequest.finishLoading(with: error)
             done(error)
             return
         }
         
-        do {
-            let ckcData = try performCKCRequest(spcData)
-            self.handleCKCData(resourceLoadingRequest, ckcData: ckcData, done: done)
-        } catch {
-            PKLog.error("Error occured while loading FairPlay license:", error)
+        performCKCRequest(spcData, url: licenseUrl) { (ckcData, error) in
+            if let ckcData = ckcData {
+                self.handleCKCData(resourceLoadingRequest, ckcData: ckcData, done: done)
+            } else {
+                PKLog.error("Error occured while loading FairPlay license:", error)
+            }
         }
     }
 
@@ -155,14 +237,6 @@ class FPSLicenseHelper {
         
         // Check if this reuqest is the result of a potential AVAssetDownloadTask.
         if #available(iOS 10.0, *), shouldPersist {
-            /* Since this request is the result of an AVAssetDownloadTask, we should get the secure persistent content key.
-             Obtain a persistable content key from a context.
-             
-             The data returned from this method may be used to immediately satisfy an
-             AVAssetResourceLoadingDataRequest, as well as any subsequent requests for the same key url.
-             
-             The value of AVAssetResourceLoadingContentInformationRequest.contentType must be set to AVStreamingKeyDeliveryPersistentContentKeyType when responding with data created with this method.
-             */
             do {
                 let persistentContentKeyData = try resourceLoadingRequest.persistentContentKey(fromKeyVendorResponse: ckcData, options: nil)
                 
@@ -170,13 +244,12 @@ class FPSLicenseHelper {
                 PKLog.debug("Saving persistentContentKeyData")
                 try FairPlayUtils.writePersistableContentKey(contentKey: persistentContentKeyData, withContentKeyIdentifier: assetId)
                 
-                guard let dataRequest = resourceLoadingRequest.dataRequest else {
-                    PKLog.error("no data is being requested in loadingRequest")
-                    let error = NSError(domain: FPSAssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
-                    resourceLoadingRequest.finishLoading(with: error)
-                    done(error)
+                guard let dataRequest = resourceLoadingRequest.dataRequest else { 
+                    resourceLoadingRequest.finishLoading(with: FairPlayError.invalidKeyRequest)
+                    done(FairPlayError.invalidKeyRequest)
                     return
                 }
+                
                 // Provide data to the loading request.
                 dataRequest.respond(with: persistentContentKeyData)
                 resourceLoadingRequest.finishLoading()  // Treat the processing of the request as complete.
@@ -190,10 +263,8 @@ class FPSLicenseHelper {
         } else {
             
             guard let dataRequest = resourceLoadingRequest.dataRequest else {
-                PKLog.error("no data is being requested in loadingRequest")
-                let error = NSError(domain: FPSAssetLoaderDelegate.errorDomain, code: -6, userInfo: nil)
-                resourceLoadingRequest.finishLoading(with: error)
-                done(error)
+                resourceLoadingRequest.finishLoading(with: FairPlayError.invalidKeyRequest)
+                done(FairPlayError.invalidKeyRequest)
                 return
             }
             
@@ -205,7 +276,7 @@ class FPSLicenseHelper {
     }
     
     @available(iOS 10.3, *)
-    func fetchLicense(contentKeyRequest: AVContentKeyRequest, done: @escaping () -> Void) throws {
+    func fetchLicense(contentKeyRequest: AVContentKeyRequest, done: @escaping (Error?) -> Void) throws {
         let assetId = self.assetId
         let keyLocation = FairPlayUtils.urlForPersistableContentKey(withContentKeyIdentifier: assetId)
         
@@ -222,7 +293,8 @@ class FPSLicenseHelper {
         }
         
         guard let appCert = self.appCertificate else { throw FairPlayError.noAppCertificate }
-        
+        guard let licenseUrl = self.licenseUrl else { throw FairPlayError.noLicenseURL }
+
         contentKeyRequest.makeStreamingContentKeyRequestData(forApp: appCert, 
                                                       contentIdentifier: assetId.data(using: .utf8)!, 
                                                       options: [AVContentKeyRequestProtocolVersionsKey: [1]]) { [weak self] (spcData, error) in
@@ -231,46 +303,40 @@ class FPSLicenseHelper {
             guard let strongSelf = self else { return }
             if let error = error {
                 contentKeyRequest.processContentKeyResponseError(error)
-                done()
-                //                    strongSelf.pendingPersistableContentKeyIdentifiers.remove(assetId)
+                done(error)
                 return
             }
             
             guard let spcData = spcData else { return }
             
-            do {
-                // Send SPC to Key Server and obtain CKC
-                
-                let ckcData = try strongSelf.performCKCRequest(spcData)
-                var keyData: Data
-                
-                if let persReq = contentKeyRequest as? AVPersistableContentKeyRequest {
-                    let pKey = try persReq.persistableContentKey(fromKeyVendorResponse: ckcData, options: nil)
-                    keyData = pKey
-                    
-                    try FairPlayUtils.writePersistableContentKey(contentKey: pKey, withContentKeyIdentifier: assetId)
-                } else {
-                    keyData = ckcData
+            // Send SPC to Key Server and obtain CKC
+            strongSelf.performCKCRequest(spcData, url: licenseUrl) { (ckcData, error) in 
+                guard let ckcData = ckcData else {
+                    contentKeyRequest.processContentKeyResponseError(error!)
+                    done(error)
+                    return
                 }
                 
-                /*
-                 AVContentKeyResponse is used to represent the data returned from the key server when requesting a key for
-                 decrypting content.
-                 */
+                var keyData = ckcData
+                
+                if let persReq = contentKeyRequest as? AVPersistableContentKeyRequest {
+                    do {
+                        keyData = try persReq.persistableContentKey(fromKeyVendorResponse: ckcData, options: nil)
+                        
+                        try FairPlayUtils.writePersistableContentKey(contentKey: keyData, withContentKeyIdentifier: assetId)
+                    } catch {
+                        contentKeyRequest.processContentKeyResponseError(error)
+                        done(error)
+                        return
+                    }
+                }
+                
                 let keyResponse = AVContentKeyResponse(fairPlayStreamingKeyResponseData: keyData)
                 
-                /*
-                 Provide the content key response to make protected content available for processing.
-                 */
                 contentKeyRequest.processContentKeyResponse(keyResponse)
                 
-                done()
-                //                    strongSelf.pendingPersistableContentKeyIdentifiers.remove(assetId)
-            } catch {
-                contentKeyRequest.processContentKeyResponseError(error)
-                
-                done()
-                //                    strongSelf.pendingPersistableContentKeyIdentifiers.remove(assetId)
+                done(nil)
+
             }
         }
     }
