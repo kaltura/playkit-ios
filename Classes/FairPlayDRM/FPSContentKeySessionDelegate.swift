@@ -77,10 +77,39 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
             return
         }
         
-        try helper.fetchLicense(contentKeyRequest: keyRequest) { error in 
+        helper.handleLicenseRequest(FPSContentKeyRequest(keyRequest)) { (error) in
             // TODO?
             PKLog.debug("Done handleStreamingContentKeyRequest for \(helper.assetId)")
             self.assetHelpersMap.removeValue(forKey: helper.assetId)
         }
     }
 }
+
+@available(iOS 10.3, *)
+class FPSContentKeyRequest: FPSLicenseRequest {
+    let request: AVContentKeyRequest
+    init(_ request: AVContentKeyRequest) {
+        self.request = request
+    }
+    
+    func getSPC(cert: Data, id: String, shouldPersist: Bool, callback: @escaping (Data?, Error?) -> Void) {
+        let options = [AVContentKeyRequestProtocolVersionsKey: [1]]
+        request.makeStreamingContentKeyRequestData(forApp: cert, contentIdentifier: id.data(using: .utf8)!, options: options, completionHandler: callback)
+    }
+    
+    func processContentKeyResponse(_ keyResponse: Data) {
+        request.processContentKeyResponse(AVContentKeyResponse(fairPlayStreamingKeyResponseData: keyResponse))
+    }
+    
+    func processContentKeyResponseError(_ error: Error) {
+        request.processContentKeyResponseError(error)
+    }
+    
+    func persistableContentKey(fromKeyVendorResponse keyVendorResponse: Data, options: [String : Any]?) throws -> Data {
+        if let request = self.request as? AVPersistableContentKeyRequest {
+            return try request.persistableContentKey(fromKeyVendorResponse: keyVendorResponse, options: options)
+        }
+        fatalError("Invalid state")
+    }
+}
+

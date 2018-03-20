@@ -13,7 +13,6 @@ import AVFoundation
 import SwiftyJSON
 
 
-
 class FPSAssetLoaderDelegate: NSObject {
     
     /// The URL scheme for FPS content.
@@ -89,8 +88,10 @@ class FPSAssetLoaderDelegate: NSObject {
             helper = FPSLicenseHelper(assetId: assetIDString)
         }
         
-        try! helper.fetchLicense(resourceLoadingRequest: resourceLoadingRequest) { (error) in
-            // TODO
+        helper.handleLicenseRequest(FPSResourceLoadingKeyRequest(resourceLoadingRequest)) { (error) in
+            if let error = error {
+                // TODO
+            }
         }
     }
 
@@ -129,5 +130,48 @@ extension FPSAssetLoaderDelegate: AVAssetResourceLoaderDelegate {
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: renewalRequest)
     }
+}
+
+class FPSResourceLoadingKeyRequest: FPSLicenseRequest {
+    let request: AVAssetResourceLoadingRequest
+    init(_ request: AVAssetResourceLoadingRequest) {
+        self.request = request
+    }
     
+    func getSPC(cert: Data, id: String, shouldPersist: Bool, callback: @escaping (Data?, Error?) -> Void) {
+        var options: [String: AnyObject]? = nil
+        
+        if #available(iOS 10.0, *), shouldPersist {
+            options = [AVAssetResourceLoadingRequestStreamingContentKeyRequestRequiresPersistentKey: true as AnyObject]
+        }
+        
+        do {
+            let spc = try request.streamingContentKeyRequestData(forApp: cert, contentIdentifier: id.data(using: .utf8)!, options: options)
+            callback(spc, nil)
+        } catch {
+            callback(nil, error)
+        }
+    }
+    
+    func processContentKeyResponse(_ keyResponse: Data) {
+        guard let dataRequest = request.dataRequest else { 
+            request.finishLoading(with: FPSError.invalidKeyRequest)
+            return
+        }
+        
+        dataRequest.respond(with: keyResponse)
+        request.finishLoading()
+    }
+    
+    func processContentKeyResponseError(_ error: Error) {
+        request.finishLoading(with: error)
+    }
+    
+    func persistableContentKey(fromKeyVendorResponse keyVendorResponse: Data, options: [String : Any]?) throws -> Data {
+        if #available(iOS 9.0, *) {
+            return try request.persistentContentKey(fromKeyVendorResponse: keyVendorResponse, options: options)
+        } else {
+            throw FPSError.persistenceNotSupported
+        }
+    }
 }
