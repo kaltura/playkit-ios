@@ -69,23 +69,24 @@ class FPSAssetLoaderDelegate: NSObject {
     
     func prepareAndSendContentKeyRequest(resourceLoadingRequest: AVAssetResourceLoadingRequest) {
         
-        guard let url = resourceLoadingRequest.request.url, let assetIDString = url.host else {
-            PKLog.error("Failed to get url or assetIDString for the request object of the resource.")
+        guard let assetId = resourceLoadingRequest.request.url?.host else {
+            PKLog.error("No asset id")
             return
         }
         
-        // Check if this reuqest is the result of a potential AVAssetDownloadTask.
-        if #available(iOS 10.0, *), shouldPersist {
-            if resourceLoadingRequest.contentInformationRequest != nil {
-                resourceLoadingRequest.contentInformationRequest!.contentType = AVStreamingKeyDeliveryPersistentContentKeyType
-            }
-        }
-        
         var helper: FPSLicenseHelper
-        if let fpsParams = self.drmData, self.storage != nil {
-            helper = try! FPSLicenseHelper(assetId: assetIDString, params: fpsParams, shouldPersist: shouldPersist, forceDownload: true)
+        
+        if let fpsParams = self.drmData {
+            if let storage = self.storage {
+                helper = try! FPSLicenseHelper(assetId: assetId, params: fpsParams, shouldPersist: shouldPersist, forceDownload: true)
+            } else {
+                helper = try! FPSLicenseHelper(assetId: assetId, params: fpsParams, shouldPersist: false)
+            }
+        } else if let storage = self.storage {
+            helper = FPSLicenseHelper(assetId: assetId)
         } else {
-            helper = FPSLicenseHelper(assetId: assetIDString)
+            PKLog.error("No storage and no DRM params")
+            return
         }
         
         helper.handleLicenseRequest(FPSResourceLoadingKeyRequest(resourceLoadingRequest)) { (error) in
