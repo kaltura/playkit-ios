@@ -74,6 +74,13 @@ class FPSAssetLoaderDelegate: NSObject {
             return
         }
         
+        // Check if this reuqest is the result of a potential AVAssetDownloadTask.
+        if #available(iOS 10.0, *), shouldPersist {
+            if let cir = resourceLoadingRequest.contentInformationRequest {
+                cir.contentType = AVStreamingKeyDeliveryPersistentContentKeyType
+            }
+        }
+        
         var helper: FPSLicenseHelper
         
         if let fpsParams = self.drmData {
