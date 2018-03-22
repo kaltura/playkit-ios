@@ -10,19 +10,39 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         try? handleContentKeyRequest(keyRequest: keyRequest) // TODO
     }
     
+    func contentKeySession(_ session: AVContentKeySession, didProvide keyRequest: AVPersistableContentKeyRequest) {
+        try? handleContentKeyRequest(keyRequest: keyRequest)
+    }
+
     func contentKeySession(_ session: AVContentKeySession, didProvideRenewingContentKeyRequest keyRequest: AVContentKeyRequest) {
         try? handleContentKeyRequest(keyRequest: keyRequest) // TODO
     }
     
-    /*
-     Provides the receiver a content key request that should be retried because a previous content key request failed.
-     Will be invoked by an AVContentKeySession when a content key request should be retried. The reason for failure of
-     previous content key request is specified. The receiver can decide if it wants to request AVContentKeySession to
-     retry this key request based on the reason. If the receiver returns YES, AVContentKeySession would restart the
-     key request process. If the receiver returns NO or if it does not implement this delegate method, the content key
-     request would fail and AVContentKeySession would let the receiver know through
-     -contentKeySession:contentKeyRequest:didFailWithError:.
-     */
+    func contentKeySession(_ session: AVContentKeySession,
+                           didUpdatePersistableContentKey persistableContentKey: Data,
+                           forContentKeyIdentifier keyIdentifier: Any) {
+        
+        /*
+         The key ID is the URI from the EXT-X-KEY tag in the playlist (e.g. "skd://key65") and the
+         asset ID in this case is "key65".
+         */
+        guard let contentKeyIdentifierString = keyIdentifier as? String,
+            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
+            let assetIDString = contentKeyIdentifierURL.host
+            else {
+                print("Failed to retrieve the assetID from the keyRequest!")
+                return
+        }
+        
+//        do {
+//            FairPlayUtils.deletePeristableContentKey(withContentKeyIdentifier: assetIDString)
+//            
+//            try FairPlayUtils.writePersistableContentKey(contentKey: persistableContentKey, withContentKeyIdentifier: assetIDString)
+//        } catch {
+//            print("Failed to write updated persistable content key to disk: \(error.localizedDescription)")
+//        }
+    }
+
     func contentKeySession(_ session: AVContentKeySession, shouldRetry keyRequest: AVContentKeyRequest,
                            reason retryReason: AVContentKeyRequestRetryReason) -> Bool {
         

@@ -38,8 +38,10 @@ class FPSLicenseHelper {
     
     let forceDownload: Bool
     let shouldPersist: Bool
+    
+    let dataStore: LocalDataStore?
 
-    init(assetId: String, params: FairPlayDRMParams, shouldPersist: Bool, forceDownload: Bool = false) throws {
+    init(assetId: String, params: FairPlayDRMParams, dataStore: LocalDataStore? = nil, forceDownload: Bool = false) throws {
         self.assetId = assetId
         
         guard let cert = params.fpsCertificate else {throw FPSError.noAppCertificate}
@@ -48,16 +50,19 @@ class FPSLicenseHelper {
         self.appCertificate = cert
         self.licenseUrl = url
         
+        self.shouldPersist = dataStore != nil
         self.forceDownload = forceDownload
-        self.shouldPersist = shouldPersist
+        
+        self.dataStore = dataStore
     }
     
-    init(assetId: String) {
+    init(assetId: String, dataStore: LocalDataStore) {
         self.assetId = assetId
         self.forceDownload = false
         self.appCertificate = nil
         self.licenseUrl = nil
         self.shouldPersist = true
+        self.dataStore = dataStore
    }
     
     @available(iOS 10.3, *)
@@ -119,18 +124,26 @@ class FPSLicenseHelper {
     
     func handleLicenseRequest(_ request: FPSLicenseRequest, done: @escaping (Error?) -> Void) {
         let assetId = self.assetId
-        let keyLocation = FairPlayUtils.urlForPersistableContentKey(withContentKeyIdentifier: assetId)
         
-        if !forceDownload && FileManager.default.fileExists(atPath: keyLocation.path) {
-            if let storedKey = try? Data.init(contentsOf: keyLocation) {
-                request.processContentKeyResponse(storedKey)
+        if let store = self.dataStore {
+            if !forceDownload && store.fpskeyExists(assetId) {
+                do {
+                    let storedKey = try store.loadFpsKey(assetId)
+                    request.processContentKeyResponse(storedKey)
+                    done(nil)
+                    
+                } catch {
+                    request.processContentKeyResponseError(error)
+                    done(error)
+                }
+                return
             }
-            return
         }
         
         guard let appCert = self.appCertificate else { done(FPSError.noAppCertificate); return }
         guard let licenseUrl = self.licenseUrl else { done(FPSError.noLicenseURL); return }
         let shouldPersist = self.shouldPersist
+        let dataStore = self.dataStore
         
         request.getSPC(cert: appCert, id: assetId, shouldPersist: shouldPersist) { [weak self] (spcData, error) in                                                                
             
@@ -156,7 +169,7 @@ class FPSLicenseHelper {
                 if shouldPersist {
                     do {
                         keyData = try request.persistableContentKey(fromKeyVendorResponse: ckcData, options: nil)
-                        try FairPlayUtils.writePersistableContentKey(contentKey: keyData, withContentKeyIdentifier: assetId)
+                        try dataStore?.saveFpsKey(assetId, keyData)
                     } catch {
                         request.processContentKeyResponseError(error)
                         done(error)
@@ -172,37 +185,26 @@ class FPSLicenseHelper {
     }
 }
 
-
-class FairPlayUtils {
-    static let contentKeyDirectory = try! DefaultLocalDataStore.storageDir()
+extension LocalDataStore {
     
-    static func urlForPersistableContentKey(withContentKeyIdentifier contentKeyIdentifier: String) -> URL {
-        return contentKeyDirectory.appendingPathComponent("\(contentKeyIdentifier).fpskey")
+    func fpsKey(_ assetId: String) -> String {
+        return assetId + ".fpskey"
     }
     
-    static func writePersistableContentKey(contentKey: Data, withContentKeyIdentifier contentKeyIdentifier: String) throws {
-        
-        let fileURL = urlForPersistableContentKey(withContentKeyIdentifier: contentKeyIdentifier)
-        
-        try contentKey.write(to: fileURL, options: Data.WritingOptions.atomicWrite)
+    func fpskeyExists(_ assetId: String) -> Bool {
+        return exists(key: fpsKey(assetId))
     }
     
-    static func persistableContentKeyExistsOnDisk(withContentKeyIdentifier contentKeyIdentifier: String) -> Bool {
-        let contentKeyURL = urlForPersistableContentKey(withContentKeyIdentifier: contentKeyIdentifier)
-        
-        return FileManager.default.fileExists(atPath: contentKeyURL.path)
+    func loadFpsKey(_ assetId: String) throws -> Data {
+        return try load(key: fpsKey(assetId))
     }
     
-    static func deletePeristableContentKey(withContentKeyIdentifier contentKeyIdentifier: String) {
-        
-        guard persistableContentKeyExistsOnDisk(withContentKeyIdentifier: contentKeyIdentifier) else { return }
-        
-        let contentKeyURL = urlForPersistableContentKey(withContentKeyIdentifier: contentKeyIdentifier)
-        
-        do {
-            try FileManager.default.removeItem(at: contentKeyURL)
-        } catch {
-            print("An error occured removing the persisted content key: \(error)")
-        }
+    func saveFpsKey(_ assetId: String, _ value: Data) throws {
+        try save(key: fpsKey(assetId), value: value)
+    }
+    
+    func removeFpsKey(_ assetId: String) throws {
+        try remove(key: fpsKey(assetId))
     }
 }
+

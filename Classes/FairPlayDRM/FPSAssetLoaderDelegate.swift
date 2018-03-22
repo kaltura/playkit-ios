@@ -85,12 +85,12 @@ class FPSAssetLoaderDelegate: NSObject {
         
         if let fpsParams = self.drmData {
             if let storage = self.storage {
-                helper = try! FPSLicenseHelper(assetId: assetId, params: fpsParams, shouldPersist: shouldPersist, forceDownload: true)
+                helper = try! FPSLicenseHelper(assetId: assetId, params: fpsParams, dataStore: storage, forceDownload: true)
             } else {
-                helper = try! FPSLicenseHelper(assetId: assetId, params: fpsParams, shouldPersist: false)
+                helper = try! FPSLicenseHelper(assetId: assetId, params: fpsParams)
             }
         } else if let storage = self.storage {
-            helper = FPSLicenseHelper(assetId: assetId)
+            helper = FPSLicenseHelper(assetId: assetId, dataStore: storage)
         } else {
             PKLog.error("No storage and no DRM params")
             return

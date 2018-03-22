@@ -158,6 +158,11 @@ import AVFoundation
     }
     
     private class NullStore: LocalDataStore {
+        func exists(key: String) -> Bool {
+            PKLog.error("LocalDataStore not set")
+            return false
+        }
+        
         public func remove(key: String) throws {
             PKLog.error("LocalDataStore not set")
         }
@@ -179,6 +184,7 @@ import AVFoundation
     func save(key: String, value: Data) throws
     func load(key: String) throws -> Data
     func remove(key: String) throws
+    func exists(key: String) -> Bool
 }
 
 /// Implementation of LocalDataStore that saves data to files in the Library directory.
@@ -213,15 +219,25 @@ import AVFoundation
     }
     
     @objc public func save(key: String, value: Data) throws {
-        try value.write(to: file(key), options: .atomic)
+        let f = file(key)
+        PKLog.debug("Saving key to", f)
+        try value.write(to: f, options: .atomic)
     }
     
     @objc public func load(key: String) throws -> Data {
-        return try Data.init(contentsOf: file(key), options: [])
+        let f = file(key)
+        PKLog.debug("Loading key from", f)
+        return try Data.init(contentsOf: f, options: [])
+    }
+    
+    @objc public func exists(key: String) -> Bool {
+        return FileManager.default.fileExists(atPath: file(key).path)
     }
     
     @objc public func remove(key: String) throws {
-        try FileManager.default.removeItem(at: file(key))
+        let f = file(key)
+        PKLog.debug("Removing key at", f)
+        try FileManager.default.removeItem(at: f)
     }
 }
 
@@ -239,8 +255,8 @@ extension LocalAssetsManager {
 
 @available(iOS 10.3, *)
 extension LocalAssetsManager {
-    public func fetchFairPlayLicense(for mediaSource: PKMediaSource, with id: String, callback: (Error?)->Void) {
-        FPSContentKeyManager.shared.requestPersistableContentKeys(for: mediaSource, with: "entry-\(id)")
+    public func fetchFairPlayLicense(for mediaSource: PKMediaSource, with id: String, callback: (Error?) -> Void) {
+        FPSContentKeyManager.shared.requestPersistableContentKeys(for: mediaSource, with: "entry-\(id)", dataStore: storage)
     }
 }
 
