@@ -2,22 +2,20 @@
 
 # Download
 
-## Download with AVAssetDownloadTask (iOS 10+) -- FairPlay or Clear
+## Download with AVAssetDownloadTask (iOS 10+) -- FairPlay or Clear HLS
 
 Call `LocalAssetsManager.prepareForDownload(of:)`.
 Returns: 
-- AVURLAsset configured with the FairPlay AssetResourceLoader delegate (if required)
+- AVURLAsset optionally configured with the PlayKit's FairPlay license acquisition delegate (AVAssetResourceLoaderDelegate)
 - PKMediaSource: the selected MediaSource
 
-The application is responsible for using AVAssetDownloadTask
+The application is responsible for starting and managing AVAssetDownloadTask and related APIs. PlayKit is only responsible for the FairPlay license delegate.
 
-
-## Download with DTG
+## Download with DTG - HLS only
 
 ### Clear: iOS 8+
 
-Call `LocalAssetsManager.getPreferredDownloadableMediaSource(for:)`.
-Returns a PKMediaSource recommended for download.
+Call `LocalAssetsManager.getPreferredDownloadableMediaSource(for:)`, returns a PKMediaSource recommended for download.
 Pass the `PKMediaSource.contentUrl` property to DTG.
 
 ### FairPlay: iOS 10.3+
@@ -26,7 +24,6 @@ Same as clear. In addition, when download is finished, call `LocalAssetsManager.
 
 # Playback
 
-Call `LocalAssetsManager.createLocalMediaEntry(for:localURL:)`.
-Returns a PKMediaEntry ready to play.
+Call `LocalAssetsManager.createLocalMediaEntry(for:localURL:)`, returns a PKMediaEntry ready to play.
 
 
