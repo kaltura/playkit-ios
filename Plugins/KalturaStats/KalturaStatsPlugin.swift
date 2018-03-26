@@ -298,7 +298,7 @@ public class KalturaStatsPlugin: BasePlugin, AnalyticsPluginProtocol {
         PKLog.debug("Action: \(action)")
         
         // send event to messageBus
-        let event = KalturaStatsEvent.Report(message: "send event with action type: \(action.rawValue)")
+        let event = KalturaStatsEvent.Report(message: "Kaltura Stats event: \(action) (\(action.rawValue))")
         self.messageBus?.post(event)
         
         guard let builder: KalturaRequestBuilder = OVPStatsService.get(config: self.config,
