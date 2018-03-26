@@ -58,8 +58,8 @@ import AVFoundation
      Note that this is only relevant for FairPlay assets, and does not do anything otherwise.
      
      - Parameters:
-     - asset: an AVURLAsset, ready to be downloaded
-     - mediaSource: the original source for the asset. mediaSource.contentUrl and asset.url should point at the same file.
+         - asset: an AVURLAsset, ready to be downloaded
+         - mediaSource: the original source for the asset. mediaSource.contentUrl and asset.url should point at the same file.
      */
     @objc public func prepareForDownload(asset: AVURLAsset, mediaSource: PKMediaSource) {
         
@@ -156,30 +156,9 @@ import AVFoundation
             WidevineClassicHelper.unregisterAsset(assetUri, callback: callback)
         }
     }
-    
-    private class NullStore: LocalDataStore {
-        func exists(key: String) -> Bool {
-            PKLog.error("LocalDataStore not set")
-            return false
-        }
-        
-        public func remove(key: String) throws {
-            PKLog.error("LocalDataStore not set")
-        }
-        
-        @objc public func load(key: String) throws -> Data {
-            PKLog.error("LocalDataStore not set")
-            throw NSError.init(domain: "LocalAssetsManager", code: -1, userInfo: nil)
-        }
-        
-        @objc public func save(key: String, value: Data) throws {
-            PKLog.error("LocalDataStore not set")
-        }
-        
-        static let instance = NullStore()
-    }
 }
 
+// For AVAssetDownloadTask
 extension LocalAssetsManager {
     
     /// Prepare a PKMediaEntry for download using AVAssetDownloadTask.
@@ -192,12 +171,36 @@ extension LocalAssetsManager {
     }
 }
 
+// For external download util
 @available(iOS 10.3, *)
 extension LocalAssetsManager {
     public func fetchFairPlayLicense(for mediaSource: PKMediaSource, with id: String, callback: (Error?) -> Void) {
         FPSContentKeyManager.shared.requestPersistableContentKeys(for: mediaSource, with: "entry-\(id)", dataStore: storage)
     }
 }
+
+fileprivate class NullStore: LocalDataStore {
+    func exists(key: String) -> Bool {
+        PKLog.error("LocalDataStore not set")
+        return false
+    }
+    
+    public func remove(key: String) throws {
+        PKLog.error("LocalDataStore not set")
+    }
+    
+    @objc public func load(key: String) throws -> Data {
+        PKLog.error("LocalDataStore not set")
+        throw NSError.init(domain: "LocalAssetsManager", code: -1, userInfo: nil)
+    }
+    
+    @objc public func save(key: String, value: Data) throws {
+        PKLog.error("LocalDataStore not set")
+    }
+    
+    static let instance = NullStore()
+}
+
 
 class LocalMediaSource: PKMediaSource {
     let storage: LocalDataStore

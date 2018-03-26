@@ -20,7 +20,7 @@ class FPSContentKeyManager {
     let contentKeyDelegate: FPSContentKeySessionDelegate
     
     /// The DispatchQueue to use for delegate callbacks.
-    let contentKeyDelegateQueue = DispatchQueue(label: "com.example.apple-samplecode.HLSCatalog.ContentKeyDelegateQueue")
+    let contentKeyDelegateQueue = DispatchQueue(label: "com.kaltura.playkit.ContentKeyDelegateQueue")
     
     // MARK: Initialization.
     
@@ -35,15 +35,12 @@ class FPSContentKeyManager {
     func requestPersistableContentKeys(for mediaSource: PKMediaSource, with assetId: String, dataStore: LocalDataStore) {
         
         guard let drmParams = mediaSource.drmData?.first as? FairPlayDRMParams else { fatalError("Not a FairPlay source") }
-
+        guard let params = FPSParams(drmParams) else { fatalError("Missing DRM parameters") }
+        
         let skdURL = "skd://" + assetId
         
-        do {
-            let helper = try FPSLicenseHelper(assetId: assetId, params: drmParams, dataStore: dataStore, forceDownload: true)
-            contentKeyDelegate.assetHelpersMap[skdURL] = helper
-        } catch {
-            return /// TODOerr
-        }
+        let helper = FPSLicenseHelper(assetId: assetId, params: params, dataStore: dataStore, forceDownload: true)
+        contentKeyDelegate.assetHelpersMap[skdURL] = helper
         
         contentKeySession.processContentKeyRequest(withIdentifier: skdURL, initializationData: nil, options: nil)
     }

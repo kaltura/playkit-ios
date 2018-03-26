@@ -25,16 +25,19 @@ class FPSAssetLoaderDelegate: NSObject {
     
     private let drmData: FairPlayDRMParams?
     
+    private let forceDownload: Bool
+    
     var done: ((Error?) -> Void)?
     
     var shouldPersist: Bool {
         return storage != nil
     }
     
-    private init(drmData: FairPlayDRMParams? = nil, storage: LocalDataStore? = nil) {
+    private init(drmData: FairPlayDRMParams? = nil, storage: LocalDataStore? = nil, forceDownload: Bool = false) {
         
         self.drmData = drmData
         self.storage = storage
+        self.forceDownload = forceDownload
         
         super.init()
     }
@@ -49,7 +52,7 @@ class FPSAssetLoaderDelegate: NSObject {
     
     @available(iOS 10.0, *)
     static func configureDownload(asset: AVURLAsset, drmData: FairPlayDRMParams, storage: LocalDataStore) -> FPSAssetLoaderDelegate {
-        let delegate = FPSAssetLoaderDelegate.init(drmData: drmData, storage: storage)
+        let delegate = FPSAssetLoaderDelegate.init(drmData: drmData, storage: storage, forceDownload: true)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
         asset.resourceLoader.preloadsEligibleContentKeys = true
@@ -81,20 +84,8 @@ class FPSAssetLoaderDelegate: NSObject {
             }
         }
         
-        var helper: FPSLicenseHelper
-        
-        if let fpsParams = self.drmData {
-            if let storage = self.storage {
-                helper = try! FPSLicenseHelper(assetId: assetId, params: fpsParams, dataStore: storage, forceDownload: true)
-            } else {
-                helper = try! FPSLicenseHelper(assetId: assetId, params: fpsParams)
-            }
-        } else if let storage = self.storage {
-            helper = FPSLicenseHelper(assetId: assetId, dataStore: storage)
-        } else {
-            PKLog.error("No storage and no DRM params")
-            return
-        }
+        guard let helper = FPSLicenseHelper.init(assetId: assetId, params: FPSParams(self.drmData), 
+                                                 dataStore: self.storage, forceDownload: self.forceDownload) else { return }
         
         helper.handleLicenseRequest(FPSResourceLoadingKeyRequest(resourceLoadingRequest)) { (error) in
             if let error = error {

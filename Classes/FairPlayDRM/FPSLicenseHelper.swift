@@ -8,8 +8,7 @@ enum FPSError: Error {
     case malformedServerResponse
     case noCKCInResponse
     case malformedCKCInResponse
-    case noLicenseURL
-    case noAppCertificate
+    case missingDRMParams
     case invalidKeyRequest
     case persistenceNotSupported
 }
@@ -33,47 +32,29 @@ class FPSLicenseHelper {
     
     let assetId: String
     
-    let appCertificate: Data?
-    let licenseUrl: URL?
+    let params: FPSParams?
     
     let forceDownload: Bool
     let shouldPersist: Bool
     
     let dataStore: LocalDataStore?
-
-    init(assetId: String, params: FairPlayDRMParams, dataStore: LocalDataStore? = nil, forceDownload: Bool = false) throws {
+    
+    // Online play, offline play, download
+    init?(assetId: String, params: FPSParams?, dataStore: LocalDataStore?, forceDownload: Bool) {
+        
+        if params == nil && dataStore == nil {
+            PKLog.error("No storage and no DRM params")
+            return nil
+        }
+        
         self.assetId = assetId
         
-        guard let cert = params.fpsCertificate else {throw FPSError.noAppCertificate}
-        guard let url = params.licenseUri else { throw FPSError.noLicenseURL }
-        
-        self.appCertificate = cert
-        self.licenseUrl = url
+        self.params = params
         
         self.shouldPersist = dataStore != nil
         self.forceDownload = forceDownload
         
         self.dataStore = dataStore
-    }
-    
-    init(assetId: String, dataStore: LocalDataStore) {
-        self.assetId = assetId
-        self.forceDownload = false
-        self.appCertificate = nil
-        self.licenseUrl = nil
-        self.shouldPersist = true
-        self.dataStore = dataStore
-   }
-    
-    @available(iOS 10.3, *)
-    static func getAssetId(_ keyRequest: AVContentKeyRequest) throws -> String {
-        return try getAssetId(keyIdentifier: keyRequest.identifier)
-    }
-    
-    static func getAssetId(keyIdentifier: Any?) throws -> String {
-        guard let keyId = keyIdentifier as? String,
-            let url = URL(string: keyId), let assetId = url.host else { throw FPSInternalError.invalidAssetKeyId }
-        return assetId
     }
     
     func performCKCRequest(_ spcData: Data, url: URL, callback: @escaping (Data?, Error?) -> Void) {
@@ -140,12 +121,11 @@ class FPSLicenseHelper {
             }
         }
         
-        guard let appCert = self.appCertificate else { done(FPSError.noAppCertificate); return }
-        guard let licenseUrl = self.licenseUrl else { done(FPSError.noLicenseURL); return }
+        guard let params = self.params else { done(FPSError.missingDRMParams); return }
         let shouldPersist = self.shouldPersist
         let dataStore = self.dataStore
         
-        request.getSPC(cert: appCert, id: assetId, shouldPersist: shouldPersist) { [weak self] (spcData, error) in                                                                
+        request.getSPC(cert: params.cert, id: assetId, shouldPersist: shouldPersist) { [weak self] (spcData, error) in                                                                
             
             guard let strongSelf = self else { return }
             if let error = error {
@@ -157,7 +137,7 @@ class FPSLicenseHelper {
             guard let spcData = spcData else { return }
             
             // Send SPC to Key Server and obtain CKC
-            strongSelf.performCKCRequest(spcData, url: licenseUrl) { (ckcData, error) in 
+            strongSelf.performCKCRequest(spcData, url: params.url) { (ckcData, error) in 
                 guard let ckcData = ckcData else {
                     request.processContentKeyResponseError(error!)
                     done(error)
@@ -182,6 +162,18 @@ class FPSLicenseHelper {
                 done(nil)
             }
         }
+    }
+}
+
+struct FPSParams {
+    let cert: Data
+    let url: URL
+    init?(_ pkParams: FairPlayDRMParams?) {
+        guard let params = pkParams else { return nil }
+        guard let cert = params.fpsCertificate else { PKLog.error("Missing FPS certificate"); return nil }
+        guard let url = params.licenseUri else { PKLog.error("Missing FPS license URL"); return nil }
+        self.cert = cert
+        self.url = url
     }
 }
 
