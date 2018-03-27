@@ -116,8 +116,19 @@ class AssetLoaderDelegate: NSObject {
         
         guard let licenseUri = drmData?.licenseUri else { return }
         
-        var request = URLRequest(url: licenseUri)
-        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+        var requestParams = PKRequestParams(url: licenseUri, headers: ["Content-Type": "application/octet-stream"])
+        
+        if let adapter = drmData?.requestAdapter {
+            requestParams = adapter.adapt(requestParams: requestParams)
+        }
+        
+        var request = URLRequest(url: requestParams.url)
+        if let headers = requestParams.headers {
+            for (header, value) in headers {
+                request.setValue(value, forHTTPHeaderField: header)
+            }
+        }
+        
         request.httpBody = spcData.base64EncodedData()
         request.httpMethod = "POST"
         
