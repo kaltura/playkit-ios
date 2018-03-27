@@ -293,6 +293,12 @@ fileprivate extension PlayerController {
             // configure media source with the adapter
             mediaSource.contentRequestAdapter = adapter
         }
+        
+        if let adapter = self.settings.licenseRequestAdapter, let drmData = mediaSource.drmData {
+            for p in drmData {
+                p.requestAdapter = adapter
+            }
+        }
     }
 }
 
