@@ -76,13 +76,15 @@ enum PlayerSettingsType {
     @objc public var network = PKNetworkSettings()
     @objc public var trackSelection = PKTrackSelectionSettings()
     
-    @objc public var contentRequestAdapter: PKRequestParamsAdapter? = KalturaPlaybackRequestAdapter()
+    @objc public var contentRequestAdapter: PKRequestParamsAdapter?
+    @objc public var licenseRequestAdapter: PKRequestParamsAdapter?
     
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()
         copy.network = self.network
         copy.trackSelection = self.trackSelection
         copy.contentRequestAdapter = self.contentRequestAdapter
+        copy.licenseRequestAdapter = self.licenseRequestAdapter
         return copy
     }
 }
