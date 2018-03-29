@@ -53,36 +53,6 @@ import AVFoundation
         self.storage = storage ?? NullStore.instance
     }
     
-    /**
-     Prepare an AVURLAsset for download via AVAssetDownloadTask.
-     Note that this is only relevant for FairPlay assets, and does not do anything otherwise.
-     
-     - Parameters:
-         - asset: an AVURLAsset, ready to be downloaded
-         - mediaSource: the original source for the asset. mediaSource.contentUrl and asset.url should point at the same file.
-     */
-    @objc public func prepareForDownload(asset: AVURLAsset, mediaSource: PKMediaSource) {
-        
-        // This function is a noop if no DRM data or DRM is not FairPlay.
-        guard let drmData = mediaSource.drmData?.first as? FairPlayDRMParams else {return}
-        
-        PKLog.debug("Preparing asset for download; asset.url:", asset.url)
-        
-        guard #available(iOS 10, *), DRMSupport.fairplayOffline else {
-            PKLog.error("Downloading FairPlay content is not supported on device")
-            return
-        }
-        
-        let resourceLoaderDelegate = FPSAssetLoaderDelegate.configureDownload(asset: asset, drmData: drmData, storage: storage)
-        
-        self.delegates.update(with: resourceLoaderDelegate)
-        
-        resourceLoaderDelegate.done =  { (_ error: Error?)->Void in
-            self.delegates.remove(resourceLoaderDelegate);
-        }
-        
-    }
-    
     /// Create a PKMediaSource for a local asset. This allows the player to play a downloaded asset.
     private func createLocalMediaSource(for assetId: String, localURL: URL) -> PKMediaSource {
         return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
@@ -170,6 +140,35 @@ import AVFoundation
 
 // For AVAssetDownloadTask
 extension LocalAssetsManager {
+    
+    /**
+     Prepare an AVURLAsset for download via AVAssetDownloadTask.
+     Note that this is only relevant for FairPlay assets, and does not do anything otherwise.
+     
+     - Parameters:
+     - asset: an AVURLAsset, ready to be downloaded
+     - mediaSource: the original source for the asset. mediaSource.contentUrl and asset.url should point at the same file.
+     */
+    @objc public func prepareForDownload(asset: AVURLAsset, mediaSource: PKMediaSource) {
+        
+        // This function is a noop if no DRM data or DRM is not FairPlay.
+        guard let drmData = mediaSource.drmData?.first as? FairPlayDRMParams else {return}
+        
+        PKLog.debug("Preparing asset for download; asset.url:", asset.url)
+        
+        guard #available(iOS 10, *), DRMSupport.fairplayOffline else {
+            PKLog.error("Downloading FairPlay content is not supported on device")
+            return
+        }
+        
+        let resourceLoaderDelegate = FPSAssetLoaderDelegate.configureDownload(asset: asset, drmData: drmData, storage: storage)
+        
+        self.delegates.update(with: resourceLoaderDelegate)
+        
+        resourceLoaderDelegate.done =  { (_ error: Error?)->Void in
+            self.delegates.remove(resourceLoaderDelegate);
+        }
+    }
     
     /// Prepare a PKMediaEntry for download using AVAssetDownloadTask.
     public func prepareForDownload(of mediaEntry: PKMediaEntry) -> (AVURLAsset, PKMediaSource)? {
