@@ -1,0 +1,34 @@
+@startuml Offline-DTG
+
+participant App
+participant LocalAssetsManager as LAM
+participant ContentManager as CM
+
+App->LAM: mediaSource = getPreferredDownloadableMediaSource(for: entry)
+
+App->CM: addItem(id: entry.id, url: mediaSource.contentUrl)
+App->CM: loadItemMetadata(id: entry.id, preferredVideoBitrate: 300000)
+App->CM: startItem(id: entry.id)
+
+... Downloading ...
+
+CM-->App: finished
+App->CM: playbackUrl = itemPlaybackUrl(id: entry.id)
+App->LAM: registerDownloadedAsset(location:playbackUrl, mediaSource: mediaSource)
+LAM-->App: done
+
+@enduml
+
+@startuml Offline-AVAssetDownloadTask
+
+participant App
+participant LocalAssetsManager as LAM
+participant ContentManager as CM
+
+App->LAM: mediaSource = getPreferredDownloadableMediaSource(for: entry)
+App->AVURLAsset: avAsset = init(mediaSource.contentUrl)
+App->LAM: prepareForDownload(asset: avAsset, mediaSource: mediaSource)
+note over App: Create and start an AVAssetDownloadTask (out of scope)
+
+
+@enduml
