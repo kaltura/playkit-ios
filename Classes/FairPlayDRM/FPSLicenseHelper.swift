@@ -39,6 +39,8 @@ class FPSLicenseHelper {
     
     let dataStore: LocalDataStore?
     
+    var done: ((Error?) -> Void)?
+    
     // Online play, offline play, download
     init?(assetId: String, params: FPSParams?, dataStore: LocalDataStore?, forceDownload: Bool) {
         
@@ -199,4 +201,3 @@ extension LocalDataStore {
         try remove(key: fpsKey(assetId))
     }
 }
-

@@ -128,14 +128,24 @@ import AVFoundation
         return nil
     }
     
-    /// Notifies the SDK that downloading of an asset has finished.
-    @objc public func assetDownloadFinished(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
-        // FairPlay -- nothing to do
-        
-        // Widevine
-        if mediaSource.mediaFormat == .wvm {
+    @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
+        if mediaSource.mediaFormat == .hls && mediaSource.drmData?.first?.scheme == DRMParams.Scheme.fairplay {
+            if #available(iOS 10.3, *) {
+                FPSContentKeyManager.shared.installFairPlayOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, done: callback)
+            } else {
+                // TODO Fallback on earlier versions
+            }
+            
+        } else if mediaSource.mediaFormat == .wvm {
+            // Widevine Classic
             WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:false, callback: callback)
         }
+    }
+    
+    /// Notifies the SDK that downloading of an asset has finished.
+    @available(*, deprecated)
+    @objc public func assetDownloadFinished(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
+        registerDownloadedAsset(location: location, mediaSource: mediaSource, callback: callback)
     }
     
     /// Renew Downloaded Asset
@@ -168,14 +178,6 @@ extension LocalAssetsManager {
         let avAsset = AVURLAsset(url: url)
         prepareForDownload(asset: avAsset, mediaSource: source)
         return (avAsset, source)
-    }
-}
-
-// For external download util
-@available(iOS 10.3, *)
-extension LocalAssetsManager {
-    public func fetchFairPlayLicense(for mediaSource: PKMediaSource, with id: String, callback: (Error?) -> Void) {
-        FPSContentKeyManager.shared.requestPersistableContentKeys(for: mediaSource, with: "entry-\(id)", dataStore: storage)
     }
 }
 

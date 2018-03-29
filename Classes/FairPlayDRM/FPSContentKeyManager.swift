@@ -1,26 +1,19 @@
 import AVFoundation
 
+fileprivate let skdUrlPattern = try? NSRegularExpression(pattern: "URI=\"skd://([\\w-]+)\"", options: [])
+
 @available(iOS 10.3, *)
 class FPSContentKeyManager {
     
-    // MARK: Types.
-    
-    /// The singleton for `ContentKeyManager`.
     static let shared: FPSContentKeyManager = FPSContentKeyManager()
-    
-    // MARK: Properties.
     
     /// The instance of `AVContentKeySession` that is used for managing and preloading content keys.
     let contentKeySession: AVContentKeySession
     
-    /**
-     The instance of `ContentKeyDelegate` which conforms to `AVContentKeySessionDelegate` and is used to respond to content key requests from
-     the `AVContentKeySession`
-     */
     let contentKeyDelegate: FPSContentKeySessionDelegate
     
     /// The DispatchQueue to use for delegate callbacks.
-    let contentKeyDelegateQueue = DispatchQueue(label: "com.kaltura.playkit.ContentKeyDelegateQueue")
+    let contentKeyDelegateQueue = DispatchQueue(label: "com.kaltura.playkit.contentKeyDelegateQueue")
     
     // MARK: Initialization.
     
@@ -32,16 +25,37 @@ class FPSContentKeyManager {
         contentKeySession.setDelegate(contentKeyDelegate, queue: contentKeyDelegateQueue)
     }
     
-    func requestPersistableContentKeys(for mediaSource: PKMediaSource, with assetId: String, dataStore: LocalDataStore) {
-        
+    func installFairPlayOfflineLicense(for location: URL, mediaSource: PKMediaSource, dataStore: LocalDataStore, done: @escaping (Error?)->Void) {
         guard let drmParams = mediaSource.drmData?.first as? FairPlayDRMParams else { fatalError("Not a FairPlay source") }
         guard let params = FPSParams(drmParams) else { fatalError("Missing DRM parameters") }
+
+        // Master should have the following line:
+        // #EXT-X-SESSION-KEY:METHOD=SAMPLE-AES,URI="skd://entry-1_x14v3p06",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
+        // The following code looks for the first line with "EXT-X-SESSION-KEY" tag.
+        guard let re = skdUrlPattern else { fatalError() }
+        guard let master = try? String(contentsOf: location) else { PKLog.error("Can't read master playlist", location); return }
+        let lines = master.components(separatedBy: .newlines)
+        var assetId: String? = nil
+        for line in lines {
+            if line.trimmingCharacters(in: .whitespaces).hasPrefix("#EXT-X-SESSION-KEY") {
+                guard let match = re.firstMatch(in: line, options: [], range: NSMakeRange(0, line.count)) else { continue }
+                if match.numberOfRanges < 2 { continue }
+                let assetIdRange = match.range(at: 1)
+                let start = line.index(line.startIndex, offsetBy: assetIdRange.location)
+                let end = line.index(line.startIndex, offsetBy: assetIdRange.location + assetIdRange.length - 1)
+                assetId = String(line[start...end])
+                break
+            }
+        }
+
+        guard let id = assetId else { return }
+        let skdUrl = "skd://" + id
+        let helper = FPSLicenseHelper(assetId: id, params: params, dataStore: dataStore, forceDownload: true)
+        helper?.done = done
+        contentKeyDelegate.assetHelpersMap[skdUrl] = helper
         
-        let skdURL = "skd://" + assetId
+        contentKeySession.processContentKeyRequest(withIdentifier: skdUrl, initializationData: nil, options: nil)
+
         
-        let helper = FPSLicenseHelper(assetId: assetId, params: params, dataStore: dataStore, forceDownload: true)
-        contentKeyDelegate.assetHelpersMap[skdURL] = helper
-        
-        contentKeySession.processContentKeyRequest(withIdentifier: skdURL, initializationData: nil, options: nil)
     }
 }
