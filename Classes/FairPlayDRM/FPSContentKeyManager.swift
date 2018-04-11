@@ -1,6 +1,6 @@
 import AVFoundation
 
-fileprivate let skdUrlPattern = try? NSRegularExpression(pattern: "URI=\"skd://([\\w-]+)\"", options: [])
+fileprivate let skdUrlPattern = try! NSRegularExpression(pattern: "URI=\"skd://([\\w-]+)\"", options: [])
 
 @available(iOS 10.3, *)
 class FPSContentKeyManager {
@@ -25,17 +25,15 @@ class FPSContentKeyManager {
         contentKeySession.setDelegate(contentKeyDelegate, queue: contentKeyDelegateQueue)
     }
     
-    func installFairPlayOfflineLicense(for location: URL, mediaSource: PKMediaSource, dataStore: LocalDataStore, done: @escaping (Error?)->Void) {
-        guard let drmParams = mediaSource.drmData?.first as? FairPlayDRMParams else { fatalError("Not a FairPlay source") }
-        guard let params = FPSParams(drmParams) else { fatalError("Missing DRM parameters") }
-
+    func extractAssetId(at location: URL) -> String? {
         // Master should have the following line:
         // #EXT-X-SESSION-KEY:METHOD=SAMPLE-AES,URI="skd://entry-1_x14v3p06",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
         // The following code looks for the first line with "EXT-X-SESSION-KEY" tag.
-        guard let re = skdUrlPattern else { fatalError() }
-        guard let master = try? String(contentsOf: location) else { PKLog.error("Can't read master playlist", location); return }
+        let re = skdUrlPattern
+        guard let master = try? String(contentsOf: location) else { PKLog.error("Can't read master playlist", location); return nil }
         let lines = master.components(separatedBy: .newlines)
         var assetId: String? = nil
+        
         for line in lines {
             if line.trimmingCharacters(in: .whitespaces).hasPrefix("#EXT-X-SESSION-KEY") {
                 guard let match = re.firstMatch(in: line, options: [], range: NSMakeRange(0, line.count)) else { continue }
@@ -44,18 +42,35 @@ class FPSContentKeyManager {
                 let start = line.index(line.startIndex, offsetBy: assetIdRange.location)
                 let end = line.index(line.startIndex, offsetBy: assetIdRange.location + assetIdRange.length - 1)
                 assetId = String(line[start...end])
-                break
+                
+                return assetId
             }
         }
+        
+        return nil
+    }
+    
+    func installOfflineLicense(for location: URL, mediaSource: PKMediaSource, dataStore: LocalDataStore, done: @escaping (Error?)->Void) {
+        guard let drmParams = mediaSource.drmData?.first as? FairPlayDRMParams else { fatalError("Not a FairPlay source") }
+        guard let params = FPSParams(drmParams) else { fatalError("Missing DRM parameters") }
 
-        guard let id = assetId else { return }
+        guard let id = extractAssetId(at: location) else {return}
         let skdUrl = "skd://" + id
         let helper = FPSLicenseHelper(assetId: id, params: params, dataStore: dataStore, forceDownload: true)
         helper?.done = done
         contentKeyDelegate.assetHelpersMap[skdUrl] = helper
         
         contentKeySession.processContentKeyRequest(withIdentifier: skdUrl, initializationData: nil, options: nil)
-
+    }
+    
+    func removeOfflineLicense(for location: URL, dataStore: LocalDataStore) -> Bool {
+        guard let id = extractAssetId(at: location) else {return false}
         
+        do {
+            try dataStore.removeFpsKey(id)
+            return true
+        } catch {
+            return false
+        }
     }
 }

@@ -101,40 +101,71 @@ import AVFoundation
     @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
         if mediaSource.mediaFormat == .hls && mediaSource.drmData?.first?.scheme == DRMParams.Scheme.fairplay {
             if #available(iOS 10.3, *) {
-                FPSContentKeyManager.shared.installFairPlayOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, done: callback)
+                FPSContentKeyManager.shared.installOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, done: callback)
             } else {
                 // TODO Fallback on earlier versions
             }
             
-        } else if mediaSource.mediaFormat == .wvm {
+        } else if mediaSource.isWidevineClassic() {
             // Widevine Classic
             WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:false, callback: callback)
         }
     }
     
+    @objc public func unregisterDownloadedAsset(location: URL, callback: @escaping (Error?) -> Void) {
+        // We can't really detect here if it's FairPlay, so just try
+        if #available(iOS 10.3, *) {
+            if FPSContentKeyManager.shared.removeOfflineLicense(for: location, dataStore: storage) {
+                // ok, it was FairPlay
+                callback(nil)
+                return
+            }
+        }
+        
+        // Try Widevine Classic
+        if location.pathExtension.lowercased() == "wvm" {
+            WidevineClassicHelper.unregisterAsset(location.absoluteString, callback: callback)
+        }
+    }
+    
+    /// Renew Downloaded Asset
+    @objc public func renewDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
+        
+        if mediaSource.isFairPlay() {
+            registerDownloadedAsset(location: location, mediaSource: mediaSource, callback: callback)
+        
+        } else if mediaSource.isWidevineClassic() {
+            WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:true, callback: callback)
+        }
+    }
+    
+    
+}
+
+@available(*, deprecated)
+extension LocalAssetsManager {
     /// Notifies the SDK that downloading of an asset has finished.
     @available(*, deprecated)
     @objc public func assetDownloadFinished(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
         registerDownloadedAsset(location: location, mediaSource: mediaSource, callback: callback)
     }
-    
-    /// Renew Downloaded Asset
-    @objc public func renewDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
-        // FairPlay -- nothing to do
         
-        // Widevine
-        if mediaSource.mediaFormat == .wvm {
-            WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:true, callback: callback)
+    @available(*, deprecated)
+    @objc public func unregisterAsset(_ assetUri: String, callback: @escaping (Error?) -> Void) {
+        if let uri = URL(string: assetUri) {
+            unregisterDownloadedAsset(location: uri, callback: callback)
         }
     }
+
+}
+
+extension PKMediaSource {
+    func isFairPlay() -> Bool {
+        return mediaFormat == .hls && drmData?.first?.scheme == .fairplay
+    }
     
-    @objc public func unregisterAsset(_ assetUri: String!, callback: @escaping (Error?) -> Void) {
-        // TODO FairPlay
-        
-        // Widevine
-        if assetUri.hasSuffix(".wvm") {
-            WidevineClassicHelper.unregisterAsset(assetUri, callback: callback)
-        }
+    func isWidevineClassic() -> Bool {
+        return mediaFormat == .wvm
     }
 }
 
