@@ -88,9 +88,7 @@ class FPSAssetLoaderDelegate: NSObject {
                                                  dataStore: self.storage, forceDownload: self.forceDownload) else { return }
         
         helper.handleLicenseRequest(FPSResourceLoadingKeyRequest(resourceLoadingRequest)) { (error) in
-            if let error = error {
-                // TODO
-            }
+            self.done?(error)
         }
     }
 

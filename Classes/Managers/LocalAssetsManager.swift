@@ -99,11 +99,14 @@ import AVFoundation
     }
     
     @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
-        if mediaSource.mediaFormat == .hls && mediaSource.drmData?.first?.scheme == DRMParams.Scheme.fairplay {
+        if mediaSource.isFairPlay() {
             if #available(iOS 10.3, *) {
                 FPSContentKeyManager.shared.installOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, done: callback)
             } else {
-                // TODO Fallback on earlier versions
+                // This shouldn't happen, and if it did it's a programming error.
+                #if DEBUG
+                fatalError("Can't register a FairPlay asset on this version of iOS")
+                #endif
             }
             
         } else if mediaSource.isWidevineClassic() {

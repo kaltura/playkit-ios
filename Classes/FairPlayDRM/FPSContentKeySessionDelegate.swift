@@ -7,7 +7,7 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
     var assetHelpersMap = [String: FPSLicenseHelper]()
     
     func contentKeySession(_ session: AVContentKeySession, didProvide keyRequest: AVContentKeyRequest) {
-        try? handleContentKeyRequest(keyRequest: keyRequest) // TODO
+        try? handleContentKeyRequest(keyRequest: keyRequest)
     }
     
     func contentKeySession(_ session: AVContentKeySession, didProvide keyRequest: AVPersistableContentKeyRequest) {
@@ -15,32 +15,16 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
     }
 
     func contentKeySession(_ session: AVContentKeySession, didProvideRenewingContentKeyRequest keyRequest: AVContentKeyRequest) {
-        try? handleContentKeyRequest(keyRequest: keyRequest) // TODO
+        try? handleContentKeyRequest(keyRequest: keyRequest)
     }
     
     func contentKeySession(_ session: AVContentKeySession,
                            didUpdatePersistableContentKey persistableContentKey: Data,
                            forContentKeyIdentifier keyIdentifier: Any) {
         
-        /*
-         The key ID is the URI from the EXT-X-KEY tag in the playlist (e.g. "skd://key65") and the
-         asset ID in this case is "key65".
-         */
-        guard let contentKeyIdentifierString = keyIdentifier as? String,
-            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
-            let assetIDString = contentKeyIdentifierURL.host
-            else {
-                print("Failed to retrieve the assetID from the keyRequest!")
-                return
-        }
-        
-//        do {
-//            FairPlayUtils.deletePeristableContentKey(withContentKeyIdentifier: assetIDString)
-//            
-//            try FairPlayUtils.writePersistableContentKey(contentKey: persistableContentKey, withContentKeyIdentifier: assetIDString)
-//        } catch {
-//            print("Failed to write updated persistable content key to disk: \(error.localizedDescription)")
-//        }
+        #if DEBUG
+        fatalError("Dual Expiry feature not implemented")
+        #endif
     }
 
     func contentKeySession(_ session: AVContentKeySession, shouldRetry keyRequest: AVContentKeyRequest,
@@ -98,7 +82,6 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         }
         
         helper.handleLicenseRequest(FPSContentKeyRequest(keyRequest)) { (error) in
-            // TODO?
             PKLog.debug("Done handleStreamingContentKeyRequest for \(helper.assetId)")
             self.assetHelpersMap.removeValue(forKey: helper.assetId)
         }
