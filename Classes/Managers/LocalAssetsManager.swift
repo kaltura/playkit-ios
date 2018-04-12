@@ -125,7 +125,11 @@ import AVFoundation
         // Try Widevine Classic
         if location.pathExtension.lowercased() == "wvm" {
             WidevineClassicHelper.unregisterAsset(location.absoluteString, callback: callback)
+            return
         }
+        
+        // Nothing -- just call the callback
+        callback(nil)
     }
     
     /// Renew Downloaded Asset
