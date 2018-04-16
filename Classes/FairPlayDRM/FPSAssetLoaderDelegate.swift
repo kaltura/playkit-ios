@@ -84,7 +84,7 @@ class FPSAssetLoaderDelegate: NSObject {
             }
         }
         
-        guard let helper = FPSLicenseHelper.init(assetId: assetId, params: FPSParams(self.drmData), 
+        guard let helper = FPSLicenseHelper.init(assetId: assetId, params: self.drmData, 
                                                  dataStore: self.storage, forceDownload: self.forceDownload) else { return }
         
         helper.handleLicenseRequest(FPSResourceLoadingKeyRequest(resourceLoadingRequest)) { (error) in

@@ -32,7 +32,7 @@ class FPSLicenseHelper {
     
     let assetId: String
     
-    let params: FPSParams?
+    let params: FairPlayDRMParams?
     
     let forceDownload: Bool
     let shouldPersist: Bool
@@ -42,7 +42,7 @@ class FPSLicenseHelper {
     var done: ((Error?) -> Void)?
     
     // Online play, offline play, download
-    init?(assetId: String, params: FPSParams?, dataStore: LocalDataStore?, forceDownload: Bool) {
+    init?(assetId: String, params: FairPlayDRMParams?, dataStore: LocalDataStore?, forceDownload: Bool) {
         
         if params == nil && dataStore == nil {
             PKLog.error("No storage and no DRM params")
@@ -61,8 +61,20 @@ class FPSLicenseHelper {
     
     func performCKCRequest(_ spcData: Data, url: URL, callback: @escaping (FPSLicense?, Error?) -> Void) {
         
-        var request = URLRequest(url: url)
-        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+        
+        var requestParams = PKRequestParams(url: url, headers: ["Content-Type": "application/octet-stream"])
+
+        if let adapter = self.params?.requestAdapter {
+            requestParams = adapter.adapt(requestParams: requestParams)
+        }
+        
+        var request = URLRequest(url: requestParams.url)
+        if let headers = requestParams.headers {
+            for (header, value) in headers {
+                request.setValue(value, forHTTPHeaderField: header)
+            }
+        }
+
         request.httpBody = spcData.base64EncodedData()
         request.httpMethod = "POST"
         
@@ -102,7 +114,8 @@ class FPSLicenseHelper {
             }
         }
         
-        guard let params = self.params else { done(FPSError.missingDRMParams); return }
+        
+        guard let params = FPSParams(self.params) else { done(FPSError.missingDRMParams); return }
         let shouldPersist = self.shouldPersist
         let dataStore = self.dataStore
         

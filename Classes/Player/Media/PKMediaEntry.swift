@@ -99,6 +99,7 @@ fileprivate let durationKey = "duration"
     
     var licenseUri: URL?
     var scheme: Scheme
+    var requestAdapter: PKRequestParamsAdapter?
     
     init(licenseUri: String?, scheme: Scheme) {
         if let url = licenseUri {
