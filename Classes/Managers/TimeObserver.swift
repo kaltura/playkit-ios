@@ -290,7 +290,7 @@ class TimeObserver: TimeMonitor {
             } else if lastObservedTimeGap < 0 { // seeked backward
                 strongSelf.updateNextBoundary()
             } else { // seeked forward
-                strongSelf.updateNextBoundary()
+                strongSelf.handleBoundaryObservations(currentTime: currentTime, currentTimePercentage: currentTimePercentage)
             }
             // update cycles count
             strongSelf.cycles += 1
