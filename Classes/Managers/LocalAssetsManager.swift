@@ -19,7 +19,26 @@ import AVFoundation
     private override init() {
         fatalError("Private initializer, use one of the factory methods")
     }
+
+    /**
+     Create a new LocalAssetsManager.
+     
+     - Parameter storage: data store. Used for DRM data, and may only be nil if DRM is not used.
+     */
+    private init(storage: LocalDataStore?) {
+        self.storage = storage ?? NullStore.instance
+    }
+
+    /// Create a PKMediaSource for a local asset. This allows the player to play a downloaded asset.
+    private func createLocalMediaSource(for assetId: String, localURL: URL) -> PKMediaSource {
+        return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
+    }
     
+}
+
+// MARK: Public initializers
+extension LocalAssetsManager {
+
     /**
      Create a new LocalAssetsManager for DRM-protected content. 
      Uses the default data-store.
@@ -43,21 +62,11 @@ import AVFoundation
     @objc public static func manager() -> LocalAssetsManager {
         return LocalAssetsManager(storage: nil)
     }
-    
-    /**
-     Create a new LocalAssetsManager.
-     
-     - Parameter storage: data store. Used for DRM data, and may only be nil if DRM is not used.
-     */
-    private init(storage: LocalDataStore?) {
-        self.storage = storage ?? NullStore.instance
-    }
-    
-    /// Create a PKMediaSource for a local asset. This allows the player to play a downloaded asset.
-    private func createLocalMediaSource(for assetId: String, localURL: URL) -> PKMediaSource {
-        return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
-    }
-    
+}
+
+// MARK: Public API
+extension LocalAssetsManager {  
+
     /// Create a PKMediaEntry for a local asset. This is a convenience function that wraps the result of
     /// `createLocalMediaSource(for:localURL:)` with a PKMediaEntry.
     @objc public func createLocalMediaEntry(for assetId: String, localURL: URL) -> PKMediaEntry {
@@ -103,10 +112,8 @@ import AVFoundation
             if #available(iOS 10.3, *) {
                 FPSContentKeyManager.shared.installOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, done: callback)
             } else {
-                // This shouldn't happen, and if it did it's a programming error.
-                #if DEBUG
-                fatalError("Can't register a FairPlay asset on this version of iOS")
-                #endif
+                PKLog.error("Can't register a FairPlay asset on this version of iOS")
+                callback(FPSError.persistenceNotSupported)
             }
             
         } else if mediaSource.isWidevineClassic() {
@@ -145,8 +152,6 @@ import AVFoundation
             WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:true, callback: callback)
         }
     }
-    
-    
 }
 
 @available(*, deprecated)
@@ -166,17 +171,7 @@ extension LocalAssetsManager {
 
 }
 
-extension PKMediaSource {
-    func isFairPlay() -> Bool {
-        return mediaFormat == .hls && drmData?.first?.scheme == .fairplay
-    }
-    
-    func isWidevineClassic() -> Bool {
-        return mediaFormat == .wvm
-    }
-}
-
-// For AVAssetDownloadTask
+// MARK: For AVAssetDownloadTask
 extension LocalAssetsManager {
     
     /**
@@ -217,6 +212,18 @@ extension LocalAssetsManager {
         return (avAsset, source)
     }
 }
+
+// MARK: Utility
+extension PKMediaSource {
+    func isFairPlay() -> Bool {
+        return mediaFormat == .hls && drmData?.first?.scheme == .fairplay
+    }
+    
+    func isWidevineClassic() -> Bool {
+        return mediaFormat == .wvm
+    }
+}
+
 
 fileprivate class NullStore: LocalDataStore {
     func exists(key: String) -> Bool {
