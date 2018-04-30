@@ -11,6 +11,13 @@
 import UIKit
 import SwiftyJSON
 
+enum EntryType: Int {
+    case Automatic = -1
+    case MediaClip = 1
+    case LiveStream = 7
+    case PlayList = 5
+}
+
 class OVPEntry: OVPBaseObject {
     
     var id: String
@@ -53,5 +60,13 @@ class OVPEntry: OVPBaseObject {
         self.name = jsonObject[nameKey].string
         self.type = jsonObject[typeKey].int
         self.tags = jsonObject[tagsKey].string
+    }
+    
+    func entryType() -> EntryType? {
+        guard let typeValue = self.type else {
+            return nil
+        }
+        
+        return EntryType(rawValue: typeValue)
     }
 }
