@@ -33,14 +33,12 @@ PODS:
   - PlayKit/YouboraPlugin (3.4.x-dev):
     - PlayKit/AnalyticsCommon
     - PlayKit/Core
-    - Youbora-AVPlayer/dynamic (= 5.4.18)
+    - YouboraLib (= 6.1.7)
   - PlayKitUtils (0.1.4)
   - Quick (1.1.0)
   - SwiftyJSON (3.1.4)
   - SwiftyXMLParser (3.0.3)
-  - Youbora-AVPlayer/dynamic (5.4.18):
-    - Youbora-YouboraLib/dynamic (= 5.4.4)
-  - Youbora-YouboraLib/dynamic (5.4.4)
+  - YouboraLib (6.1.7)
 
 DEPENDENCIES:
   - Nimble (= 7.0.1)
@@ -52,23 +50,34 @@ DEPENDENCIES:
   - PlayKit/YouboraPlugin (from `../../playkit-ios`)
   - Quick (= 1.1.0)
 
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - google-cast-sdk
+    - KalturaNetKit
+    - Log
+    - Nimble
+    - PlayKitUtils
+    - Quick
+    - SwiftyJSON
+    - SwiftyXMLParser
+    - YouboraLib
+
 EXTERNAL SOURCES:
   PlayKit:
-    :path: ../../playkit-ios
+    :path: "../../playkit-ios"
 
 SPEC CHECKSUMS:
   google-cast-sdk: fc3728ead66150ac746e001ba03a44e4b10e359e
   KalturaNetKit: d37b3c6fc08da9935677fc547c59b25abc3574a3
   Log: 5e368c9528db07517d18d2d04ff5fe2b6f5a1e21
   Nimble: 657d000e11df8aebe27cdaf9d244de7f30ed87f7
-  PlayKit: 099466211a5f9df804308d170cbf6a1cec8c3bda
+  PlayKit: a81eb139a1dd172b4520d8d1a9faad3e70399b93
   PlayKitUtils: 8f03f72690805e20718be6f913547e0966c835f9
   Quick: dafc587e21eed9f4cab3249b9f9015b0b7a7f71d
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
   SwiftyXMLParser: 9c6cc0310e778266a63d8eba50d9e07925aab0fb
-  Youbora-AVPlayer: e824d4332e65825e9e79347bc4990a407b96ca9d
-  Youbora-YouboraLib: 90bfccf52b9e918c5cb8543a5a5c015c0f02c4f2
+  YouboraLib: 8c04a76eefd756909d2cc285a75e7cb91e53abee
 
 PODFILE CHECKSUM: 24ed6305dcb645a9df435e307d6a6f160e7b6259
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.0

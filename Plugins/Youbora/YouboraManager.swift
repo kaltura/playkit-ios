@@ -8,15 +8,10 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-#if os(iOS)
-    import YouboraLib
-#elseif os(tvOS)
-    import YouboraLibTvOS
-#endif
+import YouboraLib
 
-class YouboraManager: YBPluginGeneric {
+class YouboraManager: YBPlayerAdapter<AnyObject> {
 
-    fileprivate weak var pkPlayer: Player?
     var lastReportedResource: String?
     /// The last reported playback info.
     var playbackInfo: PKPlaybackInfo?
@@ -29,12 +24,21 @@ class YouboraManager: YBPluginGeneric {
     /// Indicates if we have to delay the endedHandler() (for example when we have post-roll).
     fileprivate var shouldDelayEndedHandler = false
     
-    init(options: NSObject!, player: Player) {
+    override init(player: AnyObject) {
+        super.init(player: player)
+        guard let pkPlayer = player as? Player else {
+            assertionFailure("player have to be of type: `Player`")
+            return
+        }
+        self.player = pkPlayer
+    }
+    
+    /*init(options: NSObject!, player: Player) {
         super.init(options: options)
         self.pluginName = "\(YouboraPlugin.kaltura)-iOS"
         self.pluginVersion = YBYouboraLibVersion + "-\(YouboraPlugin.kaltura)-" + PlayKitManager.clientTag // TODO: put plugin version when we will seperate
         self.pkPlayer = player
-    }
+    }*/
     
     // We must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift). 
     private override init() {
@@ -48,22 +52,22 @@ class YouboraManager: YBPluginGeneric {
 
 extension YouboraManager {
     
-    override func startMonitoring(withPlayer player: NSObject!) {
-        guard let messageBus = player as? MessageBus else {
+    override func registerListeners() {
+        super.registerListeners()
+        guard let messageBus = self.player as? MessageBus else {
             assertionFailure("our events handler object must be of type: `MessageBus`")
             return
         }
-        super.startMonitoring(withPlayer: nil) // no need to pass our object it is not player type
         self.reset()
         self.messageBus = messageBus
         self.registerEvents(onMessageBus: messageBus)
     }
     
-    override func stopMonitoring() {
+    override func unregisterListeners() {
         if let messageBus = self.messageBus {
             self.unregisterEvents(fromMessageBus: messageBus)
         }
-        super.stopMonitoring()
+        super.unregisterListeners()
     }
 }
 
@@ -73,30 +77,33 @@ extension YouboraManager {
 
 extension YouboraManager {
     
-    override func getMediaDuration() -> NSNumber! {
-        let duration = self.pkPlayer?.duration
-        return duration != nil ? NSNumber(value: duration!) : super.getMediaDuration()
+    override func getDuration() -> NSNumber? {
+        guard let player = self.player as? Player else {
+            return super.getDuration()
+        }
+        let duration = player.duration
+        return NSNumber(value: duration)
     }
     
-    override func getResource() -> String! {
+    override func getResource() -> String? {
         return self.lastReportedResource ?? super.getResource()
     }
     
-    override func getTitle() -> String! {
-        return self.pkPlayer?.mediaEntry?.id ?? super.getTitle()
+    override func getTitle() -> String? {
+        return self.player?.mediaEntry?.id ?? super.getTitle()
     }
     
-    override func getPlayhead() -> NSNumber! {
-        let currentTime = self.pkPlayer?.currentTime
+    override func getPlayhead() -> NSNumber? {
+        let currentTime = self.player?.currentTime
         return currentTime != nil ? NSNumber(value: currentTime!) : super.getPlayhead()
     }
     
-    override func getPlayerVersion() -> String! {
+    override func getPlayerVersion() -> String? {
         return "\(PlayKitManager.clientTag)"
     }
     
-    override func getIsLive() -> NSValue! {
-        if let mediaType = self.pkPlayer?.mediaEntry?.mediaType {
+    override func getIsLive() -> NSValue? {
+        if let mediaType = self.player?.mediaEntry?.mediaType {
             if mediaType == .live {
                 return NSNumber(value: true)
             }
@@ -105,23 +112,23 @@ extension YouboraManager {
         return super.getIsLive()
     }
     
-    override func getBitrate() -> NSNumber! {
+    override func getBitrate() -> NSNumber? {
         if let playbackInfo = self.playbackInfo, playbackInfo.bitrate > 0 {
             return NSNumber(value: playbackInfo.bitrate)
         }
         return super.getBitrate()
     }
     
-    override func getThroughput() -> NSNumber! {
+    override func getThroughput() -> NSNumber? {
         if let playbackInfo = self.playbackInfo, playbackInfo.observedBitrate > 0 {
             return NSNumber(value: playbackInfo.observedBitrate)
         }
         return super.getThroughput()
     }
     
-    override func getRendition() -> String! {
+    override func getRendition() -> String? {
         if let pi = self.playbackInfo, pi.indicatedBitrate > 0 && pi.bitrate > 0 && pi.bitrate != pi.indicatedBitrate {
-            return YBUtils.buildRenditionString(withBitrate: pi.indicatedBitrate)
+            return YBYouboraUtils.buildRenditionString(withWidth: 0, height: 0, andBitrate: pi.indicatedBitrate)
         }
         return super.getRendition()
     }
@@ -163,21 +170,21 @@ extension YouboraManager {
                     guard let strongSelf = self else { return }
                     // play handler to start when asset starts loading.
                     // this point is the closest point to prepare call.
-                    strongSelf.playHandler()
+                    strongSelf.fireStart()
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
             case let e where e.self == PlayerEvent.stopped:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     // we must call `endedHandler()` when stopped so youbora will know player stopped playing content.
-                    strongSelf.adnalyzer?.endedAdHandler()
-                    strongSelf.endedHandler()
+                    strongSelf.plugin?.adsAdapter?.fireStop()
+                    strongSelf.fireStop()
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
             case let e where e.self == PlayerEvent.pause:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    strongSelf.pauseHandler()
+                    strongSelf.firePause()
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
             case let e where e.self == PlayerEvent.playing:
@@ -185,30 +192,30 @@ extension YouboraManager {
                     guard let strongSelf = self else { return }
                     if strongSelf.isFirstPlay {
                         strongSelf.isFirstPlay = false
-                        strongSelf.joinHandler()
-                        strongSelf.bufferedHandler()
+                        strongSelf.fireJoin()
+                        strongSelf.fireBufferEnd()
                     } else {
-                        strongSelf.resumeHandler()
+                        strongSelf.fireResume()
                     }
                     strongSelf.postEventLog(withMessage: "\(String(describing: event.namespace))")
                 }
             case let e where e.self == PlayerEvent.seeking:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    strongSelf.seekingHandler()
+                    strongSelf.fireSeekBegin()
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
             case let e where e.self == PlayerEvent.seeked:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    strongSelf.seekedHandler()
+                    strongSelf.fireSeekEnd()
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
             case let e where e.self == PlayerEvent.ended:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     if !strongSelf.shouldDelayEndedHandler {
-                        strongSelf.endedHandler()
+                        strongSelf.fireStop()
                     }
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
@@ -222,7 +229,7 @@ extension YouboraManager {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     if event.newState == .buffering {
-                        strongSelf.bufferingHandler()
+                        strongSelf.fireBufferBegin()
                         strongSelf.postEventLog(withMessage: "\(event.namespace)")
                     }
                 }
@@ -236,7 +243,7 @@ extension YouboraManager {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     if let error = event.error, error.code == PKErrorCode.playerItemFailed {
-                        strongSelf.errorHandler(withCode: "\(error.code)", message: error.localizedDescription, andErrorMetadata: error.description)
+                        strongSelf.fireError(withMessage: error.localizedDescription, code: "\(error.code)", andMetadata: error.description)
                     }
                 }
             case let e where e.self == AdEvent.adCuePointsUpdate:
@@ -249,8 +256,8 @@ extension YouboraManager {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     if let shouldDelayEndedHandler = self?.shouldDelayEndedHandler, shouldDelayEndedHandler == true {
                         self?.shouldDelayEndedHandler = false
-                        self?.adnalyzer?.endedAdHandler()
-                        self?.endedHandler()
+                        self?.plugin?.adsAdapter?.fireStop()
+                        self?.fireStop()
                     }
                 }
             default: assertionFailure("all events must be handled")
