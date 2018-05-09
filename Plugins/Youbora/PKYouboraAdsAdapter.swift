@@ -14,7 +14,7 @@
     import YouboraLibTvOS
 #endif
 
-class YouboraAdnalyzerManager: YBPlayerAdapter<AnyObject> {
+class PKYouboraAdsAdapter: YBPlayerAdapter<AnyObject> {
     
     var adInfo: PKAdInfo?
     var adPlayhead: TimeInterval?
@@ -22,18 +22,14 @@ class YouboraAdnalyzerManager: YBPlayerAdapter<AnyObject> {
     
     fileprivate weak var messageBus: MessageBus?
     
-    // we must override this init in order to override the `pluginInstance` init
+    // We must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift).
     private override init() {
         super.init()
     }
     
-    override init(player: AnyObject) {
+    init(player: Player, messageBus: MessageBus) {
+        self.messageBus = messageBus
         super.init(player: player)
-        guard let pkPlayer = player as? Player else {
-            assertionFailure("player have to be of type: `Player`")
-            return
-        }
-        self.player = pkPlayer
     }
 }
 
@@ -41,23 +37,16 @@ class YouboraAdnalyzerManager: YBPlayerAdapter<AnyObject> {
 // MARK: - Youbora AdnalyzerGeneric
 /************************************************************/
 
-extension YouboraAdnalyzerManager {
+extension PKYouboraAdsAdapter {
     
     override func registerListeners() {
         super.registerListeners()
-        guard let messageBus = player as? MessageBus else {
-            assertionFailure("our events handler object must be of type: `MessageBus`")
-            return
-        }
-        self.reset()
-        self.messageBus = messageBus
-        self.registerAdEvents(onMessageBus: messageBus)
+        reset()
+        registerAdEvents()
     }
     
     override func unregisterListeners() {
-        if let messageBus = self.messageBus {
-            self.unregisterAdEvents(fromMessageBus: messageBus)
-        }
+        unregisterAdEvents()
         super.unregisterListeners()
     }
 }
@@ -66,7 +55,7 @@ extension YouboraAdnalyzerManager {
 // MARK: - Youbora Info Methods
 /************************************************************/
 
-extension YouboraAdnalyzerManager {
+extension PKYouboraAdsAdapter {
     
     override func getPlayhead() -> NSNumber? {
         if let adPlayhead = self.adPlayhead, adPlayhead > 0 {
@@ -113,7 +102,7 @@ extension YouboraAdnalyzerManager {
 // MARK: - Events Handling
 /************************************************************/
 
-extension YouboraAdnalyzerManager {
+extension PKYouboraAdsAdapter {
     
     private var adEventsToRegister: [AdEvent.Type] {
         return [
@@ -131,80 +120,93 @@ extension YouboraAdnalyzerManager {
         ]
     }
     
-    fileprivate func registerAdEvents(onMessageBus messageBus: MessageBus) {
-        PKLog.debug("register ad events")
+    fileprivate func registerAdEvents() {
+        PKLog.debug("Register ad events")
         
-        self.adEventsToRegister.forEach { event in
+        guard let messageBus = self.messageBus else { return }
+        
+        adEventsToRegister.forEach { event in
             PKLog.debug("\(String(describing: type(of: self))) will register event: \(event.self)")
             
             switch event {
             case let e where e.self == AdEvent.adLoaded:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    // update ad info with the new loaded event
-                    self?.adInfo = event.adInfo
-                    // if ad is preroll make sure to call /start event before /adStart
+                    guard let strongSelf = self else { return }
+                    // Update ad info with the new loaded event
+                    strongSelf.adInfo = event.adInfo
+                    // If ad is preroll make sure to call /start event before /adStart
                     if let positionType = event.adInfo?.positionType, positionType == .preRoll {
-                        self?.plugin?.adapter?.fireStart()
+                        strongSelf.plugin?.adapter?.fireStart()
                     }
-                    self?.fireStart()
+                    strongSelf.fireStart()
                 }
             case let e where e.self == AdEvent.adStarted:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.fireJoin()
+                    guard let strongSelf = self else { return }
+                    strongSelf.fireJoin()
                 }
             case let e where e.self == AdEvent.adComplete:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.fireStop()
-                    self?.adInfo = nil
+                    guard let strongSelf = self else { return }
+                    strongSelf.fireStop()
+                    strongSelf.adInfo = nil
                 }
             case let e where e.self == AdEvent.adResumed:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.fireResume()
-                    // if we were coming from background and ad was resumed
-                    // has no effect when already playing ad and resumed because ad was already started.
-                    self?.plugin?.adapter?.fireStart()
-                    self?.fireStart()
-                    self?.fireJoin()
+                    guard let strongSelf = self else { return }
+                    strongSelf.fireResume()
+                    // If we were coming from background and ad was resumed
+                    // Has no effect when already playing ad and resumed because ad was already started.
+                    strongSelf.plugin?.adapter?.fireStart()
+                    strongSelf.fireStart()
+                    strongSelf.fireJoin()
                 }
             case let e where e.self == AdEvent.adPaused:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.firePause()
+                    guard let strongSelf = self else { return }
+                    strongSelf.firePause()
                 }
             case let e where e.self == AdEvent.adDidProgressToTime:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    // update ad playhead with new data
-                    self?.adPlayhead = event.adMediaTime?.doubleValue
+                    guard let strongSelf = self else { return }
+                    // Update ad playhead with new data
+                    strongSelf.adPlayhead = event.adMediaTime?.doubleValue
                 }
             case let e where e.self == AdEvent.adSkipped:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.fireStop(["skipped":"true"])
+                    guard let strongSelf = self else { return }
+                    strongSelf.fireStop(["skipped":"true"])
                 }
             case let e where e.self == AdEvent.adStartedBuffering:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.fireBufferBegin()
+                    guard let strongSelf = self else { return }
+                    strongSelf.fireBufferBegin()
                 }
             case let e where e.self == AdEvent.adPlaybackReady:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.fireBufferEnd()
+                    guard let strongSelf = self else { return }
+                    strongSelf.fireBufferEnd()
                 }
             case let e where e.self == AdEvent.adsRequested:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.lastReportedResource = event.adTagUrl
+                    guard let strongSelf = self else { return }
+                    strongSelf.lastReportedResource = event.adTagUrl
                 }
-            // when ad request the content to resume (finished or error) 
-            // make sure to send /adStop event and clear the info.
+            // When ad request the content to resume (finished or error)
+            // Make sure to send /adStop event and clear the info.
             case let e where e.self == AdEvent.adDidRequestContentResume:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
-                    self?.fireStop()
-                    self?.adInfo = nil
+                    guard let strongSelf = self else { return }
+                    strongSelf.fireStop()
+                    strongSelf.adInfo = nil
                 }
-            default: assertionFailure("all events must be handled")
+            default: assertionFailure("All events must be handled")
             }
         }
     }
     
-    func unregisterAdEvents(fromMessageBus messageBus: MessageBus) {
-        messageBus.removeObserver(self, events: adEventsToRegister)
+    func unregisterAdEvents() {
+        messageBus?.removeObserver(self, events: adEventsToRegister)
     }
 }
 
@@ -212,12 +214,12 @@ extension YouboraAdnalyzerManager {
 // MARK: - Internal
 /************************************************************/
 
-extension YouboraAdnalyzerManager {
+extension PKYouboraAdsAdapter {
     
-    /// resets the plugin's state.
+    // Resets the plugin's state.
     func reset() {
-        self.adInfo = nil
-        self.adPlayhead = -1
-        self.lastReportedResource = nil
+        adInfo = nil
+        adPlayhead = -1
+        lastReportedResource = nil
     }
 }

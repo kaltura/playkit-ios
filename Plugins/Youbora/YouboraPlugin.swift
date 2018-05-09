@@ -29,12 +29,13 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     /// (for example when we have post-roll call it after the ad).
     /// In addition, when content ends in the middle also make sure to call `endedHandler()`
     /// otherwise youbora will wait for /stop event and you could not start new content events until /stop is received.
-    private var youboraManager: YouboraManager
-    private var adnalyzerManager: YouboraAdnalyzerManager?
-    private var npawPlugin: YouboraNPAWPlugin?
+    private var pkYouboraPlayerAdapter: PKYouboraPlayerAdapter?
+    private var pkYouboraAdsAdapter: PKYouboraAdsAdapter?
+    private var youboraNPAWPlugin: YouboraNPAWPlugin?
     
     /// The plugin's config
     var config: AnalyticsConfig
+//    private var youboraConfig: YouboraConfig?
     
     /************************************************************/
     // MARK: - PKPlugin
@@ -42,56 +43,52 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         guard let config = pluginConfig as? AnalyticsConfig else {
-            PKLog.error("missing plugin config")
+            PKLog.error("Missing plugin config")
             throw PKPluginError.missingPluginConfig(pluginName: YouboraPlugin.pluginName)
         }
         self.config = config
-        /// initialize youbora components
-        let options = config.params
-        let optionsObject = NSDictionary(dictionary: options)
-        //self.npawPlugin = YouboraNPAWPlugin(options: options) //TODO Change this to real options
-        self.youboraManager = YouboraManager(player: player)
-        self.adnalyzerManager = YouboraAdnalyzerManager(player: player)
-        self.npawPlugin?.adapter = self.youboraManager
-        self.npawPlugin?.adsAdapter = self.adnalyzerManager
         
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         
-        // start monitoring for events
-        self.startMonitoring()
-        // monitor app state changes
-        AppStateSubject.shared.add(observer: self)
+        /// Initialize youbora components
+//        let youboraConfig = try parseYouboraConfig(fromConfig: config)
+//        self.youboraNPAWPlugin = YouboraNPAWPlugin(options: youboraConfig.options()) //TODO Change this to real options
+        setupYoubora(withConfig: config)
+        pkYouboraPlayerAdapter = PKYouboraPlayerAdapter(player: player, messageBus: messageBus)
+        pkYouboraAdsAdapter = PKYouboraAdsAdapter(player: player, messageBus: messageBus)
         
-        self.setupYoubora(withConfig: config)
+        // Start monitoring for events
+        startMonitoring()
+        // Monitor app state changes
+        AppStateSubject.shared.add(observer: self)
     }
     
     public override func onUpdateMedia(mediaConfig: MediaConfig) {
         super.onUpdateMedia(mediaConfig: mediaConfig)
-        // in case we stopped playback in the middle call eneded handlers and reset state.
-        self.stopMonitoring()
-        //self.adnalyzerManager?.reset()
-        //self.youboraManager.reset()
-        self.setupYoubora(withConfig: self.config)
+        // In case we stopped playback in the middle call eneded handlers and reset state.
+        stopMonitoring()
+        setupYoubora(withConfig: self.config)
+        startMonitoring()
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {
         super.onUpdateConfig(pluginConfig: pluginConfig)
         guard let config = pluginConfig as? AnalyticsConfig else {
-            PKLog.error("wrong config, could not setup youbora manager")
-            self.messageBus?.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
+            PKLog.error("Wrong config, could not setup youbora manager")
+            messageBus?.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
             return
         }
         self.config = config
-        self.setupYoubora(withConfig: config)
-        // make sure to create or destroy adnalyzer based on config
+        setupYoubora(withConfig: config)
+        // Make sure to create or destroy adnalyzer based on config
     }
     
     public override func destroy() {
-        // we must call `endedHandler()` when destroyed so youbora will know player stopped playing content.
-        self.endedHandler()
-        self.stopMonitoring()
-        // remove ad observers
-        self.messageBus?.removeObserver(self, events: [AdEvent.adCuePointsUpdate, AdEvent.allAdsCompleted])
+        // We must call `endedHandler()` when destroyed so youbora will know player stopped playing content.
+        endedHandler()
+        stopMonitoring()
+        // Remove ad observers
+        messageBus?.removeObserver(self, events: [AdEvent.adCuePointsUpdate, AdEvent.allAdsCompleted])
         AppStateSubject.shared.remove(observer: self)
         super.destroy()
     }
@@ -104,16 +101,17 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         return [
             NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
                 PKLog.debug("youbora plugin will terminate event received")
-                // we must call `endedHandler()` when stopped so youbora will know player stopped playing content.
+                // We must call `endedHandler()` when stopped so youbora will know player stopped playing content.
                 self.endedHandler()
                 AppStateSubject.shared.remove(observer: self)
             },
             NotificationObservation(name: .UIApplicationDidEnterBackground) { [unowned self] in
-                // when entering background we should call `endedHandler()` to make sure coming back starts a new session.
-                // otherwise events could be lost (youbora only retry sending events for 5 minutes).
+                // When entering background we should call `endedHandler()` to make sure coming back starts a new session.
+                // Otherwise events could be lost (youbora only retry sending events for 5 minutes).
                 self.endedHandler()
-                // reset the youbora plugin for background handling to start playing again when we return.
-                self.youboraManager.resetForBackground()
+                // Reset the youbora plugin for background handling to start playing again when we return.
+                let pkYouboraPlayerAdapter = self.youboraNPAWPlugin?.adapter as? PKYouboraPlayerAdapter
+                pkYouboraPlayerAdapter?.resetForBackground()
             }
         ]
     }
@@ -122,30 +120,50 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     // MARK: - Private
     /************************************************************/
     
+    private func parseYouboraConfig(fromConfig config: AnalyticsConfig) throws -> YouboraConfig {
+        if !JSONSerialization.isValidJSONObject(config.params) {
+            PKLog.error("Config params is not a valid JSON Object")
+        }
+        let data = try JSONSerialization.data(withJSONObject: config.params, options: .prettyPrinted)
+        guard let decodedYouboraConfig = try? JSONDecoder().decode(YouboraConfig.self, from: data) else {
+            PKLog.error("Couldn't decode data into YouboraConfig")
+            throw PKPluginError.failedToCreatePlugin(pluginName: YouboraPlugin.pluginName)
+        }
+        
+        return decodedYouboraConfig
+    }
+    
     private func setupYoubora(withConfig config: AnalyticsConfig) {
         var options = config.params
         self.addCustomProperties(toOptions: &options)
-        let optionsObject = NSDictionary(dictionary: options)
-        //self.npawPlugin.setOptions(options) //TODO Change this to real options
+        do {
+            let youboraConfig = try parseYouboraConfig(fromConfig: config)
+            if youboraNPAWPlugin != nil {
+                youboraNPAWPlugin?.options = youboraConfig.options() //TODO Change this to real options
+            } else {
+                youboraNPAWPlugin = YouboraNPAWPlugin(options: youboraConfig.options())
+            }
+        } catch {
+        }
     }
     
     private func startMonitoring() {
-        // make sure to first stop monitoring in case we of uneven call to start/stop
-        self.stopMonitoring()
+        // Make sure to first stop monitoring in case we have uneven call to start/stop
+        stopMonitoring()
         PKLog.debug("Start monitoring Youbora")
-        self.npawPlugin?.adapter = self.youboraManager
-        self.npawPlugin?.adsAdapter = self.adnalyzerManager
+        youboraNPAWPlugin?.adapter = pkYouboraPlayerAdapter
+        youboraNPAWPlugin?.adsAdapter = pkYouboraAdsAdapter
     }
     
     private func stopMonitoring() {
-        self.npawPlugin?.removeAdsAdapter()
         PKLog.debug("Stop monitoring using Youbora")
-        self.npawPlugin?.removeAdapter()
+        youboraNPAWPlugin?.removeAdsAdapter()
+        youboraNPAWPlugin?.removeAdapter()
     }
     
     private func endedHandler() {
-        self.npawPlugin?.adapter?.fireStop()
-        self.npawPlugin?.adsAdapter?.fireStop()
+        youboraNPAWPlugin?.adapter?.fireStop()
+        youboraNPAWPlugin?.adsAdapter?.fireStop()
     }
     
     private func addCustomProperties(toOptions options: inout [String: Any]) {

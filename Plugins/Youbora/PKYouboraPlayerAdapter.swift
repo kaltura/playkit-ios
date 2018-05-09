@@ -10,7 +10,7 @@
 
 import YouboraLib
 
-class YouboraManager: YBPlayerAdapter<AnyObject> {
+class PKYouboraPlayerAdapter: YBPlayerAdapter<AnyObject> {
 
     var lastReportedResource: String?
     /// The last reported playback info.
@@ -24,25 +24,14 @@ class YouboraManager: YBPlayerAdapter<AnyObject> {
     /// Indicates if we have to delay the endedHandler() (for example when we have post-roll).
     fileprivate var shouldDelayEndedHandler = false
     
-    override init(player: AnyObject) {
-        super.init(player: player)
-        guard let pkPlayer = player as? Player else {
-            assertionFailure("player have to be of type: `Player`")
-            return
-        }
-        self.player = pkPlayer
-    }
-    
-    /*init(options: NSObject!, player: Player) {
-        super.init(options: options)
-        self.pluginName = "\(YouboraPlugin.kaltura)-iOS"
-        self.pluginVersion = YBYouboraLibVersion + "-\(YouboraPlugin.kaltura)-" + PlayKitManager.clientTag // TODO: put plugin version when we will seperate
-        self.pkPlayer = player
-    }*/
-    
-    // We must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift). 
+    // We must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift).
     private override init() {
         super.init()
+    }
+    
+    init(player: Player, messageBus: MessageBus) {
+        self.messageBus = messageBus
+        super.init(player: player)
     }
 }
 
@@ -50,23 +39,16 @@ class YouboraManager: YBPlayerAdapter<AnyObject> {
 // MARK: - Youbora PluginGeneric
 /************************************************************/
 
-extension YouboraManager {
+extension PKYouboraPlayerAdapter {
     
     override func registerListeners() {
         super.registerListeners()
-        guard let messageBus = self.player as? MessageBus else {
-            assertionFailure("our events handler object must be of type: `MessageBus`")
-            return
-        }
-        self.reset()
-        self.messageBus = messageBus
-        self.registerEvents(onMessageBus: messageBus)
+        reset()
+        registerEvents()
     }
     
     override func unregisterListeners() {
-        if let messageBus = self.messageBus {
-            self.unregisterEvents(fromMessageBus: messageBus)
-        }
+        unregisterEvents()
         super.unregisterListeners()
     }
 }
@@ -75,26 +57,25 @@ extension YouboraManager {
 // MARK: - Youbora Info Methods
 /************************************************************/
 
-extension YouboraManager {
+extension PKYouboraPlayerAdapter {
     
     override func getDuration() -> NSNumber? {
-        guard let player = self.player as? Player else {
-            return super.getDuration()
+        guard let player = player else {
+            return nil
         }
-        let duration = player.duration
-        return NSNumber(value: duration)
+        return NSNumber(value: player.duration)
     }
     
     override func getResource() -> String? {
-        return self.lastReportedResource ?? super.getResource()
+        return lastReportedResource ?? super.getResource()
     }
     
     override func getTitle() -> String? {
-        return self.player?.mediaEntry?.id ?? super.getTitle()
+        return player?.mediaEntry?.id ?? super.getTitle()
     }
     
     override func getPlayhead() -> NSNumber? {
-        let currentTime = self.player?.currentTime
+        let currentTime = player?.currentTime
         return currentTime != nil ? NSNumber(value: currentTime!) : super.getPlayhead()
     }
     
@@ -103,7 +84,7 @@ extension YouboraManager {
     }
     
     override func getIsLive() -> NSValue? {
-        if let mediaType = self.player?.mediaEntry?.mediaType {
+        if let mediaType = player?.mediaEntry?.mediaType {
             if mediaType == .live {
                 return NSNumber(value: true)
             }
@@ -113,21 +94,21 @@ extension YouboraManager {
     }
     
     override func getBitrate() -> NSNumber? {
-        if let playbackInfo = self.playbackInfo, playbackInfo.bitrate > 0 {
+        if let playbackInfo = playbackInfo, playbackInfo.bitrate > 0 {
             return NSNumber(value: playbackInfo.bitrate)
         }
         return super.getBitrate()
     }
     
     override func getThroughput() -> NSNumber? {
-        if let playbackInfo = self.playbackInfo, playbackInfo.observedBitrate > 0 {
+        if let playbackInfo = playbackInfo, playbackInfo.observedBitrate > 0 {
             return NSNumber(value: playbackInfo.observedBitrate)
         }
         return super.getThroughput()
     }
     
     override func getRendition() -> String? {
-        if let pi = self.playbackInfo, pi.indicatedBitrate > 0 && pi.bitrate > 0 && pi.bitrate != pi.indicatedBitrate {
+        if let pi = playbackInfo, pi.indicatedBitrate > 0 && pi.bitrate > 0 && pi.bitrate != pi.indicatedBitrate {
             return YBYouboraUtils.buildRenditionString(withWidth: 0, height: 0, andBitrate: pi.indicatedBitrate)
         }
         return super.getRendition()
@@ -138,7 +119,7 @@ extension YouboraManager {
 // MARK: - Events Handling
 /************************************************************/
 
-extension YouboraManager {
+extension PKYouboraPlayerAdapter {
     
     private var eventsToRegister: [PKEvent.Type] {
         return [
@@ -158,37 +139,39 @@ extension YouboraManager {
         ]
     }
     
-    fileprivate func registerEvents(onMessageBus messageBus: MessageBus) {
-        PKLog.debug("register events")
+    fileprivate func registerEvents() {
+        PKLog.debug("Register events")
         
-        self.eventsToRegister.forEach { event in
+        guard let messageBus = self.messageBus else { return }
+        
+        eventsToRegister.forEach { event in
             PKLog.debug("Register event: \(event.self)")
             
             switch event {
             case let e where e.self == PlayerEvent.play:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    // play handler to start when asset starts loading.
-                    // this point is the closest point to prepare call.
+                    // Play handler to start when asset starts loading.
+                    // This point is the closest point to prepare call.
                     strongSelf.fireStart()
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
             case let e where e.self == PlayerEvent.stopped:
-                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    // we must call `endedHandler()` when stopped so youbora will know player stopped playing content.
+                    // We must call `fireStop()` when stopped so youbora will know player stopped playing content.
                     strongSelf.plugin?.adsAdapter?.fireStop()
                     strongSelf.fireStop()
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
             case let e where e.self == PlayerEvent.pause:
-                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     strongSelf.firePause()
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
             case let e where e.self == PlayerEvent.playing:
-                self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
+                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     if strongSelf.isFirstPlay {
                         strongSelf.isFirstPlay = false
@@ -260,13 +243,13 @@ extension YouboraManager {
                         self?.fireStop()
                     }
                 }
-            default: assertionFailure("all events must be handled")
+            default: assertionFailure("All events must be handled")
             }
         }
     }
     
-    fileprivate func unregisterEvents(fromMessageBus messageBus: MessageBus) {
-        messageBus.removeObserver(self, events: eventsToRegister)
+    fileprivate func unregisterEvents() {
+        messageBus?.removeObserver(self, events: eventsToRegister)
     }
 }
 
@@ -274,18 +257,18 @@ extension YouboraManager {
 // MARK: - Internal
 /************************************************************/
 
-extension YouboraManager {
+extension PKYouboraPlayerAdapter {
     
     func resetForBackground() {
-        self.playbackInfo = nil
-        self.isFirstPlay = true
+        playbackInfo = nil
+        isFirstPlay = true
     }
     
     func reset() {
-        self.playbackInfo = nil
-        self.lastReportedResource = nil
-        self.isFirstPlay = true
-        self.shouldDelayEndedHandler = false
+        playbackInfo = nil
+        lastReportedResource = nil
+        isFirstPlay = true
+        shouldDelayEndedHandler = false
     }
 }
 
@@ -293,10 +276,10 @@ extension YouboraManager {
 // MARK: - Private
 /************************************************************/
 
-extension YouboraManager {
+extension PKYouboraPlayerAdapter {
     
     fileprivate func postEventLog(withMessage message: String) {
         let eventLog = YouboraEvent.Report(message: message)
-        self.messageBus?.post(eventLog)
+        messageBus?.post(eventLog)
     }
 }
