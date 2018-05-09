@@ -35,7 +35,6 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     
     /// The plugin's config
     var config: AnalyticsConfig
-//    private var youboraConfig: YouboraConfig?
     
     /************************************************************/
     // MARK: - PKPlugin
@@ -65,14 +64,17 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     
     public override func onUpdateMedia(mediaConfig: MediaConfig) {
         super.onUpdateMedia(mediaConfig: mediaConfig)
+        
         // In case we stopped playback in the middle call eneded handlers and reset state.
-        stopMonitoring()
+        endedHandler()
+        pkYouboraPlayerAdapter?.reset()
+        
         setupYoubora(withConfig: self.config)
-        startMonitoring()
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {
         super.onUpdateConfig(pluginConfig: pluginConfig)
+        
         guard let config = pluginConfig as? AnalyticsConfig else {
             PKLog.error("Wrong config, could not setup youbora manager")
             messageBus?.post(PlayerEvent.PluginError(nsError: YouboraPluginError.failedToSetupYouboraManager.asNSError))
@@ -80,7 +82,6 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         }
         self.config = config
         setupYoubora(withConfig: config)
-        // Make sure to create or destroy adnalyzer based on config
     }
     
     public override func destroy() {
@@ -139,7 +140,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         do {
             let youboraConfig = try parseYouboraConfig(fromConfig: config)
             if youboraNPAWPlugin != nil {
-                youboraNPAWPlugin?.options = youboraConfig.options() //TODO Change this to real options
+                youboraNPAWPlugin?.options = youboraConfig.options()
             } else {
                 youboraNPAWPlugin = YouboraNPAWPlugin(options: youboraConfig.options())
             }
@@ -148,8 +149,6 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     }
     
     private func startMonitoring() {
-        // Make sure to first stop monitoring in case we have uneven call to start/stop
-        stopMonitoring()
         PKLog.debug("Start monitoring Youbora")
         youboraNPAWPlugin?.adapter = pkYouboraPlayerAdapter
         youboraNPAWPlugin?.adsAdapter = pkYouboraAdsAdapter
@@ -175,7 +174,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         if var properties = options[propertiesKey] as? [String: Any] { // if properties already exists override the custom properties only
             properties[CustomPropertyKey.sessionId] = player.sessionId
             options[propertiesKey] = properties
-        } else { // if properties doesn't exist then add
+        } else { // If properties doesn't exist then add
             options[propertiesKey] = [CustomPropertyKey.sessionId: player.sessionId]
         }
     }

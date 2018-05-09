@@ -30,8 +30,12 @@ class PKYouboraPlayerAdapter: YBPlayerAdapter<AnyObject> {
     }
     
     init(player: Player, messageBus: MessageBus) {
-        self.messageBus = messageBus
         super.init(player: player)
+        
+        // We cann't set the messageBus before the super init because Objective C calls init() which resets our object.
+        // Therfore we have to call registerListeners again after messageBus is set.
+        self.messageBus = messageBus
+        registerListeners()
     }
 }
 
@@ -144,7 +148,7 @@ extension PKYouboraPlayerAdapter {
         
         guard let messageBus = self.messageBus else { return }
         
-        eventsToRegister.forEach { event in
+        self.eventsToRegister.forEach { event in
             PKLog.debug("Register event: \(event.self)")
             
             switch event {
@@ -219,7 +223,7 @@ extension PKYouboraPlayerAdapter {
             case let e where e.self == PlayerEvent.sourceSelected:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
-                    self?.lastReportedResource = event.mediaSource?.playbackUrl?.absoluteString
+                    strongSelf.lastReportedResource = event.mediaSource?.playbackUrl?.absoluteString
                     strongSelf.postEventLog(withMessage: "\(event.namespace)")
                 }
             case let e where e.self == PlayerEvent.error:
