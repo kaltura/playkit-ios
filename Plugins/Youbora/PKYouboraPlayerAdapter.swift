@@ -95,13 +95,11 @@ extension PKYouboraPlayerAdapter {
     }
     
     override func getIsLive() -> NSValue? {
-        if let mediaType = player?.mediaEntry?.mediaType {
-            if mediaType == .live {
-                return NSNumber(value: true)
-            }
-            return NSNumber(value: false)
+        guard let player = self.player as? PlayerController else {
+            return super.getIsLive()
         }
-        return super.getIsLive()
+        
+        return NSNumber(value:player.isLive())
     }
     
     override func getBitrate() -> NSNumber? {
