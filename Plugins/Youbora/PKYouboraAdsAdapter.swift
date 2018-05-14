@@ -8,11 +8,7 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-#if os(iOS)
-    import YouboraLib
-#elseif os(tvOS)
-    import YouboraLibTvOS
-#endif
+import YouboraLib
 
 class PKYouboraAdsAdapter: YBPlayerAdapter<AnyObject> {
     
@@ -214,6 +210,11 @@ extension PKYouboraAdsAdapter {
                     guard let strongSelf = self else { return }
                     strongSelf.fireStop()
                     strongSelf.adInfo = nil
+                }
+            case let e where e.self == AdEvent.adClicked:
+                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    strongSelf.fireClick()
                 }
             default: assertionFailure("All events must be handled")
             }
