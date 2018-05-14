@@ -16,6 +16,8 @@
 
 class PKYouboraAdsAdapter: YBPlayerAdapter<AnyObject> {
     
+    private let KALTURA_IOS = "Kaltura-iOS"
+    
     var adInfo: PKAdInfo?
     var adPlayhead: TimeInterval?
     var lastReportedResource: String?
@@ -28,8 +30,13 @@ class PKYouboraAdsAdapter: YBPlayerAdapter<AnyObject> {
     }
     
     init(player: Player, messageBus: MessageBus) {
-        self.messageBus = messageBus
         super.init(player: player)
+        
+        // We cann't set the messageBus before the super init because Objective C calls init() which resets our object.
+        // Therfore we have to call registerListeners again after messageBus is set.
+        // Once/If they change to Swift, this can be changed.
+        self.messageBus = messageBus
+        registerListeners()
     }
 }
 
@@ -94,7 +101,15 @@ extension PKYouboraAdsAdapter {
     }
     
     override func getPlayerVersion() -> String? {
-        return PlayKitManager.clientTag
+        return YouboraPlugin.kaltura + "-" + PlayKitManager.clientTag
+    }
+    
+    override func getVersion() -> String {
+        return YouboraLibVersion + "-" + PlayKitManager.versionString + "-" + (getPlayerVersion() ?? "")
+    }
+    
+    override func getPlayerName() -> String? {
+        return KALTURA_IOS
     }
 }
 

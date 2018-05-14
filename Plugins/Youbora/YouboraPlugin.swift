@@ -35,6 +35,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     
     /// The plugin's config
     var config: AnalyticsConfig
+    var youboraConfig: YouboraConfig?
     
     /************************************************************/
     // MARK: - PKPlugin
@@ -53,7 +54,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
 //        let youboraConfig = try parseYouboraConfig(fromConfig: config)
 //        self.youboraNPAWPlugin = YouboraNPAWPlugin(options: youboraConfig.options()) //TODO Change this to real options
         setupYoubora(withConfig: config)
-        pkYouboraPlayerAdapter = PKYouboraPlayerAdapter(player: player, messageBus: messageBus)
+        pkYouboraPlayerAdapter = PKYouboraPlayerAdapter(player: player, messageBus: messageBus, config: youboraConfig)
         pkYouboraAdsAdapter = PKYouboraAdsAdapter(player: player, messageBus: messageBus)
         
         // Start monitoring for events
@@ -69,7 +70,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         endedHandler()
         pkYouboraPlayerAdapter?.reset()
         
-        setupYoubora(withConfig: self.config)
+        updateYoubora(withConfig: self.config)
     }
     
     public override func onUpdateConfig(pluginConfig: Any) {
@@ -120,32 +121,45 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     /************************************************************/
     // MARK: - Private
     /************************************************************/
-    
-    private func parseYouboraConfig(fromConfig config: AnalyticsConfig) throws -> YouboraConfig {
+
+    private func parseYouboraConfig(fromConfig config: AnalyticsConfig) -> YouboraConfig? {
         if !JSONSerialization.isValidJSONObject(config.params) {
             PKLog.error("Config params is not a valid JSON Object")
-        }
-        let data = try JSONSerialization.data(withJSONObject: config.params, options: .prettyPrinted)
-        guard let decodedYouboraConfig = try? JSONDecoder().decode(YouboraConfig.self, from: data) else {
-            PKLog.error("Couldn't decode data into YouboraConfig")
-            throw PKPluginError.failedToCreatePlugin(pluginName: YouboraPlugin.pluginName)
+            return nil
         }
         
-        return decodedYouboraConfig
+        do {
+            let data = try JSONSerialization.data(withJSONObject: config.params, options: .prettyPrinted)
+            let decodedYouboraConfig = try JSONDecoder().decode(YouboraConfig.self, from: data)
+            return decodedYouboraConfig
+            
+        } catch let error as NSError {
+            PKLog.error("Couldn't parse data into YouboraConfig error: \(error.localizedDescription)")
+        }
+        
+        return nil
     }
     
     private func setupYoubora(withConfig config: AnalyticsConfig) {
         var options = config.params
         self.addCustomProperties(toOptions: &options)
-        do {
-            let youboraConfig = try parseYouboraConfig(fromConfig: config)
-            if youboraNPAWPlugin != nil {
-                youboraNPAWPlugin?.options = youboraConfig.options()
-            } else {
-                youboraNPAWPlugin = YouboraNPAWPlugin(options: youboraConfig.options())
-            }
-        } catch {
+        
+        youboraConfig = parseYouboraConfig(fromConfig: config)
+        
+        youboraNPAWPlugin = YouboraNPAWPlugin(options: youboraConfig?.options())
+    }
+    
+    private func updateYoubora(withConfig config: AnalyticsConfig) {
+        var options = config.params
+        self.addCustomProperties(toOptions: &options)
+        
+        self.youboraConfig = parseYouboraConfig(fromConfig: config)
+        guard let youboraConfig = self.youboraConfig else {
+            PKLog.error("Can't upadate Youbora with new config")
+            return
         }
+        
+        youboraNPAWPlugin?.options = youboraConfig.options()
     }
     
     private func startMonitoring() {

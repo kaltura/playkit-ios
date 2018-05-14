@@ -11,7 +11,9 @@ struct YouboraConfig: Decodable {
     let accountCode: String
     let username: String?
     let userType: String?
+    let houseHoldId: String?
     let obfuscateIP: Bool?
+    let httpSecure: Bool = true
     let media: Media?
     let ads: Ads?
     let properties: Properties?
@@ -23,23 +25,22 @@ struct YouboraConfig: Decodable {
         options.accountCode = accountCode
         options.username = username
         options.userType = userType
-        options.networkObfuscateIp = obfuscateIP != nil ? NSNumber(booleanLiteral: obfuscateIP!) : NSNumber(booleanLiteral: false)
+        options.networkObfuscateIp = obfuscateIP != nil ? NSNumber(booleanLiteral: obfuscateIP!) : nil
         options.parseHls = false
         options.parseCdnNode = false
-        options.httpSecure = false
+        options.httpSecure = httpSecure
         
         options.deviceCode = nil // List of device codes http://mapi.youbora.com:8081/devices
         options.contentCdn = nil
         
         if let media = media {
-            options.contentIsLive = media.isLive != nil ? NSNumber(booleanLiteral: media.isLive!) : NSNumber(booleanLiteral: false)
-            options.contentIsLiveNoSeek = media.isDVR != nil ? NSNumber(booleanLiteral: !(media.isDVR!)) : NSNumber(booleanLiteral: false)
-            options.contentDuration = media.duration != nil ? NSNumber(value: media.duration!) : NSNumber(booleanLiteral: false)
+            options.contentIsLive = media.isLive != nil ? NSNumber(booleanLiteral: media.isLive!) :  nil
+            options.contentIsLiveNoSeek = media.isDVR != nil ? NSNumber(booleanLiteral: !(media.isDVR!)) : nil
+            options.contentDuration = media.duration != nil ? NSNumber(value: media.duration!) : nil
             options.contentTitle = media.title
             options.contentTitle2 = media.title2
             options.contentTransactionCode = media.transactionCode
         }
-        
         
         options.adResource = nil
         options.adCampaign = ads?.campaign

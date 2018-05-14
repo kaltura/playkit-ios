@@ -66,6 +66,7 @@ public class AVPlayerEngine: AVPlayer {
     /// because the current segment wasn't yet added to the seekable time ranges.
     public var currentPosition: TimeInterval {
         get {
+            print("Nilit AVPlayerEngine \(self.currentTime()) - \(self.rangeStart)")
             let position = self.currentTime() - self.rangeStart
             PKLog.trace("get currentPosition: \(position)")
             let time = CMTimeGetSeconds(position)

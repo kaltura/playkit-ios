@@ -12,11 +12,14 @@ import YouboraLib
 
 class PKYouboraPlayerAdapter: YBPlayerAdapter<AnyObject> {
 
+    private let KALTURA_IOS = "Kaltura-iOS"
+    
     var lastReportedResource: String?
     /// The last reported playback info.
     var playbackInfo: PKPlaybackInfo?
     
     fileprivate weak var messageBus: MessageBus?
+    fileprivate var config: YouboraConfig?
     
     /// Indicates whether we played for the first time or not.
     fileprivate var isFirstPlay: Bool = true
@@ -24,16 +27,20 @@ class PKYouboraPlayerAdapter: YBPlayerAdapter<AnyObject> {
     /// Indicates if we have to delay the endedHandler() (for example when we have post-roll).
     fileprivate var shouldDelayEndedHandler = false
     
+    private var lastReportedDuration: Double?
+    
     // We must override this init in order to add our init (happens because of interopatability of youbora objc framework with swift).
     private override init() {
         super.init()
     }
     
-    init(player: Player, messageBus: MessageBus) {
+    init(player: Player, messageBus: MessageBus, config: YouboraConfig?) {
         super.init(player: player)
         
+        self.config = config
         // We cann't set the messageBus before the super init because Objective C calls init() which resets our object.
         // Therfore we have to call registerListeners again after messageBus is set.
+        // Once/If they change to Swift, this can be changed.
         self.messageBus = messageBus
         registerListeners()
     }
@@ -64,7 +71,7 @@ extension PKYouboraPlayerAdapter {
 extension PKYouboraPlayerAdapter {
     
     override func getDuration() -> NSNumber? {
-        guard let player = player else {
+        guard let player = self.player else {
             return nil
         }
         return NSNumber(value: player.duration)
@@ -84,7 +91,7 @@ extension PKYouboraPlayerAdapter {
     }
     
     override func getPlayerVersion() -> String? {
-        return "\(PlayKitManager.clientTag)"
+        return YouboraPlugin.kaltura + "-" + PlayKitManager.clientTag
     }
     
     override func getIsLive() -> NSValue? {
@@ -117,6 +124,26 @@ extension PKYouboraPlayerAdapter {
         }
         return super.getRendition()
     }
+    
+    override func fireJoin() {
+        guard let duration = lastReportedDuration else {
+            super.fireJoin()
+            return
+        }
+        super.fireJoin(["duration": String(describing: duration), "mediaDuration": String(describing: duration)])
+    }
+    
+    override func getVersion() -> String {
+        return YouboraLibVersion + "-" + PlayKitManager.versionString + "-" + (getPlayerVersion() ?? "")
+    }
+    
+    override func getPlayerName() -> String? {
+        return KALTURA_IOS
+    }
+    
+    override func getHouseholdId() -> String {
+        return config?.houseHoldId ?? ""
+    }
 }
 
 /************************************************************/
@@ -138,6 +165,7 @@ extension PKYouboraPlayerAdapter {
             PlayerEvent.stateChanged,
             PlayerEvent.sourceSelected,
             PlayerEvent.error,
+            PlayerEvent.durationChanged,
             AdEvent.adCuePointsUpdate,
             AdEvent.allAdsCompleted
         ]
@@ -232,6 +260,11 @@ extension PKYouboraPlayerAdapter {
                     if let error = event.error, error.code == PKErrorCode.playerItemFailed {
                         strongSelf.fireError(withMessage: error.localizedDescription, code: "\(error.code)", andMetadata: error.description)
                     }
+                }
+            case let e where e.self == PlayerEvent.durationChanged:
+                messageBus.addObserver(self, events: [e.self]) { [weak self] event in
+                    guard let strongSelf = self else { return }
+                    strongSelf.lastReportedDuration = event.duration?.doubleValue
                 }
             case let e where e.self == AdEvent.adCuePointsUpdate:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
