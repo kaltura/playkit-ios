@@ -69,6 +69,7 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
         // In case we stopped playback in the middle call eneded handlers and reset state.
         endedHandler()
         pkYouboraPlayerAdapter?.reset()
+        pkYouboraAdsAdapter?.reset()
         
         updateYoubora(withConfig: self.config)
     }
