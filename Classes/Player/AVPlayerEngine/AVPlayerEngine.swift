@@ -67,9 +67,17 @@ public class AVPlayerEngine: AVPlayer {
     public var currentPosition: TimeInterval {
         get {
             let position = self.currentTime() - self.rangeStart
+            
             PKLog.trace("get currentPosition: \(position)")
-            let time = CMTimeGetSeconds(position)
-            // time could be NaN in some rare cases make sure we don't return NaN and return 0 otherwise.
+            var time = CMTimeGetSeconds(position)
+            
+            // In some cases the video will start playing with negative current time.
+            // self.currentTime() returns a large negative value
+            if time < 0.0 {
+                time = 0
+            }
+            
+            // Time could be NaN in some rare cases make sure we don't return NaN and return 0 otherwise.
             return time.isNaN ? 0 : time
         }
         set {
