@@ -23,7 +23,7 @@ extension AVPlayerEngine {
             #keyPath(currentItem.status),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
-            #keyPath(currentItem.isPlaybackBufferFull),
+            #keyPath(currentItem.playbackBufferFull),
             #keyPath(currentItem.loadedTimeRanges),
             #keyPath(currentItem.timedMetadata)
         ]
@@ -141,7 +141,7 @@ extension AVPlayerEngine {
             if (isPlaybackBufferEmpty) {
                 self.handleBufferEmptyChange()
             }
-        case #keyPath(currentItem.isPlaybackBufferFull):
+        case #keyPath(currentItem.playbackBufferFull):
             guard let isPlaybackBufferFull = currentItem?.isPlaybackBufferFull else { return }
             
             if (isPlaybackBufferFull) {
