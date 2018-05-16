@@ -11,7 +11,7 @@
 import Foundation
 
 /// An PlayerState is an enum of different player states
-@objc public enum PlayerState: Int {
+@objc public enum PlayerState: Int, CustomStringConvertible {
 /// Sent when player's state idle.
     case idle
 /// Sent when player's state ready.
@@ -26,4 +26,21 @@ import Foundation
     case error
 /// Sent when player's state unknown.
     case unknown = -1
+    
+    public var description: String {
+        switch self {
+        case .idle:
+            return "Idle"
+        case .ready:
+            return "Ready"
+        case .buffering:
+            return "Buffering"
+        case .ended:
+            return "Ended"
+        case .error:
+            return "Error"
+        case .unknown:
+            return "Unknown"
+        }
+    }
 }
