@@ -109,7 +109,7 @@ extension LocalAssetsManager {
     
     @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
         if mediaSource.isFairPlay() {
-            if #available(iOS 10.3, *) {
+            if #available(iOS 10.3, *), !Platform.isSimulator {
                 FPSContentKeyManager.shared.installOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, done: callback)
             } else {
                 PKLog.error("Can't register a FairPlay asset on this version of iOS")
@@ -124,7 +124,7 @@ extension LocalAssetsManager {
     
     @objc public func unregisterDownloadedAsset(location: URL, callback: @escaping (Error?) -> Void) {
         // We can't really detect here if it's FairPlay, so just try
-        if #available(iOS 10.3, *) {
+        if #available(iOS 10.3, *), !Platform.isSimulator {
             if FPSContentKeyManager.shared.removeOfflineLicense(for: location, dataStore: storage) {
                 // ok, it was FairPlay
                 callback(nil)
