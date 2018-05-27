@@ -203,10 +203,12 @@ extension PKYouboraPlayerAdapter {
             case let e where e.self == PlayerEvent.playing:
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
+                    strongSelf.fireJoin()
+                    strongSelf.fireBufferEnd()
                     if strongSelf.isFirstPlay {
                         strongSelf.isFirstPlay = false
-                        strongSelf.fireJoin()
-                        strongSelf.fireBufferEnd()
+                        //strongSelf.fireJoin()
+                        //strongSelf.fireBufferEnd()
                     } else {
                         strongSelf.fireResume()
                     }
@@ -256,7 +258,7 @@ extension PKYouboraPlayerAdapter {
                 messageBus.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     if let error = event.error, error.code == PKErrorCode.playerItemFailed {
-                        strongSelf.fireError(withMessage: error.localizedDescription, code: "\(error.code)", andMetadata: error.description)
+                        strongSelf.fireFatalError(withMessage: error.localizedDescription, code: "\(error.code)", andMetadata: error.description)
                     }
                 }
             case let e where e.self == PlayerEvent.durationChanged:

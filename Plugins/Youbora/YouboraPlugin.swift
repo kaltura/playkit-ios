@@ -176,8 +176,8 @@ public class YouboraPlugin: BasePlugin, AppStateObservable {
     }
     
     private func endedHandler() {
-        youboraNPAWPlugin?.adapter?.fireStop()
         youboraNPAWPlugin?.adsAdapter?.fireStop()
+        youboraNPAWPlugin?.adapter?.fireStop()
     }
     
     private func addCustomProperties(toOptions options: inout [String: Any]) {

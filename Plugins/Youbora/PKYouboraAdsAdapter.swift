@@ -127,6 +127,7 @@ extension PKYouboraAdsAdapter {
             AdEvent.adStartedBuffering,
             AdEvent.adPlaybackReady,
             AdEvent.adsRequested,
+            AdEvent.adClicked,
             AdEvent.adDidRequestContentResume
         ]
     }
