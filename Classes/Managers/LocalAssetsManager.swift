@@ -125,7 +125,7 @@ extension LocalAssetsManager {
     @objc public func unregisterDownloadedAsset(location: URL, callback: @escaping (Error?) -> Void) {
         // We can't really detect here if it's FairPlay, so just try
         if #available(iOS 10.3, *), !Platform.isSimulator {
-            if FPSContentKeyManager.shared.removeOfflineLicense(for: location, dataStore: storage) {
+            if FPSUtils.removeOfflineLicense(for: location, dataStore: storage) {
                 // ok, it was FairPlay
                 callback(nil)
                 return
@@ -140,6 +140,12 @@ extension LocalAssetsManager {
         
         // Nothing -- just call the callback
         callback(nil)
+    }
+    
+    /// Check Downloaded Asset status
+    @objc public func checkDownloadedAsset(location: URL) -> Date? {
+        return FPSUtils.checkOfflineLicense(for: location, dataStore: self.storage)
+        // not supported for widevine classic            
     }
     
     /// Renew Downloaded Asset

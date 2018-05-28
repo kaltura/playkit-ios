@@ -192,14 +192,14 @@ class FPSLicense: Codable {
             throw FPSError.malformedCKCInResponse
         }
         
-        let expiry = json["expiry"].double ?? FPSLicense.defaultExpiry
+        let offlineExpiry = json["offline"].double ?? FPSLicense.defaultExpiry
         
         if ckc.count == 0 {
             throw FPSError.malformedCKCInResponse
         }
         
         self.data = ckc
-        self.expiryDate = Date(timeIntervalSinceNow: expiry)
+        self.expiryDate = Date(timeIntervalSinceNow: offlineExpiry)
     }
     
     init(legacyData: Data) {
