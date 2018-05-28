@@ -11,6 +11,11 @@
 import Foundation
 import SwiftyJSON
 
+fileprivate let idKey: String = "id"
+fileprivate let contentUrlKey: String = "url"
+fileprivate let drmDataKey: String = "drmData"
+fileprivate let formatTypeKey: String = "sourceType"
+
 @objc public class PKMediaSource: NSObject {
     
     @objc public enum MediaFormat: Int {
@@ -69,11 +74,6 @@ import SwiftyJSON
         }
         return contentUrl
     }
-    
-    private let idKey: String = "id"
-    private let contentUrlKey: String = "url"
-    private let drmDataKey: String = "drmData"
-    private let formatTypeKey: String = "sourceType"
     
     @objc public convenience init (id: String) {
         self.init(id, contentUrl: nil)
