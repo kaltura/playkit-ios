@@ -8,14 +8,17 @@ class FPSUtils {
         // Master should have the following line:
         // #EXT-X-SESSION-KEY:METHOD=SAMPLE-AES,URI="skd://entry-1_x14v3p06",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
         // The following code looks for the first line with "EXT-X-SESSION-KEY" tag.
-        let re = skdUrlPattern
-        guard let master = try? String(contentsOf: location) else { PKLog.error("Can't read master playlist", location); return nil }
+        guard let master = try? String(contentsOf: location) else { 
+            PKLog.error("Can't read master playlist", location); 
+            return nil 
+        }
+        
         let lines = master.components(separatedBy: .newlines)
         var assetId: String? = nil
         
         for line in lines {
             if line.trimmingCharacters(in: .whitespaces).hasPrefix("#EXT-X-SESSION-KEY") {
-                guard let match = re.firstMatch(in: line, options: [], range: NSMakeRange(0, line.count)) else { continue }
+                guard let match = skdUrlPattern.firstMatch(in: line, options: [], range: NSMakeRange(0, line.count)) else { continue }
                 if match.numberOfRanges < 2 { continue }
                 let assetIdRange = match.range(at: 1)
                 let start = line.index(line.startIndex, offsetBy: assetIdRange.location)

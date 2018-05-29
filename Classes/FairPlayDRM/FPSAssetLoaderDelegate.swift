@@ -10,7 +10,6 @@
 
 import Foundation
 import AVFoundation
-import SwiftyJSON
 
 
 class FPSAssetLoaderDelegate: NSObject {
@@ -116,21 +115,24 @@ extension FPSAssetLoaderDelegate: AVAssetResourceLoaderDelegate {
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         
-        PKLog.trace("\(#function) was called in AssetLoaderDelegate with loadingRequest: \(loadingRequest)")
+        PKLog.trace("\(#function) was called in FPSAssetLoaderDelegate with loadingRequest: \(loadingRequest)")
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: loadingRequest)
     }
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForRenewalOfRequestedResource renewalRequest: AVAssetResourceRenewalRequest) -> Bool {
         
-        PKLog.trace("\(#function) was called in AssetLoaderDelegate with renewalRequest: \(renewalRequest)")
+        PKLog.trace("\(#function) was called in FPSAssetLoaderDelegate with renewalRequest: \(renewalRequest)")
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: renewalRequest)
     }
 }
 
+//MARK:- FPSAssetLoaderDelegate version of FPSLicenseRequest
 class FPSResourceLoadingKeyRequest: FPSLicenseRequest {
+    
     let request: AVAssetResourceLoadingRequest
+    
     init(_ request: AVAssetResourceLoadingRequest) {
         self.request = request
     }
@@ -165,7 +167,7 @@ class FPSResourceLoadingKeyRequest: FPSLicenseRequest {
     }
     
     func persistableContentKey(fromKeyVendorResponse keyVendorResponse: Data, options: [String : Any]?) throws -> Data {
-        if #available(iOS 9.0, *) {
+        if #available(iOS 10.0, *) {
             return try request.persistentContentKey(fromKeyVendorResponse: keyVendorResponse, options: options)
         } else {
             throw FPSError.persistenceNotSupported
