@@ -39,7 +39,7 @@ class FPSLicenseHelper {
     
     let dataStore: LocalDataStore?
     
-    var done: ((Error?) -> Void)?
+    var doneCallback: ((Error?) -> Void)?
     
     // Online play, offline play, download
     init?(assetId: String, params: FairPlayDRMParams?, dataStore: LocalDataStore?, forceDownload: Bool) {
@@ -94,7 +94,13 @@ class FPSLicenseHelper {
         dataTask.resume()
     }
 
-    func handleLicenseRequest(_ request: FPSLicenseRequest, done: @escaping (Error?) -> Void) {
+    func handleLicenseRequest(_ request: FPSLicenseRequest, done callback: @escaping (Error?) -> Void) {
+        
+        let done: (Error?) -> Void = { [unowned self] error in 
+            callback(error)
+            self.doneCallback?(error)
+        }
+        
         let assetId = self.assetId
         
         if let store = self.dataStore {

@@ -80,7 +80,7 @@ class FPSContentKeyManager {
         guard let id = FPSUtils.extractAssetId(at: location) else {return}
         let skdUrl = "skd://" + id
         let helper = FPSLicenseHelper(assetId: id, params: drmParams, dataStore: dataStore, forceDownload: true)
-        helper?.done = done
+        helper?.doneCallback = done
         contentKeyDelegate.assetHelpersMap[skdUrl] = helper
         
         contentKeySession.processContentKeyRequest(withIdentifier: skdUrl, initializationData: nil, options: nil)
