@@ -162,7 +162,7 @@ class FPSResourceLoadingKeyRequest: FPSLicenseRequest {
         request.finishLoading()
     }
     
-    func processContentKeyResponseError(_ error: Error) {
+    func processContentKeyResponseError(_ error: Error?) {
         request.finishLoading(with: error)
     }
     

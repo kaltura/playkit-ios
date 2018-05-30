@@ -63,7 +63,7 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
     
     // Informs the receiver a content key request has failed.
     func contentKeySession(_ session: AVContentKeySession, contentKeyRequest keyRequest: AVContentKeyRequest, didFailWithError err: Error) {
-        // Add your code here to handle errors.
+        PKLog.error("contentKeySession has failed: \(err)")
     }
     
     func assetHelper(_ keyIdentifier: Any?) -> FPSLicenseHelper? {
@@ -71,7 +71,7 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         return assetHelpersMap[id]
     }
     
-    func handleContentKeyRequest(keyRequest: AVContentKeyRequest) throws {
+    func handleContentKeyRequest(keyRequest: AVContentKeyRequest) {
         
         guard let helper = assetHelper(keyRequest.identifier) else { return }
         
@@ -90,7 +90,9 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
 
 @available(iOS 10.3, *)
 class FPSContentKeyRequest: FPSLicenseRequest {
+    
     let request: AVContentKeyRequest
+    
     init(_ request: AVContentKeyRequest) {
         self.request = request
     }
@@ -104,8 +106,8 @@ class FPSContentKeyRequest: FPSLicenseRequest {
         request.processContentKeyResponse(AVContentKeyResponse(fairPlayStreamingKeyResponseData: keyResponse))
     }
     
-    func processContentKeyResponseError(_ error: Error) {
-        request.processContentKeyResponseError(error)
+    func processContentKeyResponseError(_ error: Error?) {
+        request.processContentKeyResponseError(error ?? NSError())
     }
     
     func persistableContentKey(fromKeyVendorResponse keyVendorResponse: Data, options: [String : Any]?) throws -> Data {

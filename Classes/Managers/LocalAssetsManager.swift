@@ -110,7 +110,13 @@ extension LocalAssetsManager {
     @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
         if mediaSource.isFairPlay() {
             if #available(iOS 10.3, *), !Platform.isSimulator {
-                FPSContentKeyManager.shared.installOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, callback: callback)
+                do {
+                    try FPSContentKeyManager.shared.installOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, callback: callback)
+                } catch {
+                    PKLog.error(error)
+                    callback(error)
+                    return
+                }
             } else {
                 PKLog.error("Can't register a FairPlay asset on this version of iOS")
                 callback(FPSError.persistenceNotSupported)
@@ -143,8 +149,8 @@ extension LocalAssetsManager {
     }
     
     /// Check Downloaded Asset status
-    @objc public func checkDownloadedAsset(location: URL) -> Date? {
-        return FPSUtils.checkOfflineLicense(for: location, dataStore: self.storage)
+    @objc public func getLicenseExpirationInfo(location: URL) -> FPSExpirationInfo? {
+        return FPSUtils.getLicenseExpirationInfo(for: location, dataStore: self.storage)
         // not supported for widevine classic            
     }
     
@@ -218,18 +224,6 @@ extension LocalAssetsManager {
         return (avAsset, source)
     }
 }
-
-// MARK: Utility
-extension PKMediaSource {
-    func isFairPlay() -> Bool {
-        return mediaFormat == .hls && drmData?.first?.scheme == .fairplay
-    }
-    
-    func isWidevineClassic() -> Bool {
-        return mediaFormat == .wvm
-    }
-}
-
 
 fileprivate class NullStore: LocalDataStore {
     func exists(key: String) -> Bool {

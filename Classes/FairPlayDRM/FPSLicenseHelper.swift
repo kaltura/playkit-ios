@@ -3,31 +3,6 @@ import Foundation
 import AVFoundation
 import SwiftyJSON
 
-enum FPSError: Error {
-    case emptyServerResponse
-    case malformedServerResponse
-    case noCKCInResponse
-    case malformedCKCInResponse
-    case missingDRMParams
-    case invalidKeyRequest
-    case persistenceNotSupported
-}
-
-enum FPSInternalError: Error {
-    case unknownAssetKeyId
-    case unknownAssetMode
-    case invalidAssetKeyId
-}
-
-
-protocol FPSLicenseRequest {
-    func getSPC(cert: Data, id: String, shouldPersist: Bool, callback: @escaping (Data?, Error?) -> Void)
-    func processContentKeyResponse(_ keyResponse: Data)
-    func processContentKeyResponseError(_ error: Error)
-    func persistableContentKey(fromKeyVendorResponse keyVendorResponse: Data, options: [String : Any]?) throws -> Data
-}
-
-
 class FPSLicenseHelper {
     
     let assetId: String
@@ -104,9 +79,9 @@ class FPSLicenseHelper {
         let assetId = self.assetId
         
         if let store = self.dataStore {
-            if !forceDownload && store.fpskeyExists(assetId) {
+            if !forceDownload && store.fpsKeyExists(assetId) {
                 do {
-                    let license = try store.loadFpsKey(assetId)
+                    let license = try store.loadFPSKey(assetId)
                     if !license.isExpired() {
                         request.processContentKeyResponse(license.data)
                         done(nil)
@@ -121,7 +96,11 @@ class FPSLicenseHelper {
         }
         
         
-        guard let params = FPSParams(self.params) else { done(FPSError.missingDRMParams); return }
+        guard let params = FPSParams(self.params) else { 
+            done(FPSError.missingDRMParams); 
+            return
+        }
+        
         let shouldPersist = self.shouldPersist
         let dataStore = self.dataStore
         
@@ -139,7 +118,7 @@ class FPSLicenseHelper {
             // Send SPC to Key Server and obtain CKC
             strongSelf.performCKCRequest(spcData, url: params.url) { (license, error) in 
                 guard let license = license else {
-                    request.processContentKeyResponseError(error!)
+                    request.processContentKeyResponseError(error)
                     done(error)
                     return
                 }
@@ -149,7 +128,7 @@ class FPSLicenseHelper {
                         let pck = try request.persistableContentKey(fromKeyVendorResponse: license.data, options: nil)
                         license.data = pck
                         
-                        try dataStore?.saveFpsKey(assetId, license)
+                        try dataStore?.saveFPSKey(assetId, license)
                         
                     } catch {
                         request.processContentKeyResponseError(error)
@@ -166,87 +145,3 @@ class FPSLicenseHelper {
     }
 }
 
-struct FPSParams {
-    let cert: Data
-    let url: URL
-    init?(_ pkParams: FairPlayDRMParams?) {
-        guard let params = pkParams else { return nil }
-        guard let cert = params.fpsCertificate else { PKLog.error("Missing FPS certificate"); return nil }
-        guard let url = params.licenseUri else { PKLog.error("Missing FPS license URL"); return nil }
-        self.cert = cert
-        self.url = url
-    }
-}
-
-class FPSLicense: Codable {
-    static let defaultExpiry: TimeInterval = 7*24*60*60
-    let expiryDate: Date?
-    var data: Data
-    
-    init(jsonResponse: Data?) throws {
-        guard let data = jsonResponse else {
-            throw FPSError.emptyServerResponse
-        }
-        
-        let json = JSON(data: data, options: [])
-        
-        guard let b64CKC = json["ckc"].string else {
-            throw FPSError.noCKCInResponse
-        }
-        
-        guard let ckc = Data(base64Encoded: b64CKC) else {
-            throw FPSError.malformedCKCInResponse
-        }
-        
-        let offlineExpiry = json["offline"].double ?? FPSLicense.defaultExpiry
-        
-        if ckc.count == 0 {
-            throw FPSError.malformedCKCInResponse
-        }
-        
-        self.data = ckc
-        self.expiryDate = Date(timeIntervalSinceNow: offlineExpiry)
-    }
-    
-    init(legacyData: Data) {
-        self.data = legacyData
-        self.expiryDate = nil
-    }
-    
-    func isExpired() -> Bool {
-        if let expiryDate = self.expiryDate {
-            return Date() > expiryDate
-        }
-        return false
-    }
-}
-
-extension LocalDataStore {
-    
-    func fpsKey(_ assetId: String) -> String {
-        return assetId + ".fpskey"
-    }
-    
-    func fpskeyExists(_ assetId: String) -> Bool {
-        return exists(key: fpsKey(assetId))
-    }
-    
-    func loadFpsKey(_ assetId: String) throws -> FPSLicense {
-        let obj = try load(key: fpsKey(assetId))
-
-        if let license = try? JSONDecoder().decode(FPSLicense.self, from: obj) {
-            return license
-        } else {
-            return FPSLicense(legacyData: obj)
-        }
-    }
-    
-    func saveFpsKey(_ assetId: String, _ value: FPSLicense) throws {
-        let json = try JSONEncoder().encode(value)
-        try save(key: fpsKey(assetId), value: json)
-    }
-    
-    func removeFpsKey(_ assetId: String) throws {
-        try remove(key: fpsKey(assetId))
-    }
-}
