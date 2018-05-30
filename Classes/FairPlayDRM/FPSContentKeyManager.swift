@@ -76,14 +76,14 @@ class FPSContentKeyManager {
         contentKeySession.setDelegate(contentKeyDelegate, queue: contentKeyDelegateQueue)
     }
     
-    func installOfflineLicense(for location: URL, mediaSource: PKMediaSource, dataStore: LocalDataStore, done: @escaping (Error?)->Void) {
+    func installOfflineLicense(for location: URL, mediaSource: PKMediaSource, dataStore: LocalDataStore, callback: @escaping (Error?)->Void) {
         guard let drmParams = mediaSource.drmData?.first as? FairPlayDRMParams else { fatalError("Not a FairPlay source") }
         guard FPSParams(drmParams) != nil else { fatalError("Missing DRM parameters") }
 
         guard let id = FPSUtils.extractAssetId(at: location) else {return}
         let skdUrl = "skd://" + id
         let helper = FPSLicenseHelper(assetId: id, params: drmParams, dataStore: dataStore, forceDownload: true)
-        helper?.doneCallback = done
+        helper?.doneCallback = callback
         contentKeyDelegate.assetHelpersMap[skdUrl] = helper
         
         contentKeySession.processContentKeyRequest(withIdentifier: skdUrl, initializationData: nil, options: nil)
