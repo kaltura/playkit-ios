@@ -8,18 +8,42 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
+
+
+// NOTE: LocalAssetsManager (and other offline features) is only working in iOS 
+
+#if os(iOS)
 import Foundation
 import AVFoundation
 
 /// Manage local (downloaded) assets.
 @objc public class LocalAssetsManager: NSObject {
     let storage: LocalDataStore
-    var delegates = Set<AssetLoaderDelegate>()
+    var delegates = Set<FPSAssetLoaderDelegate>()
     
     private override init() {
         fatalError("Private initializer, use one of the factory methods")
     }
+
+    /**
+     Create a new LocalAssetsManager.
+     
+     - Parameter storage: data store. Used for DRM data, and may only be nil if DRM is not used.
+     */
+    private init(storage: LocalDataStore?) {
+        self.storage = storage ?? NullStore.instance
+    }
+
+    /// Create a PKMediaSource for a local asset. This allows the player to play a downloaded asset.
+    private func createLocalMediaSource(for assetId: String, localURL: URL) -> PKMediaSource {
+        return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
+    }
     
+}
+
+// MARK: Public initializers
+extension LocalAssetsManager {
+
     /**
      Create a new LocalAssetsManager for DRM-protected content. 
      Uses the default data-store.
@@ -43,51 +67,11 @@ import AVFoundation
     @objc public static func manager() -> LocalAssetsManager {
         return LocalAssetsManager(storage: nil)
     }
-    
-    /**
-     Create a new LocalAssetsManager.
-     
-     - Parameter storage: data store. Used for DRM data, and may only be nil if DRM is not used.
-     */
-    private init(storage: LocalDataStore?) {
-        self.storage = storage ?? NullStore.instance
-    }
-    
-    /**
-     Prepare an AVURLAsset for download via AVAssetDownloadTask.
-     Note that this is only relevant for FairPlay assets, and does not do anything otherwise.
-     
-     - Parameters:
-     - asset: an AVURLAsset, ready to be downloaded
-     - mediaSource: the original source for the asset. mediaSource.contentUrl and asset.url should point at the same file.
-     */
-    @objc public func prepareForDownload(asset: AVURLAsset, mediaSource: PKMediaSource) {
-        
-        // This function is a noop if no DRM data or DRM is not FairPlay.
-        guard let drmData = mediaSource.drmData?.first as? FairPlayDRMParams else {return}
-        
-        PKLog.debug("Preparing asset for download; asset.url:", asset.url)
-        
-        guard #available(iOS 10, *), DRMSupport.fairplayOffline else {
-            PKLog.error("Downloading FairPlay content is not supported on device")
-            return
-        }
-        
-        let resourceLoaderDelegate = AssetLoaderDelegate.configureDownload(asset: asset, drmData: drmData, storage: storage)
-        
-        self.delegates.update(with: resourceLoaderDelegate)
-        
-        resourceLoaderDelegate.done =  { (_ error: Error?)->Void in
-            self.delegates.remove(resourceLoaderDelegate);
-        }
-        
-    }
-    
-    /// Create a PKMediaSource for a local asset. This allows the player to play a downloaded asset.
-    private func createLocalMediaSource(for assetId: String, localURL: URL) -> PKMediaSource {
-        return LocalMediaSource(storage: self.storage, id: assetId, localContentUrl: localURL)
-    }
-    
+}
+
+// MARK: Public API
+extension LocalAssetsManager {  
+
     /// Create a PKMediaEntry for a local asset. This is a convenience function that wraps the result of
     /// `createLocalMediaSource(for:localURL:)` with a PKMediaEntry.
     @objc public func createLocalMediaEntry(for assetId: String, localURL: URL) -> PKMediaEntry {
@@ -128,98 +112,112 @@ import AVFoundation
         return nil
     }
     
-    /// Notifies the SDK that downloading of an asset has finished.
-    @objc public func assetDownloadFinished(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
-        // FairPlay -- nothing to do
-        
-        // Widevine
-        if mediaSource.mediaFormat == .wvm {
+    @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
+        if mediaSource.isFairPlay() {
+            if #available(iOS 10.3, *), !Platform.isSimulator {
+                do {
+                    try FPSContentKeyManager.shared.installOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, callback: callback)
+                } catch {
+                    PKLog.error(error)
+                    callback(error)
+                    return
+                }
+            } else {
+                PKLog.error("Can't register a FairPlay asset on this version of iOS")
+                callback(FPSError.persistenceNotSupported)
+            }
+            
+        } else if mediaSource.isWidevineClassic() {
+            // Widevine Classic
             WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:false, callback: callback)
         }
     }
     
+    @objc public func unregisterDownloadedAsset(location: URL, callback: @escaping (Error?) -> Void) {
+        // We can't really detect here if it's FairPlay, so just try
+        if #available(iOS 10.3, *), !Platform.isSimulator {
+            if FPSUtils.removeOfflineLicense(for: location, dataStore: storage) {
+                // ok, it was FairPlay
+                callback(nil)
+                return
+            }
+        }
+        
+        // Try Widevine Classic
+        if location.pathExtension.lowercased() == "wvm" {
+            WidevineClassicHelper.unregisterAsset(location.absoluteString, callback: callback)
+            return
+        }
+        
+        // Nothing -- just call the callback
+        callback(nil)
+    }
+    
+    /// Check Downloaded Asset status
+    @objc public func getLicenseExpirationInfo(location: URL) -> FPSExpirationInfo? {
+        return FPSUtils.getLicenseExpirationInfo(for: location, dataStore: self.storage)
+        // not supported for widevine classic            
+    }
+    
     /// Renew Downloaded Asset
     @objc public func renewDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
-        // FairPlay -- nothing to do
         
-        // Widevine
-        if mediaSource.mediaFormat == .wvm {
+        if mediaSource.isFairPlay() {
+            registerDownloadedAsset(location: location, mediaSource: mediaSource, callback: callback)
+        
+        } else if mediaSource.isWidevineClassic() {
             WidevineClassicHelper.registerLocalAsset(location.absoluteString, mediaSource: mediaSource, refresh:true, callback: callback)
         }
     }
-    
-    @objc public func unregisterAsset(_ assetUri: String!, callback: @escaping (Error?) -> Void) {
-        // TODO FairPlay
-        
-        // Widevine
-        if assetUri.hasSuffix(".wvm") {
-            WidevineClassicHelper.unregisterAsset(assetUri, callback: callback)
-        }
-    }
-    
-    private class NullStore: LocalDataStore {
-        public func remove(key: String) throws {
-            PKLog.error("LocalDataStore not set")
-        }
-        
-        @objc public func load(key: String) throws -> Data {
-            PKLog.error("LocalDataStore not set")
-            throw NSError.init(domain: "LocalAssetsManager", code: -1, userInfo: nil)
-        }
-        
-        @objc public func save(key: String, value: Data) throws {
-            PKLog.error("LocalDataStore not set")
-        }
-        
-        static let instance = NullStore()
-    }
 }
 
-@objc public protocol LocalDataStore {
-    func save(key: String, value: Data) throws
-    func load(key: String) throws -> Data
-    func remove(key: String) throws
-}
-
-/// Implementation of LocalDataStore that saves data to files in the Library directory.
-@objc public class DefaultLocalDataStore: NSObject, LocalDataStore {
-    
-    static let pkLocalDataStore = "pkLocalDataStore"
-    let storageDirectory: URL
-    
-    @objc public static func defaultDataStore() -> DefaultLocalDataStore? {
-        return try? DefaultLocalDataStore(directory: .libraryDirectory)
-    }
-    
-    private override init() {
-        fatalError("Private initializer, use a factory or `init(directory:)`")
-    }
-    
-    @objc public init(directory: FileManager.SearchPathDirectory) throws {
-        let baseDir = try FileManager.default.url(for: directory, in: .userDomainMask, appropriateFor: nil, create: false)
-        self.storageDirectory = baseDir.appendingPathComponent(DefaultLocalDataStore.pkLocalDataStore, isDirectory: true)
-        
-        try FileManager.default.createDirectory(at: self.storageDirectory, withIntermediateDirectories: true, attributes: nil)
-    }
-    
-    private func file(_ key: String) -> URL {
-        return self.storageDirectory.appendingPathComponent(key)
-    }
-    
-    @objc public func save(key: String, value: Data) throws {
-        try value.write(to: file(key), options: .atomic)
-    }
-    
-    @objc public func load(key: String) throws -> Data {
-        return try Data.init(contentsOf: file(key), options: [])
-    }
-    
-    @objc public func remove(key: String) throws {
-        try FileManager.default.removeItem(at: file(key))
-    }
-}
-
+@available(*, deprecated)
 extension LocalAssetsManager {
+    /// Notifies the SDK that downloading of an asset has finished.
+    @available(*, deprecated)
+    @objc public func assetDownloadFinished(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
+        registerDownloadedAsset(location: location, mediaSource: mediaSource, callback: callback)
+    }
+        
+    @available(*, deprecated)
+    @objc public func unregisterAsset(_ assetUri: String, callback: @escaping (Error?) -> Void) {
+        if let uri = URL(string: assetUri) {
+            unregisterDownloadedAsset(location: uri, callback: callback)
+        }
+    }
+}
+
+// MARK: For AVAssetDownloadTask
+extension LocalAssetsManager {
+    
+    /**
+     Prepare an AVURLAsset for download via AVAssetDownloadTask.
+     Note that this is only relevant for FairPlay assets, and does not do anything otherwise.
+     
+     - Parameters:
+     - asset: an AVURLAsset, ready to be downloaded
+     - mediaSource: the original source for the asset. mediaSource.contentUrl and asset.url should point at the same file.
+     */
+    @objc public func prepareForDownload(asset: AVURLAsset, mediaSource: PKMediaSource) {
+        
+        // This function is a noop if no DRM data or DRM is not FairPlay.
+        guard let drmData = mediaSource.drmData?.first as? FairPlayDRMParams else {return}
+        
+        PKLog.debug("Preparing asset for download; asset.url:", asset.url)
+        
+        guard #available(iOS 10, *), DRMSupport.fairplayOffline else {
+            PKLog.error("Downloading FairPlay content is not supported on device")
+            return
+        }
+        
+        let resourceLoaderDelegate = FPSAssetLoaderDelegate.configureDownload(asset: asset, drmData: drmData, storage: storage)
+        
+        self.delegates.update(with: resourceLoaderDelegate)
+        
+        resourceLoaderDelegate.done =  { (_ error: Error?)->Void in
+            self.delegates.remove(resourceLoaderDelegate);
+        }
+    }
     
     /// Prepare a PKMediaEntry for download using AVAssetDownloadTask.
     public func prepareForDownload(of mediaEntry: PKMediaEntry) -> (AVURLAsset, PKMediaSource)? {
@@ -230,6 +228,30 @@ extension LocalAssetsManager {
         return (avAsset, source)
     }
 }
+
+fileprivate class NullStore: LocalDataStore {
+    func exists(key: String) -> Bool {
+        PKLog.error("LocalDataStore not set")
+        return false
+    }
+    
+    public func remove(key: String) throws {
+        PKLog.error("LocalDataStore not set")
+    }
+    
+    @objc public func load(key: String) throws -> Data {
+        PKLog.error("LocalDataStore not set")
+        throw NSError.init(domain: "LocalAssetsManager", code: -1, userInfo: nil)
+    }
+    
+    @objc public func save(key: String, value: Data) throws {
+        PKLog.error("LocalDataStore not set")
+    }
+    
+    static let instance = NullStore()
+}
+#endif
+
 
 class LocalMediaSource: PKMediaSource {
     let storage: LocalDataStore

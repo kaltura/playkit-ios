@@ -36,7 +36,7 @@ enum PlayerError: PKError {
     
     var errorDescription: String {
         switch self {
-        case .failedToLoadAssetFromKeys: return "Can't use this AVAsset because one of it's keys failed to load"
+        case .failedToLoadAssetFromKeys: return "Can't use this AVAsset because one of its keys failed to load"
         case .assetNotPlayable: return "Can't use this AVAsset because it isn't playable"
         case .playerItemFailed: return "Player item failed to play"
         case .failed: return "Player failed, you can no longer use the player for playback and need to recreate it"

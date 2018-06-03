@@ -17,6 +17,12 @@ import SwiftyJSON
     case unknown
 }
 
+fileprivate let idKey = "id"
+fileprivate let sourcesKey = "sources"
+fileprivate let mediaTypeKey = "mediaType"
+fileprivate let durationKey = "duration"
+
+
 @objc public class PKMediaEntry: NSObject {
     @objc public var id: String
     @objc public var sources: [PKMediaSource]?
@@ -34,11 +40,6 @@ import SwiftyJSON
             }
         }
     }
-    
-    private let idKey = "id"
-    private let sourcesKey = "sources"
-    private let mediaTypeKey = "mediaType"
-    private let durationKey = "duration"
     
     internal init(id: String) {
         self.id = id
@@ -96,9 +97,9 @@ import SwiftyJSON
         case unknown
     }
     
-    var licenseUri: URL?
-    var scheme: Scheme
-    var requestAdapter: PKRequestParamsAdapter?
+    public var licenseUri: URL?
+    public var scheme: Scheme
+    public var requestAdapter: PKRequestParamsAdapter?
     
     init(licenseUri: String?, scheme: Scheme) {
         if let url = licenseUri {
@@ -124,7 +125,7 @@ import SwiftyJSON
 }
 
 public class FairPlayDRMParams: DRMParams {
-    @objc var fpsCertificate: Data?
+    @objc public var fpsCertificate: Data?
     
     @objc init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
