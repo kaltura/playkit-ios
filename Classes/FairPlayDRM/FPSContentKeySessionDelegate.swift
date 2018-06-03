@@ -63,7 +63,7 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         
         guard let helper = assetHelper(keyRequest.identifier) else { return }
                 
-        if helper.forceDownload, !keyRequest.canProvidePersistableContentKey {
+        if helper.forceDownload, !(keyRequest is AVPersistableContentKeyRequest) {
             // We want to download but we're given a non-download request
             keyRequest.respondByRequestingPersistableContentKeyRequest()
             return
