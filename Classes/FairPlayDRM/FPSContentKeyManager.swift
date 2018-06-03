@@ -1,6 +1,7 @@
 import AVFoundation
 
-@available(iOS 10.3, *)
+@available(tvOS, unavailable)
+@available(iOS 10.3, tvOS 10.2, *)
 class FPSContentKeyManager {
     
     static let shared: FPSContentKeyManager = FPSContentKeyManager()

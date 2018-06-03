@@ -1,7 +1,8 @@
 import AVFoundation
 import SwiftyJSON
 
-@available(iOS 10.3, *)
+@available(tvOS, unavailable)
+@available(iOS 10.3, tvOS 10.2, *)
 class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         
     var assetHelpersMap = [String: FPSLicenseHelper]()
@@ -10,23 +11,10 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         try? handleContentKeyRequest(keyRequest: keyRequest)
     }
     
-    func contentKeySession(_ session: AVContentKeySession, didProvide keyRequest: AVPersistableContentKeyRequest) {
-        try? handleContentKeyRequest(keyRequest: keyRequest)
-    }
-
     func contentKeySession(_ session: AVContentKeySession, didProvideRenewingContentKeyRequest keyRequest: AVContentKeyRequest) {
         try? handleContentKeyRequest(keyRequest: keyRequest)
     }
     
-    func contentKeySession(_ session: AVContentKeySession,
-                           didUpdatePersistableContentKey persistableContentKey: Data,
-                           forContentKeyIdentifier keyIdentifier: Any) {
-        
-        #if DEBUG
-        fatalError("Dual Expiry feature not implemented")
-        #endif
-    }
-
     func contentKeySession(_ session: AVContentKeySession, shouldRetry keyRequest: AVContentKeyRequest,
                            reason retryReason: AVContentKeyRequestRetryReason) -> Bool {
         
@@ -74,8 +62,8 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
     func handleContentKeyRequest(keyRequest: AVContentKeyRequest) {
         
         guard let helper = assetHelper(keyRequest.identifier) else { return }
-        
-        if helper.forceDownload && !(keyRequest is AVPersistableContentKeyRequest) {
+                
+        if #available(iOS 10.3, *), helper.forceDownload, !keyRequest.canProvidePersistableContentKey {
             // We want to download but we're given a non-download request
             keyRequest.respondByRequestingPersistableContentKeyRequest()
             return
@@ -88,7 +76,25 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
     }
 }
 
-@available(iOS 10.3, *)
+
+@available(tvOS, unavailable)
+@available(iOS 10.3, tvOS 10.2, *)
+extension FPSContentKeySessionDelegate {
+    func contentKeySession(_ session: AVContentKeySession, didProvide keyRequest: AVPersistableContentKeyRequest) {
+        try? handleContentKeyRequest(keyRequest: keyRequest)
+    }
+    
+    func contentKeySession(_ session: AVContentKeySession,
+                           didUpdatePersistableContentKey persistableContentKey: Data,
+                           forContentKeyIdentifier keyIdentifier: Any) {
+        
+        #if DEBUG
+        fatalError("Dual Expiry feature not implemented")
+        #endif
+    }
+}
+
+@available(iOS 10.3, tvOS 10.2, *)
 class FPSContentKeyRequest: FPSLicenseRequest {
     
     let request: AVContentKeyRequest

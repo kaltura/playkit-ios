@@ -109,7 +109,7 @@ extension LocalAssetsManager {
     
     @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
         if mediaSource.isFairPlay() {
-            if #available(iOS 10.3, *), !Platform.isSimulator {
+            if #available(iOS 10.3, tvOS 10.2, *), !Platform.isSimulator {
                 do {
                     try FPSContentKeyManager.shared.installOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, callback: callback)
                 } catch {
