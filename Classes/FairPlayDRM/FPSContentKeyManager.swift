@@ -24,7 +24,7 @@ class FPSContentKeyManager {
         contentKeySession.setDelegate(contentKeyDelegate, queue: contentKeyDelegateQueue)
     }
     
-    func installOfflineLicense(for location: URL, mediaSource: PKMediaSource, dataStore: LocalDataStore, callback: @escaping (Error?)->Void) throws {
+    func installOfflineLicense(for location: URL, mediaSource: PKMediaSource, dataStore: LocalDataStore, callback: @escaping (Error?) -> Void) throws {
         
         let drmParams = try mediaSource.fairPlayParams()
 
