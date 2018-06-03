@@ -1,8 +1,8 @@
 import AVFoundation
 import SwiftyJSON
 
-@available(tvOS, unavailable)
-@available(iOS 10.3, tvOS 10.2, *)
+#if os(iOS)
+@available(iOS 10.3, *)
 class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         
     var assetHelpersMap = [String: FPSLicenseHelper]()
@@ -63,7 +63,7 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
         
         guard let helper = assetHelper(keyRequest.identifier) else { return }
                 
-        if #available(iOS 10.3, *), helper.forceDownload, !keyRequest.canProvidePersistableContentKey {
+        if helper.forceDownload, !keyRequest.canProvidePersistableContentKey {
             // We want to download but we're given a non-download request
             keyRequest.respondByRequestingPersistableContentKeyRequest()
             return
@@ -76,9 +76,7 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
     }
 }
 
-
-@available(tvOS, unavailable)
-@available(iOS 10.3, tvOS 10.2, *)
+@available(iOS 10.3, *)
 extension FPSContentKeySessionDelegate {
     func contentKeySession(_ session: AVContentKeySession, didProvide keyRequest: AVPersistableContentKeyRequest) {
         try? handleContentKeyRequest(keyRequest: keyRequest)
@@ -94,7 +92,7 @@ extension FPSContentKeySessionDelegate {
     }
 }
 
-@available(iOS 10.3, tvOS 10.2, *)
+@available(iOS 10.3, *)
 class FPSContentKeyRequest: FPSLicenseRequest {
     
     let request: AVContentKeyRequest
@@ -123,4 +121,4 @@ class FPSContentKeyRequest: FPSLicenseRequest {
         fatalError("Invalid state")
     }
 }
-
+#endif

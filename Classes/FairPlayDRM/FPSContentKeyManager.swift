@@ -1,7 +1,7 @@
 import AVFoundation
 
-@available(tvOS, unavailable)
-@available(iOS 10.3, tvOS 10.2, *)
+#if os(iOS)
+@available(iOS 10.3, *)
 class FPSContentKeyManager {
     
     static let shared: FPSContentKeyManager = FPSContentKeyManager()
@@ -37,3 +37,4 @@ class FPSContentKeyManager {
         contentKeySession.processContentKeyRequest(withIdentifier: skdUrl, initializationData: nil, options: nil)
     }
 }
+#endif

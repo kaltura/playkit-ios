@@ -8,6 +8,11 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
+
+
+// NOTE: LocalAssetsManager (and other offline features) is only working in iOS 
+
+#if os(iOS)
 import Foundation
 import AVFoundation
 
@@ -109,7 +114,7 @@ extension LocalAssetsManager {
     
     @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
         if mediaSource.isFairPlay() {
-            if #available(iOS 10.3, tvOS 10.2, *), !Platform.isSimulator {
+            if #available(iOS 10.3, *), !Platform.isSimulator {
                 do {
                     try FPSContentKeyManager.shared.installOfflineLicense(for: location, mediaSource: mediaSource, dataStore: storage, callback: callback)
                 } catch {
@@ -180,7 +185,6 @@ extension LocalAssetsManager {
             unregisterDownloadedAsset(location: uri, callback: callback)
         }
     }
-
 }
 
 // MARK: For AVAssetDownloadTask
@@ -246,6 +250,7 @@ fileprivate class NullStore: LocalDataStore {
     
     static let instance = NullStore()
 }
+#endif
 
 
 class LocalMediaSource: PKMediaSource {
