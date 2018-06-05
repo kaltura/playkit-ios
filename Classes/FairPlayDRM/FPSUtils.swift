@@ -76,7 +76,7 @@ class FPSLicense: Codable {
             throw FPSError.malformedCKCInResponse
         }
         
-        let offlineExpiry = json["offline"].double ?? FPSLicense.defaultExpiry
+        let offlineExpiry = json["persistence_duration"].double ?? FPSLicense.defaultExpiry
         
         if ckc.count == 0 {
             throw FPSError.malformedCKCInResponse
