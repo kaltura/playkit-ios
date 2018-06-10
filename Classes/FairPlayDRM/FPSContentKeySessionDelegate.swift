@@ -18,11 +18,11 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
     var assetHelpersMap = [String: FPSLicenseHelper]()
     
     func contentKeySession(_ session: AVContentKeySession, didProvide keyRequest: AVContentKeyRequest) {
-        try? handleContentKeyRequest(keyRequest: keyRequest)
+        handleContentKeyRequest(keyRequest: keyRequest)
     }
     
     func contentKeySession(_ session: AVContentKeySession, didProvideRenewingContentKeyRequest keyRequest: AVContentKeyRequest) {
-        try? handleContentKeyRequest(keyRequest: keyRequest)
+        handleContentKeyRequest(keyRequest: keyRequest)
     }
     
     func contentKeySession(_ session: AVContentKeySession, shouldRetry keyRequest: AVContentKeyRequest,
@@ -89,7 +89,7 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
 @available(iOS 10.3, *)
 extension FPSContentKeySessionDelegate {
     func contentKeySession(_ session: AVContentKeySession, didProvide keyRequest: AVPersistableContentKeyRequest) {
-        try? handleContentKeyRequest(keyRequest: keyRequest)
+        handleContentKeyRequest(keyRequest: keyRequest)
     }
     
     func contentKeySession(_ session: AVContentKeySession,
