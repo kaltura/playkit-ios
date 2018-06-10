@@ -27,8 +27,14 @@ class FPSContentKeyManager {
     // MARK: Initialization.
     
     private init() {
-        let storageUrl = try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        contentKeySession = AVContentKeySession(keySystem: .fairPlayStreaming, storageDirectoryAt: storageUrl)
+        if #available(iOS 11.0, *) {
+            contentKeySession = AVContentKeySession(keySystem: .fairPlayStreaming)
+        } else {
+            // iOS 10.3
+            let storageUrl = try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent("pkLegacyExpiredContentKeySessionReports", isDirectory: true)
+            try? FileManager.default.createDirectory(at: storageUrl, withIntermediateDirectories: true, attributes: nil)
+            contentKeySession = AVContentKeySession(keySystem: .fairPlayStreaming, storageDirectoryAt: storageUrl)
+        }
         contentKeyDelegate = FPSContentKeySessionDelegate()
         
         contentKeySession.setDelegate(contentKeyDelegate, queue: contentKeyDelegateQueue)
