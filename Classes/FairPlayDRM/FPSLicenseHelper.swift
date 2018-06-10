@@ -81,9 +81,10 @@ class FPSLicenseHelper {
 
     func handleLicenseRequest(_ request: FPSLicenseRequest, done callback: @escaping (Error?) -> Void) {
         
-        let done: (Error?) -> Void = { [unowned self] error in 
+        let done: (Error?) -> Void = { [weak self] error in
+            guard let strongSelf = self else { return }
             callback(error)
-            self.doneCallback?(error)
+            strongSelf.doneCallback?(error)
         }
         
         let assetId = self.assetId
