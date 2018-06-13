@@ -285,6 +285,7 @@ import KalturaNetKit
                     mediaEntry.sources = mediaSources
                     mediaEntry.metadata = metaDataItems
                     mediaEntry.tags = entry.tags
+                    mediaEntry.mediaType = self.mediaType(of: entry.entryType())
                     callback(mediaEntry, nil)
                 })
             
@@ -371,6 +372,21 @@ import KalturaNetKit
         }
         
         return playURL
+    }
+    
+    private func mediaType(of type: EntryType?) -> MediaType {
+        guard let type = type else {
+            return .unknown
+        }
+        
+        switch type {
+        case .MediaClip:
+            return .vod
+        case .LiveStream:
+            return .live
+        default:
+            return .unknown
+        }
     }
     
     @objc public func cancel(){

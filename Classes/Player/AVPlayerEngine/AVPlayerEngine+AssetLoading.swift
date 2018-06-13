@@ -50,7 +50,7 @@ extension AVPlayerEngine {
                     var error: NSError?
                     
                     if newAsset.avAsset.statusOfValue(forKey: key, error: &error) == .failed {
-                        let stringFormat = NSLocalizedString("error.asset_key_%@_failed.description", comment: "Can't use this AVAsset because one of it's keys failed to load")
+                        let stringFormat = NSLocalizedString("error.asset_key_%@_failed.description", comment: "Can't use this AVAsset because one of its keys failed to load")
                         
                         let message = String.localizedStringWithFormat(stringFormat, key)
                         

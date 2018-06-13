@@ -23,7 +23,7 @@ extension AVPlayerEngine {
             #keyPath(currentItem.status),
             #keyPath(currentItem.playbackLikelyToKeepUp),
             #keyPath(currentItem.playbackBufferEmpty),
-            #keyPath(currentItem.isPlaybackBufferFull),
+            #keyPath(currentItem.playbackBufferFull),
             #keyPath(currentItem.loadedTimeRanges),
             #keyPath(currentItem.timedMetadata)
         ]
@@ -129,9 +129,24 @@ extension AVPlayerEngine {
         PKLog.debug("keyPath:: \(keyPath)")
         
         switch keyPath {
-        case #keyPath(currentItem.playbackLikelyToKeepUp): self.handleLikelyToKeepUp()
-        case #keyPath(currentItem.playbackBufferEmpty): self.handleBufferEmptyChange()
-        case #keyPath(currentItem.isPlaybackBufferFull): PKLog.debug("Buffer Full")
+        case #keyPath(currentItem.playbackLikelyToKeepUp):
+            guard let isPlaybackLikelyToKeepUp = currentItem?.isPlaybackLikelyToKeepUp else { return }
+            
+            if (isPlaybackLikelyToKeepUp) {
+                self.handleLikelyToKeepUp()
+            }
+        case #keyPath(currentItem.playbackBufferEmpty):
+            guard let isPlaybackBufferEmpty = currentItem?.isPlaybackBufferEmpty else { return }
+            
+            if (isPlaybackBufferEmpty) {
+                self.handleBufferEmptyChange()
+            }
+        case #keyPath(currentItem.playbackBufferFull):
+            guard let isPlaybackBufferFull = currentItem?.isPlaybackBufferFull else { return }
+            
+            if (isPlaybackBufferFull) {
+                PKLog.debug("Buffer Full")
+            }
         case #keyPath(currentItem.loadedTimeRanges):
             guard let loadedTimeRanges = self.currentItem?.loadedTimeRanges else { return }
             // convert values to PKTimeRange
