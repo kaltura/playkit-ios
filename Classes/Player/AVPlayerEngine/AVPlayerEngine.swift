@@ -83,7 +83,13 @@ public class AVPlayerEngine: AVPlayer {
             return time.isNaN ? 0 : time
         }
         set {
-            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
+            var newTime: CMTime
+            if CMTIME_IS_VALID(self.rangeStart) {
+                newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
+            } else {
+                newTime = CMTimeMakeWithSeconds(newValue, 1)
+            }
+            
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [weak self] (isSeeked: Bool) in
                 guard let strongSelf = self else { return }
@@ -165,7 +171,9 @@ public class AVPlayerEngine: AVPlayer {
             if let currentItem = self.currentItem {
                 let seekableRanges = currentItem.seekableTimeRanges
                 if seekableRanges.count > 0 {
-                    result = seekableRanges.last!.timeRangeValue.start
+                    if let range = seekableRanges.last {
+                        result = range.timeRangeValue.start
+                    }
                 }
             }
             return result
