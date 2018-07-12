@@ -168,6 +168,8 @@ public class AVPlayerEngine: AVPlayer {
                 if seekableRanges.count > 0 {
                     if let range = seekableRanges.last as? CMTimeRange, range.isValid {
                         result = range.timeRangeValue.start
+                    } else {
+                        PKLog.debug("Seekable range is invalid")
                     }
                 }
             }
