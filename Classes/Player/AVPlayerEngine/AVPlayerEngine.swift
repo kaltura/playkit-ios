@@ -84,6 +84,7 @@ public class AVPlayerEngine: AVPlayer {
         }
         set {
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
+            
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [weak self] (isSeeked: Bool) in
                 guard let strongSelf = self else { return }
@@ -165,7 +166,11 @@ public class AVPlayerEngine: AVPlayer {
             if let currentItem = self.currentItem {
                 let seekableRanges = currentItem.seekableTimeRanges
                 if seekableRanges.count > 0 {
-                    result = seekableRanges.last!.timeRangeValue.start
+                    if let lastSeekableTimeRange = seekableRanges.last as? CMTimeRange, lastSeekableTimeRange.isValid {
+                        result = lastSeekableTimeRange.start
+                    } else {
+                        PKLog.debug("Seekable range is invalid")
+                    }
                 }
             }
             return result
