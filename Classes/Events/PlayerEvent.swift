@@ -72,33 +72,33 @@ import AVFoundation
     
     // MARK: - Player Basic Events
 
-    class CanPlay: PlayerEvent {}
-    class DurationChanged: PlayerEvent {
+    public class CanPlay: PlayerEvent {}
+    public class DurationChanged: PlayerEvent {
         convenience init(duration: TimeInterval) {
             self.init([EventDataKeys.duration: NSNumber(value: duration)])
         }
     }
     
-    class Stopped: PlayerEvent {}
-    class Ended: PlayerEvent {}
-    class LoadedMetadata: PlayerEvent {}
-    class Play: PlayerEvent {}
-    class Pause: PlayerEvent {}
-    class Playing: PlayerEvent {}
-    class Seeking: PlayerEvent {
+    public class Stopped: PlayerEvent {}
+    public class Ended: PlayerEvent {}
+    public class LoadedMetadata: PlayerEvent {}
+    public class Play: PlayerEvent {}
+    public class Pause: PlayerEvent {}
+    public class Playing: PlayerEvent {}
+    public class Seeking: PlayerEvent {
         convenience init(targetSeekPosition: TimeInterval) {
             self.init([EventDataKeys.targetSeekPosition: NSNumber(value: targetSeekPosition)])
         }
     }
-    class Seeked: PlayerEvent {}
+    public class Seeked: PlayerEvent {}
     
-    class SourceSelected: PlayerEvent {
+    public class SourceSelected: PlayerEvent {
         convenience init(mediaSource: PKMediaSource) {
             self.init([EventDataKeys.mediaSource: mediaSource])
         }
     }
     
-    class Error: PlayerEvent {
+    public class Error: PlayerEvent {
         convenience init(nsError: NSError) {
             self.init([EventDataKeys.error: nsError])
         }
@@ -108,7 +108,7 @@ import AVFoundation
         }
     }
     
-    class PluginError: PlayerEvent {
+    public class PluginError: PlayerEvent {
         convenience init(nsError: NSError) {
             self.init([EventDataKeys.error: nsError])
         }
@@ -118,7 +118,7 @@ import AVFoundation
         }
     }
     
-    class ErrorLog: PlayerEvent {
+    public class ErrorLog: PlayerEvent {
         convenience init(nsError: NSError) {
             self.init([EventDataKeys.error: nsError])
         }
@@ -128,50 +128,50 @@ import AVFoundation
         }
     }
     
-    class TimedMetadata: PlayerEvent {
+    public class TimedMetadata: PlayerEvent {
         convenience init(metadata: [AVMetadataItem]) {
             self.init([EventDataKeys.metadata: metadata])
         }
     }
     
-    class TracksAvailable: PlayerEvent {
+    public class TracksAvailable: PlayerEvent {
         convenience init(tracks: PKTracks) {
             self.init([EventDataKeys.tracks: tracks])
         }
     }
     
-    class TextTrackChanged: PlayerEvent {
+    public class TextTrackChanged: PlayerEvent {
         convenience init(track: Track) {
             self.init([EventDataKeys.selectedTrack: track])
         }
     }
     
-    class AudioTrackChanged: PlayerEvent {
+    public class AudioTrackChanged: PlayerEvent {
         convenience init(track: Track) {
             self.init([EventDataKeys.selectedTrack: track])
         }
     }
 
-    class VideoTrackChanged: PlayerEvent {
+    public class VideoTrackChanged: PlayerEvent {
         convenience init(bitrate: Double) {
             self.init([EventDataKeys.bitrate: bitrate])
         }
     }
 
-    class PlaybackInfo: PlayerEvent {
+    public class PlaybackInfo: PlayerEvent {
         convenience init(playbackInfo: PKPlaybackInfo) {
             self.init([EventDataKeys.playbackInfo: playbackInfo])
         }
     }
     
-    class StateChanged: PlayerEvent {
+    public class StateChanged: PlayerEvent {
         convenience init(newState: PlayerState, oldState: PlayerState) {
             self.init([EventDataKeys.newState: newState as AnyObject,
                        EventDataKeys.oldState: oldState as AnyObject])
         }
     }
     
-    class LoadedTimeRanges: PlayerEvent {
+    public class LoadedTimeRanges: PlayerEvent {
         convenience init(timeRanges: [PKTimeRange]) {
             self.init([EventDataKeys.timeRanges: timeRanges])
         }
