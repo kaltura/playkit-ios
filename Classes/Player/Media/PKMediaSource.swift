@@ -97,7 +97,7 @@ fileprivate let formatTypeKey: String = "sourceType"
         self.setContentUrl(sj[contentUrlKey].url)
         
         if let drmData = sj[drmDataKey].array {
-            self.drmData = drmData.flatMap { DRMParams.fromJSON($0) }
+            self.drmData = drmData.compactMap { DRMParams.fromJSON($0) }
         }
         
         if let st = sj[formatTypeKey].int, let mediaFormat = MediaFormat(rawValue: st) {

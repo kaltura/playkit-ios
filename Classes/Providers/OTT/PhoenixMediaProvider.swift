@@ -426,7 +426,7 @@ public enum PhoenixMediaProviderError: PKError {
         let sortedSources = sortedAndFilterSources(by: loaderInfo.fileIds, or: loaderInfo.formats, sources: context.sources)
 
         var maxDuration: Float = 0.0
-        let mediaSources =  sortedSources.flatMap { (source: OTTPlaybackSource) -> PKMediaSource? in
+        let mediaSources =  sortedSources.compactMap { (source: OTTPlaybackSource) -> PKMediaSource? in
 
             let format = FormatsHelper.getMediaFormat(format: source.format, hasDrm: source.drm != nil)
             guard  FormatsHelper.supportedFormats.contains(format) else {
@@ -435,7 +435,7 @@ public enum PhoenixMediaProviderError: PKError {
 
             var drm: [DRMParams]? = nil
             if let drmData = source.drm, drmData.count > 0 {
-                drm = drmData.flatMap({ (drmData: OTTDrmData) -> DRMParams? in
+                drm = drmData.compactMap({ (drmData: OTTDrmData) -> DRMParams? in
 
                     let scheme = convertScheme(scheme: drmData.scheme)
                     guard FormatsHelper.supportedSchemes.contains(scheme) else {
