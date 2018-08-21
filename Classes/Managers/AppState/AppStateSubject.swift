@@ -11,7 +11,7 @@
 import Foundation
 
 /// The interface of `AppStateSubject`, allows us to better divide the logic and mock easier.
-public protocol AppStateSubjectProtocol: class, AppStateProviderDelegate {
+public protocol AppStateSubjectProtocol: AppStateProviderDelegate {
     associatedtype InstanceType
     static var shared: InstanceType { get }
     /// Lock object for synchronizing access.

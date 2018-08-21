@@ -19,7 +19,7 @@ import Foundation
     ///
     /// - Parameters:
     ///   - player: The player you want to use with the request adapter
-    ///   - applicationName: the application name, if `nil` will use the bundle identifier.
+    ///   - appName: the application name, if `nil` will use the bundle identifier.
     @objc public static func install(in player: Player, withAppName appName: String) {
         let requestAdapter = KalturaPlaybackRequestAdapter()
         requestAdapter.sessionId = player.sessionId
