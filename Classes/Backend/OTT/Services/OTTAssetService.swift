@@ -27,6 +27,20 @@ class OTTAssetService {
             return nil
         }
     }
+    
+    internal static func getMetaData(baseURL: String, ks: String, assetId: String, type: AssetObjectType) -> KalturaRequestBuilder? {
+        
+        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "get") {
+            request
+                .setBody(key: "ks", value: JSON(ks))
+                .setBody(key: "id", value: JSON(assetId))
+                .setBody(key: "assetReferenceType", value: JSON(type.asString))
+                .setBody(key: "type", value: JSON(type.asString))
+            return request
+        }
+        
+        return nil
+    }
 }
 
 struct PlaybackContextOptions {

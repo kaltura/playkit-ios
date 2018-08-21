@@ -136,8 +136,9 @@ public enum PhoenixMediaProviderError: PKError {
     @objc public var fileIds: [String]?
     @objc public var playbackContextType: PlaybackContextType = .unknown
     @objc public var networkProtocol: String?
-    public weak var responseDelegate: PKMediaEntryProviderResponseDelegate? = nil
     @objc public var referrer: String?
+    
+    public weak var responseDelegate: PKMediaEntryProviderResponseDelegate? = nil
     
     public var executor: RequestExecutor?
 
@@ -205,7 +206,6 @@ public enum PhoenixMediaProviderError: PKError {
         self.networkProtocol = networkProtocol
         return self
     }
-
     
     /// - Parameter referrer: the referrer
     /// - Returns: Self
@@ -224,7 +224,6 @@ public enum PhoenixMediaProviderError: PKError {
         return self
     }
     
-    
     /// - Parameter responseDelegate: responseDelegate which will be used to get the response of the requests are being sent by the mediaProvider
     ///    default is nil
     /// - Returns: Self
@@ -234,8 +233,6 @@ public enum PhoenixMediaProviderError: PKError {
         return self
     }
 
-    
-    
     
 
     let defaultProtocol = "https"
@@ -291,30 +288,56 @@ public enum PhoenixMediaProviderError: PKError {
     ///   - ks: ks if exist
     ///   - loaderInfo: info regarding entry to load
     /// - Returns: request builder
-    func loaderRequestBuilder(ks: String?, loaderInfo: LoaderInfo) -> KalturaRequestBuilder? {
+    func loaderRequestBuilder(ks: String?, loaderInfo: LoaderInfo) -> KalturaMultiRequestBuilder? {
 
-       let playbackContextOptions = PlaybackContextOptions(playbackContextType: loaderInfo.playbackContextType, protocls: [loaderInfo.networkProtocol], assetFileIds: loaderInfo.fileIds, referrer: self.referrer)
-
-        if let token = ks {
-
-            let playbackContextRequest = OTTAssetService.getPlaybackContext(baseURL:loaderInfo.sessionProvider.serverURL, ks: token, assetId: loaderInfo.assetId, type: loaderInfo.assetType, playbackContextOptions: playbackContextOptions )
-            return playbackContextRequest
+        let multiRequestBuilder = KalturaMultiRequestBuilder(url: loaderInfo.sessionProvider.serverURL)?.setOTTBasicParams()
+        
+       let playbackContextOptions = PlaybackContextOptions(playbackContextType: loaderInfo.playbackContextType,
+                                                           protocls: [loaderInfo.networkProtocol],
+                                                           assetFileIds: loaderInfo.fileIds,
+                                                           referrer: self.referrer)
+        
+        var ksString: String
+        
+        if let token = ks, token.isEmpty == false {
+            ksString = token
         } else {
-
-            let anonymouseLoginRequest = OTTUserService.anonymousLogin(baseURL: loaderInfo.sessionProvider.serverURL, partnerId: loaderInfo.sessionProvider.partnerId)
-            let ks = "{1:result:ks}"
-            let playbackContextRequest = OTTAssetService.getPlaybackContext(baseURL:loaderInfo.sessionProvider.serverURL, ks: ks, assetId: loaderInfo.assetId, type: loaderInfo.assetType, playbackContextOptions: playbackContextOptions )
-
-            guard let req1 = anonymouseLoginRequest, let req2 = playbackContextRequest else {
+            let anonymousLogin = OTTUserService.anonymousLogin(baseURL: loaderInfo.sessionProvider.serverURL,
+                                                                       partnerId: loaderInfo.sessionProvider.partnerId)
+            
+            guard let anonymousLoginRequest = anonymousLogin else {
                 return nil
             }
-
-            let multiRquest = KalturaMultiRequestBuilder(url: loaderInfo.sessionProvider.serverURL)?.setOTTBasicParams()
-            multiRquest?.add(request: req1).add(request: req2)
-            return multiRquest
-
+            
+            multiRequestBuilder?.add(request: anonymousLoginRequest)
+            
+            ksString = "{1:result:ks}"
         }
-
+        
+        let getMetaData = OTTAssetService.getMetaData(baseURL: loaderInfo.sessionProvider.serverURL,
+                                                      ks: ksString,
+                                                      assetId: loaderInfo.assetId,
+                                                      type: loaderInfo.assetType)
+        
+        guard let metadataRequest = getMetaData else {
+            return nil
+        }
+        
+        multiRequestBuilder?.add(request: metadataRequest)
+        
+        let getPlaybackContext = OTTAssetService.getPlaybackContext(baseURL:loaderInfo.sessionProvider.serverURL,
+                                                                        ks: ksString,
+                                                                        assetId: loaderInfo.assetId,
+                                                                        type: loaderInfo.assetType,
+                                                                        playbackContextOptions: playbackContextOptions)
+        
+        guard let playbackContextRequest = getPlaybackContext else {
+            return nil
+        }
+        
+        multiRequestBuilder?.add(request: playbackContextRequest)
+        
+        return multiRequestBuilder
     }
 
     /// This method is called after all input is valid and we can start loading media
@@ -325,14 +348,12 @@ public enum PhoenixMediaProviderError: PKError {
     func startLoad(loaderInfo: LoaderInfo, callback: @escaping (PKMediaEntry?, Error?) -> Void) {
         loaderInfo.sessionProvider.loadKS { (ks, error) in
 
-            guard let requestBuilder: KalturaRequestBuilder =  self.loaderRequestBuilder( ks: ks, loaderInfo: loaderInfo) else {
+            guard let multiRequestBuilder: KalturaMultiRequestBuilder =  self.loaderRequestBuilder(ks: ks, loaderInfo: loaderInfo) else {
                 callback(nil, PhoenixMediaProviderError.invalidInputParam(param:"requests params"))
                 return
             }
-            
-            let isMultiRequest = requestBuilder is KalturaMultiRequestBuilder
 
-            let request = requestBuilder.set(completion: { (response: Response) in
+            let request = multiRequestBuilder.set(completion: { (response: Response) in
 
                 if let delegate = self.responseDelegate {
                     delegate.providerGotResponse(sender: self, response: response)
@@ -348,20 +369,37 @@ public enum PhoenixMediaProviderError: PKError {
                     return
                 }
                 
-                var playbackContext: OTTBaseObject? = nil
+                var objects: [OTTBaseObject] = []
+                
                 do {
-                    if (isMultiRequest) {
-                        playbackContext =  try OTTMultiResponseParser.parse(data: responseData).last
-                    } else {
-                        playbackContext =  try OTTResponseParser.parse(data: responseData)
-                    }
+                    objects = try OTTMultiResponseParser.parse(data: responseData)
 
                 } catch {
                     callback(nil, PhoenixMediaProviderError.unableToParseData(data: responseData).asNSError)
                 }
 
-                if let context = playbackContext as? OTTPlaybackContext {
-                    let tuple = PhoenixMediaProvider.createMediaEntry(loaderInfo: loaderInfo, context: context)
+                var playbackContext: OTTPlaybackContext? = nil
+                var mediaAsset: OTTMediaAsset? = nil
+                var error: OTTError? = nil
+                
+                for object in objects {
+                    if let context = object as? OTTPlaybackContext {
+                        playbackContext = context
+                    }
+                    else if let asset = object as? OTTMediaAsset {
+                        mediaAsset = asset
+                    }
+                    else if let errorObject = object as? OTTError {
+                        error = errorObject
+                    }
+                }
+                
+                if let anError = error {
+                    callback(nil, PhoenixMediaProviderError.serverError(code: anError.code ?? "", message: anError.message ?? "").asNSError)
+                }
+                
+                if let context = playbackContext {
+                    let tuple = PhoenixMediaProvider.createMediaEntry(loaderInfo: loaderInfo, context: context, asset: mediaAsset)
                     if let error = tuple.1 {
                         callback(nil, error)
                     } else if let media = tuple.0 {
@@ -371,8 +409,6 @@ public enum PhoenixMediaProviderError: PKError {
                             callback(nil, PhoenixMediaProviderError.noSourcesFound.asNSError)
                         }
                     }
-                } else if let error = playbackContext as? OTTError {
-                    callback(nil, PhoenixMediaProviderError.serverError(code: error.code ?? "", message: error.message ?? "").asNSError)
                 } else {
                     callback(nil, PhoenixMediaProviderError.unableToParseData(data: responseData).asNSError)
                 }
@@ -413,7 +449,7 @@ public enum PhoenixMediaProviderError: PKError {
         return orderedSources
     }
 
-    static public func createMediaEntry(loaderInfo: LoaderInfo, context: OTTPlaybackContext) -> (PKMediaEntry?, NSError?) {
+    static public func createMediaEntry(loaderInfo: LoaderInfo, context: OTTPlaybackContext, asset: OTTMediaAsset?) -> (PKMediaEntry?, NSError?) {
 
         if context.hasBlockAction() != nil {
             if let error = context.hasErrorMessage() {
@@ -471,6 +507,11 @@ public enum PhoenixMediaProviderError: PKError {
 
         mediaEntry.sources = mediaSources
         mediaEntry.duration = TimeInterval(maxDuration)
+        
+        let metadata = asset?.arrayOfMetas()
+        if let tags = metadata?["tags"] {
+            mediaEntry.tags = tags
+        }
 
         return (mediaEntry, nil)
     }
