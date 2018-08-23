@@ -57,8 +57,7 @@ public class OTTMediaAsset: OTTBaseObject {
     
     func arrayOfMetas() -> [String: String] {
         var metas: [String: String] = [:]
-        for meta in self.metas
-        {
+        for meta in self.metas {
             if let stringValue = meta.value as? OTTMultilingualStringValue {
                 metas[meta.key] = stringValue.value?.description
             }
