@@ -21,9 +21,9 @@ extension AVPlayerEngine {
             #keyPath(status),
             #keyPath(currentItem),
             #keyPath(currentItem.status),
-            #keyPath(currentItem.playbackLikelyToKeepUp),
-            #keyPath(currentItem.playbackBufferEmpty),
-            #keyPath(currentItem.playbackBufferFull),
+            #keyPath(currentItem.isPlaybackLikelyToKeepUp),
+            #keyPath(currentItem.isPlaybackBufferEmpty),
+            #keyPath(currentItem.isPlaybackBufferFull),
             #keyPath(currentItem.loadedTimeRanges),
             #keyPath(currentItem.timedMetadata)
         ]
@@ -129,19 +129,19 @@ extension AVPlayerEngine {
         PKLog.debug("keyPath:: \(keyPath)")
         
         switch keyPath {
-        case #keyPath(currentItem.playbackLikelyToKeepUp):
+        case #keyPath(currentItem.isPlaybackLikelyToKeepUp):
             guard let isPlaybackLikelyToKeepUp = currentItem?.isPlaybackLikelyToKeepUp else { return }
             
             if (isPlaybackLikelyToKeepUp) {
                 self.handleLikelyToKeepUp()
             }
-        case #keyPath(currentItem.playbackBufferEmpty):
+        case #keyPath(currentItem.isPlaybackBufferEmpty):
             guard let isPlaybackBufferEmpty = currentItem?.isPlaybackBufferEmpty else { return }
             
             if (isPlaybackBufferEmpty) {
                 self.handleBufferEmptyChange()
             }
-        case #keyPath(currentItem.playbackBufferFull):
+        case #keyPath(currentItem.isPlaybackBufferFull):
             guard let isPlaybackBufferFull = currentItem?.isPlaybackBufferFull else { return }
             
             if (isPlaybackBufferFull) {
