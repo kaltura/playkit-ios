@@ -7,7 +7,7 @@ then
   #pod trunk push --allow-warnings PlayKit.podspec
 else
   # just lint
-  pod lib lint --allow-warnings --verbose
+  pod lib lint --allow-warnings
 fi
 
 login() {
