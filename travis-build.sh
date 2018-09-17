@@ -10,6 +10,8 @@ else
   CMD="lib lint"
 fi
 
+echo Executing pod $CMD
+
 # Travis aborts the build if it doesn't get output for a long while.
 FLAG=$(mktemp)
 pod $CMD --allow-warnings && rm $FLAG & while [ -f $FLAG ]; do sleep 5; echo . ; done;
