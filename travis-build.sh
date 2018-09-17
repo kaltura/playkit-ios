@@ -4,11 +4,15 @@ if [ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]
 then
   # push to cocoapods, this also lints before
   login
-  #pod trunk push --allow-warnings PlayKit.podspec
+  CMD="trunk push"
 else
   # just lint
-  pod lib lint --allow-warnings
+  CMD="lib lint"
 fi
+
+# Travis aborts the build if it doesn't get output for a long while.
+FLAG=$(mktemp)
+pod $CMD --allow-warnings && rm $FLAG & while [ -f $FLAG ]; do sleep 5; echo . ; done;
 
 login() {
   cat << EOF > ~/.netrc
