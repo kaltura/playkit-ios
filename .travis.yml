@@ -1,11 +1,13 @@
 language: objective-c
 osx_image: xcode9.4
+
 before_install:
   - gem install cocoapods # Since Travis is not always on latest version
+  - pod repo update
+
 script:
-  - cd PlayKitFramework
-  - pod update --repo-update
-  - xcodebuild -scheme PlayKitFramework -workspace PlayKitFramework.xcworkspace
+ - pod lib lint --allow-warnings --verbose
+
 notifications:
   email:
     recipients:
