@@ -34,7 +34,6 @@ import AVFoundation
 @objc public protocol VRPlayerEngine: PlayerEngine {
     /// VRPlayerEngine initializer
     ///
-    /// - Parameter delegate: object that conforms to PlayerDelegate protocol.
     init()
     
     /// Current View State

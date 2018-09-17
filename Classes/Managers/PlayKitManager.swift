@@ -41,7 +41,7 @@ import UIKit
     ///     player.prepare(config)
     /// ````
     ///
-    /// - Parameter config: The configuration object to load the player with.
+    /// - Parameter pluginConfig: The configuration object to load the player with.
     /// - Returns: A player loaded using the provided configuration.
     @objc public func loadPlayer(pluginConfig: PluginConfig?) throws -> Player {
         let loader = PlayerLoader()

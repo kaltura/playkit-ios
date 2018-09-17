@@ -23,7 +23,7 @@ public protocol AppStateProviderProtocol {
     /// Holds all the observation names we will be observing.
     /// If you want to observe more events add them here.
     var observationNames: Set<ObservationName> { get }
-    weak var delegate: AppStateProviderDelegate? { get }
+    var delegate: AppStateProviderDelegate? { get }
 }
 
 extension AppStateProviderProtocol {
@@ -55,7 +55,7 @@ public final class AppStateProvider: AppStateProviderProtocol {
         self.delegate = delegate
     }
     
-    public var delegate: AppStateProviderDelegate?
+    public weak var delegate: AppStateProviderDelegate?
     
     public let notificationsManager = NotificationsManager()
     

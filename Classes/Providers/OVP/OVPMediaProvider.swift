@@ -323,7 +323,7 @@ import KalturaNetKit
     // Creating the drm data based on scheme
     private func buildDRMParams(drm: [OVPDRM]?) -> [DRMParams]? {
         
-        let drmData = drm?.flatMap({ (drm: OVPDRM) -> DRMParams? in
+        let drmData = drm?.compactMap({ (drm: OVPDRM) -> DRMParams? in
             
             guard let schemeName = drm.scheme  else {
                 return nil

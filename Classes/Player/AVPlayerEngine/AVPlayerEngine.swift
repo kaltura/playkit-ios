@@ -17,6 +17,8 @@ import CoreMedia
 /// It provides the interface to control the player’s behavior such as its ability to play, pause, and seek to various points in the timeline.
 public class AVPlayerEngine: AVPlayer {
     
+    var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+    
     // MARK: Player Properties
     
     // Attempt load and test these asset keys before playing.
@@ -82,6 +84,7 @@ public class AVPlayerEngine: AVPlayer {
         }
         set {
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
+            
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [weak self] (isSeeked: Bool) in
                 guard let strongSelf = self else { return }
@@ -163,7 +166,11 @@ public class AVPlayerEngine: AVPlayer {
             if let currentItem = self.currentItem {
                 let seekableRanges = currentItem.seekableTimeRanges
                 if seekableRanges.count > 0 {
-                    result = seekableRanges.last!.timeRangeValue.start
+                    if let lastSeekableTimeRange = seekableRanges.last as? CMTimeRange, lastSeekableTimeRange.isValid {
+                        result = lastSeekableTimeRange.start
+                    } else {
+                        PKLog.debug("Seekable range is invalid")
+                    }
                 }
             }
             return result
@@ -268,7 +275,32 @@ extension AVPlayerEngine: AppStateObservable {
             NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
                 PKLog.debug("player: \(self)\n will terminate, destroying...")
                 self.destroy()
+            },
+            NotificationObservation(name: .UIApplicationDidEnterBackground) { [unowned self] in
+                PKLog.debug("player: \(self)\n did enter background, finishing up...")
+                self.startBackgroundTask()
             }
         ]
+    }
+    
+    func startBackgroundTask() {
+        self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(withName: "AVPlayerEngineBackgroundTask") { [unowned self] in
+            self.endBackgroundTask()
+        }
+
+        if self.backgroundTaskIdentifier == UIBackgroundTaskInvalid {
+            PKLog.debug("backgroundTaskIdentifier is invalid, can't create backgroundTask.")
+        } else {
+            PKLog.debug("backgroundTaskIdentifier:\(String(describing: self.backgroundTaskIdentifier)))")
+            Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(endBackgroundTask), userInfo: nil, repeats: false)
+        }
+    }
+
+    @objc func endBackgroundTask() {
+        if self.backgroundTaskIdentifier != UIBackgroundTaskInvalid {
+            PKLog.debug("player: \(self)\n in background, ending the background task...(backgroundTaskIdentifier:\(String(describing: backgroundTaskIdentifier)))")
+            UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+            self.backgroundTaskIdentifier = UIBackgroundTaskInvalid
+        }
     }
 }
