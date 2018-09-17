@@ -8,6 +8,9 @@ before_install:
 script:
  - pod lib lint --allow-warnings --verbose
 
+after_success:
+  - ./travis-push-to-pods.sh
+
 notifications:
   email:
     recipients:
