@@ -6,10 +6,7 @@ before_install:
   - pod repo update
 
 script:
- - pod lib lint --allow-warnings --verbose
-
-after_success:
-  - ./travis-push-to-pods.sh
+ - ./travis-build.sh
 
 notifications:
   email:
