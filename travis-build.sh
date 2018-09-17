@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]
+if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
 then
   # push to cocoapods, this also lints before
   login
