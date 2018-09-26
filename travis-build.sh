@@ -20,6 +20,8 @@ keepAlive() {
   done
 }
 
+set -ex
+
 # FLAG=$(mktemp)
 touch FLAG_FILE
 
