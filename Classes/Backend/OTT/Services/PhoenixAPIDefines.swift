@@ -11,28 +11,36 @@
 import Foundation
 
 
-enum AssetObjectType: Int {
+enum AssetTypeAPI: Int {
     case media
     case epg
-    case unknown
     
     var asString: String {
         switch self {
         case .media: return "media"
         case .epg: return "epg"
-        case .unknown: return ""
         }
     }
 }
 
+enum AssetReferenceTypeAPI: Int {
+    case media, epgInternal, epgExternal
+    
+    var asString: String {
+        switch self {
+        case .media: return "media"
+        case .epgInternal: return "epg_internal"
+        case .epgExternal: return "epg_external"
+        }
+    }
+}
 
-enum PlaybackType: Int {
+enum PlaybackTypeAPI: Int {
     
     case trailer
     case catchup
     case startOver
     case playback
-    case unknown
     
     var asString: String {
         switch self {
@@ -40,7 +48,6 @@ enum PlaybackType: Int {
         case .catchup: return "CATCHUP"
         case .startOver: return "START_OVER"
         case .playback: return "PLAYBACK"
-        case .unknown: return ""
         }
     }
 }
