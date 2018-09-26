@@ -13,36 +13,51 @@ import SwiftyJSON
 import KalturaNetKit
 
 
-@objc public enum AssetType: Int {
+@objc public enum AssetType: Int, CustomStringConvertible {
     case media
     case epg
-    case unknown
+    case unset
     
-    var asString: String {
+    public var description: String {
         switch self {
         case .media: return "media"
         case .epg: return "epg"
-        case .unknown: return ""
+        case .unset: return "<unset>"
         }
     }
 }
 
+@objc public enum AssetReferenceType: Int, CustomStringConvertible {
+    case media
+    case epgInternal
+    case epgExternal
+    case unset
+    
+    public var description: String {
+        switch self {
+        case .media: return "media"
+        case .epgInternal: return "epgInternal"
+        case .epgExternal: return "epgExternal"
+        case .unset: return "<unset>"
+        }
+    }
+}
 
-@objc public enum PlaybackContextType: Int {
+@objc public enum PlaybackContextType: Int, CustomStringConvertible {
     
     case trailer
     case catchup
     case startOver
     case playback
-    case unknown
+    case unset
     
-    var asString: String {
+    public var description: String {
         switch self {
         case .trailer: return "TRAILER"
         case .catchup: return "CATCHUP"
         case .startOver: return "START_OVER"
         case .playback: return "PLAYBACK"
-        case .unknown: return ""
+        case .unset: return "<unset>"
         }
     }
 }
@@ -131,10 +146,11 @@ public enum PhoenixMediaProviderError: PKError {
 
     @objc public var sessionProvider: SessionProvider?
     @objc public var assetId: String?
-    @objc public var type: AssetType = .unknown
+    @objc public var type: AssetType = .unset
+    @objc public var refType: AssetReferenceType = .unset
     @objc public var formats: [String]?
     @objc public var fileIds: [String]?
-    @objc public var playbackContextType: PlaybackContextType = .unknown
+    @objc public var playbackContextType: PlaybackContextType = .unset
     @objc public var networkProtocol: String?
     @objc public var referrer: String?
     
@@ -171,6 +187,14 @@ public enum PhoenixMediaProviderError: PKError {
         return self
     }
 
+    /// - Parameter refType: Asset reference type
+    /// - Returns: Self
+    @discardableResult
+    @nonobjc public func set(refType: AssetReferenceType) -> Self {
+        self.refType = refType
+        return self
+    }
+    
     /// - Parameter playbackContextType: Trailer/Playback/StartOver/Catchup
     /// - Returns: Self
     @discardableResult
@@ -241,39 +265,59 @@ public enum PhoenixMediaProviderError: PKError {
     public struct LoaderInfo {
         var sessionProvider: SessionProvider
         var assetId: String
-        var assetType: AssetObjectType
+        var assetType: AssetTypeAPI
+        var assetRefType: AssetReferenceTypeAPI
+        var playbackContextType: PlaybackTypeAPI
         var formats: [String]?
         var fileIds: [String]?
-        var playbackContextType: PlaybackType
         var networkProtocol: String
         var executor: RequestExecutor
 
     }
 
     @objc public func loadMedia(callback: @escaping (PKMediaEntry?, Error?) -> Void) {
+        
         guard let sessionProvider = self.sessionProvider else {
             callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "sessionProvider" ).asNSError )
             return
         }
+        
         guard let assetId = self.assetId else {
             callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "assetId" ).asNSError)
             return
         }
-        guard self.type != .unknown else {
-            callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "type" ).asNSError)
-            return
+        
+        if self.type == .unset {
+            self.type = .media  // default
         }
-        guard self.playbackContextType != .unknown  else {
-            callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "contextType" ).asNSError)
-            return
+        
+        if self.playbackContextType == .unset {
+            self.playbackContextType = .playback    // default
+        }
+        
+        if self.refType == .unset {
+            if self.type == .media {
+                self.refType = .media   // default if type is media
+            } else {
+                // no default => error
+                callback(nil, PhoenixMediaProviderError.invalidInputParam(param: "refType" ).asNSError)
+                return
+            }
         }
 
         let pr = self.networkProtocol ?? defaultProtocol
         let executor = self.executor ?? USRExecutor.shared
 
-        let assetType = self.convertAssetTyp(type: self.type)
-        let contextPlaybackContextType = self.convertPlaybackContextType(type: self.playbackContextType)
-        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, assetId: assetId, assetType: assetType, formats: self.formats, fileIds: self.fileIds, playbackContextType: contextPlaybackContextType, networkProtocol: pr, executor: executor)
+        let loaderParams = LoaderInfo(sessionProvider: sessionProvider, 
+                                      assetId: assetId,
+                                      
+                                      assetType: self.toAPIType(type: self.type),
+                                      assetRefType: self.toAPIType(type: self.refType),
+                                      playbackContextType: self.toAPIType(type: self.playbackContextType),
+                                      
+                                      formats: self.formats, fileIds: self.fileIds,
+                                      
+                                      networkProtocol: pr, executor: executor)
 
         self.startLoad(loaderInfo: loaderParams, callback: callback)
     }
@@ -317,7 +361,7 @@ public enum PhoenixMediaProviderError: PKError {
         let getMetaData = OTTAssetService.getMetaData(baseURL: loaderInfo.sessionProvider.serverURL,
                                                       ks: ksString,
                                                       assetId: loaderInfo.assetId,
-                                                      type: loaderInfo.assetType)
+                                                      refType: loaderInfo.assetRefType)
         
         guard let metadataRequest = getMetaData else {
             return nil
@@ -396,6 +440,7 @@ public enum PhoenixMediaProviderError: PKError {
                 
                 if let anError = error {
                     callback(nil, PhoenixMediaProviderError.serverError(code: anError.code ?? "", message: anError.message ?? "").asNSError)
+                    return
                 }
                 
                 if let context = playbackContext {
@@ -532,19 +577,31 @@ public enum PhoenixMediaProviderError: PKError {
             }
     }
     
-    func convertAssetTyp(type: AssetType) -> AssetObjectType {
-        
+    func toAPIType(type: AssetType) -> AssetTypeAPI {
         switch type {
         case .epg:
             return .epg
         case .media:
             return .media
-        default:
-            return .unknown
+        case .unset:
+            fatalError("Invalid AssetType")
         }
     }
     
-    func convertPlaybackContextType(type: PlaybackContextType) -> PlaybackType {
+    func toAPIType(type: AssetReferenceType) -> AssetReferenceTypeAPI {
+        switch type {
+        case .media:
+            return .media
+        case .epgInternal:
+            return .epgInternal
+        case .epgExternal:
+            return .epgExternal
+        case .unset:
+            fatalError("Invalid AssetReferenceType")
+        }
+    }
+    
+    func toAPIType(type: PlaybackContextType) -> PlaybackTypeAPI {
         switch type {
         case .catchup:
             return .catchup
@@ -554,8 +611,8 @@ public enum PhoenixMediaProviderError: PKError {
             return .startOver
         case .trailer:
             return .trailer
-        default:
-            return .unknown
+        case .unset:
+            fatalError("Invalid PlaybackContextType")
         }
     }
 

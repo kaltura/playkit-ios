@@ -8,19 +8,22 @@
 import Foundation
 import SwiftyJSON
 
+
+fileprivate let idKey = "id"
+fileprivate let typeKey = "type"
+fileprivate let nameKey = "name"
+fileprivate let mediaFilesKey = "mediaFiles"
+fileprivate let metasKey = "metas"
+
 public class OTTMediaAsset: OTTBaseObject {
+    // This class is for both KalturaMediaAsset and KalturaProgramAsset, because
+    // the fields we use are common between them.
     
     var id: Int?
     var type: Int?
     var name: String?
     var mediaFiles: [OTTMediaFile] = []
     var metas: Dictionary<String, OTTBaseObject> = Dictionary()
-    
-    let idKey = "id"
-    let typeKey = "type"
-    let nameKey = "name"
-    let mediaFilesKey = "mediaFiles"
-    let metasKey = "metas"
     
     public required init?(json: Any) {
         let jsonObj: JSON = JSON(json)
