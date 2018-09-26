@@ -13,29 +13,28 @@ chmod 0600 ~/.netrc
 
 # Travis aborts the build if it doesn't get output for a long while.
 keepAlive() {
-  while [ -f FLAG_FILE ]
+  while [ -f $1 ]
   do 
     sleep 5
     echo .
   done
 }
 
-set -ex
+FLAG=$(mktemp)
 
-# FLAG=$(mktemp)
-touch FLAG_FILE
-
-keepAlive &
+keepAlive $FLAG &
 
 # If we're building a proper tag (v1.2.3), push to cocoapods. Else lint.
 if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
 then
   echo "Pushing to Trunk"
   login
-  pod trunk push --allow-warnings && rm FLAG_FILE
+  pod trunk push --allow-warnings
 else
   echo "Linting the pod"
-  pod lib lint --allow-warnings && rm FLAG_FILE
+  sleep 9
+#  pod lib lint --allow-warnings
 fi
 
+rm $FLAG  # stop keepAlive
 echo "Cocoapods done"
