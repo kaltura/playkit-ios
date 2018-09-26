@@ -26,10 +26,8 @@ FLAG=$(mktemp)
 if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
 then
   login
-  pod trunk push --allow-warnings && rm $FLAG &
+  pod trunk push --allow-warnings && rm $FLAG & keepAlive
 else
-  pod lib lint --allow-warnings && rm $FLAG &
+  pod lib lint --allow-warnings && rm $FLAG & keepAlive
 fi
-
-keepAlive
 
