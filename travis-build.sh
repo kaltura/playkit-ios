@@ -28,9 +28,12 @@ keepAlive &
 # If we're building a proper tag (v1.2.3), push to cocoapods. Else lint.
 if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
 then
+  echo "Pushing to Trunk"
   login
   pod trunk push --allow-warnings && rm FLAG_FILE
 else
+  echo "Linting the pod"
   pod lib lint --allow-warnings && rm FLAG_FILE
 fi
 
+echo "Cocoapods done"
