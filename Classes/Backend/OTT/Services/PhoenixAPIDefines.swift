@@ -14,11 +14,13 @@ import Foundation
 enum AssetTypeAPI: Int {
     case media
     case epg
+    case recording
     
     var asString: String {
         switch self {
         case .media: return "media"
         case .epg: return "epg"
+        case .recording: return "recording"
         }
     }
 }

@@ -16,12 +16,14 @@ import KalturaNetKit
 @objc public enum AssetType: Int, CustomStringConvertible {
     case media
     case epg
+    case recording
     case unset
     
     public var description: String {
         switch self {
         case .media: return "media"
         case .epg: return "epg"
+        case .recording: return "recording"
         case .unset: return "<unset>"
         }
     }
@@ -583,6 +585,8 @@ public enum PhoenixMediaProviderError: PKError {
             return .epg
         case .media:
             return .media
+        case .recording:
+            return .recording
         case .unset:
             fatalError("Invalid AssetType")
         }
