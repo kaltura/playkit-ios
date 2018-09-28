@@ -13,25 +13,17 @@ import KalturaNetKit
 
 /**
  A SessionProvider that just reflects its input parameters -- baseUrl, partnerId, ks. 
- Unlike the full OVPSessionManager, this class does not attempt to manage (create, renew, validate, clear) a session. 
+ This class does not attempt to manage (create, renew, validate, clear) a session. 
  The application is expected to provide a valid KS, which it can update as required via the `ks` property. For some 
- use cases, the KS can be null (anonymous media playback, if allowed by access-control). Basic usage with a OVPMediaProvider:
- 
-     let mediaProvider = OVPMediaProvider(SimpleOVPSessionProvider(serverURL: "https://cdnapisec.kaltura.com", 
-                                                                    partnerId: 1851571, 
-                                                                    ks: applicationKS))
-     mediaProvider.set(entryId: "0_pl5lbfo0").loadMedia { (entry) in
-        print("entry:", entry.data ?? "<nil>")
-     }
- 
+ use cases, the KS can be null (anonymous media playback, if allowed by access-control).  
  */
-@objc public class SimpleOVPSessionProvider: NSObject, SessionProvider {
+@objc public class SimpleSessionProvider: NSObject, SessionProvider {
     public let serverURL: String
     public let partnerId: Int64
     public var ks: String?
     
     /**
-        Build an OVP SessionProvider with the specified parameters.
+        Build a SessionProvider with the specified parameters.
         - Parameters:
             - serverURL: Kaltura Server URL, such as `"https://cdnapisec.kaltura.com"`.
             - partnerId: Kaltura partner id.
@@ -47,3 +39,8 @@ import KalturaNetKit
         completion(ks, nil)
     }
 }
+
+// Avoid breaking old code -- will be removed later. 
+// Using a subclass instead of a typealias because typealiases are not exported to objective-c.
+@available(*, deprecated, renamed: "SimpleSessionProvider")
+@objc public class SimpleOVPSessionProvider: SimpleSessionProvider {}
