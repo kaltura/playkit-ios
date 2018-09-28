@@ -267,7 +267,7 @@ public enum PhoenixMediaProviderError: PKError {
         var sessionProvider: SessionProvider
         var assetId: String
         var assetType: AssetTypeAPI
-        var assetRefType: AssetReferenceTypeAPI
+        var assetRefType: AssetReferenceTypeAPI?
         var playbackContextType: PlaybackTypeAPI
         var formats: [String]?
         var fileIds: [String]?
@@ -362,27 +362,24 @@ public enum PhoenixMediaProviderError: PKError {
             ksString = "{1:result:ks}"
         }
         
-        switch loaderInfo.assetType {
-        case .media, .epg:
-            let getMetaData = OTTAssetService.getMetaData(baseURL: loaderInfo.sessionProvider.serverURL,
-                                                          ks: ksString,
-                                                          assetId: loaderInfo.assetId,
-                                                          refType: loaderInfo.assetRefType)
-            if let metadataRequest = getMetaData {
-                multiRequestBuilder?.add(request: metadataRequest)
-            }
-        default:
-            break
+        if let getPlaybackContext = OTTAssetService.getPlaybackContext(baseURL:loaderInfo.sessionProvider.serverURL,
+                                                                       ks: ksString,
+                                                                       assetId: loaderInfo.assetId,
+                                                                       type: loaderInfo.assetType,
+                                                                       playbackContextOptions: playbackContextOptions) {
+            
+            multiRequestBuilder?.add(request: getPlaybackContext)
         }
         
-        let getPlaybackContext = OTTAssetService.getPlaybackContext(baseURL:loaderInfo.sessionProvider.serverURL,
-                                                                    ks: ksString,
-                                                                    assetId: loaderInfo.assetId,
-                                                                    type: loaderInfo.assetType,
-                                                                    playbackContextOptions: playbackContextOptions)
-        
-        if let playbackContextRequest = getPlaybackContext {
-            multiRequestBuilder?.add(request: playbackContextRequest)
+        // getMetaData is only valid if assetRefType is not nil
+        if let refType = loaderInfo.assetRefType {
+            if let getMetaData = OTTAssetService.getMetaData(baseURL: loaderInfo.sessionProvider.serverURL,
+                                                             ks: ksString,
+                                                             assetId: loaderInfo.assetId,
+                                                             refType: refType) {
+                
+                multiRequestBuilder?.add(request: getMetaData)
+            }
         }
         
         return multiRequestBuilder
@@ -594,7 +591,7 @@ public enum PhoenixMediaProviderError: PKError {
         }
     }
     
-    func toAPIType(type: AssetReferenceType) -> AssetReferenceTypeAPI {
+    func toAPIType(type: AssetReferenceType) -> AssetReferenceTypeAPI? {
         switch type {
         case .media:
             return .media
@@ -603,7 +600,7 @@ public enum PhoenixMediaProviderError: PKError {
         case .epgExternal:
             return .epgExternal
         case .unset:
-            fatalError("Invalid AssetReferenceType")
+            return nil
         }
     }
     

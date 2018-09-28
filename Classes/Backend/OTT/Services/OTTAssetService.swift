@@ -16,29 +16,27 @@ class OTTAssetService {
 
     internal static func getPlaybackContext(baseURL: String, ks: String, assetId: String, type: AssetTypeAPI, playbackContextOptions: PlaybackContextOptions) -> KalturaRequestBuilder? {
 
-        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "getPlaybackContext") {
-            request
+        guard let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "getPlaybackContext") else {
+            return nil
+        }
+        
+        return request
             .setBody(key: "assetId", value: JSON(assetId))
             .setBody(key: "ks", value: JSON(ks))
             .setBody(key: "assetType", value: JSON(type.asString))
             .setBody(key: "contextDataParams", value: JSON(playbackContextOptions.toDictionary()))
-            return request
-        } else {
-            return nil
-        }
     }
     
     internal static func getMetaData(baseURL: String, ks: String, assetId: String, refType: AssetReferenceTypeAPI) -> KalturaRequestBuilder? {
         
-        if let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "get") {
-            request
-                .setBody(key: "ks", value: JSON(ks))
-                .setBody(key: "id", value: JSON(assetId))
-                .setBody(key: "assetReferenceType", value: JSON(refType.asString))
-            return request
+        guard let request: KalturaRequestBuilder = KalturaRequestBuilder(url: baseURL, service: "asset", action: "get") else {
+            return nil
         }
         
-        return nil
+        return request
+            .setBody(key: "ks", value: JSON(ks))
+            .setBody(key: "id", value: JSON(assetId))
+            .setBody(key: "assetReferenceType", value: JSON(refType.asString))
     }
 }
 
