@@ -10,10 +10,9 @@
 
 import UIKit
 
-
 /**
  
- TVPAPICastBuilder this component will help you to comunicate with Kaltura-custom-receiver with OVP-Kaltura Server.
+ OVPCastBuilder this component will help you to communicate with Kaltura-custom-receiver with OVP-Kaltura Server.
  
  */
 @objc public class OVPCastBuilder: BasicCastBuilder{

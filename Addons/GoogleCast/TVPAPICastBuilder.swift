@@ -12,7 +12,7 @@ import UIKit
 
 /**
  
- TVPAPICastBuilder this component will help you to comunicate with Kaltura-custom-receiver with TVPAPI Server.
+ TVPAPICastBuilder this component will help you to communicate with Kaltura-custom-receiver with TVPAPI Server.
 
  */
 @objc public class TVPAPICastBuilder: BasicCastBuilder {
