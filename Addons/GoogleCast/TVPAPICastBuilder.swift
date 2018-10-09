@@ -61,11 +61,15 @@ import UIKit
     
     
     /**
-      In order to comunicate with Kaltura receiver you should have init object and format this will throw exception if the input is not valid
+      In order to comunicate with Kaltura receiver you should have init object and format, this will throw exception if the input is not valid
      */
     override func validate() throws {
         
         try super.validate()
+        
+        guard self.streamType != .unknown else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
+        }
         
         guard self.initObject != nil else {
             throw TVPAPICastBuilder.BasicBuilderDataError.missingInitObject
@@ -74,7 +78,6 @@ import UIKit
         guard self.format != nil else {
             throw TVPAPICastBuilder.BasicBuilderDataError.missingFormat
         }
-        
     }
     
     internal override func flashVars() -> [String: Any] {

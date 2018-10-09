@@ -58,17 +58,6 @@ import GoogleCast
     // MARK: - Set - Required
     
     /**
-     Set - streamType
-     - Parameter streamType: Receiver stream type to play.
-     */
-    @discardableResult
-    @nonobjc public func set(streamType: StreamType) -> Self {
-        
-        self.streamType = streamType
-        return self
-    }
-    
-    /**
      Set - contentId
      - Parameter contentId: Receiver content id to play ( Entry id, or Asset id )
      */
@@ -85,6 +74,17 @@ import GoogleCast
     }
     
     // MARK: - Set - Optional
+    
+    /**
+     Set - streamType
+     - Parameter streamType: Receiver stream type to play.
+     */
+    @discardableResult
+    @nonobjc public func set(streamType: StreamType) -> Self {
+        
+        self.streamType = streamType
+        return self
+    }
     
     /**
      Set - contentType - Optional
@@ -242,12 +242,9 @@ import GoogleCast
     // MARK: -
     
     internal func validate() throws {
+        
         guard self.contentId != nil else {
             throw BasicCastBuilder.BasicBuilderDataError.missingContentId
-        }
-        
-        guard self.streamType != .unknown else {
-            throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
         }
     }
     

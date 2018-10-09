@@ -37,7 +37,15 @@ import UIKit
         return self
     }
     
-  
+    override func validate() throws {
+        
+        try super.validate()
+        
+        guard self.streamType != .unknown else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
+        }
+    }
+    
     override func embedConfig() -> [String: Any]? {
      
         if var embedConfig = super.embedConfig(), let ks = self.ks , ks.isEmpty == false {
