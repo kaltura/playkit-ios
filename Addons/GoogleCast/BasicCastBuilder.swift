@@ -262,6 +262,8 @@ import GoogleCast
                                                                  streamType: self.gckMediaStreamType,
                                                                  contentType: self.contentType,
                                                                  metadata: self.metaData,
+                                                                 adBreaks: self.adBreaks,
+                                                                 adBreakClips: self.adBreakClips,
                                                                  streamDuration: self.streamDuration,
                                                                  mediaTracks: self.mediaTracks,
                                                                  textTrackStyle: self.textTrackStyle,
