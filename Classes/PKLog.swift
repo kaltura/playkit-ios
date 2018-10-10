@@ -37,3 +37,10 @@ public let PKLog: XCGLogger = {
     logger.outputLevel = PKLogLevel.default.toLoggerLevel
     return logger
 }()
+
+// For compatibility with the old logger -- in XCGLogger 'trace' is called 'verbose'.
+extension XCGLogger {
+    func trace(_ closure: @autoclosure () -> Any?, functionName: StaticString = #function, fileName: StaticString = #file, lineNumber: Int = #line, userInfo: [String: Any] = [:]) {
+        self.logln(.verbose, functionName: functionName, fileName: fileName, lineNumber: lineNumber, userInfo: userInfo, closure: closure)
+    }
+}
