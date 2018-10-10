@@ -150,6 +150,6 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
     }
     
     private func printInvocationWarning(_ action: String) {
-        PKLog.trace("Warning: Attempt to invoke \(action) on null instance of the player")
+        PKLog.verbose("Warning: Attempt to invoke \(action) on null instance of the player")
     }
 }

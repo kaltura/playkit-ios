@@ -70,7 +70,7 @@ public class AVPlayerEngine: AVPlayer {
         get {
             let position = self.currentTime() - self.rangeStart
             
-            PKLog.trace("get currentPosition: \(position)")
+            PKLog.verbose("get currentPosition: \(position)")
             var time = CMTimeGetSeconds(position)
             
             // In some cases the video will start playing with negative current time.
@@ -121,7 +121,7 @@ public class AVPlayerEngine: AVPlayer {
             }
         }
         
-        PKLog.trace("get duration: \(result)")
+        PKLog.verbose("get duration: \(result)")
         // in some rare cases duration can be nan, in that case we will return 0.
         return result.isNaN ? 0.0 : result
     }
@@ -191,7 +191,7 @@ public class AVPlayerEngine: AVPlayer {
     // MARK: Player Methods
     
     override init() {
-        PKLog.trace("init AVPlayer")
+        PKLog.verbose("init AVPlayer")
         self.startPosition = 0
         super.init()
         self.onEventBlock = nil
@@ -205,7 +205,7 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func stop() {
-        PKLog.trace("stop player")
+        PKLog.verbose("stop player")
         self.pause()
         self.seek(to: kCMTimeZero)
         self.replaceCurrentItem(with: nil)
@@ -229,7 +229,7 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     func destroy() {
-        PKLog.trace("destroy player")
+        PKLog.verbose("destroy player")
         self.onEventBlock = nil
         // removes app state observer
         AppStateSubject.shared.remove(observer: self)
@@ -253,7 +253,7 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     func post(event: PKEvent) {
-        PKLog.trace("onEvent:: \(String(describing: event))")
+        PKLog.verbose("onEvent:: \(String(describing: event))")
         onEventBlock?(event)
     }
     

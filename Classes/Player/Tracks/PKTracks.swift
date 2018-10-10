@@ -15,7 +15,7 @@ import Foundation
     @objc public var textTracks: [Track]?
     
     init(audioTracks: [Track]?, textTracks: [Track]?) {
-        PKLog.trace("init::")
+        PKLog.verbose("init::")
         self.audioTracks = audioTracks
         self.textTracks = textTracks
     }

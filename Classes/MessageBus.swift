@@ -35,7 +35,7 @@ private struct Observation {
     
     private func add(observer: AnyObject, events: [PKEvent.Type], observeOn dispatchQueue: DispatchQueue = DispatchQueue.main, block: @escaping (PKEvent) -> Void) {
         self.dispatchQueue.sync {
-            PKLog.trace("Add observer: \(String(describing: observer)) for events: \(String(describing: events))")
+            PKLog.verbose("Add observer: \(String(describing: observer)) for events: \(String(describing: events))")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
                 var observationList: [Observation] = observations[typeId] ?? []
@@ -47,7 +47,7 @@ private struct Observation {
     
     @objc public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
         self.dispatchQueue.sync {
-            PKLog.trace("Remove observer: \(String(describing: observer)) for events: \(String(describing: events))")
+            PKLog.verbose("Remove observer: \(String(describing: observer)) for events: \(String(describing: events))")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
                 
@@ -63,7 +63,7 @@ private struct Observation {
     @objc public func post(_ event: PKEvent) {
         self.dispatchQueue.sync { [weak self] in
             guard let strongSelf = self else { return }
-            PKLog.trace("post event: \(event.namespace), with data: \(event.data ?? [:])")
+            PKLog.verbose("post event: \(event.namespace), with data: \(event.data ?? [:])")
             let typeId = NSStringFromClass(type(of: event))
             
             if let array = strongSelf.observations[typeId] {

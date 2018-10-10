@@ -23,7 +23,7 @@ internal enum TrackType {
     var type: TrackType
     
     init(id: String, title: String, type: TrackType, language: String?) {
-        PKLog.trace("init:: id:\(String(describing: id)) title:\(String(describing: title)) language: \(String(describing: language))")
+        PKLog.verbose("init:: id:\(String(describing: id)) title:\(String(describing: title)) language: \(String(describing: language))")
         
         self.id = id
         self.title = title

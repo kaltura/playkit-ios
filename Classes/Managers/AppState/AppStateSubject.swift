@@ -31,7 +31,7 @@ extension AppStateSubjectProtocol {
         sync {
             // if not already observing and has more than 0 oberserver then start observing
             if !isObserving {
-                PKLog.trace("start observing app state")
+                PKLog.verbose("start observing app state")
                 appStateProvider.addObservers()
                 isObserving = true
             }
@@ -42,7 +42,7 @@ extension AppStateSubjectProtocol {
     func stopObservingAppState() {
         sync {
             if isObserving {
-                PKLog.trace("stop observing app state")
+                PKLog.verbose("stop observing app state")
                 appStateProvider.removeObservers()
                 isObserving = false
             }
@@ -53,7 +53,7 @@ extension AppStateSubjectProtocol {
     public func add(observer: AppStateObservable) {
         sync {
             cleanObservers()
-            PKLog.trace("add observer, \(observer)")
+            PKLog.verbose("add observer, \(observer)")
             // if no observers were available start observing now
             if observers.count == 0 && !isObserving {
                 startObservingAppState()
@@ -70,7 +70,7 @@ extension AppStateSubjectProtocol {
             for i in 0..<observers.count {
                 if observers[i].observer === observer {
                     let removedObserver = observers.remove(at: i)
-                    PKLog.trace("removed observer, \(removedObserver)")
+                    PKLog.verbose("removed observer, \(removedObserver)")
                     // if no more observers available stop observing
                     if observers.count == 0 && isObserving {
                         stopObservingAppState()
@@ -85,7 +85,7 @@ extension AppStateSubjectProtocol {
     func removeAllObservers() {
         sync {
             if observers.count > 0 {
-                PKLog.trace("remove all observers")
+                PKLog.verbose("remove all observers")
                 observers.removeAll()
                 stopObservingAppState()
             }
@@ -98,7 +98,7 @@ extension AppStateSubjectProtocol {
     
     public func appStateEventPosted(name: ObservationName) {
         sync {
-            PKLog.trace("app state event posted with name: \(name.rawValue)")
+            PKLog.verbose("app state event posted with name: \(name.rawValue)")
             for appStateObserver in self.observers {
                 if let filteredObservations = appStateObserver.observer?.observations.filter({ $0.name == name }) {
                     for observation in filteredObservations {

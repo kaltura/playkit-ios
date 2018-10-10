@@ -115,7 +115,7 @@ class PlayerController: NSObject, Player {
         super.init()
         self.timeObserver = TimeObserver(timeProvider: self)
         self.currentPlayer.onEventBlock = { [weak self] event in
-            PKLog.trace("postEvent:: \(event)")
+            PKLog.verbose("postEvent:: \(event)")
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil

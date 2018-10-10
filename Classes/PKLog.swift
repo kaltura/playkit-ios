@@ -10,37 +10,6 @@
 
 import XCGLogger
 
-/**
- # property PKLog
- 
- ## abstract
- 
- Logging framework that provides built-in themes and formatters.
- 
- 
- ## level
- 
- Define a minimum level of severity to only print the messages with a greater or equal severity:
- 
-     PKLog.minLevel = .warning
- 
- 
- ## disable
- 
- Disable Log by setting enabled to false:
- 
-     PKLog.enabled = false
- 
- 
- ## use
-
-     PKLog.trace("Called!!!")
-     PKLog.debug("Who is self:", self)
-     PKLog.info(some, objects, here)
-     PKLog.warning(one, two, three, separator: " - ")
-     PKLog.error(error, terminator: "\n")
- */
-
 /// `PKLogLevel` describes the available log levels.
 @objc public enum PKLogLevel: Int {
     case verbose, debug, info, warning, error
@@ -68,11 +37,3 @@ public let PKLog: XCGLogger = {
     logger.outputLevel = PKLogLevel.default.toLoggerLevel
     return logger
 }()
-
-    
-
-extension XCGLogger {
-    func trace(_ closure: @autoclosure () -> Any?, functionName: StaticString = #function, fileName: StaticString = #file, lineNumber: Int = #line, userInfo: [String: Any] = [:]) {
-        self.logln(.verbose, functionName: functionName, fileName: fileName, lineNumber: lineNumber, userInfo: userInfo, closure: closure)
-    }
-}
