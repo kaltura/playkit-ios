@@ -22,7 +22,8 @@ import Foundation
     @objc public weak var messageBus: MessageBus?
     
     @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
-        PKLog.info("initializing plugin \(type(of:self))")
+        let pluginClass = type(of: self)
+        PKLog.trace("initializing plugin \(pluginClass)")
         self.player = player
         self.messageBus = messageBus
     }
