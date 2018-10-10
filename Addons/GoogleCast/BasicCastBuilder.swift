@@ -22,6 +22,8 @@ import GoogleCast
         case missingPartnerID
         case missingUIConfId
         case missingStreamType
+        case missingAdTagType
+        case missingAdTagURL
     }
     
     @objc public enum StreamType: Int {

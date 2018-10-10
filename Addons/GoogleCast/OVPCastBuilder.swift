@@ -19,6 +19,8 @@ import UIKit
     
     internal var ks: String?
     
+    // MARK: - Set - Kaltura Data
+    
     /**
      Set - ks
      The ks which represent the user key, used by the Kaltura Web Player
@@ -37,6 +39,8 @@ import UIKit
         return self
     }
     
+    // MARK: -
+    
     override func validate() throws {
         
         try super.validate()
@@ -45,6 +49,8 @@ import UIKit
             throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
         }
     }
+    
+    // MARK: - Create custom data
     
     override func embedConfig() -> [String: Any]? {
      

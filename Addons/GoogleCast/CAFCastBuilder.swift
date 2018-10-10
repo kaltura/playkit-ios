@@ -6,12 +6,13 @@
 //
 
 import UIKit
+import GoogleCast
 
 /**
  CAFCastBuilder this component will help you to communicate with Kaltura-custom-receiver.
  */
 @objc public class CAFCastBuilder: BasicCastBuilder {
-
+    
     internal var ks: String?
     internal var kalturaAssetType: CAFKalturaAssetType = .media
     internal var assetReferenceType: CAFAssetReferenceType = .media
@@ -208,7 +209,7 @@ import UIKit
     
     /**
      Set - adTagType
-     - Parameter adTagType: The adTag type, used by the Kaltura Web Player.
+     - Parameter adTagType: The adTagURL type, vast/vmap. This is only requierd when providing the adTagURL
      */
     @discardableResult
     @objc public func set(adTagType: CAFAdTagType) -> Self {
@@ -217,13 +218,41 @@ import UIKit
         return self
     }
     
+    // MARK: -
+    
+    override func validate() throws {
+        
+        try super.validate()
+        
+        if self.adTagType == .unset, self.adTagURL != nil {
+            throw BasicCastBuilder.BasicBuilderDataError.missingAdTagType
+        }
+        
+        if self.adTagType != .unset, self.adTagURL == nil {
+            throw BasicCastBuilder.BasicBuilderDataError.missingAdTagURL
+        }
+    }
+    
+    // MARK: - Create custom data
+    
     override func customData() -> [String:Any]? {
         
         var customData: [String:Any] = [:]
         
         customData["mediaInfo"] = mediaInfoData()
         
-        // Add adTag
+        switch self.adTagType {
+        case .vmap:
+            if self.adTagURL != nil {
+                customData["vmapAdsRequest"] = vmapAdData()
+            }
+        case .vast:
+            if self.adTagURL != nil {
+                createAdBreaksAndClips()
+            }
+        case .unset:
+            break
+        }
         
         if let textLanguage = self.textLanguage {
             customData["textLanguage"] = textLanguage
@@ -260,5 +289,36 @@ import UIKit
         }
         
         return mediaInfoData
+    }
+    
+    internal func vmapAdData() -> [String:Any] {
+        
+        var vmapAdData: [String:Any] = [:]
+        
+        vmapAdData["adTagUrl"] = self.adTagURL
+        
+        return vmapAdData
+    }
+    
+    internal func createAdBreaksAndClips() {
+        
+        guard let adTagURL = self.adTagURL else {
+            return
+        }
+        
+        let adBreakClipId = UUID().uuidString
+        let adBreakId = UUID().uuidString
+        
+        let adBreakInfo = GCKAdBreakInfo(playbackPosition: 0)
+        adBreakInfo.setValue(adBreakId, forKey: "adBreakID")
+        adBreakInfo.setValue([adBreakClipId], forKey: "adBreakClipIDs")
+        self.adBreaks = [adBreakInfo]
+        
+        let adBreakClipInfo = GCKAdBreakClipInfo()
+        adBreakClipInfo.setValue(adBreakClipId, forKey: "adBreakClipID")
+        let adBreakClipVastAdsRequest = GCKAdBreakClipVastAdsRequest()
+        adBreakClipVastAdsRequest.setValue(NSURL(string: adTagURL), forKey: "adTagUrl")
+        adBreakClipInfo.setValue(adBreakClipVastAdsRequest, forKey: "vastAdsRequest")
+        self.adBreakClips = [adBreakClipInfo]
     }
 }

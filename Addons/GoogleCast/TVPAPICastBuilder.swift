@@ -25,6 +25,8 @@ import UIKit
     internal var initObject: [String: Any]!
     internal var format: String!
  
+    // MARK: - Set - Kaltura Data
+    
     /**
      Set - initObject
      - Parameter initObject: that the receiver will use to represent the user
@@ -59,6 +61,7 @@ import UIKit
         return self
     }
     
+    // MARK: -
     
     /**
       In order to comunicate with Kaltura receiver you should have init object and format, this will throw exception if the input is not valid
@@ -79,6 +82,8 @@ import UIKit
             throw TVPAPICastBuilder.BasicBuilderDataError.missingFormat
         }
     }
+    
+    // MARK: - Create custom data
     
     internal override func flashVars() -> [String: Any] {
         
