@@ -191,7 +191,7 @@ public class AVPlayerEngine: AVPlayer {
     // MARK: Player Methods
     
     override init() {
-        PKLog.info("init AVPlayer")
+        PKLog.trace("init AVPlayer")
         self.startPosition = 0
         super.init()
         self.onEventBlock = nil
@@ -205,7 +205,7 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func stop() {
-        PKLog.info("stop player")
+        PKLog.trace("stop player")
         self.pause()
         self.seek(to: kCMTimeZero)
         self.replaceCurrentItem(with: nil)
@@ -229,7 +229,7 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     func destroy() {
-        PKLog.info("destroy player")
+        PKLog.trace("destroy player")
         self.onEventBlock = nil
         // removes app state observer
         AppStateSubject.shared.remove(observer: self)

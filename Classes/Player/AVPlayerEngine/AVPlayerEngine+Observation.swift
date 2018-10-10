@@ -69,7 +69,7 @@ extension AVPlayerEngine {
         if let playerItem = notification.object as? AVPlayerItem, let accessLog = playerItem.accessLog(),
             let lastEvent = accessLog.events.last, playerItem === self.currentItem {
             if #available(iOS 10.0, tvOS 10.0, *) {
-                PKLog.debug("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
+                PKLog.trace("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
             }
             
             self.post(event: PlayerEvent.PlaybackInfo(playbackInfo: PKPlaybackInfo(logEvent: lastEvent)))
@@ -115,7 +115,7 @@ extension AVPlayerEngine {
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        PKLog.debug("observeValue:: onEvent/onState")
+        PKLog.trace("observeValue:: onEvent/onState")
         
         guard context == &AVPlayerEngine.observerContext else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
@@ -126,7 +126,7 @@ extension AVPlayerEngine {
             return
         }
         
-        PKLog.debug("keyPath:: \(keyPath)")
+        PKLog.trace("keyPath:: \(keyPath)")
         
         switch keyPath {
         case #keyPath(currentItem.isPlaybackLikelyToKeepUp):
