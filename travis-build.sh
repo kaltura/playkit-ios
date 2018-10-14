@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Login to cocoapods trunk.
 login() {
 cat << EOF > ~/.netrc
