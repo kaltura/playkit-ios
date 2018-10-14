@@ -20,7 +20,11 @@ class PlayerController: NSObject, Player {
     
     weak var delegate: PlayerDelegate?
     
-    fileprivate var currentPlayer: PlayerEngine
+    fileprivate var currentPlayer: PlayerEngine = DefaultPlayerWrapper() {
+        didSet {
+            timeObserver.enabled = true
+        }
+    }
     
     /// Current selected media source
     fileprivate var selectedSource: PKMediaSource?
@@ -109,11 +113,7 @@ class PlayerController: NSObject, Player {
     // MARK: - Initialization
     /************************************************************/
     
-    public override init() {
-        // Since currentPlayer is PlayerEngine! 
-        // Dafault Wrapper creation for safety
-        self.currentPlayer = DefaultPlayerWrapper()
-        
+    public override init() {        
         super.init()
         self.timeObserver = TimeObserver(timeProvider: self)
         self.currentPlayer.onEventBlock = { [weak self] event in
@@ -198,11 +198,6 @@ class PlayerController: NSObject, Player {
         
         if let currentPlayer = self.currentPlayer as? AVPlayerWrapper {
             currentPlayer.settings = self.settings
-        }
-        
-        // If we just created a player, enable the TimeObserver
-        if isCreated {
-            timeObserver.enabled = true
         }
         
         return isCreated
