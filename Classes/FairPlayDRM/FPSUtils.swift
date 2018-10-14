@@ -152,7 +152,7 @@ class FPSUtils {
         // #EXT-X-SESSION-KEY:METHOD=SAMPLE-AES,URI="skd://entry-1_x14v3p06",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
         // The following code looks for the first line with "EXT-X-SESSION-KEY" tag.
         guard let master = try? String(contentsOf: location) else { 
-            PKLog.error("Can't read master playlist", location); 
+            PKLog.error("Can't read master playlist \(location)"); 
             return nil 
         }
         

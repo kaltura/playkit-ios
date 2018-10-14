@@ -70,9 +70,9 @@ public class TVPAPIAnalyticsPlugin: BaseOTTAnalyticsPlugin {
         }
         requestBuilder.set(responseSerializer: StringSerializer())
         requestBuilder.set { (response: Response) in
-            PKLog.trace("Response: \(response)")
+            PKLog.verbose("Response: \(response)")
             if response.statusCode == 0 {
-                PKLog.trace("\(String(describing: response.data))")
+                PKLog.verbose("\(String(describing: response.data))")
                 guard let data = response.data as? String, data.lowercased() == "\"concurrent\"" else { return }
                 self.reportConcurrencyEvent()
             }

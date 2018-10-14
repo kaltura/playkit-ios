@@ -203,7 +203,7 @@ extension LocalAssetsManager {
         // This function is a noop if no DRM data or DRM is not FairPlay.
         guard let drmData = mediaSource.drmData?.first as? FairPlayDRMParams else {return}
         
-        PKLog.debug("Preparing asset for download; asset.url:", asset.url)
+        PKLog.debug("Preparing asset for download; asset.url: \(asset.url)")
         
         guard #available(iOS 10, *), DRMSupport.fairplayOffline else {
             PKLog.error("Downloading FairPlay content is not supported on device")

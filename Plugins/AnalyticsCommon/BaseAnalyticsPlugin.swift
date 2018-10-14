@@ -48,7 +48,7 @@ import Foundation
             return
         }
         
-        PKLog.debug("new config::\(String(describing: config))")
+        PKLog.verbose("new config::\(String(describing: config))")
         self.config = config
     }
     

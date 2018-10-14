@@ -22,20 +22,21 @@ import Foundation
     @objc public weak var messageBus: MessageBus?
     
     @objc public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
-        PKLog.info("initializing plugin \(type(of:self))")
+        let pluginClass = type(of: self)
+        PKLog.verbose("initializing plugin \(pluginClass)")
         self.player = player
         self.messageBus = messageBus
     }
     
     @objc open func onUpdateMedia(mediaConfig: MediaConfig) {
-        PKLog.info("plugin \(type(of:self)) onUpdateMedia with media config: \(String(describing: mediaConfig))")
+        PKLog.verbose("plugin \(type(of:self)) onUpdateMedia with media config: \(String(describing: mediaConfig))")
     }
     
     @objc open func onUpdateConfig(pluginConfig: Any) {
-        PKLog.info("plugin \(type(of:self)) onUpdateConfig with media config: \(String(describing: pluginConfig))")
+        PKLog.verbose("plugin \(type(of:self)) onUpdateConfig with media config: \(String(describing: pluginConfig))")
     }
     
     @objc open func destroy() {
-        PKLog.info("destroying plugin \(type(of:self))")
+        PKLog.verbose("destroying plugin \(type(of:self))")
     }
 }

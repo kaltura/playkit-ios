@@ -52,7 +52,7 @@ class OTTAnalyticsPluginTest: QuickSpec {
         override var observations: Set<NotificationObservation> {
             return [
                 NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
-                    PKLog.trace("plugin: \(self) will terminate event received, sending analytics stop event")
+                    PKLog.verbose("plugin: \(self) will terminate event received, sending analytics stop event")
                     self.destroy()
                     self.onTerminate?(self)
                 }
@@ -76,7 +76,7 @@ class OTTAnalyticsPluginTest: QuickSpec {
         override var observations: Set<NotificationObservation> {
             return [
                 NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
-                    PKLog.trace("plugin: \(self) will terminate event received, sending analytics stop event")
+                    PKLog.verbose("plugin: \(self) will terminate event received, sending analytics stop event")
                     self.onTerminate?(self)
                     self.destroy()
                 }
