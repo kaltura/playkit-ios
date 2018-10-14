@@ -200,6 +200,7 @@ class PlayerController: NSObject, Player {
             currentPlayer.settings = self.settings
         }
         
+        // If we just created a player, enable the TimeObserver
         if isCreated {
             timeObserver.enabled = true
         }
