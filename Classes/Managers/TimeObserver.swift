@@ -102,6 +102,13 @@ class TimeObserver: TimeMonitor {
     /// The timer source that will be used to fire the events.
     var dispatchTimer: DispatchSourceTimer?
     
+    // Should the TimeObserver be active?
+    var enabled = false {
+        didSet {
+            startStopTimer()
+        }
+    }
+    
     /// all boundary observations, mapped by time in [millis: observation]
     var boundaryObservations = [Int64: [BoundaryObservation]]() {
         didSet {
@@ -251,6 +258,11 @@ class TimeObserver: TimeMonitor {
     /************************************************************/
     
     func startTimer() {
+        
+        if !enabled {
+            return
+        }
+        
         // reset the timer
         if let dispatchTimer = self.dispatchTimer {
             dispatchTimer.cancel()
