@@ -56,10 +56,12 @@ class PlayerController: NSObject, Player {
     
     public var currentTime: TimeInterval {
         get {
-            if self.currentPlayer.currentPosition != TimeInterval.infinity && self.currentPlayer.currentPosition > self.duration {
-                return self.duration
+            let position = self.currentPlayer.currentPosition
+            let duration = self.duration
+            if position != TimeInterval.infinity && position > duration {
+                return duration
             }
-            return self.currentPlayer.currentPosition
+            return position
         }
         set {
             self.seek(to: newValue)
