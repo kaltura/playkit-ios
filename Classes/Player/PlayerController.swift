@@ -21,8 +21,10 @@ class PlayerController: NSObject, Player {
     weak var delegate: PlayerDelegate?
     
     fileprivate var currentPlayer: PlayerEngine = DefaultPlayerWrapper() {
+        // Initialize the currentPlayer to DefaultPlayerWrapper, which does nothing except printing warnings.
         didSet {
-            timeObserver.enabled = true
+            // When set to a real player, enable the observer. 
+            timeObserver.enabled = !(currentPlayer is DefaultPlayerWrapper)
         }
     }
     
