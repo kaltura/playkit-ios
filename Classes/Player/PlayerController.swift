@@ -199,6 +199,11 @@ class PlayerController: NSObject, Player {
         if let currentPlayer = self.currentPlayer as? AVPlayerWrapper {
             currentPlayer.settings = self.settings
         }
+        
+        if isCreated {
+            timeObserver.enabled = true
+        }
+        
         return isCreated
     }
     
