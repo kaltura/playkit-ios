@@ -50,13 +50,13 @@ import Foundation
     
     @objc public func save(key: String, value: Data) throws {
         let f = file(key)
-        PKLog.debug("Saving key to", f)
+        PKLog.debug("Saving key to \(f)")
         try value.write(to: f, options: .atomic)
     }
     
     @objc public func load(key: String) throws -> Data {
         let f = file(key)
-        PKLog.debug("Loading key from", f)
+        PKLog.debug("Loading key from \(f)")
         return try Data.init(contentsOf: f, options: [])
     }
     
@@ -66,7 +66,7 @@ import Foundation
     
     @objc public func remove(key: String) throws {
         let f = file(key)
-        PKLog.debug("Removing key at", f)
+        PKLog.debug("Removing key at \(f)")
         try FileManager.default.removeItem(at: f)
     }
 }

@@ -128,7 +128,7 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
             return
         }
         
-        PKLog.trace("playAsset:: url: \(contentUrl.absoluteString), uri: \(licenseUri.absoluteString)")
+        PKLog.verbose("playAsset:: url: \(contentUrl.absoluteString), uri: \(licenseUri.absoluteString)")
        
         WidevineClassicHelper.playAsset(contentUrl.absoluteString, withLicenseUri: licenseUri.absoluteString) {  (_ playbackURL:String?)->Void  in
             
