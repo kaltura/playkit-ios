@@ -108,11 +108,11 @@ import GoogleCast
      - Parameter ks: The ks which represent the user key, used by the Kaltura Web Player
      */
     @discardableResult
-    @objc public func set(ks:String) -> Self {
+    @objc public func set(ks:String?) -> Self {
         
-        guard ks.isEmpty == false else {
-            PKLog.warning("Trying to set an empty string to ks")
-            return self
+        guard ks != nil, ks?.isEmpty == false else {
+                PKLog.verbose("Trying to set nil or empty string to ks")
+                return self
         }
         
         self.ks = ks
@@ -168,7 +168,12 @@ import GoogleCast
      - Parameter formats: An array of formats, used by the Kaltura Web Player.
      */
     @discardableResult
-    @objc public func set(formats: [String]) -> Self {
+    @objc public func set(formats: [String]?) -> Self {
+        
+        guard formats != nil else {
+            PKLog.verbose("Trying to set nil to formats")
+            return self
+        }
         
         self.formats = formats
         return self
@@ -179,9 +184,14 @@ import GoogleCast
      - Parameter fileIds: The format ids seperated by commas ("fileId,fileId,..."), used by the Kaltura Web Player.
      */
     @discardableResult
-    @objc public func set(fileIds: String) -> Self {
+    @objc public func set(fileIds: String?) -> Self {
         
-        self.formats = formats
+        guard fileIds != nil else {
+            PKLog.verbose("Trying to set nil to fileIds")
+            return self
+        }
+        
+        self.fileIds = fileIds
         return self
     }
     
@@ -190,7 +200,12 @@ import GoogleCast
      - Parameter textLanguage: The preferred text language, used by the Kaltura Web Player.
      */
     @discardableResult
-    @objc public func set(textLanguage: String) -> Self {
+    @objc public func set(textLanguage: String?) -> Self {
+        
+        guard textLanguage != nil else {
+            PKLog.verbose("Trying to set nil to textLanguage")
+            return self
+        }
         
         self.textLanguage = textLanguage
         return self
@@ -201,7 +216,12 @@ import GoogleCast
      - Parameter audioLanguage: The preferred audio language, used by the Kaltura Web Player.
      */
     @discardableResult
-    @objc public func set(audioLanguage: String) -> Self {
+    @objc public func set(audioLanguage: String?) -> Self {
+        
+        guard audioLanguage != nil else {
+            PKLog.verbose("Trying to set nil to audioLanguage")
+            return self
+        }
         
         self.audioLanguage = audioLanguage
         return self

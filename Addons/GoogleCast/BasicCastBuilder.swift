@@ -125,7 +125,12 @@ import GoogleCast
      - Parameter adBreaks: Receiver ad breaks. The list of ad breaks in this content.
      */
     @discardableResult
-    @nonobjc public func set(adBreaks: [GCKAdBreakInfo]) -> Self {
+    @nonobjc public func set(adBreaks: [GCKAdBreakInfo]?) -> Self {
+        
+        guard adBreaks != nil else {
+            PKLog.verbose("Trying to set nil to adBreaks")
+            return self
+        }
         
         self.adBreaks = adBreaks
         return self
@@ -136,7 +141,12 @@ import GoogleCast
      - Parameter adBreakClips: Receiver ad break clips. The list of ad break clips in this content.
      */
     @discardableResult
-    @nonobjc public func set(adBreakClips: [GCKAdBreakClipInfo]) -> Self {
+    @nonobjc public func set(adBreakClips: [GCKAdBreakClipInfo]?) -> Self {
+        
+        guard adBreakClips != nil else {
+            PKLog.verbose("Trying to set nil to adBreakClips")
+            return self
+        }
         
         self.adBreakClips = adBreakClips
         return self
@@ -158,7 +168,12 @@ import GoogleCast
      - Parameter mediaTracks: Receiver media tracks. The media tracks.
      */
     @discardableResult
-    @nonobjc public func set(mediaTracks: [GCKMediaTrack]) -> Self {
+    @nonobjc public func set(mediaTracks: [GCKMediaTrack]?) -> Self {
+        
+        guard mediaTracks != nil else {
+            PKLog.verbose("Trying to set nil to mediaTracks")
+            return self
+        }
         
         self.mediaTracks = mediaTracks
         return self
@@ -169,7 +184,12 @@ import GoogleCast
      - Parameter textTrackStyle: Receiver text track style. The text track style.
      */
     @discardableResult
-    @nonobjc public func set(textTrackStyle: GCKMediaTextTrackStyle) -> Self {
+    @nonobjc public func set(textTrackStyle: GCKMediaTextTrackStyle?) -> Self {
+        
+        guard textTrackStyle != nil else {
+            PKLog.verbose("Trying to set nil to textTrackStyle")
+            return self
+        }
         
         self.textTrackStyle = textTrackStyle
         return self
@@ -185,7 +205,7 @@ import GoogleCast
     @nonobjc public func set(adTagURL: String?) -> Self {
         
         guard adTagURL != nil, adTagURL?.isEmpty == false else {
-            PKLog.warning("Trying to set nil or empty string to adTagURL")
+            PKLog.verbose("Trying to set nil or empty string to adTagURL")
             return self
         }
         
