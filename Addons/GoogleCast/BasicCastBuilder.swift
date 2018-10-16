@@ -93,10 +93,10 @@ import GoogleCast
      - Parameter contentType: Receiver content type. The content (MIME) type.
      */
     @discardableResult
-    @nonobjc public func set(contentType: String) -> Self {
+    @nonobjc public func set(contentType: String?) -> Self {
         
-        guard contentType.isEmpty == false else {
-                PKLog.warning("Trying to set an empty string to content type")
+        guard contentType != nil, contentType?.isEmpty == false else {
+                PKLog.verbose("Trying to set nil or an empty string to contentType")
                 return self
         }
         
