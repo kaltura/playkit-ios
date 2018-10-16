@@ -95,12 +95,12 @@ import GoogleCast
     @discardableResult
     @nonobjc public func set(contentType: String?) -> Self {
         
-        guard contentType != nil, contentType?.isEmpty == false else {
+        guard let theContentType = contentType, theContentType.isEmpty == false else {
                 PKLog.verbose("Trying to set nil or an empty string to contentType")
                 return self
         }
         
-        self.contentType = contentType
+        self.contentType = theContentType
         return self
     }
     
