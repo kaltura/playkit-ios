@@ -21,6 +21,9 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
     var timer: Timer?
     var interval: TimeInterval = 30
     var fileId: String?
+    var lastPosition: Int32 = 0
+    var periodicObserverUUID: UUID?
+    var mediaId: String?
 
     /************************************************************/
     // MARK: - PKPlugin
@@ -29,6 +32,9 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
     public required init(player: Player, pluginConfig: Any?, messageBus: MessageBus) throws {
         try super.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
         AppStateSubject.shared.add(observer: self)
+        self.periodicObserverUUID = self.player?.addPeriodicObserver(interval: 1.0, observeOn: DispatchQueue.main, using: { (time) in
+            self.lastPosition = time.toInt32()
+        })
         self.registerEvents()
     }
 
@@ -41,6 +47,10 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
     
     public override func destroy() {
         self.messageBus?.removeObserver(self, events: playerEventsToRegister)
+        if let periodicObserverUUID = self.periodicObserverUUID {
+            self.player?.removePeriodicObserver(periodicObserverUUID)
+        }
+        
         // only send stop event if content started playing already & content is not ended
         if !self.isFirstPlay && self.player?.currentState != PlayerState.ended {
             self.sendAnalyticsEvent(ofType: .stop)
@@ -113,6 +123,7 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     strongSelf.cancelTimer()
+                    strongSelf.sendAnalyticsEvent(ofType: .stop)
                 }
             case let e where e.self == PlayerEvent.loadedMetadata:
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
@@ -140,6 +151,7 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
                     guard let strongSelf = self else { return }
                     guard let mediaSource = event.mediaSource else { return }
                     strongSelf.fileId = mediaSource.id
+                    strongSelf.mediaId = strongSelf.player?.mediaEntry?.id
                 }
             default: assertionFailure("plugin \(type(of:self)) all events must be handled")
             }
