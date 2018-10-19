@@ -152,6 +152,7 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
                     guard let mediaSource = event.mediaSource else { return }
                     strongSelf.fileId = mediaSource.id
                     strongSelf.mediaId = strongSelf.player?.mediaEntry?.id
+                    strongSelf.lastPosition = 0
                 }
             default: assertionFailure("plugin \(type(of:self)) all events must be handled")
             }
