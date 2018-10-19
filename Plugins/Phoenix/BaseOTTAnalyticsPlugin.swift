@@ -101,6 +101,7 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
                 self.messageBus?.addObserver(self, events: [e.self]) { [weak self] event in
                     guard let strongSelf = self else { return }
                     strongSelf.timer?.invalidate()
+                    strongSelf.lastPosition = strongSelf.player?.currentTime.toInt32() ?? strongSelf.lastPosition
                     strongSelf.sendAnalyticsEvent(ofType: .finish)
                 }
             case let e where e.self == PlayerEvent.error:
