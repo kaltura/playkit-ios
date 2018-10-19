@@ -217,13 +217,5 @@ extension BaseOTTAnalyticsPlugin {
         
         let progress = Float(player.currentTime) / Float(player.duration)
         PKLog.debug("Progress is \(progress)")
-        
-        if progress > 0.98 {
-            self.sendAnalyticsEvent(ofType: .finish)
-        }
     }
 }
-
-
-
-
