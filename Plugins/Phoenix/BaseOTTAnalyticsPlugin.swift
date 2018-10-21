@@ -194,9 +194,6 @@ extension BaseOTTAnalyticsPlugin {
             self.timer = nil
         }
         
-        // media hit should fire on every time we start the timer.
-        self.sendProgressEvent()
-        
         self.timer = PKTimer.every(self.interval) { [weak self] _ in
             PKLog.debug("timerHit")
             self?.sendProgressEvent()
