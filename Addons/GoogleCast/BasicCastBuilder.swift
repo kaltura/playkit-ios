@@ -37,6 +37,7 @@ import GoogleCast
     @objc public var partnerID: String?
     @objc public var uiconfID: String?
     @objc public var adTagURL: String?
+    @objc public var defaultCCLanguage : String?
     @objc public var metaData: GCKMediaMetadata?
     
     @objc public var streamType = StreamType.unknown {
@@ -171,6 +172,23 @@ import GoogleCast
     }
     
     
+    /**
+     Set - defaultCCLanguage
+     */
+    @discardableResult
+    @nonobjc public func set(defaultCCLanguage: String?) -> Self{
+        
+        guard defaultCCLanguage != nil
+            else {
+                PKLog.warning("Trying to set nil to defaultCCLanguage")
+                return self
+        }
+        
+        self.defaultCCLanguage = defaultCCLanguage
+        return self
+    }
+    
+    
     internal func validate() throws {
         guard self.contentId != nil else {
             throw BasicCastBuilder.BasicBuilderDataError.missingContentId
@@ -210,10 +228,25 @@ import GoogleCast
     internal func customData() -> [String:Any]? {
         
         if let embedConfig = self.embedConfig() {
-            let customData: [String:Any] = ["embedConfig":embedConfig]
+            var customData: [String:Any] = ["embedConfig":embedConfig]
+            
+            // add chromecast defaultLanguageKey
+            customData["receiverConfig"] = self.chromeDefaultLanguageKey()
+            
             return customData
         }
         return nil
+    }
+    
+    internal func chromeDefaultLanguageKey() -> [String:Any]? {
+        var chromeDefaultLanguageKey: [String:Any] = [:]
+        
+        if let defaultLanguage = self.defaultCCLanguage {
+            chromeDefaultLanguageKey ["defaultLanguageKey"] = defaultLanguage
+        }
+        
+        return chromeDefaultLanguageKey
+        
     }
     
     
