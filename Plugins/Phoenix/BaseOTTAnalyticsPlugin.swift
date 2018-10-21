@@ -46,7 +46,7 @@ public class BaseOTTAnalyticsPlugin: BasePlugin, OTTAnalyticsPluginProtocol, App
     }
     
     public override func destroy() {
-        self.messageBus?.removeObserver(self, events: playerEventsToRegister)
+        self.unregisterEvents()
         if let periodicObserverUUID = self.periodicObserverUUID {
             self.player?.removePeriodicObserver(periodicObserverUUID)
         }
