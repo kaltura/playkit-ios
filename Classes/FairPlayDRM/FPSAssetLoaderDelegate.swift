@@ -115,14 +115,14 @@ extension FPSAssetLoaderDelegate: AVAssetResourceLoaderDelegate {
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         
-        PKLog.trace("\(#function) was called in FPSAssetLoaderDelegate with loadingRequest: \(loadingRequest)")
+        PKLog.verbose("\(#function) was called in FPSAssetLoaderDelegate with loadingRequest: \(loadingRequest)")
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: loadingRequest)
     }
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForRenewalOfRequestedResource renewalRequest: AVAssetResourceRenewalRequest) -> Bool {
         
-        PKLog.trace("\(#function) was called in FPSAssetLoaderDelegate with renewalRequest: \(renewalRequest)")
+        PKLog.verbose("\(#function) was called in FPSAssetLoaderDelegate with renewalRequest: \(renewalRequest)")
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: renewalRequest)
     }

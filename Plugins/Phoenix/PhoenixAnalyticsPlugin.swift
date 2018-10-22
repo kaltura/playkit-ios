@@ -49,30 +49,31 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
     
     override func buildRequest(ofType type: OTTAnalyticsEventType) -> Request? {
        
-        guard let player = self.player else {
-            PKLog.error("send analytics failed due to nil associated player")
-            return nil
-        }
+        var currentTime: Int32 = 0
         
-        guard let mediaEntry = player.mediaEntry else {
-            PKLog.error("send analytics failed due to nil mediaEntry")
-            return nil
+        if type == .stop {
+            currentTime = self.lastPosition
+        } else {
+            guard let player = self.player else {
+                PKLog.error("send analytics failed due to nil associated player")
+                return nil
+            }
+            
+            currentTime = player.currentTime.toInt32()
         }
         
         guard let requestBuilder: KalturaRequestBuilder = BookmarkService.actionAdd(baseURL: config.baseUrl,
                                                                                     partnerId: config.partnerId,
                                                                                     ks: config.ks,
                                                                                     eventType: type.rawValue.uppercased(),
-                                                                                    currentTime: player.currentTime.toInt32(),
-                                                                                    assetId: mediaEntry.id,
-                                                                                    fileId: fileId ?? "") else {
-                                                                                        return nil
-        }
+                                                                                    currentTime: currentTime,
+                                                                                    assetId: mediaId ?? "",
+                                                                                    fileId: fileId ?? "") else { return nil }
         
         requestBuilder.set { (response: Response) in
-            PKLog.trace("Response: \(response)")
+            PKLog.verbose("Response: \(response)")
             if response.statusCode == 0 {
-                PKLog.trace("\(String(describing: response.data))")
+                PKLog.verbose("\(String(describing: response.data))")
                 guard let data = response.data as? [String: Any] else { return }
                 guard let result = data["result"] as? [String: Any] else { return }
                 guard let errorData = result["error"] as? [String: Any] else { return }
@@ -84,5 +85,3 @@ public class PhoenixAnalyticsPlugin: BaseOTTAnalyticsPlugin {
         return requestBuilder.build()
     }
 }
-
-

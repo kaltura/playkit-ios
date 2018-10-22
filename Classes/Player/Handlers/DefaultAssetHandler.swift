@@ -40,7 +40,7 @@ class DefaultAssetHandler: AssetHandler {
                 self.assetLoaderDelegate = FPSAssetLoaderDelegate.configureLocalPlay(asset: asset, storage: localSource.storage)
             } else {
                 // On earlier versions, this will only work for non-FairPlay content.
-                PKLog.warning("Preparing local asset in iOS<10:", contentUrl)
+                PKLog.warning("Preparing local asset in iOS<10: \(contentUrl)")
             }
             
             self.avAsset = asset  
@@ -57,7 +57,7 @@ class DefaultAssetHandler: AssetHandler {
 
         // FairPlay: only looking at the first DRMParams element.
         guard let fpsData = drmData as? FairPlayDRMParams else {
-            PKLog.error("Unsupported DRM Data:", drmData)
+            PKLog.error("Unsupported DRM Data: \(drmData)")
             readyCallback(AssetError.invalidDrmScheme, nil)
             return
         }

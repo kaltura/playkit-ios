@@ -20,7 +20,13 @@ class PlayerController: NSObject, Player {
     
     weak var delegate: PlayerDelegate?
     
-    fileprivate var currentPlayer: PlayerEngine
+    fileprivate var currentPlayer: PlayerEngine = DefaultPlayerWrapper() {
+        // Initialize the currentPlayer to DefaultPlayerWrapper, which does nothing except printing warnings.
+        didSet {
+            // When set to a real player, enable the observer. 
+            timeObserver.enabled = !(currentPlayer is DefaultPlayerWrapper)
+        }
+    }
     
     /// Current selected media source
     fileprivate var selectedSource: PKMediaSource?
@@ -56,10 +62,12 @@ class PlayerController: NSObject, Player {
     
     public var currentTime: TimeInterval {
         get {
-            if self.currentPlayer.currentPosition != TimeInterval.infinity && self.currentPlayer.currentPosition > self.duration {
-                return self.duration
+            let position = self.currentPlayer.currentPosition
+            let duration = self.duration
+            if position != TimeInterval.infinity && position > duration {
+                return duration
             }
-            return self.currentPlayer.currentPosition
+            return position
         }
         set {
             self.seek(to: newValue)
@@ -107,15 +115,11 @@ class PlayerController: NSObject, Player {
     // MARK: - Initialization
     /************************************************************/
     
-    public override init() {
-        // Since currentPlayer is PlayerEngine! 
-        // Dafault Wrapper creation for safety
-        self.currentPlayer = DefaultPlayerWrapper()
-        
+    public override init() {        
         super.init()
         self.timeObserver = TimeObserver(timeProvider: self)
         self.currentPlayer.onEventBlock = { [weak self] event in
-            PKLog.trace("postEvent:: \(event)")
+            PKLog.verbose("postEvent:: \(event)")
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
@@ -197,6 +201,7 @@ class PlayerController: NSObject, Player {
         if let currentPlayer = self.currentPlayer as? AVPlayerWrapper {
             currentPlayer.settings = self.settings
         }
+        
         return isCreated
     }
     

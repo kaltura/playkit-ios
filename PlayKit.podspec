@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
 s.name              = 'PlayKit'
-s.version           = '3.6.1'
+s.version           = '3.6.2'
 s.summary           = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 s.homepage          = 'https://github.com/kaltura/playkit-ios'
 s.license           = { :type => 'AGPLv3', :text => 'AGPLv3' }
@@ -15,7 +15,7 @@ s.tvos.deployment_target = '9.0'
 s.subspec 'Core' do |sp|
     sp.source_files = 'Classes/**/*'
     sp.dependency 'SwiftyJSON', '3.1.4'
-    sp.dependency 'Log', '1.0'
+    sp.dependency 'XCGLogger', '~> 6.1.0'
     sp.dependency 'SwiftyXMLParser', '3.0.3'
     sp.dependency 'KalturaNetKit', '~> 0.0'
     sp.dependency 'PlayKitUtils', '0.1.4'
