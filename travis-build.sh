@@ -23,11 +23,8 @@ keepAlive() {
 }
 
 trunkPush() {
-  FLAG=$(mktemp)
-  keepAlive $FLAG &
   login
   pod trunk push --allow-warnings
-  rm $FLAG  # stop keepAlive
 }
 
 justBuild() {
@@ -37,20 +34,17 @@ justBuild() {
 }
 
 libLint() {
-  FLAG=$(mktemp)
-  keepAlive $FLAG &
   pod lib lint --allow-warnings
-  rm $FLAG  # stop keepAlive
 }
 
 
-pod repo update
-
+FLAG=$(mktemp)
+keepAlive $FLAG &
 
 if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   # If we're building a release tag (v1.2.3) push to cocoapods
   trunkPush
-elif [ $TRAVIS_EVENT_TYPE == cron ]; then
+elif [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
   # A cron build should do a full build (daily)
   libLint
 else
@@ -58,3 +52,4 @@ else
   justBuild
 fi
 
+rm $FLAG  # stop keepAlive
