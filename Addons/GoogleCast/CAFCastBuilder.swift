@@ -111,7 +111,7 @@ import GoogleCast
     @objc public func set(ks:String?) -> Self {
         
         guard ks != nil, ks?.isEmpty == false else {
-                PKLog.verbose("Trying to set nil or empty string to ks")
+                PKLog.debug("Trying to set nil or empty string to ks")
                 return self
         }
         
@@ -171,7 +171,7 @@ import GoogleCast
     @objc public func set(formats: [String]?) -> Self {
         
         guard formats != nil else {
-            PKLog.verbose("Trying to set nil to formats")
+            PKLog.debug("Trying to set nil to formats")
             return self
         }
         
@@ -187,7 +187,7 @@ import GoogleCast
     @objc public func set(fileIds: String?) -> Self {
         
         guard fileIds != nil else {
-            PKLog.verbose("Trying to set nil to fileIds")
+            PKLog.debug("Trying to set nil to fileIds")
             return self
         }
         
@@ -203,7 +203,7 @@ import GoogleCast
     @objc public func set(textLanguage: String?) -> Self {
         
         guard textLanguage != nil else {
-            PKLog.verbose("Trying to set nil to textLanguage")
+            PKLog.debug("Trying to set nil to textLanguage")
             return self
         }
         
@@ -219,7 +219,7 @@ import GoogleCast
     @objc public func set(audioLanguage: String?) -> Self {
         
         guard audioLanguage != nil else {
-            PKLog.verbose("Trying to set nil to audioLanguage")
+            PKLog.debug("Trying to set nil to audioLanguage")
             return self
         }
         

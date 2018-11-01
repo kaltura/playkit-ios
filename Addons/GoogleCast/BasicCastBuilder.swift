@@ -96,7 +96,7 @@ import GoogleCast
     @nonobjc public func set(contentType: String?) -> Self {
         
         guard let theContentType = contentType, theContentType.isEmpty == false else {
-                PKLog.verbose("Trying to set nil or an empty string to contentType")
+                PKLog.debug("Trying to set nil or an empty string to contentType")
                 return self
         }
         
@@ -128,7 +128,7 @@ import GoogleCast
     @nonobjc public func set(adBreaks: [GCKAdBreakInfo]?) -> Self {
         
         guard adBreaks != nil else {
-            PKLog.verbose("Trying to set nil to adBreaks")
+            PKLog.debug("Trying to set nil to adBreaks")
             return self
         }
         
@@ -144,7 +144,7 @@ import GoogleCast
     @nonobjc public func set(adBreakClips: [GCKAdBreakClipInfo]?) -> Self {
         
         guard adBreakClips != nil else {
-            PKLog.verbose("Trying to set nil to adBreakClips")
+            PKLog.debug("Trying to set nil to adBreakClips")
             return self
         }
         
@@ -171,7 +171,7 @@ import GoogleCast
     @nonobjc public func set(mediaTracks: [GCKMediaTrack]?) -> Self {
         
         guard mediaTracks != nil else {
-            PKLog.verbose("Trying to set nil to mediaTracks")
+            PKLog.debug("Trying to set nil to mediaTracks")
             return self
         }
         
@@ -187,7 +187,7 @@ import GoogleCast
     @nonobjc public func set(textTrackStyle: GCKMediaTextTrackStyle?) -> Self {
         
         guard textTrackStyle != nil else {
-            PKLog.verbose("Trying to set nil to textTrackStyle")
+            PKLog.debug("Trying to set nil to textTrackStyle")
             return self
         }
         
@@ -205,7 +205,7 @@ import GoogleCast
     @nonobjc public func set(adTagURL: String?) -> Self {
         
         guard adTagURL != nil, adTagURL?.isEmpty == false else {
-            PKLog.verbose("Trying to set nil or empty string to adTagURL")
+            PKLog.debug("Trying to set nil or empty string to adTagURL")
             return self
         }
         
@@ -291,9 +291,7 @@ import GoogleCast
         return mediaInfo
     }
     
-    
     // MARK: - Create custom data
-    
     
     /**
      customData - Which used by Kaltura receiver to play the content through the Kaltura Web Player
