@@ -8,6 +8,7 @@ s.license           = { :type => 'AGPLv3', :text => 'AGPLv3' }
 s.author            = { 'Kaltura' => 'community@kaltura.com' }
 s.source            = { :git => 'https://github.com/kaltura/playkit-ios.git', :tag => 'v' + s.version.to_s }
 s.swift_version     = '4.0'
+s.static_framework = true
 
 s.ios.deployment_target = '8.0'
 s.tvos.deployment_target = '9.0'
@@ -22,7 +23,7 @@ s.subspec 'Core' do |sp|
 end
 
 s.subspec 'GoogleCastAddon' do |ssp|
-    ssp.ios.deployment_target = '8.0'
+    ssp.ios.deployment_target = '9.0'
     ssp.source_files = 'Addons/GoogleCast'
     ssp.xcconfig = { 
         'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
@@ -30,7 +31,7 @@ s.subspec 'GoogleCastAddon' do |ssp|
         'FRAMEWORK_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**',
         'LIBRARY_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}"/**' 
     }
-    ssp.dependency 'google-cast-sdk', '3.5'
+    ssp.dependency 'google-cast-sdk', '4.3.3'
     ssp.dependency 'PlayKit/Core'
 end
 

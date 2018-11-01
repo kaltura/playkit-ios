@@ -12,7 +12,7 @@ import UIKit
 
 /**
  
- TVPAPICastBuilder this component will help you to comunicate with Kaltura-custom-receiver with TVPAPI Server.
+ TVPAPICastBuilder this component will help you to communicate with Kaltura-custom-receiver with TVPAPI Server.
 
  */
 @objc public class TVPAPICastBuilder: BasicCastBuilder {
@@ -25,6 +25,8 @@ import UIKit
     internal var initObject: [String: Any]!
     internal var format: String!
  
+    // MARK: - Set - Kaltura Data
+    
     /**
      Set - initObject
      - Parameter initObject: that the receiver will use to represent the user
@@ -59,13 +61,18 @@ import UIKit
         return self
     }
     
+    // MARK: -
     
     /**
-      In order to comunicate with Kaltura receiver you should have init object and format this will throw exception if the input is not valid
+      In order to comunicate with Kaltura receiver you should have init object and format, this will throw exception if the input is not valid
      */
     override func validate() throws {
         
         try super.validate()
+        
+        guard self.streamType != .unknown else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
+        }
         
         guard self.initObject != nil else {
             throw TVPAPICastBuilder.BasicBuilderDataError.missingInitObject
@@ -74,8 +81,9 @@ import UIKit
         guard self.format != nil else {
             throw TVPAPICastBuilder.BasicBuilderDataError.missingFormat
         }
-        
     }
+    
+    // MARK: - Create custom data
     
     internal override func flashVars() -> [String: Any] {
         

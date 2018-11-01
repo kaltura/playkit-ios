@@ -10,15 +10,16 @@
 
 import UIKit
 
-
 /**
  
- TVPAPICastBuilder this component will help you to comunicate with Kaltura-custom-receiver with OVP-Kaltura Server.
+ OVPCastBuilder this component will help you to communicate with Kaltura-custom-receiver with OVP-Kaltura Server.
  
  */
 @objc public class OVPCastBuilder: BasicCastBuilder{
     
     internal var ks: String?
+    
+    // MARK: - Set - Kaltura Data
     
     /**
      Set - ks
@@ -38,7 +39,19 @@ import UIKit
         return self
     }
     
-  
+    // MARK: -
+    
+    override func validate() throws {
+        
+        try super.validate()
+        
+        guard self.streamType != .unknown else {
+            throw BasicCastBuilder.BasicBuilderDataError.missingStreamType
+        }
+    }
+    
+    // MARK: - Create custom data
+    
     override func embedConfig() -> [String: Any]? {
      
         if var embedConfig = super.embedConfig(), let ks = self.ks , ks.isEmpty == false {
