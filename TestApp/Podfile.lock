@@ -1,0 +1,75 @@
+PODS:
+  - google-cast-sdk (3.5.0):
+    - google-cast-sdk/Core (= 3.5.0)
+  - google-cast-sdk/Core (3.5.0)
+  - KalturaNetKit (0.0.17):
+    - KalturaNetKit/Core (= 0.0.17)
+  - KalturaNetKit/Core (0.0.17):
+    - SwiftyJSON
+  - ObjcExceptionBridging (1.0.1):
+    - ObjcExceptionBridging/ObjcExceptionBridging (= 1.0.1)
+  - ObjcExceptionBridging/ObjcExceptionBridging (1.0.1)
+  - PlayKit (3.6.x-dev):
+    - PlayKit/Core (= 3.6.x-dev)
+  - PlayKit/AnalyticsCommon (3.6.x-dev):
+    - PlayKit/Core
+  - PlayKit/Core (3.6.x-dev):
+    - KalturaNetKit (~> 0.0)
+    - PlayKitUtils (= 0.1.4)
+    - SwiftyJSON (= 3.1.4)
+    - SwiftyXMLParser (= 3.0.3)
+    - XCGLogger (~> 6.1.0)
+  - PlayKit/GoogleCastAddon (3.6.x-dev):
+    - google-cast-sdk (= 3.5)
+    - PlayKit/Core
+  - PlayKit/KalturaLiveStatsPlugin (3.6.x-dev):
+    - PlayKit/AnalyticsCommon
+    - PlayKit/Core
+  - PlayKit/KalturaStatsPlugin (3.6.x-dev):
+    - PlayKit/AnalyticsCommon
+    - PlayKit/Core
+  - PlayKit/PhoenixPlugin (3.6.x-dev):
+    - PlayKit/AnalyticsCommon
+    - PlayKit/Core
+  - PlayKitUtils (0.1.4)
+  - SwiftyJSON (3.1.4)
+  - SwiftyXMLParser (3.0.3)
+  - XCGLogger (6.1.0):
+    - XCGLogger/Core (= 6.1.0)
+  - XCGLogger/Core (6.1.0):
+    - ObjcExceptionBridging
+
+DEPENDENCIES:
+  - PlayKit (from `..`)
+  - PlayKit/GoogleCastAddon (from `..`)
+  - PlayKit/KalturaLiveStatsPlugin (from `..`)
+  - PlayKit/KalturaStatsPlugin (from `..`)
+  - PlayKit/PhoenixPlugin (from `..`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - google-cast-sdk
+    - KalturaNetKit
+    - ObjcExceptionBridging
+    - PlayKitUtils
+    - SwiftyJSON
+    - SwiftyXMLParser
+    - XCGLogger
+
+EXTERNAL SOURCES:
+  PlayKit:
+    :path: ".."
+
+SPEC CHECKSUMS:
+  google-cast-sdk: fc3728ead66150ac746e001ba03a44e4b10e359e
+  KalturaNetKit: d37b3c6fc08da9935677fc547c59b25abc3574a3
+  ObjcExceptionBridging: c30e00eb3700467e695faeea30e26e18bd445001
+  PlayKit: 2b80ea194a84abc5ae38c64507e4be32be2313b7
+  PlayKitUtils: 8f03f72690805e20718be6f913547e0966c835f9
+  SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
+  SwiftyXMLParser: 9c6cc0310e778266a63d8eba50d9e07925aab0fb
+  XCGLogger: 7f7f43f15dfe3a305fa1342b7dc29af656289abd
+
+PODFILE CHECKSUM: 2a83932b76de87af58f1b97639f6f546da299839
+
+COCOAPODS: 1.6.0.beta.2
