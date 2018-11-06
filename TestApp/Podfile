@@ -7,7 +7,6 @@ target 'TestApp' do
 
   # Pods for TestApp
   pod 'PlayKit', :path => '..'
-  pod 'PlayKit/GoogleCastAddon', :path => '..'
   pod 'PlayKit/PhoenixPlugin', :path => '..'
   pod 'PlayKit/KalturaStatsPlugin', :path => '..'
   pod 'PlayKit/KalturaLiveStatsPlugin', :path => '..'
