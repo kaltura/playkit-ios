@@ -48,19 +48,22 @@ import Foundation
     /// Provides a collection of time ranges for which the player has the media data readily available. The ranges provided might be discontinuous.
     @objc var loadedTimeRanges: [PKTimeRange]? { get }
     
-    /// send play action for the player.
+    /// Send play action for the player.
     @objc func play()
     
-    /// send pause action for the player.
+    /// Send pause action for the player.
     @objc func pause()
     
-    /// send resume action for the player.
+    /// Send resume action for the player.
     @objc func resume()
     
-    /// send stop action for the player.
+    /// Send stop action for the player.
     @objc func stop()
     
-    /// send seek action for the player.
+    /// Send replay action for the player.
+    @objc func replay()
+    
+    /// Send seek action for the player.
     @objc func seek(to time: TimeInterval)
     
     /// Select Track

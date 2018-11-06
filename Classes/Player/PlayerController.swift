@@ -229,6 +229,10 @@ class PlayerController: NSObject, Player {
         self.currentPlayer.stop()
     }
     
+    func replay() {
+        self.currentPlayer.replay()
+    }
+    
     func seek(to time: TimeInterval) {
         self.currentPlayer.currentPosition = time
     }

@@ -14,11 +14,10 @@ import AVFoundation
 /// PlayerEvent is a class used to reflect player events.
 @objc public class PlayerEvent: PKEvent {
     
-    // All events EXCLUDING error. Assuming error events are treated differently.
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
-        canPlay, durationChanged, ended, loadedMetadata,
-        play, pause, playing, seeking, seeked, stateChanged, playbackInfo,
-        tracksAvailable, textTrackChanged, audioTrackChanged, videoTrackChanged, error
+        canPlay, durationChanged, stopped, ended, loadedMetadata, play, pause, playing, seeking, seeked, replay,
+        tracksAvailable, textTrackChanged, audioTrackChanged, videoTrackChanged, playbackInfo, stateChanged,
+        timedMetadata, sourceSelected, loadedTimeRanges, error, pluginError, errorLog
     ]
     
     // MARK: - Player Events Static Reference
@@ -43,6 +42,8 @@ import AVFoundation
     @objc public static let seeking: PlayerEvent.Type = Seeking.self
     /// Sent when a seek operation completes.
     @objc public static let seeked: PlayerEvent.Type = Seeked.self
+    /// Sent when a replay operation performed
+    @objc public static let replay: PlayerEvent.Type = Replay.self
     /// Sent when tracks available.
     @objc public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
     /// Sent when text track has been changed.
@@ -85,12 +86,15 @@ import AVFoundation
     public class Play: PlayerEvent {}
     public class Pause: PlayerEvent {}
     public class Playing: PlayerEvent {}
+    
     public class Seeking: PlayerEvent {
         convenience init(targetSeekPosition: TimeInterval) {
             self.init([EventDataKeys.targetSeekPosition: NSNumber(value: targetSeekPosition)])
         }
     }
     public class Seeked: PlayerEvent {}
+    
+    public class Replay: PlayerEvent {}
     
     public class SourceSelected: PlayerEvent {
         convenience init(mediaSource: PKMediaSource) {

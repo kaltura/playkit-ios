@@ -17,7 +17,11 @@ import Foundation
     /************************************************************/
     
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, allAdsCompleted, adComplete, adClicked, adCuePointsUpdate, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestContentPause, adDidRequestContentResume, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, requestTimedOut
+        adBreakReady, allAdsCompleted, adComplete, adClicked, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused,
+        adResumed, adSkipped, adStarted, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestContentPause,
+        adDidRequestContentResume, webOpenerEvent, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser,
+        adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adCuePointsUpdate,
+        adStartedBuffering, adPlaybackReady, requestTimedOut, adsRequested, error
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self

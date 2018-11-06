@@ -128,6 +128,10 @@ import AVKit
         self.player.stop()
     }
     
+    public func replay() {
+        self.player.replay()
+    }
+    
     public func updatePluginConfig(pluginName: String, config: Any) {
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
     }
