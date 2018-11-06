@@ -212,6 +212,14 @@ public class AVPlayerEngine: AVPlayer {
         self.post(event: PlayerEvent.Stopped())
     }
     
+    public func replay() {
+        PKLog.verbose("Replay item in player")
+        self.pause()
+        self.seek(to: kCMTimeZero)
+        super.play()
+        self.post(event: PlayerEvent.Replay())
+    }
+    
     override public func pause() {
         if self.rate > 0 {
             // Playing, so pause.

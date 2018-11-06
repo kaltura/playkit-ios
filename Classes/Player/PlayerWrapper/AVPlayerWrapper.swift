@@ -191,6 +191,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         self.currentPlayer.stop()
     }
     
+    public func replay() {
+        self.currentPlayer.replay()
+    }
+    
     public func seek(to time: TimeInterval) {
         self.currentPlayer.currentPosition = time
     }
