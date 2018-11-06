@@ -274,22 +274,22 @@ extension AVPlayerEngine: AppStateObservable {
     public var observations: Set<NotificationObservation> {
         return [
             NotificationObservation(name: .UIApplicationWillTerminate, onObserve: { [weak self] in
-                guard let `self` = self else { return }
+                guard let strongSelf = self else { return }
                 
-                PKLog.debug("player: \(self)\n Will terminate, destroying...")
-                self.destroy()
+                PKLog.debug("player: \(strongSelf)\n Will terminate, destroying...")
+                strongSelf.destroy()
             }),
             NotificationObservation(name: .UIApplicationDidEnterBackground, onObserve: { [weak self] in
-                guard let `self` = self else { return }
+                guard let strongSelf = self else { return }
                 
-                PKLog.debug("player: \(self)\n Did enter background, finishing up...")
-                self.startBackgroundTask()
+                PKLog.debug("player: \(strongSelf)\n Did enter background, finishing up...")
+                strongSelf.startBackgroundTask()
             }),
             NotificationObservation(name: .UIApplicationWillEnterForeground, onObserve: { [weak self] in
-                guard let `self` = self else { return }
+                guard let strongSelf = self else { return }
                 
-                PKLog.debug("player: \(self)\n Will enter foreground...")
-                self.endBackgroundTask()
+                PKLog.debug("player: \(strongSelf)\n Will enter foreground...")
+                strongSelf.endBackgroundTask()
             })
         ]
     }
@@ -297,10 +297,10 @@ extension AVPlayerEngine: AppStateObservable {
     func startBackgroundTask() {
         
         self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(withName: "AVPlayerEngineBackgroundTask", expirationHandler: { [weak self] in
-            guard let `self` = self else { return }
+            guard let strongSelf = self else { return }
             
-            PKLog.debug("player: \(self)\n Reached the expirationHandler")
-            self.endBackgroundTask()
+            PKLog.debug("player: \(strongSelf)\n Reached the expirationHandler")
+            strongSelf.endBackgroundTask()
         })
 
         if self.backgroundTaskIdentifier == UIBackgroundTaskInvalid {
