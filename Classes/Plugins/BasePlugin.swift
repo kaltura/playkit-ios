@@ -15,7 +15,14 @@ import Foundation
     
     /// abstract implementation subclasses will have names
     @objc open class var pluginName: String {
-        fatalError("abstract property should be overriden in subclass")
+        fatalError("abstract property must be overriden in subclass")
+    }
+    
+    @objc open class var pluginVersion: String {
+        guard let version = Bundle(for: self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String else {
+            return "?.?.?"
+        }
+        return version
     }
 
     @objc public weak var player: Player?

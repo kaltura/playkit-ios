@@ -16,6 +16,24 @@ import AVFoundation
     /// The plugin name.
     static var pluginName: String { get }
 
+    /**
+     The plugin version. The default (implemented in BasePlugin) is the plugin's bundle `CFBundleShortVersionString`:
+        `Bundle(for: pluginClass).object(forInfoDictionaryKey: "CFBundleShortVersionString")`
+     Override this function to provide a version from a different source.
+
+     Example for overriding:
+     ```
+         @objc override public class var pluginVersion: String {
+             return "1.2.3"
+         }
+     ```
+     
+     If `CFBundleShortVersionString` wasn't found (or is not a string), and no alternative implementation is 
+     provided, the string "?.?.?" is used.
+     
+    */
+    static var pluginVersion: String { get }
+
     /// The player associated with the plugin
     weak var player: Player? { get }
     /// The messageBus associated with the plugin
