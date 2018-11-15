@@ -63,7 +63,7 @@ private struct Observation {
     @objc public func post(_ event: PKEvent) {
         self.dispatchQueue.sync { [weak self] in
             guard let strongSelf = self else { return }
-            PKLog.verbose("post event: \(event.namespace), with data: \(event.data ?? [:])")
+            PKLog.verbose("post event: \(event), with data: \(event.data ?? [:])")
             let typeId = NSStringFromClass(type(of: event))
             
             if let array = strongSelf.observations[typeId] {

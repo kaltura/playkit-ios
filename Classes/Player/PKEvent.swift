@@ -30,6 +30,12 @@ import AVFoundation
         }
         return namespace
     }()
+    
+    open override var description: String {
+        get {
+            return self.namespace
+        }
+    }
 }
 
 // MARK: - PKEvent Data Accessors Extension
