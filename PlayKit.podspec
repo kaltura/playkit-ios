@@ -21,13 +21,6 @@ s.subspec 'Core' do |sp|
     sp.dependency 'PlayKitUtils', '~> 0.1.6'
 end
 
-s.subspec 'YouboraPlugin' do |ssp|
-    ssp.source_files = 'Plugins/Youbora'
-    ssp.dependency 'Youbora-AVPlayer/dynamic', '5.4.18'
-    ssp.dependency 'PlayKit/Core'
-    ssp.dependency 'PlayKit/AnalyticsCommon'
-end
-
 s.subspec 'WidevineClassic' do |ssp|
   ssp.ios.deployment_target = '8.0'  
   ssp.source_files = 'Widevine'

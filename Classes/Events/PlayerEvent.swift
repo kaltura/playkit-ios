@@ -17,7 +17,7 @@ import AVFoundation
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, stopped, ended, loadedMetadata, play, pause, playing, seeking, seeked, replay,
         tracksAvailable, textTrackChanged, audioTrackChanged, videoTrackChanged, playbackInfo, stateChanged,
-        timedMetadata, sourceSelected, loadedTimeRanges, error, pluginError, errorLog
+        timedMetadata, sourceSelected, loadedTimeRanges, error, errorLog
     ]
     
     // MARK: - Player Events Static Reference
@@ -66,8 +66,7 @@ import AVFoundation
 
     /// Sent when an error occurs in the player that the playback can recover from.
     @objc public static let error: PlayerEvent.Type = Error.self
-    /// Sent when a plugin error occurs.
-    @objc public static let pluginError: PlayerEvent.Type = PluginError.self
+    
     /// Sent when an error log event received from player (non fatal errors).
     @objc public static let errorLog: PlayerEvent.Type = ErrorLog.self
     
@@ -103,16 +102,6 @@ import AVFoundation
     }
     
     public class Error: PlayerEvent {
-        convenience init(nsError: NSError) {
-            self.init([EventDataKeys.error: nsError])
-        }
-        
-        convenience init(error: PKError) {
-            self.init([EventDataKeys.error: error.asNSError])
-        }
-    }
-    
-    public class PluginError: PlayerEvent {
         convenience init(nsError: NSError) {
             self.init([EventDataKeys.error: nsError])
         }

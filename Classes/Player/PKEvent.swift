@@ -19,12 +19,9 @@ import AVFoundation
     @objc public required init(_ data: [String: Any]? = nil) {
         self.data = data
         super.init()
-        self.namespace = self.getEventNamespace()
     }
     
-    private(set) var namespace: String = ""
-    
-    private func getEventNamespace() -> String {
+    public private(set) lazy var namespace: String = {
         var namespace = ""
         var mirror: Mirror? = Mirror(reflecting: self)
         while let m = mirror, m.subjectType != PKEvent.self && m.subjectType != NSObject.self {
@@ -32,7 +29,7 @@ import AVFoundation
             mirror = m.superclassMirror
         }
         return namespace
-    }
+    }()
 }
 
 // MARK: - PKEvent Data Accessors Extension

@@ -262,7 +262,7 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     func post(event: PKEvent) {
-        PKLog.verbose("onEvent:: \(String(describing: event))")
+        PKLog.verbose("onEvent:: \(String(describing: event.namespace))")
         onEventBlock?(event)
     }
     
