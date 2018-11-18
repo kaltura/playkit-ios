@@ -103,6 +103,10 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
+    func replay() {
+        printInvocationWarning("\(#function)")
+    }
+    
     func seek(to time: TimeInterval) {
         printInvocationWarning("\(#function)")
     }

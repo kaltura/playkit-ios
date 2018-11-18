@@ -31,7 +31,7 @@ fileprivate let durationKey = "duration"
     @objc public var metadata: [String: String]?
    
     var vrData: VRData?
-    var tags: String? {
+    public var tags: String? {
         didSet {
             //creating media entry with the above sources
             let vrKey = "360"
@@ -101,7 +101,7 @@ fileprivate let durationKey = "duration"
     public var scheme: Scheme
     public var requestAdapter: PKRequestParamsAdapter?
     
-    init(licenseUri: String?, scheme: Scheme) {
+    public init(licenseUri: String?, scheme: Scheme) {
         if let url = licenseUri {
             self.licenseUri = URL(string: url)
         }
@@ -127,7 +127,7 @@ fileprivate let durationKey = "duration"
 public class FairPlayDRMParams: DRMParams {
     @objc public var fpsCertificate: Data?
     
-    @objc init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
+    @objc public init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
         super.init(licenseUri: licenseUri, scheme: scheme)
     }

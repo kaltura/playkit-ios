@@ -17,7 +17,8 @@ import CoreMedia
 /// It provides the interface to control the player’s behavior such as its ability to play, pause, and seek to various points in the timeline.
 public class AVPlayerEngine: AVPlayer {
     
-    var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+    private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+    private var backgroundTimer: Timer?
     
     // MARK: Player Properties
     
@@ -212,6 +213,14 @@ public class AVPlayerEngine: AVPlayer {
         self.post(event: PlayerEvent.Stopped())
     }
     
+    public func replay() {
+        PKLog.verbose("Replay item in player")
+        self.pause()
+        self.seek(to: kCMTimeZero)
+        super.play()
+        self.post(event: PlayerEvent.Replay())
+    }
+    
     override public func pause() {
         if self.rate > 0 {
             // Playing, so pause.
@@ -253,7 +262,7 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     func post(event: PKEvent) {
-        PKLog.verbose("onEvent:: \(String(describing: event))")
+        PKLog.verbose("onEvent:: \(event)")
         onEventBlock?(event)
     }
     
@@ -272,33 +281,49 @@ extension AVPlayerEngine: AppStateObservable {
  
     public var observations: Set<NotificationObservation> {
         return [
-            NotificationObservation(name: .UIApplicationWillTerminate) { [unowned self] in
-                PKLog.debug("player: \(self)\n will terminate, destroying...")
-                self.destroy()
-            },
-            NotificationObservation(name: .UIApplicationDidEnterBackground) { [unowned self] in
-                PKLog.debug("player: \(self)\n did enter background, finishing up...")
-                self.startBackgroundTask()
-            }
+            NotificationObservation(name: .UIApplicationWillTerminate, onObserve: { [weak self] in
+                guard let strongSelf = self else { return }
+                
+                PKLog.debug("player: \(strongSelf)\n Will terminate, destroying...")
+                strongSelf.destroy()
+            }),
+            NotificationObservation(name: .UIApplicationDidEnterBackground, onObserve: { [weak self] in
+                guard let strongSelf = self else { return }
+                
+                PKLog.debug("player: \(strongSelf)\n Did enter background, finishing up...")
+                strongSelf.startBackgroundTask()
+            }),
+            NotificationObservation(name: .UIApplicationWillEnterForeground, onObserve: { [weak self] in
+                guard let strongSelf = self else { return }
+                
+                PKLog.debug("player: \(strongSelf)\n Will enter foreground...")
+                strongSelf.endBackgroundTask()
+            })
         ]
     }
     
     func startBackgroundTask() {
-        self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(withName: "AVPlayerEngineBackgroundTask") { [unowned self] in
-            self.endBackgroundTask()
-        }
+        
+        self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(withName: "AVPlayerEngineBackgroundTask", expirationHandler: { [weak self] in
+            guard let strongSelf = self else { return }
+            
+            PKLog.debug("player: \(strongSelf)\n Reached the expirationHandler")
+            strongSelf.endBackgroundTask()
+        })
 
         if self.backgroundTaskIdentifier == UIBackgroundTaskInvalid {
             PKLog.debug("backgroundTaskIdentifier is invalid, can't create backgroundTask.")
         } else {
             PKLog.debug("backgroundTaskIdentifier:\(String(describing: self.backgroundTaskIdentifier)))")
-            Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(endBackgroundTask), userInfo: nil, repeats: false)
+            self.backgroundTimer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(endBackgroundTask), userInfo: nil, repeats: false)
         }
     }
 
     @objc func endBackgroundTask() {
         if self.backgroundTaskIdentifier != UIBackgroundTaskInvalid {
-            PKLog.debug("player: \(self)\n in background, ending the background task...(backgroundTaskIdentifier:\(String(describing: backgroundTaskIdentifier)))")
+            PKLog.debug("player: \(self)\n Ending the background task...(backgroundTaskIdentifier:\(String(describing: backgroundTaskIdentifier)))")
+            self.backgroundTimer?.invalidate()
+            self.backgroundTimer = nil
             UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
             self.backgroundTaskIdentifier = UIBackgroundTaskInvalid
         }

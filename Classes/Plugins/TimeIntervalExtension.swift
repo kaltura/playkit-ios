@@ -12,7 +12,7 @@ import UIKit
 
 extension TimeInterval {
     
-    func toInt32() -> Int32 {
+    public func toInt32() -> Int32 {
         if !self.isNaN && !self.isInfinite {
             return Int32(self)
         }

@@ -50,10 +50,21 @@ import UIKit
     }
     
     @objc public func registerPlugin(_ pluginClass: BasePlugin.Type) {
+        
+        PKLog.info("Registering plugin \(pluginClass.pluginName)/\(pluginClass.pluginVersion)")
+        
         if let pluginWarmUp = pluginClass as? PKPluginWarmUp.Type {
             pluginWarmUp.warmUp()
         }
         pluginRegistry[pluginClass.pluginName] = pluginClass
+    }
+    
+    @objc public func registeredPlugins() -> [String: String] {
+        var dict = [String: String]()
+        for (name, type) in pluginRegistry {
+            dict[name] = type.pluginVersion
+        }
+        return dict
     }
     
     func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) throws -> PKPlugin {

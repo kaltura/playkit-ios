@@ -25,7 +25,7 @@ fileprivate let formatTypeKey: String = "sourceType"
         case mp3
         case unknown
         
-        var fileExtension: String {
+        public var fileExtension: String {
             get {
                 switch self {
                 case .hls: return "m3u8"
@@ -67,7 +67,7 @@ fileprivate let formatTypeKey: String = "sourceType"
     /// request params adapter, used to adapt the url.
     var contentRequestAdapter: PKRequestParamsAdapter?
     /// the playback url, if adapter exists uses it adapt otherwise uses the contentUrl.
-    var playbackUrl: URL? {
+    public var playbackUrl: URL? {
         guard let contentUrl = self.contentUrl else { return nil }
         if let contentRequestAdapter = self.contentRequestAdapter {
             return contentRequestAdapter.adapt(requestParams: PKRequestParams(url: contentUrl, headers: nil)).url
