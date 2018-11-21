@@ -63,6 +63,8 @@ import AVFoundation
     /// Sent when loaded time ranges was changed, loaded time ranges represent the buffered content.
     /// could be used to show amount buffered on the playhead UI.
     @objc public static let loadedTimeRanges: PlayerEvent.Type = LoadedTimeRanges.self
+    
+    @objc public static let playheadUpdate: PlayerEvent.Type = PlayheadUpdate.self
 
     /// Sent when an error occurs in the player that the playback can recover from.
     @objc public static let error: PlayerEvent.Type = Error.self
@@ -167,6 +169,12 @@ import AVFoundation
     public class LoadedTimeRanges: PlayerEvent {
         convenience init(timeRanges: [PKTimeRange]) {
             self.init([EventDataKeys.timeRanges: timeRanges])
+        }
+    }
+    
+    public class PlayheadUpdate: PlayerEvent {
+        convenience init(currentTime: TimeInterval, duration: TimeInterval) {
+            self.init([EventDataKeys.currentTime: currentTime, EventDataKeys.duration: duration])
         }
     }
 }

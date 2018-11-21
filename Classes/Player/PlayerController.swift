@@ -41,8 +41,7 @@ class PlayerController: NSObject, Player {
     
     var mediaFormat = PKMediaSource.MediaFormat.unknown
     
-    /* Time Observation */
-    var timeObserver: TimeObserver!
+    var reportedDuration: TimeInterval?
     
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
@@ -111,21 +110,38 @@ class PlayerController: NSObject, Player {
     let reachability = PKReachability()
     var shouldRefresh: Bool = false
     
+    /* Time Observation */
+    lazy var timeObserver = TimeObserver(timeProvider: self)
+    lazy var playheadObserverUUID = self.timeObserver.addPeriodicObserver(interval: 0.1, observeOn: DispatchQueue.global()) { [weak self] (time) in
+        guard let strongSelf = self, let block = strongSelf.onEventBlock else {return}
+        block(PlayerEvent.PlayheadUpdate(currentTime: time, duration: strongSelf.reportedDuration ?? 0.0))
+    }
+    
     /************************************************************/
     // MARK: - Initialization
     /************************************************************/
     
     public override init() {        
         super.init()
-        self.timeObserver = TimeObserver(timeProvider: self)
+
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.verbose("postEvent:: \(event)")
-            self?.onEventBlock?(event)
+            guard let strongSelf = self else {return}
+            
+            // Cache the last reported duration
+            if event is PlayerEvent.DurationChanged {
+                if let duration = event.duration {
+                    strongSelf.reportedDuration = duration.doubleValue
+                }
+            }
+            
+            strongSelf.onEventBlock?(event)
         }
         self.onEventBlock = nil
     }
     
     deinit {
+        self.timeObserver.removePeriodicObserver(self.playheadObserverUUID)
         self.timeObserver.stopTimer()
         self.timeObserver.removePeriodicObservers()
         self.timeObserver.removeBoundaryObservers()
