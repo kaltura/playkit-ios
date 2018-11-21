@@ -63,7 +63,7 @@ import AVFoundation
     /// Sent when loaded time ranges was changed, loaded time ranges represent the buffered content.
     /// could be used to show amount buffered on the playhead UI.
     @objc public static let loadedTimeRanges: PlayerEvent.Type = LoadedTimeRanges.self
-    
+    /// Sent when the playhead (current time) has moved.
     @objc public static let playheadUpdate: PlayerEvent.Type = PlayheadUpdate.self
 
     /// Sent when an error occurs in the player that the playback can recover from.
