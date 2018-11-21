@@ -173,8 +173,8 @@ import AVFoundation
     }
     
     public class PlayheadUpdate: PlayerEvent {
-        convenience init(currentTime: TimeInterval, duration: TimeInterval) {
-            self.init([EventDataKeys.currentTime: currentTime, EventDataKeys.duration: duration])
+        convenience init(currentTime: TimeInterval) {
+            self.init([EventDataKeys.currentTime: currentTime])
         }
     }
 }

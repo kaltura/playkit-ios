@@ -41,8 +41,6 @@ class PlayerController: NSObject, Player {
     
     var mediaFormat = PKMediaSource.MediaFormat.unknown
     
-    var reportedDuration: TimeInterval?
-    
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
     }
@@ -112,10 +110,7 @@ class PlayerController: NSObject, Player {
     
     /* Time Observation */
     lazy var timeObserver = TimeObserver(timeProvider: self)
-    lazy var playheadObserverUUID = self.timeObserver.addPeriodicObserver(interval: 0.1, observeOn: DispatchQueue.global()) { [weak self] (time) in
-        guard let strongSelf = self, let block = strongSelf.onEventBlock else {return}
-        block(PlayerEvent.PlayheadUpdate(currentTime: time, duration: strongSelf.reportedDuration ?? 0.0))
-    }
+    var playheadObserverUUID: UUID?
     
     /************************************************************/
     // MARK: - Initialization
@@ -126,22 +121,21 @@ class PlayerController: NSObject, Player {
 
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.verbose("postEvent:: \(event)")
-            guard let strongSelf = self else {return}
-            
-            // Cache the last reported duration
-            if event is PlayerEvent.DurationChanged {
-                if let duration = event.duration {
-                    strongSelf.reportedDuration = duration.doubleValue
-                }
-            }
-            
-            strongSelf.onEventBlock?(event)
+            self?.onEventBlock?(event)
         }
+        
+        self.playheadObserverUUID = self.timeObserver.addPeriodicObserver(interval: 0.1, observeOn: DispatchQueue.global()) { [weak self] (time) in
+            self?.onEventBlock?(PlayerEvent.PlayheadUpdate(currentTime: time))
+        }
+        
         self.onEventBlock = nil
     }
     
     deinit {
-        self.timeObserver.removePeriodicObserver(self.playheadObserverUUID)
+        if let uuid = self.playheadObserverUUID {
+            self.timeObserver.removePeriodicObserver(uuid)
+        }
+        
         self.timeObserver.stopTimer()
         self.timeObserver.removePeriodicObservers()
         self.timeObserver.removeBoundaryObservers()
