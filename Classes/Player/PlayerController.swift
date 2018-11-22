@@ -41,9 +41,6 @@ class PlayerController: NSObject, Player {
     
     var mediaFormat = PKMediaSource.MediaFormat.unknown
     
-    /* Time Observation */
-    var timeObserver: TimeObserver!
-    
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
     }
@@ -111,21 +108,34 @@ class PlayerController: NSObject, Player {
     let reachability = PKReachability()
     var shouldRefresh: Bool = false
     
+    /* Time Observation */
+    lazy var timeObserver = TimeObserver(timeProvider: self)
+    var playheadObserverUUID: UUID?
+    
     /************************************************************/
     // MARK: - Initialization
     /************************************************************/
     
     public override init() {        
         super.init()
-        self.timeObserver = TimeObserver(timeProvider: self)
+
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.verbose("postEvent:: \(event)")
             self?.onEventBlock?(event)
         }
+        
+        self.playheadObserverUUID = self.timeObserver.addPeriodicObserver(interval: 0.1, observeOn: DispatchQueue.global()) { [weak self] (time) in
+            self?.onEventBlock?(PlayerEvent.PlayheadUpdate(currentTime: time))
+        }
+        
         self.onEventBlock = nil
     }
     
     deinit {
+        if let uuid = self.playheadObserverUUID {
+            self.timeObserver.removePeriodicObserver(uuid)
+        }
+        
         self.timeObserver.stopTimer()
         self.timeObserver.removePeriodicObservers()
         self.timeObserver.removeBoundaryObservers()
