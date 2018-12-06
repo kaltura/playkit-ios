@@ -76,6 +76,11 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         return nil
     }
     
+    public var playbackType: String? {
+        printInvocationWarning("\(#function)")
+        return nil
+    }
+    
     /// Save view reference till prepare
     public weak var view: PlayerView?
     

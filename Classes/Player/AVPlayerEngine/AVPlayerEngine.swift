@@ -189,6 +189,12 @@ public class AVPlayerEngine: AVPlayer {
         }
     }
     
+    public var playbackType: String? {
+        get {
+            return self.currentItem?.accessLog()?.events.last?.playbackType
+        }
+    }
+    
     // MARK: Player Methods
     
     override init() {

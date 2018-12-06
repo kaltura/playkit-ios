@@ -116,6 +116,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         return self.currentPlayer.currentItem?.loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
     }
     
+    public var playbackType: String? {
+        return self.currentPlayer.playbackType
+    }
+    
     public override init() {
         self.currentPlayer = AVPlayerEngine()
         super.init()
