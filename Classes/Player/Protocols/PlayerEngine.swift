@@ -22,6 +22,8 @@ import Foundation
     
     var mediaConfig: MediaConfig? { get set }
     
+    var playbackType: String? { get }
+    
     /// Load media on player
     func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler)
 }

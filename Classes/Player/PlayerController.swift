@@ -248,6 +248,11 @@ class PlayerController: NSObject, Player {
     }
     
     func isLive() -> Bool {
+        let avPlayerItemAccessLogEventPlaybackTypeLive = "LIVE"
+        if let playbackType = currentPlayer.playbackType, playbackType == avPlayerItemAccessLogEventPlaybackTypeLive {
+            return true
+        }
+        
         if let entry = self.mediaEntry {
             if entry.mediaType == MediaType.live {
                 return true
