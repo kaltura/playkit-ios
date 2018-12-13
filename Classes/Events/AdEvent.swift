@@ -80,7 +80,11 @@ import Foundation
     public class AdBreakReady: AdEvent {}
     public class AllAdsCompleted: AdEvent {}
     public class AdComplete: AdEvent {}
-    public class AdClicked: AdEvent {}
+    public class AdClicked: AdEvent {
+        public convenience init(clickThroughUrl: String) {
+            self.init([AdEventDataKeys.clickThroughUrl: clickThroughUrl])
+        }
+    }
     public class AdFirstQuartile: AdEvent {}
     public class AdLog: AdEvent {}
     public class AdMidpoint: AdEvent {}
@@ -152,6 +156,7 @@ import Foundation
     public static let adCuePoints = "adCuePoints"
     public static let adInfo = "adInfo"
     public static let adTagUrl = "adTagUrl"
+    public static let clickThroughUrl = "clickThroughUrl"
 }
 
 extension PKEvent {
