@@ -47,6 +47,12 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
+    public var currentProgramTime: Date? {
+        printInvocationWarning("\(#function)")
+        return nil
+    }
+    
+
     public var startPosition: TimeInterval {
         get {
             printInvocationWarning("\(#function)")

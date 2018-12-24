@@ -46,6 +46,10 @@ import AVKit
         }
     }
     
+    public var currentProgramTime: Date? {
+        return self.player.currentProgramTime
+    }
+    
     public var duration: Double {
         return self.player.duration
     }

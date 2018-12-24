@@ -36,6 +36,9 @@ import Foundation
     /// The current player position.
     @objc var currentTime: TimeInterval { get set }
     
+    /// The current program time (PROGRAM-DATE-TIME).
+    @objc var currentProgramTime: Date? { get }
+    
     /// Get the player's current audio track.
     @objc var currentAudioTrack: String? { get }
     

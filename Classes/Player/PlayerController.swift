@@ -71,6 +71,10 @@ class PlayerController: NSObject, Player {
         }
     }
     
+    public var currentProgramTime: Date? {
+        return self.currentPlayer.currentProgramTime
+    }
+    
     public var currentAudioTrack: String? {
         return self.currentPlayer.currentAudioTrack
     }
