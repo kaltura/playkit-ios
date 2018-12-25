@@ -76,6 +76,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         set { self.currentPlayer.currentPosition = newValue }
     }
     
+    public var currentProgramTime: Date? {
+        return self.currentPlayer.currentItem?.currentDate()
+    }
+    
     public var currentPosition: TimeInterval {
         get { return self.currentPlayer.currentPosition }
         set { self.currentPlayer.currentPosition = newValue }
