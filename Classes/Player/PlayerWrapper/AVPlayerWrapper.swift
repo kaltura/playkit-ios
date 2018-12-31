@@ -125,7 +125,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         super.init()
         
         self.currentPlayer.onEventBlock = { [weak self] event in
-            PKLog.verbose("postEvent:: \(event.namespace)")
+            PKLog.verbose("postEvent:: \(event)")
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
