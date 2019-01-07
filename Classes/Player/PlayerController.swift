@@ -258,7 +258,7 @@ class PlayerController: NSObject, Player {
         }
         
         if let entry = self.mediaEntry {
-            if entry.mediaType == MediaType.live {
+            if entry.mediaType == MediaType.live || entry.mediaType == MediaType.dvrLive {
                 return true
             }
         }

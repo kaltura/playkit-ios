@@ -12,6 +12,7 @@ import UIKit
 import SwiftyJSON
 
 @objc public enum MediaType: Int {
+    case dvrLive
     case live
     case vod
     case unknown
