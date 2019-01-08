@@ -26,4 +26,7 @@ import Foundation
     
     /// Load media on player
     func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler)
+    
+    /// Plays the live media from the live edge
+    func playFromLiveEdge()
 }

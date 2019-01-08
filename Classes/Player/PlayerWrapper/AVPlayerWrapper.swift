@@ -187,6 +187,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         self.currentPlayer.play()
     }
     
+    public func playFromLiveEdge() {
+        self.currentPlayer.playFromLiveEdge()
+    }
+    
     public func pause() {
         self.currentPlayer.pause()
     }

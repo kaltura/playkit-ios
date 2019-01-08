@@ -228,7 +228,11 @@ class PlayerController: NSObject, Player {
     }
     
     func play() {
-        self.currentPlayer.play()
+        if self.mediaEntry?.mediaType == .live {
+            self.currentPlayer.playFromLiveEdge()
+        } else {
+            self.currentPlayer.play()
+        }
     }
     
     func pause() {

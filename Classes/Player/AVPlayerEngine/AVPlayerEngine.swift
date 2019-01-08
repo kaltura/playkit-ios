@@ -84,8 +84,7 @@ public class AVPlayerEngine: AVPlayer {
             return time.isNaN ? 0 : time
         }
         set {
-            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
-            
+            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, self.rangeStart.timescale)
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [weak self] (isSeeked: Bool) in
                 guard let strongSelf = self else { return }
@@ -241,6 +240,31 @@ public class AVPlayerEngine: AVPlayer {
             self.post(event: PlayerEvent.Play())
             super.play()
         }
+    }
+    
+    func playFromLiveEdge() {
+        if let currentItem = self.currentItem {
+            let seekableRanges = currentItem.seekableTimeRanges
+            if seekableRanges.count > 0 {
+                if let lastSeekableTimeRange = seekableRanges.last as? CMTimeRange, lastSeekableTimeRange.isValid {
+                    var result = CMTimeRangeGetEnd(lastSeekableTimeRange)
+                    result = CMTimeSubtract(result, CMTime(seconds: 2, preferredTimescale: result.timescale))
+                    
+                    // Need to compare with the same time scale - converting
+                    var currentTime = self.currentTime()
+                    let method: CMTimeRoundingMethod = result.timescale < currentTime.timescale ? .roundTowardZero : .roundAwayFromZero
+                    currentTime = currentTime.convertScale(result.timescale, method: method)
+
+                    if (CMTimeCompare(currentTime, result) == -1) {
+                        super.seek(to: result)
+                    }
+                } else {
+                    PKLog.debug("Seekable range is invalid")
+                }
+            }
+        }
+        
+        self.play()
     }
     
     func destroy() {
