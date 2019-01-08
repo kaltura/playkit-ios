@@ -211,6 +211,11 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func stop() {
+        guard let _ = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         PKLog.verbose("stop player")
         self.pause()
         self.seek(to: kCMTimeZero)
@@ -219,6 +224,11 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func replay() {
+        guard let _ = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         PKLog.verbose("Replay item in player")
         self.pause()
         self.seek(to: kCMTimeZero)
@@ -227,6 +237,11 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     override public func pause() {
+        guard let _ = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         if self.rate > 0 {
             // Playing, so pause.
             PKLog.debug("pause player")
@@ -235,6 +250,11 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     override public func play() {
+        guard let _ = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         if self.rate == 0 {
             PKLog.debug("play player")
             self.post(event: PlayerEvent.Play())
@@ -256,15 +276,15 @@ public class AVPlayerEngine: AVPlayer {
                     currentTime = currentTime.convertScale(result.timescale, method: method)
 
                     if (CMTimeCompare(currentTime, result) == -1) {
+                        PKLog.debug("Seeking to live edge")
                         super.seek(to: result)
                     }
                 } else {
                     PKLog.debug("Seekable range is invalid")
                 }
             }
+            self.play()
         }
-        
-        self.play()
     }
     
     func destroy() {
