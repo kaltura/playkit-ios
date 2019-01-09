@@ -228,7 +228,11 @@ class PlayerController: NSObject, Player {
     }
     
     func play() {
-        self.currentPlayer.play()
+        if self.mediaEntry?.mediaType == .live {
+            self.currentPlayer.playFromLiveEdge()
+        } else {
+            self.currentPlayer.play()
+        }
     }
     
     func pause() {
@@ -258,7 +262,7 @@ class PlayerController: NSObject, Player {
         }
         
         if let entry = self.mediaEntry {
-            if entry.mediaType == MediaType.live {
+            if entry.mediaType == MediaType.live || entry.mediaType == MediaType.dvrLive {
                 return true
             }
         }

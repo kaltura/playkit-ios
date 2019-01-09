@@ -84,8 +84,7 @@ public class AVPlayerEngine: AVPlayer {
             return time.isNaN ? 0 : time
         }
         set {
-            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, 1)
-            
+            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, self.rangeStart.timescale)
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [weak self] (isSeeked: Bool) in
                 guard let strongSelf = self else { return }
@@ -212,6 +211,11 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func stop() {
+        guard let _ = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         PKLog.verbose("stop player")
         self.pause()
         self.seek(to: kCMTimeZero)
@@ -220,6 +224,11 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func replay() {
+        guard let _ = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         PKLog.verbose("Replay item in player")
         self.pause()
         self.seek(to: kCMTimeZero)
@@ -228,6 +237,11 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     override public func pause() {
+        guard let _ = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         if self.rate > 0 {
             // Playing, so pause.
             PKLog.debug("pause player")
@@ -236,11 +250,45 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     override public func play() {
+        guard let _ = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         if self.rate == 0 {
             PKLog.debug("play player")
             self.post(event: PlayerEvent.Play())
             super.play()
         }
+    }
+    
+    func playFromLiveEdge() {
+        guard let currentItem = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
+        let seekableRanges = currentItem.seekableTimeRanges
+        if seekableRanges.count > 0 {
+            if let lastSeekableTimeRange = seekableRanges.last as? CMTimeRange, lastSeekableTimeRange.isValid {
+                var result = CMTimeRangeGetEnd(lastSeekableTimeRange)
+                let liveEdgeThreshold: Double = 2.0
+                result = CMTimeSubtract(result, CMTime(seconds: liveEdgeThreshold, preferredTimescale: result.timescale))
+                
+                // Need to compare with the same time scale - converting
+                var currentTime = self.currentTime()
+                let method: CMTimeRoundingMethod = result.timescale < currentTime.timescale ? .roundTowardZero : .roundAwayFromZero
+                currentTime = currentTime.convertScale(result.timescale, method: method)
+
+                if (CMTimeCompare(currentTime, result) == -1) {
+                    PKLog.debug("Seeking to live edge")
+                    super.seek(to: result)
+                }
+            } else {
+                PKLog.debug("Seekable range is invalid")
+            }
+        }
+        self.play()
     }
     
     func destroy() {
@@ -252,7 +300,11 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func selectTrack(trackId: String) {
-        guard let currentItem = self.currentItem else { return }
+        guard let currentItem = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         if trackId.isEmpty == false {
             let selectedTrack = self.tracksManager.selectTrack(item: currentItem, trackId: trackId)
             if let selectedTrack = selectedTrack {

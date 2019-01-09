@@ -102,6 +102,10 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
+    func playFromLiveEdge() {
+        printInvocationWarning("\(#function)")
+    }
+    
     func pause() {
         printInvocationWarning("\(#function)")
     }
