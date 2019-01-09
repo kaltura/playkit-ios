@@ -272,8 +272,8 @@ public class AVPlayerEngine: AVPlayer {
         if seekableRanges.count > 0 {
             if let lastSeekableTimeRange = seekableRanges.last as? CMTimeRange, lastSeekableTimeRange.isValid {
                 var result = CMTimeRangeGetEnd(lastSeekableTimeRange)
-                let liveEdgeInset = 2
-                result = CMTimeSubtract(result, CMTime(seconds: liveEdgeInset, preferredTimescale: result.timescale))
+                let liveEdgeThreshold = 2
+                result = CMTimeSubtract(result, CMTime(seconds: liveEdgeThreshold, preferredTimescale: result.timescale))
                 
                 // Need to compare with the same time scale - converting
                 var currentTime = self.currentTime()
