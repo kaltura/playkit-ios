@@ -263,28 +263,32 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     func playFromLiveEdge() {
-        if let currentItem = self.currentItem {
-            let seekableRanges = currentItem.seekableTimeRanges
-            if seekableRanges.count > 0 {
-                if let lastSeekableTimeRange = seekableRanges.last as? CMTimeRange, lastSeekableTimeRange.isValid {
-                    var result = CMTimeRangeGetEnd(lastSeekableTimeRange)
-                    result = CMTimeSubtract(result, CMTime(seconds: 2, preferredTimescale: result.timescale))
-                    
-                    // Need to compare with the same time scale - converting
-                    var currentTime = self.currentTime()
-                    let method: CMTimeRoundingMethod = result.timescale < currentTime.timescale ? .roundTowardZero : .roundAwayFromZero
-                    currentTime = currentTime.convertScale(result.timescale, method: method)
-
-                    if (CMTimeCompare(currentTime, result) == -1) {
-                        PKLog.debug("Seeking to live edge")
-                        super.seek(to: result)
-                    }
-                } else {
-                    PKLog.debug("Seekable range is invalid")
-                }
-            }
-            self.play()
+        guard let currentItem = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
         }
+        
+        let seekableRanges = currentItem.seekableTimeRanges
+        if seekableRanges.count > 0 {
+            if let lastSeekableTimeRange = seekableRanges.last as? CMTimeRange, lastSeekableTimeRange.isValid {
+                var result = CMTimeRangeGetEnd(lastSeekableTimeRange)
+                let liveEdgeInset = 2
+                result = CMTimeSubtract(result, CMTime(seconds: liveEdgeInset, preferredTimescale: result.timescale))
+                
+                // Need to compare with the same time scale - converting
+                var currentTime = self.currentTime()
+                let method: CMTimeRoundingMethod = result.timescale < currentTime.timescale ? .roundTowardZero : .roundAwayFromZero
+                currentTime = currentTime.convertScale(result.timescale, method: method)
+
+                if (CMTimeCompare(currentTime, result) == -1) {
+                    PKLog.debug("Seeking to live edge")
+                    super.seek(to: result)
+                }
+            } else {
+                PKLog.debug("Seekable range is invalid")
+            }
+        }
+        self.play()
     }
     
     func destroy() {
@@ -296,7 +300,11 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func selectTrack(trackId: String) {
-        guard let currentItem = self.currentItem else { return }
+        guard let currentItem = self.currentItem else {
+            PKLog.error("current item is empty")
+            return
+        }
+        
         if trackId.isEmpty == false {
             let selectedTrack = self.tracksManager.selectTrack(item: currentItem, trackId: trackId)
             if let selectedTrack = selectedTrack {
