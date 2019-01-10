@@ -42,6 +42,12 @@ import Foundation
     // The index of the pod, where pre-roll pod is 0, mid-roll pods are 1 .. N
     // and the post-roll is -1.
     @objc public var podIndex: Int
+    // The width of the selected creative as specified in the VAST response.
+    @objc public var vastMediaWidth: Int
+    // The height of the selected creative as specified in the VAST response.
+    @objc public var vastMediaHeight: Int
+    // The bitrate of the selected creative as specified in the VAST response.
+    @objc public var vastMediaBitrate: Int
     
     /// returns the position type of the ad (pre, mid, post)
     @objc public var positionType: AdPositionType {
@@ -67,7 +73,10 @@ import Foundation
          adPosition: Int,
          timeOffset: TimeInterval,
          isBumper: Bool,
-         podIndex: Int) {
+         podIndex: Int,
+         vastMediaWidth: Int,
+         vastMediaHeight: Int,
+         vastMediaBitrate: Int) {
         
         self.adDescription = adDescription
         self.duration = adDuration
@@ -83,5 +92,28 @@ import Foundation
         self.timeOffset = timeOffset
         self.isBumper = isBumper
         self.podIndex = podIndex
+        self.vastMediaWidth = vastMediaWidth
+        self.vastMediaHeight = vastMediaHeight
+        self.vastMediaBitrate = vastMediaBitrate
+    }
+    
+    public override var description: String {
+        return "adDescription: \(adDescription)," +
+            "\n duration: \(duration)," +
+            "\n title: \(title)," +
+            "\n isSkippable: \(isSkippable)," +
+            "\n contentType: \(contentType)," +
+            "\n adId: \(adId)," +
+            "\n adSystem: \(adSystem)," +
+            "\n height: \(height)," +
+            "\n width: \(width)," +
+            "\n totalAds: \(totalAds)," +
+            "\n adPosition: \(adPosition)," +
+            "\n timeOffset: \(timeOffset)," +
+            "\n isBumper: \(isBumper)," +
+            "\n podIndex: \(podIndex)," +
+            "\n vastMediaWidth: \(vastMediaWidth)," +
+            "\n vastMediaHeight: \(vastMediaHeight)," +
+            "\n vastMediaBitrate: \(vastMediaBitrate)"
     }
 }
