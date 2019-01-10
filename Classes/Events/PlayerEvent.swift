@@ -17,7 +17,7 @@ import AVFoundation
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, stopped, ended, loadedMetadata, play, pause, playing, seeking, seeked, replay,
         tracksAvailable, textTrackChanged, audioTrackChanged, videoTrackChanged, playbackInfo, stateChanged,
-        timedMetadata, sourceSelected, loadedTimeRanges, playheadUpdate, error, errorLog
+        timedMetadata, sourceSelected, loadedTimeRanges, playheadUpdate, error, errorLog, stalled
     ]
     
     // MARK: - Player Events Static Reference
@@ -65,12 +65,12 @@ import AVFoundation
     @objc public static let loadedTimeRanges: PlayerEvent.Type = LoadedTimeRanges.self
     /// Sent when the playhead (current time) has moved.
     @objc public static let playheadUpdate: PlayerEvent.Type = PlayheadUpdate.self
-
     /// Sent when an error occurs in the player that the playback can recover from.
     @objc public static let error: PlayerEvent.Type = Error.self
-    
     /// Sent when an error log event received from player (non fatal errors).
     @objc public static let errorLog: PlayerEvent.Type = ErrorLog.self
+    /// Sent when the player has stalled. Buffering with no available data to play.
+    @objc public static let stalled: PlayerEvent.Type = Stalled.self
     
     // MARK: - Player Basic Events
 
@@ -177,4 +177,6 @@ import AVFoundation
             self.init([EventDataKeys.currentTime: currentTime])
         }
     }
+    
+    public class Stalled: PlayerEvent {}
 }
