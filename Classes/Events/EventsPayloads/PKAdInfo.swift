@@ -42,12 +42,8 @@ import Foundation
     // The index of the pod, where pre-roll pod is 0, mid-roll pods are 1 .. N
     // and the post-roll is -1.
     @objc public var podIndex: Int
-    // The width of the selected creative as specified in the VAST response.
-    @objc public var vastMediaWidth: Int
-    // The height of the selected creative as specified in the VAST response.
-    @objc public var vastMediaHeight: Int
-    // The bitrate of the selected creative as specified in the VAST response.
-    @objc public var vastMediaBitrate: Int
+    // The bitrate of the selected creative.
+    @objc public var mediaBitrate: Int
     
     /// returns the position type of the ad (pre, mid, post)
     @objc public var positionType: AdPositionType {
@@ -74,9 +70,7 @@ import Foundation
          timeOffset: TimeInterval,
          isBumper: Bool,
          podIndex: Int,
-         vastMediaWidth: Int,
-         vastMediaHeight: Int,
-         vastMediaBitrate: Int) {
+         mediaBitrate: Int) {
         
         self.adDescription = adDescription
         self.duration = adDuration
@@ -92,9 +86,7 @@ import Foundation
         self.timeOffset = timeOffset
         self.isBumper = isBumper
         self.podIndex = podIndex
-        self.vastMediaWidth = vastMediaWidth
-        self.vastMediaHeight = vastMediaHeight
-        self.vastMediaBitrate = vastMediaBitrate
+        self.mediaBitrate = mediaBitrate
     }
     
     public override var description: String {
@@ -112,8 +104,6 @@ import Foundation
             "\n timeOffset: \(timeOffset)," +
             "\n isBumper: \(isBumper)," +
             "\n podIndex: \(podIndex)," +
-            "\n vastMediaWidth: \(vastMediaWidth)," +
-            "\n vastMediaHeight: \(vastMediaHeight)," +
-            "\n vastMediaBitrate: \(vastMediaBitrate)"
+            "\n mediaBitrate: \(mediaBitrate)"
     }
 }
