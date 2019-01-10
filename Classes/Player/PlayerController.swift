@@ -192,12 +192,19 @@ class PlayerController: NSObject, Player {
             if type(of: self.currentPlayer) is VRPlayerEngine.Type { // do not create new if current player is already vr player
                 isCreated = false
             } else {
-                guard let vrPlayerWrapper = NSClassFromString("PlayKitVR.VRPlayerWrapper") as? VRPlayerEngine.Type else {
-                    PKLog.error("VRPlayerWrapper does not exist")
-                    fatalError("VR library is missing, make sure to add it via Podfile.")
+                if let vrPlayerWrapper = NSClassFromString("PlayKitVR.VRPlayerWrapper") as? VRPlayerEngine.Type {
+                    self.currentPlayer = vrPlayerWrapper.init()
+                    isCreated = true
+                } else {
+                    PKLog.error("VRPlayerWrapper does not exist, VR library is missing, make sure to add it via Podfile.")
+                    // Create AVPlayer
+                    if self.currentPlayer is AVPlayerWrapper { // do not create new if current player is already vr player
+                        isCreated = false
+                    } else {
+                        self.currentPlayer = AVPlayerWrapper()
+                        isCreated = true
+                    }
                 }
-                self.currentPlayer = vrPlayerWrapper.init()
-                isCreated = true
             }
         } else {
             if type(of: self.currentPlayer) is VRPlayerEngine.Type {
