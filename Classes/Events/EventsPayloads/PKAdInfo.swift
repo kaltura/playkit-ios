@@ -42,6 +42,8 @@ import Foundation
     // The index of the pod, where pre-roll pod is 0, mid-roll pods are 1 .. N
     // and the post-roll is -1.
     @objc public var podIndex: Int
+    // The bitrate of the selected creative.
+    @objc public var mediaBitrate: Int
     
     /// returns the position type of the ad (pre, mid, post)
     @objc public var positionType: AdPositionType {
@@ -67,7 +69,8 @@ import Foundation
          adPosition: Int,
          timeOffset: TimeInterval,
          isBumper: Bool,
-         podIndex: Int) {
+         podIndex: Int,
+         mediaBitrate: Int) {
         
         self.adDescription = adDescription
         self.duration = adDuration
@@ -83,5 +86,24 @@ import Foundation
         self.timeOffset = timeOffset
         self.isBumper = isBumper
         self.podIndex = podIndex
+        self.mediaBitrate = mediaBitrate
+    }
+    
+    public override var description: String {
+        return "adDescription: \(adDescription)," +
+            "\n duration: \(duration)," +
+            "\n title: \(title)," +
+            "\n isSkippable: \(isSkippable)," +
+            "\n contentType: \(contentType)," +
+            "\n adId: \(adId)," +
+            "\n adSystem: \(adSystem)," +
+            "\n height: \(height)," +
+            "\n width: \(width)," +
+            "\n totalAds: \(totalAds)," +
+            "\n adPosition: \(adPosition)," +
+            "\n timeOffset: \(timeOffset)," +
+            "\n isBumper: \(isBumper)," +
+            "\n podIndex: \(podIndex)," +
+            "\n mediaBitrate: \(mediaBitrate)"
     }
 }
