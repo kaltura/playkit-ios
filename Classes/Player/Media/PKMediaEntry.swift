@@ -16,6 +16,19 @@ import SwiftyJSON
     case live
     case vod
     case unknown
+    
+    public var description: String {
+        switch self {
+        case .dvrLive:
+            return "Live with DVR"
+        case .live:
+            return "Live"
+        case .vod:
+            return "VOD"
+        case .unknown:
+            return "Unknown"
+        }
+    }
 }
 
 fileprivate let idKey = "id"
@@ -30,6 +43,7 @@ fileprivate let durationKey = "duration"
     @objc public var duration: TimeInterval = 0
     @objc public var mediaType: MediaType = .unknown
     @objc public var metadata: [String: String]?
+    @objc public var name: String?
    
     var vrData: VRData?
     public var tags: String? {
@@ -77,7 +91,12 @@ fileprivate let durationKey = "duration"
     
     @objc override public var description: String {
         get {
-            return "id : \(self.id), sources: \(String(describing: self.sources))"
+            return "id : \(self.id)," +
+                "\n sources: \(String(describing: self.sources))," +
+                "\n duration: \(duration)," +
+                "\n mediaType: \(mediaType.description)," +
+                "\n metadata: \(String(describing: metadata))," +
+                "\n name: \(String(describing: name))"
         }
     }
     
