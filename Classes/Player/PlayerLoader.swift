@@ -25,7 +25,7 @@ class PlayerLoader: PlayerDecoratorBase {
     var messageBus = MessageBus()
     var concreatePlayerController: PlayerController?
     
-    func load(pluginConfig: PluginConfig?) throws {
+    func load(pluginConfig: PluginConfig?) {
         var playerController: PlayerController
         
         playerController = PlayerController()
@@ -42,17 +42,19 @@ class PlayerLoader: PlayerDecoratorBase {
         if let pluginConfigs = pluginConfig?.config {
             for pluginName in pluginConfigs.keys {
                 let pluginConfig = pluginConfigs[pluginName]
-                let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
-                
-                var decorator: PlayerDecoratorBase? = nil
-                
-                if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
-                    d.setPlayer(player)
-                    decorator = d
-                    player = d
+                do {
+                    let pluginObject = try PlayKitManager.shared.createPlugin(name: pluginName, player: player, pluginConfig: pluginConfig, messageBus: self.messageBus)
+                    var decorator: PlayerDecoratorBase? = nil
+                    
+                    if let d = (pluginObject as? PlayerDecoratorProvider)?.getPlayerDecorator() {
+                        d.setPlayer(player)
+                        decorator = d
+                        player = d
+                    }
+                    
+                    loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
+                } catch {
                 }
-                
-                loadedPlugins[pluginName] = LoadedPlugin(plugin: pluginObject, decorator: decorator)
             }
         }
         
