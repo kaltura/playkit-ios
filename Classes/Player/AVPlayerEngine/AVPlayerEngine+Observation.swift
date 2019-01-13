@@ -95,7 +95,7 @@ extension AVPlayerEngine {
         // post notification only for current player item.
         guard let notificationObject = notification.object as? AVPlayerItem, notificationObject === self.currentItem else { return }
         
-        self.post(event: PlayerEvent.Stalled())
+        self.post(event: PlayerEvent.PlaybackStalled())
     }
     
     @objc func didFailToPlayToEndTime(_ notification: NSNotification) {

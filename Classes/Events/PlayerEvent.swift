@@ -17,7 +17,7 @@ import AVFoundation
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, stopped, ended, loadedMetadata, play, pause, playing, seeking, seeked, replay,
         tracksAvailable, textTrackChanged, audioTrackChanged, videoTrackChanged, playbackInfo, stateChanged,
-        timedMetadata, sourceSelected, loadedTimeRanges, playheadUpdate, error, errorLog, stalled
+        timedMetadata, sourceSelected, loadedTimeRanges, playheadUpdate, error, errorLog, playbackStalled
     ]
     
     // MARK: - Player Events Static Reference
@@ -70,7 +70,7 @@ import AVFoundation
     /// Sent when an error log event received from player (non fatal errors).
     @objc public static let errorLog: PlayerEvent.Type = ErrorLog.self
     /// Sent when the player has stalled. Buffering with no available data to play.
-    @objc public static let stalled: PlayerEvent.Type = Stalled.self
+    @objc public static let playbackStalled: PlayerEvent.Type = PlaybackStalled.self
     
     // MARK: - Player Basic Events
 
@@ -178,5 +178,5 @@ import AVFoundation
         }
     }
     
-    public class Stalled: PlayerEvent {}
+    public class PlaybackStalled: PlayerEvent {}
 }
