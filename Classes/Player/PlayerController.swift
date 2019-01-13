@@ -247,7 +247,7 @@ class PlayerController: NSObject, Player {
     }
     
     func resume() {
-        self.currentPlayer.play()
+        self.play()
     }
     
     func stop() {
