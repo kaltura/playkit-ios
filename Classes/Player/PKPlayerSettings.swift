@@ -23,7 +23,7 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     }
 }
 
-@objc public enum TrackSelectionMode: Int {
+@objc public enum TrackSelectionMode: Int, CustomStringConvertible {
     case off
     case auto
     case selection
@@ -37,12 +37,17 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
         }
     }
     
-    public var asString: String {
+    public var description: String {
         switch self {
         case .off: return "OFF"
         case .auto: return "AUTO"
         case .selection: return "SELECTION"
         }
+    }
+    
+    @available(*, deprecated, message: "Use description instead")
+    public var asString: String {
+        return self.description
     }
 }
 

@@ -18,7 +18,7 @@ fileprivate let formatTypeKey: String = "sourceType"
 
 @objc public class PKMediaSource: NSObject {
     
-    @objc public enum MediaFormat: Int {
+    @objc public enum MediaFormat: Int, CustomStringConvertible {
         case hls
         case wvm
         case mp4
@@ -46,6 +46,16 @@ fileprivate let formatTypeKey: String = "sourceType"
             case "mov": return .mp4
             case "m4a": return .mp3
             default: return .unknown
+            }
+        }
+        
+        public var description: String {
+            switch self {
+            case .hls: return "hls"
+            case .wvm: return "wvm"
+            case .mp4: return "mp4"
+            case .mp3: return "mp3"
+            case .unknown: return "Unknown"
             }
         }
     }
