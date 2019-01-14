@@ -134,7 +134,17 @@ public class TracksManager: NSObject {
             
             optionMediaType = option.mediaType
             let trackId = "\(optionMediaType):\(String(index))"
-            let track = Track(id: trackId, title: option.displayName, type: .text, language: option.extendedLanguageTag)
+            
+            var title: String = option.displayName
+            for metadata in option.commonMetadata {
+                if metadata.commonKey == .commonKeyTitle {
+                    if let metadataTitle = metadata.stringValue {
+                        title = metadataTitle
+                    }
+                }
+            }
+            
+            let track = Track(id: trackId, title: title, type: .text, language: option.extendedLanguageTag)
             
             self.textTracks?.append(track)
         }
