@@ -249,7 +249,10 @@ extension AVPlayerEngine {
             if self.isFirstReady {
                 self.isFirstReady = false
                 // handle tracks, send event and handle selection mode.
-                self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+                
+                self.tracksManager.handleTracks(item: self.currentItem,
+                                                cea608CaptionsEnabled: self.asset?.playerSettings.cea608CaptionsEnabled ?? false,
+                                                block: { (tracks: PKTracks) in
                     self.handleTracksSelection(tracks)
                     self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
                 })

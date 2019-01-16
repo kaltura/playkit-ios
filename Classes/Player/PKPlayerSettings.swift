@@ -72,6 +72,8 @@ enum PlayerSettingsType {
         }
     }
     
+    @objc public var cea608CaptionsEnabled = false
+    
     /// The settings for network data consumption.
     @objc public var network = PKNetworkSettings()
     @objc public var trackSelection = PKTrackSelectionSettings()
@@ -81,6 +83,7 @@ enum PlayerSettingsType {
     
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()
+        copy.cea608CaptionsEnabled = self.cea608CaptionsEnabled
         copy.network = self.network
         copy.trackSelection = self.trackSelection
         copy.contentRequestAdapter = self.contentRequestAdapter
