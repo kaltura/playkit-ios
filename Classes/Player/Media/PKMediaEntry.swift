@@ -11,7 +11,7 @@
 import UIKit
 import SwiftyJSON
 
-@objc public enum MediaType: Int {
+@objc public enum MediaType: Int, CustomStringConvertible {
     case dvrLive
     case live
     case vod
@@ -19,14 +19,10 @@ import SwiftyJSON
     
     public var description: String {
         switch self {
-        case .dvrLive:
-            return "Live with DVR"
-        case .live:
-            return "Live"
-        case .vod:
-            return "VOD"
-        case .unknown:
-            return "Unknown"
+        case .dvrLive: return "Live with DVR"
+        case .live: return "Live"
+        case .vod: return "VOD"
+        case .unknown: return "Unknown"
         }
     }
 }
@@ -109,12 +105,22 @@ fileprivate let durationKey = "duration"
 
 @objc open class DRMParams: NSObject {
     
-    @objc public enum Scheme: Int {
+    @objc public enum Scheme: Int, CustomStringConvertible {
         case widevineCenc
         case playreadyCenc
         case widevineClassic
         case fairplay
         case unknown
+        
+        public var description: String {
+            switch self {
+            case .widevineCenc: return "Widevine Cenc"
+            case .playreadyCenc: return "PlayReady Cenc"
+            case .widevineClassic: return "Widevine Classic"
+            case .fairplay: return "FairPlay"
+            case .unknown: return "Unknown"
+            }
+        }
     }
     
     public var licenseUri: URL?

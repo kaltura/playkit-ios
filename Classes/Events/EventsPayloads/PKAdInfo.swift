@@ -11,10 +11,18 @@
 import Foundation
 
 /// The position type of the ad according to the content timeline.
-@objc public enum AdPositionType: Int {
+@objc public enum AdPositionType: Int, CustomStringConvertible {
     case preRoll
     case midRoll
     case postRoll
+    
+    public var description: String {
+        switch self {
+        case .preRoll: return "preRoll"
+        case .midRoll: return "midRoll"
+        case .postRoll: return "postRoll"
+        }
+    }
 }
 
 /// `PKAdInfo` represents ad information.
@@ -90,20 +98,21 @@ import Foundation
     }
     
     public override var description: String {
-        return "adDescription: \(adDescription)," +
-            "\n duration: \(duration)," +
-            "\n title: \(title)," +
-            "\n isSkippable: \(isSkippable)," +
-            "\n contentType: \(contentType)," +
-            "\n adId: \(adId)," +
-            "\n adSystem: \(adSystem)," +
-            "\n height: \(height)," +
-            "\n width: \(width)," +
-            "\n totalAds: \(totalAds)," +
-            "\n adPosition: \(adPosition)," +
-            "\n timeOffset: \(timeOffset)," +
-            "\n isBumper: \(isBumper)," +
-            "\n podIndex: \(podIndex)," +
-            "\n mediaBitrate: \(mediaBitrate)"
+        return "adDescription: \(adDescription)\n" +
+            "duration: \(duration)\n" +
+            "title: \(title)\n" +
+            "isSkippable: \(isSkippable)\n" +
+            "contentType: \(contentType)\n" +
+            "adId: \(adId)\n" +
+            "adSystem: \(adSystem)\n" +
+            "height: \(height)\n" +
+            "width: \(width)\n" +
+            "totalAds: \(totalAds)\n" +
+            "adPosition: \(adPosition)\n" +
+            "timeOffset: \(timeOffset)\n" +
+            "isBumper: \(isBumper)\n" +
+            "podIndex: \(podIndex)\n" +
+            "mediaBitrate: \(mediaBitrate)\n" +
+            "positionType: \(positionType)"
     }
 }
