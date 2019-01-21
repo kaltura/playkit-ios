@@ -11,10 +11,20 @@
 import UIKit
 import SwiftyJSON
 
-@objc public enum MediaType: Int {
+@objc public enum MediaType: Int, CustomStringConvertible {
+    case dvrLive
     case live
     case vod
     case unknown
+    
+    public var description: String {
+        switch self {
+        case .dvrLive: return "Live with DVR"
+        case .live: return "Live"
+        case .vod: return "VOD"
+        case .unknown: return "Unknown"
+        }
+    }
 }
 
 fileprivate let idKey = "id"
@@ -29,6 +39,7 @@ fileprivate let durationKey = "duration"
     @objc public var duration: TimeInterval = 0
     @objc public var mediaType: MediaType = .unknown
     @objc public var metadata: [String: String]?
+    @objc public var name: String?
    
     var vrData: VRData?
     public var tags: String? {
@@ -76,7 +87,12 @@ fileprivate let durationKey = "duration"
     
     @objc override public var description: String {
         get {
-            return "id : \(self.id), sources: \(String(describing: self.sources))"
+            return "id : \(self.id)," +
+                "\n sources: \(String(describing: self.sources))," +
+                "\n duration: \(duration)," +
+                "\n mediaType: \(mediaType.description)," +
+                "\n metadata: \(String(describing: metadata))," +
+                "\n name: \(String(describing: name))"
         }
     }
     
@@ -89,12 +105,22 @@ fileprivate let durationKey = "duration"
 
 @objc open class DRMParams: NSObject {
     
-    @objc public enum Scheme: Int {
+    @objc public enum Scheme: Int, CustomStringConvertible {
         case widevineCenc
         case playreadyCenc
         case widevineClassic
         case fairplay
         case unknown
+        
+        public var description: String {
+            switch self {
+            case .widevineCenc: return "Widevine Cenc"
+            case .playreadyCenc: return "PlayReady Cenc"
+            case .widevineClassic: return "Widevine Classic"
+            case .fairplay: return "FairPlay"
+            case .unknown: return "Unknown"
+            }
+        }
     }
     
     public var licenseUri: URL?

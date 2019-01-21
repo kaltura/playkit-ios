@@ -15,7 +15,7 @@ import AVFoundation
 // MARK: - ViewState
 /************************************************************/
 
-@objc public enum ViewState: Int {
+@objc public enum ViewState: Int, CustomStringConvertible {
     /// Sent when player's view state panorama.
     case panorama
     /// Sent when player's view state vr.
@@ -24,6 +24,15 @@ import AVFoundation
     case error
     /// Sent when player's view state unknown.
     case unknown = -1
+    
+    public var description: String {
+        switch self {
+        case .panorama: return "Panorama"
+        case .stereo: return "Stereo"
+        case .error: return "Error"
+        case .unknown: return "Unknown"
+        }
+    }
 }
 
 /************************************************************/

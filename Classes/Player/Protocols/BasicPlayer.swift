@@ -1,5 +1,5 @@
 // ===================================================================================================
-// Copyright (C) 2017 Kaltura Inc.
+// Copyright (C) 2019 Kaltura Inc.
 //
 // Licensed under the AGPLv3 license, unless a different license for a 
 // particular library is specified in the applicable library path.
@@ -35,6 +35,9 @@ import Foundation
     
     /// The current player position.
     @objc var currentTime: TimeInterval { get set }
+    
+    /// The current program time (PROGRAM-DATE-TIME).
+    @objc var currentProgramTime: Date? { get }
     
     /// Get the player's current audio track.
     @objc var currentAudioTrack: String? { get }

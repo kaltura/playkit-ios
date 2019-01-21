@@ -41,9 +41,6 @@ class PlayerController: NSObject, Player {
     
     var mediaFormat = PKMediaSource.MediaFormat.unknown
     
-    /* Time Observation */
-    var timeObserver: TimeObserver!
-    
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
     }
@@ -72,6 +69,10 @@ class PlayerController: NSObject, Player {
         set {
             self.seek(to: newValue)
         }
+    }
+    
+    public var currentProgramTime: Date? {
+        return self.currentPlayer.currentProgramTime
     }
     
     public var currentAudioTrack: String? {
@@ -111,21 +112,34 @@ class PlayerController: NSObject, Player {
     let reachability = PKReachability()
     var shouldRefresh: Bool = false
     
+    /* Time Observation */
+    lazy var timeObserver = TimeObserver(timeProvider: self)
+    var playheadObserverUUID: UUID?
+    
     /************************************************************/
     // MARK: - Initialization
     /************************************************************/
     
     public override init() {        
         super.init()
-        self.timeObserver = TimeObserver(timeProvider: self)
+
         self.currentPlayer.onEventBlock = { [weak self] event in
             PKLog.verbose("postEvent:: \(event)")
             self?.onEventBlock?(event)
         }
+        
+        self.playheadObserverUUID = self.timeObserver.addPeriodicObserver(interval: 0.1, observeOn: DispatchQueue.global()) { [weak self] (time) in
+            self?.onEventBlock?(PlayerEvent.PlayheadUpdate(currentTime: time))
+        }
+        
         self.onEventBlock = nil
     }
     
     deinit {
+        if let uuid = self.playheadObserverUUID {
+            self.timeObserver.removePeriodicObserver(uuid)
+        }
+        
         self.timeObserver.stopTimer()
         self.timeObserver.removePeriodicObservers()
         self.timeObserver.removeBoundaryObservers()
@@ -178,12 +192,19 @@ class PlayerController: NSObject, Player {
             if type(of: self.currentPlayer) is VRPlayerEngine.Type { // do not create new if current player is already vr player
                 isCreated = false
             } else {
-                guard let vrPlayerWrapper = NSClassFromString("PlayKitVR.VRPlayerWrapper") as? VRPlayerEngine.Type else {
-                    PKLog.error("VRPlayerWrapper does not exist")
-                    fatalError("VR library is missing, make sure to add it via Podfile.")
+                if let vrPlayerWrapper = NSClassFromString("PlayKitVR.VRPlayerWrapper") as? VRPlayerEngine.Type {
+                    self.currentPlayer = vrPlayerWrapper.init()
+                    isCreated = true
+                } else {
+                    PKLog.error("VRPlayerWrapper does not exist, VR library is missing, make sure to add it via Podfile.")
+                    // Create AVPlayer
+                    if self.currentPlayer is AVPlayerWrapper { // do not create new if current player is already vr player
+                        isCreated = false
+                    } else {
+                        self.currentPlayer = AVPlayerWrapper()
+                        isCreated = true
+                    }
                 }
-                self.currentPlayer = vrPlayerWrapper.init()
-                isCreated = true
             }
         } else {
             if type(of: self.currentPlayer) is VRPlayerEngine.Type {
@@ -214,7 +235,11 @@ class PlayerController: NSObject, Player {
     }
     
     func play() {
-        self.currentPlayer.play()
+        if self.mediaEntry?.mediaType == .live {
+            self.currentPlayer.playFromLiveEdge()
+        } else {
+            self.currentPlayer.play()
+        }
     }
     
     func pause() {
@@ -222,7 +247,7 @@ class PlayerController: NSObject, Player {
     }
     
     func resume() {
-        self.currentPlayer.play()
+        self.play()
     }
     
     func stop() {
@@ -238,8 +263,13 @@ class PlayerController: NSObject, Player {
     }
     
     func isLive() -> Bool {
+        let avPlayerItemAccessLogEventPlaybackTypeLive = "LIVE"
+        if let playbackType = currentPlayer.playbackType, playbackType == avPlayerItemAccessLogEventPlaybackTypeLive {
+            return true
+        }
+        
         if let entry = self.mediaEntry {
-            if entry.mediaType == MediaType.live {
+            if entry.mediaType == MediaType.live || entry.mediaType == MediaType.dvrLive {
                 return true
             }
         }

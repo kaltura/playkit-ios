@@ -43,6 +43,7 @@ extension AVPlayerEngine {
         NotificationCenter.default.addObserver(self, selector: #selector(self.didPlayToEndTime(_:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onPlaybackStalledNotification), name: .AVPlayerItemPlaybackStalled, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
@@ -62,6 +63,7 @@ extension AVPlayerEngine {
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemPlaybackStalled, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
@@ -81,10 +83,19 @@ extension AVPlayerEngine {
     }
     
     @objc func onErrorLogEntryNotification(notification: Notification) {
-        guard let playerItem = notification.object as? AVPlayerItem, let errorLog = playerItem.errorLog(),
-            let lastEvent = errorLog.events.last, playerItem === self.currentItem else { return }
+        guard let playerItem = notification.object as? AVPlayerItem,
+            let errorLog = playerItem.errorLog(),
+            let lastEvent = errorLog.events.last,
+            playerItem === self.currentItem else { return }
         PKLog.warning("error description: \(String(describing: lastEvent.errorComment)), error domain: \(lastEvent.errorDomain), error code: \(lastEvent.errorStatusCode)")
         self.post(event: PlayerEvent.ErrorLog(error: PlayerErrorLog(errorLogEvent: lastEvent)))
+    }
+    
+    @objc func onPlaybackStalledNotification(notification: Notification) {
+        // post notification only for current player item.
+        guard let notificationObject = notification.object as? AVPlayerItem, notificationObject === self.currentItem else { return }
+        
+        self.post(event: PlayerEvent.PlaybackStalled())
     }
     
     @objc func didFailToPlayToEndTime(_ notification: NSNotification) {
@@ -238,7 +249,10 @@ extension AVPlayerEngine {
             if self.isFirstReady {
                 self.isFirstReady = false
                 // handle tracks, send event and handle selection mode.
-                self.tracksManager.handleTracks(item: self.currentItem, block: { (tracks: PKTracks) in
+                
+                self.tracksManager.handleTracks(item: self.currentItem,
+                                                cea608CaptionsEnabled: self.asset?.playerSettings.cea608CaptionsEnabled ?? false,
+                                                block: { (tracks: PKTracks) in
                     self.handleTracksSelection(tracks)
                     self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
                 })

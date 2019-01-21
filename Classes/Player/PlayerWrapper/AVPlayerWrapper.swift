@@ -76,6 +76,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         set { self.currentPlayer.currentPosition = newValue }
     }
     
+    public var currentProgramTime: Date? {
+        return self.currentPlayer.currentItem?.currentDate()
+    }
+    
     public var currentPosition: TimeInterval {
         get { return self.currentPlayer.currentPosition }
         set { self.currentPlayer.currentPosition = newValue }
@@ -116,12 +120,16 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         return self.currentPlayer.currentItem?.loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
     }
     
+    public var playbackType: String? {
+        return self.currentPlayer.playbackType
+    }
+    
     public override init() {
         self.currentPlayer = AVPlayerEngine()
         super.init()
         
         self.currentPlayer.onEventBlock = { [weak self] event in
-            PKLog.verbose("postEvent:: \(event.namespace)")
+            PKLog.verbose("postEvent:: \(event)")
             self?.onEventBlock?(event)
         }
         self.onEventBlock = nil
@@ -178,6 +186,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     
     public func play() {
         self.currentPlayer.play()
+    }
+    
+    public func playFromLiveEdge() {
+        self.currentPlayer.playFromLiveEdge()
     }
     
     public func pause() {

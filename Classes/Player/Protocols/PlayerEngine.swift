@@ -8,16 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-// ===================================================================================================
-// Copyright (C) 2017 Kaltura Inc.
-//
-// Licensed under the AGPLv3 license, unless a different license for a
-// particular library is specified in the applicable library path.
-//
-// You may obtain a copy of the License at
-// https://www.gnu.org/licenses/agpl-3.0.html
-// ===================================================================================================
-
 import Foundation
 
 @objc public protocol PlayerEngine: BasicPlayer {
@@ -32,6 +22,11 @@ import Foundation
     
     var mediaConfig: MediaConfig? { get set }
     
+    var playbackType: String? { get }
+    
     /// Load media on player
     func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler)
+    
+    /// Plays the live media from the live edge
+    func playFromLiveEdge()
 }

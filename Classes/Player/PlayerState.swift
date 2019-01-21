@@ -39,18 +39,12 @@ import Foundation
     
     public var description: String {
         switch self {
-        case .idle:
-            return "Idle"
-        case .ready:
-            return "Ready"
-        case .buffering:
-            return "Buffering"
-        case .ended:
-            return "Ended"
-        case .error:
-            return "Error"
-        case .unknown:
-            return "Unknown"
+        case .idle: return "Idle"
+        case .ready: return "Ready"
+        case .buffering: return "Buffering"
+        case .ended: return "Ended"
+        case .error: return "Error"
+        case .unknown: return "Unknown"
         }
     }
 }

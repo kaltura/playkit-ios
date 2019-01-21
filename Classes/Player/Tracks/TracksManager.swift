@@ -15,10 +15,11 @@ public class TracksManager: NSObject {
     
     static let textOffDisplay: String = "Off"
     
+    private var cea608CaptionsEnabled = false
     private var audioTracks: [Track]?
     private var textTracks: [Track]?
     
-    public func handleTracks(item: AVPlayerItem?, block: @escaping(_ tracks: PKTracks)->Void) {
+    public func handleTracks(item: AVPlayerItem?, cea608CaptionsEnabled: Bool, block: @escaping(_ tracks: PKTracks)->Void) {
         guard let playerItem = item else {
             PKLog.error("AVPlayerItem is nil")
             return
@@ -26,6 +27,7 @@ public class TracksManager: NSObject {
         
         PKLog.verbose("item:: \(playerItem)")
         
+        self.cea608CaptionsEnabled = cea608CaptionsEnabled
         self.audioTracks = nil
         self.textTracks = nil
         self.handleAudioTracks(item: playerItem)
@@ -124,6 +126,10 @@ public class TracksManager: NSObject {
             
             PKLog.verbose("option:: \(option)")
             
+            if !cea608CaptionsEnabled && option.mediaType == AVMediaType.closedCaption.rawValue {
+                return
+            }
+            
             var index = 0
             
             if let tracks = self.textTracks {
@@ -134,7 +140,17 @@ public class TracksManager: NSObject {
             
             optionMediaType = option.mediaType
             let trackId = "\(optionMediaType):\(String(index))"
-            let track = Track(id: trackId, title: option.displayName, type: .text, language: option.extendedLanguageTag)
+            
+            var title: String = option.displayName
+            for metadata in option.commonMetadata {
+                if metadata.commonKey == .commonKeyTitle {
+                    if let metadataTitle = metadata.stringValue {
+                        title = metadataTitle
+                    }
+                }
+            }
+            
+            let track = Track(id: trackId, title: title, type: .text, language: option.extendedLanguageTag)
             
             self.textTracks?.append(track)
         }

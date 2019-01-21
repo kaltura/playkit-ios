@@ -54,6 +54,7 @@ public extension PKEvent {
         static let mediaSource = "mediaSource"
         static let timeRanges = "timeRanges"
         static let bitrate = "bitrate"
+        static let currentTime = "currentTime"
     }
     
     // MARK: Player Data Accessors
@@ -61,6 +62,11 @@ public extension PKEvent {
     /// Duration Value, PKEvent Data Accessor
     @objc public var duration: NSNumber? {
         return self.data?[EventDataKeys.duration] as? NSNumber
+    }
+    
+    /// Current Time Value, PKEvent Data Accessor
+    @objc public var currentTime: NSNumber? {
+        return self.data?[EventDataKeys.currentTime] as? NSNumber
     }
     
     /// Duration Value, PKEvent Data Accessor

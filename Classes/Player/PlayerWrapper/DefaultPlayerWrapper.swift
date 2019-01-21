@@ -47,6 +47,12 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
+    public var currentProgramTime: Date? {
+        printInvocationWarning("\(#function)")
+        return nil
+    }
+    
+
     public var startPosition: TimeInterval {
         get {
             printInvocationWarning("\(#function)")
@@ -76,6 +82,11 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         return nil
     }
     
+    public var playbackType: String? {
+        printInvocationWarning("\(#function)")
+        return nil
+    }
+    
     /// Save view reference till prepare
     public weak var view: PlayerView?
     
@@ -88,6 +99,10 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
     }
     
     func play() {
+        printInvocationWarning("\(#function)")
+    }
+    
+    func playFromLiveEdge() {
         printInvocationWarning("\(#function)")
     }
     
