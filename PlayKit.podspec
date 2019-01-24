@@ -20,7 +20,7 @@ s.subspec 'Core' do |sp|
     sp.dependency 'SwiftyJSON', '3.1.4'
     sp.dependency 'XCGLogger', '~> 6.1.0'
     sp.dependency 'SwiftyXMLParser', '3.0.3'
-    sp.dependency 'KalturaNetKit', '~> 0.0'
+    sp.dependency 'KalturaNetKit', '~> 1.0.0'
     sp.dependency 'PlayKitUtils', '~> 0.1.6'
 end
 
