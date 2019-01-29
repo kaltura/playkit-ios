@@ -17,7 +17,7 @@ import CoreMedia
 /// It provides the interface to control the player’s behavior such as its ability to play, pause, and seek to various points in the timeline.
 public class AVPlayerEngine: AVPlayer {
     
-    private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
+    private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
     private var backgroundTimer: Timer?
     
     // MARK: Player Properties
@@ -84,9 +84,9 @@ public class AVPlayerEngine: AVPlayer {
             return time.isNaN ? 0 : time
         }
         set {
-            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, self.rangeStart.timescale)
+            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, preferredTimescale:self.rangeStart.timescale)
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
-            super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [weak self] (isSeeked: Bool) in
+            super.seek(to: newTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero) { [weak self] (isSeeked: Bool) in
                 guard let strongSelf = self else { return }
                 if isSeeked {
                     strongSelf.post(event: PlayerEvent.Seeked())
@@ -162,7 +162,7 @@ public class AVPlayerEngine: AVPlayer {
     /// This helps calculate `currentTime` and `duration` for live streams.
     private var rangeStart: CMTime {
         get {
-            var result: CMTime = CMTimeMakeWithSeconds(0, 1)
+            var result: CMTime = CMTimeMakeWithSeconds(0, preferredTimescale:1)
             if let currentItem = self.currentItem {
                 let seekableRanges = currentItem.seekableTimeRanges
                 if seekableRanges.count > 0 {
@@ -218,7 +218,7 @@ public class AVPlayerEngine: AVPlayer {
         
         PKLog.verbose("stop player")
         self.pause()
-        self.seek(to: kCMTimeZero)
+        self.seek(to: CMTime.zero)
         self.replaceCurrentItem(with: nil)
         self.post(event: PlayerEvent.Stopped())
     }
@@ -231,7 +231,7 @@ public class AVPlayerEngine: AVPlayer {
         
         PKLog.verbose("Replay item in player")
         self.pause()
-        self.seek(to: kCMTimeZero)
+        self.seek(to: CMTime.zero)
         super.play()
         self.post(event: PlayerEvent.Replay())
     }
@@ -339,19 +339,19 @@ extension AVPlayerEngine: AppStateObservable {
  
     public var observations: Set<NotificationObservation> {
         return [
-            NotificationObservation(name: .UIApplicationWillTerminate, onObserve: { [weak self] in
+            NotificationObservation(name: UIApplication.willTerminateNotification, onObserve: { [weak self] in
                 guard let strongSelf = self else { return }
                 
                 PKLog.debug("player: \(strongSelf)\n Will terminate, destroying...")
                 strongSelf.destroy()
             }),
-            NotificationObservation(name: .UIApplicationDidEnterBackground, onObserve: { [weak self] in
+            NotificationObservation(name: UIApplication.didEnterBackgroundNotification, onObserve: { [weak self] in
                 guard let strongSelf = self else { return }
                 
                 PKLog.debug("player: \(strongSelf)\n Did enter background, finishing up...")
                 strongSelf.startBackgroundTask()
             }),
-            NotificationObservation(name: .UIApplicationWillEnterForeground, onObserve: { [weak self] in
+            NotificationObservation(name: UIApplication.willEnterForegroundNotification, onObserve: { [weak self] in
                 guard let strongSelf = self else { return }
                 
                 PKLog.debug("player: \(strongSelf)\n Will enter foreground...")
@@ -369,7 +369,7 @@ extension AVPlayerEngine: AppStateObservable {
             strongSelf.endBackgroundTask()
         })
 
-        if self.backgroundTaskIdentifier == UIBackgroundTaskInvalid {
+        if self.backgroundTaskIdentifier == UIBackgroundTaskIdentifier.invalid {
             PKLog.debug("backgroundTaskIdentifier is invalid, can't create backgroundTask.")
         } else {
             PKLog.debug("backgroundTaskIdentifier:\(String(describing: self.backgroundTaskIdentifier)))")
@@ -378,12 +378,12 @@ extension AVPlayerEngine: AppStateObservable {
     }
 
     @objc func endBackgroundTask() {
-        if self.backgroundTaskIdentifier != UIBackgroundTaskInvalid {
+        if self.backgroundTaskIdentifier != UIBackgroundTaskIdentifier.invalid {
             PKLog.debug("player: \(self)\n Ending the background task...(backgroundTaskIdentifier:\(String(describing: backgroundTaskIdentifier)))")
             self.backgroundTimer?.invalidate()
             self.backgroundTimer = nil
             UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
-            self.backgroundTaskIdentifier = UIBackgroundTaskInvalid
+            self.backgroundTaskIdentifier = UIBackgroundTaskIdentifier.invalid
         }
     }
 }
