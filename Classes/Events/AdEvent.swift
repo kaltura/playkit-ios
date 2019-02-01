@@ -25,6 +25,8 @@ import Foundation
     ]
     
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
+    @objc public static let adBreakStarted: AdEvent.Type = AdBreakStarted.self // DAI
+    @objc public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self // DAI
     @objc public static let allAdsCompleted: AdEvent.Type = AllAdsCompleted.self
     @objc public static let adComplete: AdEvent.Type = AdComplete.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
@@ -78,6 +80,8 @@ import Foundation
     }
     
     public class AdBreakReady: AdEvent {}
+    public class AdBreakStarted: AdEvent {} // DAI
+    public class AdBreakEnded: AdEvent {} // DAI
     public class AllAdsCompleted: AdEvent {}
     public class AdComplete: AdEvent {}
     public class AdClicked: AdEvent {

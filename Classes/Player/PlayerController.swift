@@ -28,6 +28,8 @@ class PlayerController: NSObject, Player {
         }
     }
     
+    var playerEngineWrapper: PlayerEngineWrapper?
+    
     /// Current selected media source
     fileprivate var selectedSource: PKMediaSource?
     /// Current handler for the selected source
