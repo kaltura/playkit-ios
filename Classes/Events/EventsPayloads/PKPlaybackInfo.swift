@@ -15,11 +15,11 @@ import AVFoundation
 @objc public class PKPlaybackInfo: NSObject {
     
     /// The actual bitrate of the playback.
-    public let bitrate: Double
+    @objc public let bitrate: Double
     /// The selected track indicated bitrate.
-    public let indicatedBitrate: Double
+    @objc public let indicatedBitrate: Double
     /// The throughput of the playback (download speed)
-    public let observedBitrate: Double
+    @objc public let observedBitrate: Double
     
     init(bitrate: Double, indicatedBitrate: Double, observedBitrate: Double) {
         self.bitrate = bitrate
