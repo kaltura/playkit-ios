@@ -21,7 +21,7 @@ import AVFoundation
     /// The throughput of the playback (download speed)
     public let observedBitrate: Double
     /// The playback framerate (optional since not all media is a video)
-    @ojbc public let framesPerSecond: Float? 
+    @objc public let framesPerSecond: Float? 
     
     init(bitrate: Double, 
          indicatedBitrate: Double, 
@@ -50,7 +50,7 @@ import AVFoundation
 
         for track in playerItem.tracks {
             if track.assetTrack.mediaType == AVMediaType.video {
-               framesPerSecond = track.currentVideoFramerate 
+               framesPerSecond = track.currentVideoFrameRate 
             }
         }
 
