@@ -3,33 +3,32 @@
 import Foundation
 
 /// `AdsPlayerEngineWrapperState` represents `AdsPlayerEngineWrapper` state machine states.
-enum AdsPlayerEngineWrapperState: Int, StateProtocol {
-    /// initial state.
+enum AdsDAIPlayerEngineWrapperState: Int, StateProtocol {
+    /// Initial state.
     case start = 0
-    /// when prepare was requested for the first time and it is stalled until ad started (preroll) / faliure or content resume
+    /// When prepare was requested for the first time and it is stalled until the stream URL has been received or in case of faliure.
     case waitingForPrepare
-    /// a moment before we called prepare until prepare() was finished (the sychornos code only not async tasks)
+    /// A moment before we call prepare until prepare() is finished (the synchronous code only, not async tasks).
     case preparing
-    /// Indicates when prepare() was finished (the sychornos code only not async tasks)
+    /// Indicates when prepare() is finished (the synchronous code only, not async tasks).
     case prepared
 }
 
-public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, AdsPluginDataSource {
-    
-    /// The ads player state machine.
-    private var stateMachine = BasicStateMachine(initialState: AdsPlayerEngineWrapperState.start, allowTransitionToInitialState: true)
+public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, AdsPluginDataSource {
+
+    fileprivate var stateMachine = BasicStateMachine(initialState: AdsDAIPlayerEngineWrapperState.start, allowTransitionToInitialState: true)
     
     /// The media config to prepare the player with.
     /// Uses @NSCopying in order to make a copy whenever set with new value.
     @NSCopying private var prepareMediaConfig: MediaConfig!
     
-    /// indicates if play was used, if `play()` or `resume()` was called we set this to true.
+    /// Indicates if play was used, if `play()` or `resume()` was called we set this to true.
     private var isPlayEnabled = false
     
-    /// a semaphore to make sure prepare calling will not be reached from 2 threads by mistake.
+    /// A semaphore to make sure prepare will not be called from 2 threads.
     private let prepareSemaphore = DispatchSemaphore(value: 1)
     
-    /// when playing post roll google sends content resume when finished.
+    /// When playing post roll google sends content resume when finished.
     /// In our case we need to prevent sending play/resume to the player because the content already ended.
     var shouldPreventContentResume = false
     
@@ -48,13 +47,13 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
     // MARK: - Private
     /************************************************************/
     
-    /// prepare the player only if wasn't prepared yet.
+    /// Prepare the player only if it wasn't prepared yet.
     private func preparePlayerIfNeeded() {
         self.prepareSemaphore.wait() // use semaphore to make sure will not be called from more than one thread by mistake.
         
         if self.stateMachine.getState() == .waitingForPrepare {
             self.stateMachine.set(state: .preparing)
-            PKLog.debug("will prepare player")
+            PKLog.debug("Will prepare player")
             super.prepare(self.prepareMediaConfig)
             self.stateMachine.set(state: .prepared)
         }
@@ -64,43 +63,49 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
     
     override public var isPlaying: Bool {
         get {
-            if self.adsPlugin.isAdPlaying {
-                return isPlayEnabled
-            }
             return super.isPlaying
         }
     }
     
     override public func prepare(_ config: MediaConfig) {
-        self.stateMachine.set(state: .start)
-        self.adsPlugin.destroyManager()
-        self.isPlayEnabled = false
-        self.shouldPreventContentResume = false
-        
-        self.stateMachine.set(state: .waitingForPrepare)
-        self.prepareMediaConfig = config
-        do {
-            try self.adsPlugin.requestAds()
-        } catch {
-            self.preparePlayerIfNeeded()
-        }
+            self.stateMachine.set(state: .start)
+            self.adsPlugin.destroyManager()
+//            self.isPlayEnabled = false
+            self.shouldPreventContentResume = false
+            
+            self.stateMachine.set(state: .waitingForPrepare)
+            self.prepareMediaConfig = config
+            do {
+                try self.adsPlugin.requestAds()
+            } catch {
+                self.preparePlayerIfNeeded()
+                if isPlayEnabled {
+                    self.play()
+                }
+            }
     }
     
     override public func play() {
         self.isPlayEnabled = true
-        self.adsPlugin.didRequestPlay(ofType: .play)
+        if self.stateMachine.getState() == .prepared {
+            self.adsPlugin.didRequestPlay(ofType: .play)
+        } else {
+            super.pause()
+        }
     }
     
     override public func resume() {
         self.isPlayEnabled = true
-        self.adsPlugin.didRequestPlay(ofType: .resume)
+        if self.stateMachine.getState() == .prepared {
+            self.adsPlugin.didRequestPlay(ofType: .resume)
+        } else {
+            super.pause()
+        }
     }
     
     override public func pause() {
         self.isPlayEnabled = false
-        if self.adsPlugin.isAdPlaying {
-            self.adsPlugin.pause()
-        } else {
+        if self.stateMachine.getState() == .prepared {
             super.pause()
         }
     }
@@ -111,6 +116,10 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
         self.adsPlugin.destroyManager()
         self.isPlayEnabled = false
         self.shouldPreventContentResume = false
+    }
+    
+    override public func seek(to time: TimeInterval) {
+        super.seek(to: time)
     }
     
     override public func destroy() {
@@ -138,6 +147,7 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
     /************************************************************/
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String) {
+        print("Nilit: AdsDAIPlayerEngineWrapper adsPlugin loaderFailedWith: \(error)")
         if self.isPlayEnabled {
             self.preparePlayerIfNeeded()
             super.play()
@@ -146,42 +156,50 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
     }
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String) {
+        print("Nilit: AdsDAIPlayerEngineWrapper adsPlugin managerFailedWith: \(error)")
         self.preparePlayerIfNeeded()
         super.play()
         self.adsPlugin.didPlay()
     }
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
+        print("Nilit: AdsDAIPlayerEngineWrapper adsPlugin didReceive: \(event)")
         switch event {
+        case is AdEvent.StreamLoaded:
+            self.preparePlayerIfNeeded()
         case is AdEvent.AdDidRequestContentPause:
-            super.pause()
+            break
         case is AdEvent.AdDidRequestContentResume:
-            if !self.shouldPreventContentResume {
-                self.preparePlayerIfNeeded()
-                super.resume()
-            }
+            break
         case is AdEvent.AdPaused:
-            self.isPlayEnabled = false
+//            self.isPlayEnabled = false
+            break
         case is AdEvent.AdResumed:
-            self.isPlayEnabled = true
+//            self.isPlayEnabled = true
+            break
         case is AdEvent.AdStarted:
-            // when starting to play pre roll start preparing the player.
-            if event.adInfo?.positionType == .preRoll {
-                self.preparePlayerIfNeeded()
-            }
-        case is AdEvent.AdBreakReady, is AdEvent.AdLoaded:
+            break
+        case is AdEvent.AdBreakStarted, is AdEvent.AdLoaded:
             if self.shouldPreventContentResume == true { return } // no need to handle twice if already true
             if event.adInfo?.positionType == .postRoll {
                 self.shouldPreventContentResume = true
             }
         case is AdEvent.AllAdsCompleted:
             self.shouldPreventContentResume = false
+        case is AdEvent.AdsRequested:
+            break
+        case is AdEvent.RequestTimedOut:
+            self.adsRequestTimedOut(shouldPlay: isPlayEnabled)
+        case is AdEvent.AdDidProgressToTime:
+            break
         default:
+            print("Nilit: \(event) not taken care of (AdsDAIPlayerEngineWrapper:adsPlugin:)")
             break
         }
     }
     
     public func adsRequestTimedOut(shouldPlay: Bool) {
+        print("Nilit: AdsDAIPlayerEngineWrapper adsRequestTimedOut shouldPlay: \(shouldPlay)")
         if shouldPlay {
             self.preparePlayerIfNeeded()
             self.play()
@@ -189,6 +207,7 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
     }
     
     public func play(_ playType: PlayType) {
+        print("Nilit: AdsDAIPlayerEngineWrapper play playType: \(playType.description)")
         self.preparePlayerIfNeeded()
         playType == .play ? super.play() : super.resume()
         self.adsPlugin.didPlay()
@@ -199,14 +218,14 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
 // MARK: - AppStateObservable
 /************************************************************/
 
-extension AdsPlayerEngineWrapper: AppStateObservable {
+extension AdsDAIPlayerEngineWrapper: AppStateObservable {
     
     public var observations: Set<NotificationObservation> {
         return [
             NotificationObservation(name: .UIApplicationDidEnterBackground) { [weak self] in
-                // when we enter background make sure to pause if we were playing.
+                // When we enter background make sure to pause if we were playing.
                 self?.pause()
-                // notify the ads plugin we are entering to the background.
+                // Notify the ads plugin we are entering to the background.
                 self?.adsPlugin.didEnterBackground()
             },
             NotificationObservation(name: .UIApplicationWillEnterForeground) { [weak self] in

@@ -1,156 +1,156 @@
-//
-//  PlayerEngineWrapper.swift
-//  PlayKit
-//
-//  Created by Nilit Danan on 1/28/19.
-//
+
 
 import Foundation
 
-public class PlayerEngineWrapper: PlayerEngine {
+public class PlayerEngineWrapper: NSObject, PlayerEngine {
     
-    public private(set) var playerEngine: PlayerEngine
-    
-    init(playerEngine: PlayerEngine) {
-        self.playerEngine = playerEngine
-    }
+    public var playerEngine: PlayerEngine?
     
     public var onEventBlock: ((PKEvent) -> Void)? {
         get {
-            return playerEngine.onEventBlock
+            return playerEngine?.onEventBlock
         }
         set {
-            playerEngine.onEventBlock = newValue
+            playerEngine?.onEventBlock = newValue
         }
     }
     
     public var startPosition: TimeInterval {
         get {
-            return playerEngine.startPosition
+            return playerEngine?.startPosition ?? 0.0
         }
         set {
-            playerEngine.startPosition = newValue
+            playerEngine?.startPosition = newValue
         }
     }
     
     public var currentPosition: TimeInterval {
         get {
-            return playerEngine.currentPosition
+            return playerEngine?.currentPosition ?? 0.0
         }
         set {
-            playerEngine.currentPosition = newValue
+            playerEngine?.currentPosition = newValue
         }
     }
     
     public var mediaConfig: MediaConfig? {
         get {
-            return playerEngine.mediaConfig
+            return playerEngine?.mediaConfig
         }
         set {
-            playerEngine.mediaConfig = newValue
+            playerEngine?.mediaConfig = newValue
         }
     }
     
     public var playbackType: String? {
-        return playerEngine.playbackType
+        return playerEngine?.playbackType
     }
     
     public var duration: TimeInterval {
-        return playerEngine.duration
+        return playerEngine?.duration ?? 0.0
     }
     
     public var currentState: PlayerState {
-        return playerEngine.currentState
+        return playerEngine?.currentState ?? .unknown
     }
     
     public var isPlaying: Bool {
-        return playerEngine.isPlaying
+        return playerEngine?.isPlaying ?? false
     }
     
     public var view: PlayerView? {
         get {
-            return playerEngine.view
+            return playerEngine?.view
         }
         set {
-            playerEngine.view = newValue
+            playerEngine?.view = newValue
         }
     }
     
     public var currentTime: TimeInterval {
         get {
-            return playerEngine.currentTime
+            return playerEngine?.currentTime ?? 0.0
         }
         set {
-            playerEngine.currentTime = newValue
+            playerEngine?.currentTime = newValue
         }
     }
     
     public var currentProgramTime: Date? {
-        return playerEngine.currentProgramTime
+        return playerEngine?.currentProgramTime
     }
     
     public var currentAudioTrack: String? {
-        return playerEngine.currentAudioTrack
+        return playerEngine?.currentAudioTrack
     }
     
     public var currentTextTrack: String? {
-        return playerEngine.currentTextTrack
+        return playerEngine?.currentTextTrack
     }
     
     public var rate: Float {
         get {
-            return playerEngine.rate
+            return playerEngine?.rate ?? 0.0
         }
         set {
-            playerEngine.rate = newValue
+            playerEngine?.rate = newValue
+        }
+    }
+    
+    public var volume: Float {
+        get {
+            return playerEngine?.volume ?? 0.0
+        }
+        set {
+            playerEngine?.volume = newValue
         }
     }
     
     public var loadedTimeRanges: [PKTimeRange]? {
-        return playerEngine.loadedTimeRanges
+        return playerEngine?.loadedTimeRanges
     }
     
     public func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
-        playerEngine.loadMedia(from: mediaSource, handler: handler)
+        playerEngine?.loadMedia(from: mediaSource, handler: handler)
     }
     
     public func playFromLiveEdge() {
-        playerEngine.playFromLiveEdge()
+        playerEngine?.playFromLiveEdge()
     }
     
     public func play() {
-        playerEngine.play()
+        playerEngine?.play()
     }
     
     public func pause() {
-        playerEngine.pause()
+        playerEngine?.pause()
     }
     
     public func resume() {
-        playerEngine.resume()
+        playerEngine?.resume()
     }
     
     public func stop() {
-        playerEngine.stop()
+        playerEngine?.stop()
     }
     
     public func replay() {
-        playerEngine.replay()
+        playerEngine?.replay()
     }
     
     public func seek(to time: TimeInterval) {
-        playerEngine.seek(to: time)
+        playerEngine?.seek(to: time)
     }
     
     public func selectTrack(trackId: String) {
-        playerEngine.selectTrack(trackId: trackId)
+        playerEngine?.selectTrack(trackId: trackId)
     }
     
     public func destroy() {
-        playerEngine.destroy()
+        playerEngine?.destroy()
     }
     
     public func prepare(_ config: MediaConfig) {
-        playerEngine.prepare(config)
+        playerEngine?.prepare(config)
     }
 }

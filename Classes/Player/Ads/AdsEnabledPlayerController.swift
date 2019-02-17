@@ -1,9 +1,20 @@
-
+// ===================================================================================================
+// Copyright (C) 2017 Kaltura Inc.
+//
+// Licensed under the AGPLv3 license,
+// unless a different license for a particular library is specified in the applicable library path.
+//
+// You may obtain a copy of the License at
+// https://www.gnu.org/licenses/agpl-3.0.html
+// ===================================================================================================
 
 import Foundation
+import UIKit
+import AVFoundation
+import AVKit
 
-/// `AdsPlayerEngineWrapperState` represents `AdsPlayerEngineWrapper` state machine states.
-enum AdsPlayerEngineWrapperState: Int, StateProtocol {
+/// `AdsPlayerState` represents `AdsEnabledPlayerController` state machine states.
+enum AdsPlayerState: Int, StateProtocol {
     /// initial state.
     case start = 0
     /// when prepare was requested for the first time and it is stalled until ad started (preroll) / faliure or content resume
@@ -14,10 +25,10 @@ enum AdsPlayerEngineWrapperState: Int, StateProtocol {
     case prepared
 }
 
-public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, AdsPluginDataSource {
+public class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate, AdsPluginDataSource {
     
     /// The ads player state machine.
-    private var stateMachine = BasicStateMachine(initialState: AdsPlayerEngineWrapperState.start, allowTransitionToInitialState: true)
+    private var stateMachine = BasicStateMachine(initialState: AdsPlayerState.start, allowTransitionToInitialState: true)
     
     /// The media config to prepare the player with.
     /// Uses @NSCopying in order to make a copy whenever set with new value.
@@ -33,33 +44,15 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
     /// In our case we need to prevent sending play/resume to the player because the content already ended.
     var shouldPreventContentResume = false
     
-    private var adsPlugin: AdsPlugin
+    var adsPlugin: AdsPlugin!
+    weak var messageBus: MessageBus?
     
     public init(adsPlugin: AdsPlugin) {
-        self.adsPlugin = adsPlugin
         super.init()
-        
+        self.adsPlugin = adsPlugin
         AppStateSubject.shared.add(observer: self)
         self.adsPlugin.delegate = self
         self.adsPlugin.dataSource = self
-    }
-    
-    /************************************************************/
-    // MARK: - Private
-    /************************************************************/
-    
-    /// prepare the player only if wasn't prepared yet.
-    private func preparePlayerIfNeeded() {
-        self.prepareSemaphore.wait() // use semaphore to make sure will not be called from more than one thread by mistake.
-        
-        if self.stateMachine.getState() == .waitingForPrepare {
-            self.stateMachine.set(state: .preparing)
-            PKLog.debug("will prepare player")
-            super.prepare(self.prepareMediaConfig)
-            self.stateMachine.set(state: .prepared)
-        }
-        
-        self.prepareSemaphore.signal()
     }
     
     override public var isPlaying: Bool {
@@ -123,10 +116,7 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
     /************************************************************/
     
     public func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
-        guard let player = adsPlugin.player else {
-            return false
-        }
-        return player.delegate?.playerShouldPlayAd?(player) ?? false
+        return self.delegate?.playerShouldPlayAd?(self) ?? false
     }
     
     public var playAdsAfterTime: TimeInterval {
@@ -193,13 +183,31 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
         playType == .play ? super.play() : super.resume()
         self.adsPlugin.didPlay()
     }
+    
+    /************************************************************/
+    // MARK: - Private
+    /************************************************************/
+    
+    /// prepare the player only if wasn't prepared yet.
+    private func preparePlayerIfNeeded() {
+        self.prepareSemaphore.wait() // use semaphore to make sure will not be called from more than one thread by mistake.
+        
+        if self.stateMachine.getState() == .waitingForPrepare {
+            self.stateMachine.set(state: .preparing)
+            PKLog.debug("will prepare player")
+            super.prepare(self.prepareMediaConfig)
+            self.stateMachine.set(state: .prepared)
+        }
+        
+        self.prepareSemaphore.signal()
+    }
 }
 
 /************************************************************/
 // MARK: - AppStateObservable
 /************************************************************/
 
-extension AdsPlayerEngineWrapper: AppStateObservable {
+extension AdsEnabledPlayerController: AppStateObservable {
     
     public var observations: Set<NotificationObservation> {
         return [

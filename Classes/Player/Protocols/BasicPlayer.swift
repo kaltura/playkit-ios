@@ -8,16 +8,6 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-// ===================================================================================================
-// Copyright (C) 2017 Kaltura Inc.
-//
-// Licensed under the AGPLv3 license, unless a different license for a
-// particular library is specified in the applicable library path.
-//
-// You may obtain a copy of the License at
-// https://www.gnu.org/licenses/agpl-3.0.html
-// ===================================================================================================
-
 import Foundation
 
 @objc public protocol BasicPlayer {
@@ -47,6 +37,9 @@ import Foundation
     
     /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
     @objc var rate: Float { get set }
+    
+    // The audio playback volume for the player, ranging from 0.0 through 1.0 on a linear scale.
+    @objc var volume: Float { get set }
     
     /// Provides a collection of time ranges for which the player has the media data readily available. The ranges provided might be discontinuous.
     @objc var loadedTimeRanges: [PKTimeRange]? { get }

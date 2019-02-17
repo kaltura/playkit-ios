@@ -103,6 +103,15 @@ class PlayerController: NSObject, Player {
         }
     }
     
+    public var volume: Float {
+        get {
+            return self.currentPlayer.volume
+        }
+        set {
+            self.currentPlayer.volume = newValue
+        }
+    }
+    
     public var loadedTimeRanges: [PKTimeRange]? {
         return self.currentPlayer.loadedTimeRanges
     }
@@ -225,6 +234,12 @@ class PlayerController: NSObject, Player {
             currentPlayer.settings = self.settings
         }
         
+        if let playerEW = playerEngineWrapper {
+            playerEW.playerEngine = currentPlayer
+//            playerEW.delegate = delegate
+            currentPlayer = playerEW
+        }
+        
         return isCreated
     }
     
@@ -249,7 +264,11 @@ class PlayerController: NSObject, Player {
     }
     
     func resume() {
-        self.play()
+        if self.mediaEntry?.mediaType == .live {
+            self.currentPlayer.playFromLiveEdge()
+        } else {
+            self.currentPlayer.resume()
+        }
     }
     
     func stop() {
@@ -353,9 +372,11 @@ extension PlayerController {
         guard let selectedSource = self.selectedSource,
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
-        refreshableHandler.shouldRefreshAsset(mediaSource: selectedSource) { [unowned self] (shouldRefresh) in
+        refreshableHandler.shouldRefreshAsset(mediaSource: selectedSource) { [weak self] (shouldRefresh) in
+            guard let strongSelf = self else { return }
+            
             if shouldRefresh {
-                self.shouldRefresh = true
+                strongSelf.shouldRefresh = true
             }
         }
     }
@@ -387,9 +408,11 @@ extension PlayerController {
         reachability.onUnreachable = { reachability in
             PKLog.warning("network unreachable")
         }
-        reachability.onReachable = { [unowned self] reachability in
-            if self.shouldRefresh {
-                self.handleRefreshAsset()
+        reachability.onReachable = { [weak self] reachability in
+            guard let strongSelf = self else { return }
+            
+            if strongSelf.shouldRefresh {
+                strongSelf.handleRefreshAsset()
             }
         }
     }

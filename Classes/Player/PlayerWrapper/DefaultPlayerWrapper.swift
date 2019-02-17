@@ -52,7 +52,6 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         return nil
     }
     
-
     public var startPosition: TimeInterval {
         get {
             printInvocationWarning("\(#function)")
@@ -91,6 +90,14 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
     public weak var view: PlayerView?
     
     public var rate: Float {
+        get {
+            printInvocationWarning("\(#function)")
+            return 0.0
+        }
+        set { printInvocationWarning("\(#function)") }
+    }
+    
+    public var volume: Float {
         get {
             printInvocationWarning("\(#function)")
             return 0.0

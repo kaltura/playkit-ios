@@ -17,13 +17,15 @@ import Foundation
     /************************************************************/
     
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        adBreakReady, allAdsCompleted, adComplete, adClicked, adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused,
-        adResumed, adSkipped, adStarted, adTapped, adThirdQuartile, adDidProgressToTime, adDidRequestContentPause,
-        adDidRequestContentResume, webOpenerEvent, adWebOpenerWillOpenExternalBrowser, adWebOpenerWillOpenInAppBrowser,
-        adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser, adCuePointsUpdate,
-        adStartedBuffering, adPlaybackReady, requestTimedOut, adsRequested, error
+        streamLoaded, streamStarted, adBreakReady, adBreakStarted, adBreakEnded, allAdsCompleted, adComplete, adClicked,
+        adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTapped, adThirdQuartile,
+        adDidProgressToTime, adDidRequestContentPause, adDidRequestContentResume, webOpenerEvent, adWebOpenerWillOpenExternalBrowser,
+        adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser,
+        adCuePointsUpdate, adStartedBuffering, adPlaybackReady, requestTimedOut, adsRequested, error
     ]
     
+    @objc public static let streamLoaded: AdEvent.Type = StreamLoaded.self // DAI
+    @objc public static let streamStarted: AdEvent.Type = StreamStarted.self // DAI
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
     @objc public static let adBreakStarted: AdEvent.Type = AdBreakStarted.self // DAI
     @objc public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self // DAI
@@ -66,6 +68,9 @@ import Foundation
     /************************************************************/
     // MARK: - Events
     /************************************************************/
+    
+    public class StreamLoaded: AdEvent {}
+    public class StreamStarted: AdEvent {}
     
     public class AdStarted: AdEvent {
         public convenience init(adInfo: PKAdInfo) {

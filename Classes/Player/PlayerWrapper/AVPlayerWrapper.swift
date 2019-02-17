@@ -23,6 +23,7 @@ import AVFoundation
 import AVKit
 
 open class AVPlayerWrapper: NSObject, PlayerEngine {
+    
     public var onEventBlock: ((PKEvent) -> Void)?
     
     public var currentPlayer: AVPlayerEngine
@@ -113,6 +114,15 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         }
         set {
             self.currentPlayer.rate = newValue
+        }
+    }
+    
+    public var volume: Float {
+        get {
+            return self.currentPlayer.volume
+        }
+        set {
+            self.currentPlayer.volume = newValue
         }
     }
     
@@ -231,9 +241,11 @@ extension AVPlayerWrapper {
         guard let preferredMediaSource = self.preferredMediaSource,
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
-        refreshableHandler.shouldRefreshAsset(mediaSource: preferredMediaSource) { [unowned self] (shouldRefresh) in
+        refreshableHandler.shouldRefreshAsset(mediaSource: preferredMediaSource) { [weak self] (shouldRefresh) in
+            guard let strongSelf = self else { return }
+            
             if shouldRefresh {
-                self.shouldRefresh = true
+                strongSelf.shouldRefresh = true
             }
         }
     }
@@ -265,8 +277,10 @@ extension AVPlayerWrapper {
         reachability.onUnreachable = { reachability in
             PKLog.warning("network unreachable")
         }
-        reachability.onReachable = { [unowned self] reachability in
-            self.handleRefreshAsset()
+        reachability.onReachable = { [weak self] reachability in
+            guard let strongSelf = self else { return }
+            
+            strongSelf.handleRefreshAsset()
         }
     }
     
