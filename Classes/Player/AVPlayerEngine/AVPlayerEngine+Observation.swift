@@ -74,7 +74,9 @@ extension AVPlayerEngine {
                 PKLog.verbose("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
             }
             
-            self.post(event: PlayerEvent.PlaybackInfo(playbackInfo: PKPlaybackInfo(logEvent: lastEvent)))
+            self.post(event: PlayerEvent
+                             .PlaybackInfo(playbackInfo: PKPlaybackInfo(logEvent: lastEvent,
+                                                                        playerItem: playerItem)))
             if self.lastIndicatedBitrate != lastEvent.indicatedBitrate {
                 self.lastIndicatedBitrate = lastEvent.indicatedBitrate
                 self.post(event: PlayerEvent.VideoTrackChanged(bitrate: lastEvent.indicatedBitrate))
