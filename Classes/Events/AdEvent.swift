@@ -111,6 +111,9 @@ import Foundation
         public convenience init(adCuePoints: PKAdCuePoints) {
             self.init([AdEventDataKeys.adCuePoints: adCuePoints])
         }
+        public convenience init(adDAICuePoints: PKAdDAICuePoints) {
+            self.init([AdEventDataKeys.adDAICuePoints: adDAICuePoints])
+        }
     }
     
     public class Error: AdEvent {
@@ -163,6 +166,7 @@ import Foundation
     public static let webOpener = "webOpener"
     public static let error = "error"
     public static let adCuePoints = "adCuePoints"
+    public static let adDAICuePoints = "adDAICuePoints"
     public static let adInfo = "adInfo"
     public static let adTagUrl = "adTagUrl"
     public static let clickThroughUrl = "clickThroughUrl"
@@ -193,6 +197,11 @@ extension PKEvent {
     /// Ad cue points, PKEvent Ad Data Accessor
     @objc public var adCuePoints: PKAdCuePoints? {
         return self.data?[AdEventDataKeys.adCuePoints] as? PKAdCuePoints
+    }
+    
+    /// Ad DAI cue points, PKEvent Ad Data Accessor
+    @objc public var adDAICuePoints: PKAdDAICuePoints? {
+        return self.data?[AdEventDataKeys.adDAICuePoints] as? PKAdDAICuePoints
     }
     
     /// TotalTime, PKEvent Ad Data Accessor
