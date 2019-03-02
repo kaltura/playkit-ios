@@ -36,12 +36,12 @@ public protocol AdsDAIPlugin: AdsPlugin {
     func previousCuepoint(forStreamTime streamTime: TimeInterval) -> CuePoint?
     
     /**
-     *  Returns if the upcoming ad can be played and the end of the content time of the ad end time.
-     *  Returns true and the content time of the given stream time, in case no ad was found.
+     *  Returns if the upcoming ad can be played and the duration of the ad.
+     *  Returns true and duration 0, in case no ad was found.
      *
      *  @param streamTime   the stream time to check for specific ad
      *
-     *  @return (canPlay, endTime) if the ad can be played or not, the content ad end time
+     *  @return (canPlay, duration) if the ad can be played or not, duration of the ad
      */
-    func canPlayAd(atStreamTime streamTime: TimeInterval) -> (canPlay: Bool, endTime: TimeInterval)
+    func canPlayAd(atStreamTime streamTime: TimeInterval) -> (canPlay: Bool, duration: TimeInterval)
 }

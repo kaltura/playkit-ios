@@ -17,9 +17,10 @@ enum AdsDAIPlayerEngineWrapperState: Int, StateProtocol {
 
 public protocol AdsDAIPlayerEngineWrapperDelegate {
     func streamStarted()
-    func adPlaying()
+    func adPlaying(startTime: TimeInterval, duration: TimeInterval)
     func adPaused()
     func adResumed()
+    func adCompleted()
 }
 
 public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, AdsPluginDataSource {
@@ -48,27 +49,40 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     /// In our case we need to prevent sending play/resume to the player because the content already ended.
     var shouldPreventContentResume = false
     
-    var timeObserverToken: Any?
+    var adStartTimeObserverToken: Any?
+    var adEndTimeObserverToken: Any?
     var setCuePointsObserver: Bool = false
     var pkAdDAICuePoints: PKAdDAICuePoints = PKAdDAICuePoints([]) {
         didSet {
             if !self.setCuePointsObserver {
                 self.setCuePointsObserver = true
                 
-                var times: [NSValue] = []
+                var adStartTimes: [NSValue] = []
+                var adEndTimes: [NSValue] = []
                 for cuepoint in pkAdDAICuePoints.cuePoints {
-                    times.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.startTime, 1)))
+                    adStartTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.startTime, 1)))
+                    adEndTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.endTime, 1)))
                 }
                 
                 if let avPlayerWrapper = playerEngine as? AVPlayerWrapper {
-                    timeObserverToken = avPlayerWrapper.currentPlayer.addBoundaryTimeObserver(forTimes: times, queue: DispatchQueue.main) { [weak self] in
+                    adStartTimeObserverToken = avPlayerWrapper.currentPlayer.addBoundaryTimeObserver(forTimes: adStartTimes, queue: DispatchQueue.main) { [weak self] in
                         guard let strongSelf = self else { return }
                         guard let player = strongSelf.playerEngine else { return }
-                        let ad = strongSelf.adsPlugin.canPlayAd(atStreamTime: player.currentPosition)
+                        let currentPosition = player.currentPosition
+                        let ad = strongSelf.adsPlugin.canPlayAd(atStreamTime: currentPosition)
                         if ad.canPlay {
-                            strongSelf.delegate?.adPlaying()
+                            strongSelf.delegate?.adPlaying(startTime: currentPosition, duration: ad.duration)
                         } else {
-                            strongSelf.seek(to: ad.endTime)
+                            let seekTime = currentPosition + ad.duration
+                            print("Nilit: seek over")
+                            strongSelf.seek(to: seekTime)
+                        }
+                    }
+                    
+                    adEndTimeObserverToken = avPlayerWrapper.currentPlayer.addBoundaryTimeObserver(forTimes: adEndTimes, queue: DispatchQueue.main) { [weak self] in
+                        guard let strongSelf = self else { return }
+                        if strongSelf.adsPlugin.isAdPlaying {
+                            strongSelf.delegate?.adCompleted()
                         }
                     }
                 }
@@ -235,7 +249,9 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 self.snapbackMode = true
                 self.seekTo = endTime < previousCuePoint.endTime ? previousCuePoint.endTime : endTime
                 // Add 1 to the seek time to get the keyframe at the start of the ad to be our landing place.
-                super.seek(to: previousCuePoint.startTime + 1)
+                super.seek(to: previousCuePoint.startTime)
+                let duration = previousCuePoint.endTime - previousCuePoint.startTime
+                delegate?.adPlaying(startTime: previousCuePoint.startTime, duration: duration)
                 return
             }
         }
@@ -246,9 +262,13 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     
     override public func destroy() {
         if let avPlayerWrapper = playerEngine as? AVPlayerWrapper {
-            if let token = timeObserverToken {
+            if let token = adStartTimeObserverToken {
                 avPlayerWrapper.currentPlayer.removeTimeObserver(token)
-                timeObserverToken = nil
+                adStartTimeObserverToken = nil
+            }
+            if let token = adEndTimeObserverToken {
+                avPlayerWrapper.currentPlayer.removeTimeObserver(token)
+                adEndTimeObserverToken = nil
             }
         }
         AppStateSubject.shared.remove(observer: self)
@@ -349,13 +369,17 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 let ad = self.adsPlugin.canPlayAd(atStreamTime: 0)
                 if ad.canPlay {
                     super.play()
-                    delegate?.adPlaying()
+                    delegate?.adPlaying(startTime: 0, duration: ad.duration)
                 } else {
-                    seek(to: ad.endTime)
+                    let seekTime = ad.duration
+                    seek(to: seekTime)
                     super.play()
                 }
             } else {
                 super.play()
+                if adsPlugin.isAdPlaying {
+                    delegate?.adResumed()
+                }
             }
             
         } else {
