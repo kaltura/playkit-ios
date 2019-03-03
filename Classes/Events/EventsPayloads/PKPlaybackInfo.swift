@@ -46,7 +46,7 @@ import AVFoundation
         let indicatedBitrate = logEvent.indicatedBitrate
         let observedBitrate = logEvent.observedBitrate
 
-        var framesPerSecond: Float
+        var framesPerSecond: Float = 0
 
         for track in playerItem.tracks {
             if track.assetTrack.mediaType == AVMediaType.video {
