@@ -20,7 +20,7 @@ import AVFoundation
     public let indicatedBitrate: Double
     /// The throughput of the playback (download speed)
     public let observedBitrate: Double
-    /// The playback framerate (optional since not all media is a video)
+    /// The playback framerate (this value is zero if it is not reported)
     @objc public let framesPerSecond: Float 
     
     init(bitrate: Double, 
