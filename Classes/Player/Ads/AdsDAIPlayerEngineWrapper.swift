@@ -45,17 +45,14 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     /// A semaphore to make sure prepare will not be called from 2 threads.
     private let prepareSemaphore = DispatchSemaphore(value: 1)
     
-    /// When playing post roll google sends content resume when finished.
-    /// In our case we need to prevent sending play/resume to the player because the content already ended.
-    var shouldPreventContentResume = false
-    
     var adStartTimeObserverToken: Any?
     var adEndTimeObserverToken: Any?
     var setCuePointsObserver: Bool = false
     var pkAdDAICuePoints: PKAdDAICuePoints = PKAdDAICuePoints([]) {
         didSet {
-            if !self.setCuePointsObserver {
-                self.setCuePointsObserver = true
+            if pkAdDAICuePoints.cuePoints.isEmpty { return }
+            if !setCuePointsObserver {
+                setCuePointsObserver = true
                 
                 var adStartTimes: [NSValue] = []
                 var adEndTimes: [NSValue] = []
@@ -66,6 +63,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 
                 if let avPlayerWrapper = playerEngine as? AVPlayerWrapper {
                     adStartTimeObserverToken = avPlayerWrapper.currentPlayer.addBoundaryTimeObserver(forTimes: adStartTimes, queue: DispatchQueue.main) { [weak self] in
+                        // The PreRoll is not called, taken cared of in the play func
                         guard let strongSelf = self else { return }
                         guard let player = strongSelf.playerEngine else { return }
                         let currentPosition = player.currentPosition
@@ -80,6 +78,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                     }
                     
                     adEndTimeObserverToken = avPlayerWrapper.currentPlayer.addBoundaryTimeObserver(forTimes: adEndTimes, queue: DispatchQueue.main) { [weak self] in
+                        // The end time of the PostRoll is not called, taken cared of in the PKIMAVideoDisplay
                         guard let strongSelf = self else { return }
                         if strongSelf.adsPlugin.isAdPlaying {
                             strongSelf.delegate?.adCompleted()
@@ -91,7 +90,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     }
     
     // Maintains seeking status for snapback.
-    private var seekTo: TimeInterval = 0
+    private var snapbackTime: TimeInterval = 0
     private var snapbackMode: Bool = false
     
     private var adsPlugin: AdsDAIPlugin
@@ -111,21 +110,52 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     
     /// Prepare the player only if it wasn't prepared yet.
     private func preparePlayerIfNeeded() {
-        self.prepareSemaphore.wait() // use semaphore to make sure will not be called from more than one thread by mistake.
+        prepareSemaphore.wait() // Use semaphore to make sure will not be called from more than one thread by mistake.
         
-        if self.stateMachine.getState() == .waitingForPrepare {
-            self.stateMachine.set(state: .preparing)
+        if stateMachine.getState() == .waitingForPrepare {
+            stateMachine.set(state: .preparing)
             PKLog.debug("Will prepare player")
             super.prepare(self.prepareMediaConfig)
-            self.stateMachine.set(state: .prepared)
+            stateMachine.set(state: .prepared)
         }
         
-        self.prepareSemaphore.signal()
+        prepareSemaphore.signal()
+    }
+    
+    func playOriginalMedia() {
+        if stateMachine.getState() == .waitingForPrepare {
+            preparePlayerIfNeeded()
+            if let mediaSource = mediaSource, let handler = handler {
+                super.loadMedia(from: mediaSource, handler: handler)
+            }
+            if playPerformed {
+                super.play()
+                adsPlugin.didPlay()
+            }
+        }
     }
     
     /************************************************************/
-    // MARK: - Public
+    // MARK: - PlayerEngineWrapper
     /************************************************************/
+    
+    public override var currentPosition: TimeInterval {
+        get {
+            guard let streamPosition = playerEngine?.currentPosition, streamPosition > 0 else { return 0 }
+            let mediaPosition = adsPlugin.contentTime(forStreamTime: streamPosition)
+            return mediaPosition
+        }
+        set {
+            let streamPosition = adsPlugin.streamTime(forContentTime: newValue)
+            playerEngine?.currentPosition = streamPosition
+        }
+    }
+    
+    public override var duration: TimeInterval {
+        guard let streamTime = playerEngine?.duration, streamTime > 0 else { return 0 }
+        let mediaDuration = adsPlugin.contentTime(forStreamTime: streamTime)
+        return mediaDuration
+    }
     
     override public var isPlaying: Bool {
         get {
@@ -133,95 +163,38 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         }
     }
     
-    override public func prepare(_ config: MediaConfig) {
-        self.stateMachine.set(state: .start)
-        self.adsPlugin.destroyManager()
-//            self.isPlayEnabled = false
-        self.shouldPreventContentResume = false
-        
-        self.stateMachine.set(state: .waitingForPrepare)
-        self.prepareMediaConfig = config
-        do {
-            try self.adsPlugin.requestAds()
-        } catch {
-            self.preparePlayerIfNeeded()
-            if playPerformed {
-                self.play()
-            }
-        }
-    }
-    
-    public func loadStream(_ streamURL: URL!) {
-        self.mediaSource?.contentUrl = streamURL
-        for source in self.mediaConfig?.mediaEntry.sources ?? [] {
-            source.contentUrl = streamURL
-        }
-        if let mediaSource = self.mediaSource, let handler = self.handler {
-            super.loadMedia(from: mediaSource, handler: handler)
-            self.preparePlayerIfNeeded()
-            if playPerformed {
-                self.play()
-            }
-        }
-    }
-    
-    public override func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
-        self.mediaSource = mediaSource
-        self.handler = handler
-    }
-    
-    public override var duration: TimeInterval {
-        guard let streamTime = self.playerEngine?.duration, streamTime > 0 else { return 0 }
-        let mediaDuration = adsPlugin.contentTime(forStreamTime: streamTime)
-        return mediaDuration
-    }
-    
-    public override var currentPosition: TimeInterval {
-        get {
-            guard let streamPosition = self.playerEngine?.currentPosition, streamPosition > 0 else { return 0 }
-            let mediaPosition = adsPlugin.contentTime(forStreamTime: streamPosition)
-//            print("Nilit: \(mediaPosition)")
-            return mediaPosition
-        }
-        set {
-            let streamPosition = adsPlugin.streamTime(forContentTime: newValue)
-            self.playerEngine?.currentPosition = streamPosition
-        }
-    }
-    
     public override var currentTime: TimeInterval {
         get {
-            guard let streamTime = self.playerEngine?.currentTime, streamTime > 0 else { return 0 }
+            guard let streamTime = playerEngine?.currentTime, streamTime > 0 else { return 0 }
             let mediaTime = adsPlugin.contentTime(forStreamTime: streamTime)
             return mediaTime
         }
         set {
             let streamTime = adsPlugin.streamTime(forContentTime: newValue)
-            self.playerEngine?.currentTime = streamTime
+            playerEngine?.currentTime = streamTime
         }
+    }
+    
+    public override func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
+        print("Nilit: loadMedia")
+        reset()
+        
+        self.mediaSource = mediaSource
+        self.handler = handler
     }
     
     override public func play() {
-        self.playPerformed = true
-        if self.stateMachine.getState() == .prepared {
-            self.adsPlugin.didRequestPlay(ofType: .play)
-        } else {
-            super.pause()
-        }
-    }
-    
-    override public func resume() {
-        self.playPerformed = true
-        if self.stateMachine.getState() == .prepared {
-            self.adsPlugin.didRequestPlay(ofType: .resume)
+        playPerformed = true
+        if stateMachine.getState() == .prepared {
+            adsPlugin.didRequestPlay(ofType: .play)
         } else {
             super.pause()
         }
     }
     
     override public func pause() {
-        self.playPerformed = false
-        if self.stateMachine.getState() == .prepared {
+        playPerformed = false
+        if stateMachine.getState() == .prepared {
             super.pause()
             if adsPlugin.isAdPlaying {
                 delegate?.adPaused()
@@ -229,16 +202,24 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         }
     }
     
+    override public func resume() {
+        playPerformed = true
+        if stateMachine.getState() == .prepared {
+            adsPlugin.didRequestPlay(ofType: .resume)
+        } else {
+            super.pause()
+        }
+    }
+    
     override public func stop() {
-        self.stateMachine.set(state: .start)
+        stateMachine.set(state: .start)
         super.stop()
-        self.adsPlugin.destroyManager()
-        self.playPerformed = false
-        self.shouldPreventContentResume = false
+        adsPlugin.destroyManager()
+        playPerformed = false
     }
     
     override public func seek(to time: TimeInterval) {
-        let endTime = self.adsPlugin.streamTime(forContentTime: time)
+        let endTime = adsPlugin.streamTime(forContentTime: time)
         
         guard !adsPlugin.isAdPlaying else { return }
         
@@ -246,8 +227,8 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         if startTime < endTime {
             // Seeking forward
             if let previousCuePoint = adsPlugin.previousCuepoint(forStreamTime: endTime), previousCuePoint.played == false {
-                self.snapbackMode = true
-                self.seekTo = endTime < previousCuePoint.endTime ? previousCuePoint.endTime : endTime
+                snapbackMode = true
+                snapbackTime = endTime < previousCuePoint.endTime ? previousCuePoint.endTime : endTime
                 // Add 1 to the seek time to get the keyframe at the start of the ad to be our landing place.
                 super.seek(to: previousCuePoint.startTime)
                 let duration = previousCuePoint.endTime - previousCuePoint.startTime
@@ -276,6 +257,50 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         super.destroy()
     }
     
+    override public func prepare(_ config: MediaConfig) {
+        stateMachine.set(state: .waitingForPrepare)
+        prepareMediaConfig = config
+        do {
+            try adsPlugin.requestAds()
+        } catch {
+            preparePlayerIfNeeded()
+            if playPerformed {
+                play()
+            }
+        }
+    }
+    
+    /************************************************************/
+    // MARK: - Public
+    /************************************************************/
+    
+    public func reset() {
+        stateMachine.set(state: .start)
+        mediaSource = nil
+        handler = nil
+        playPerformed = false
+        isFirstPlay = true
+        setCuePointsObserver = false
+        pkAdDAICuePoints = PKAdDAICuePoints([])
+        snapbackTime = 0
+        snapbackMode = false
+        adsPlugin.destroyManager()
+    }
+    
+    public func loadStream(_ streamURL: URL!) {
+        mediaSource?.contentUrl = streamURL
+        for source in mediaConfig?.mediaEntry.sources ?? [] {
+            source.contentUrl = streamURL
+        }
+        if let mediaSource = mediaSource, let handler = handler {
+            super.loadMedia(from: mediaSource, handler: handler)
+            preparePlayerIfNeeded()
+            if playPerformed {
+                play()
+            }
+        }
+    }
+    
     /************************************************************/
     // MARK: - AdsPluginDataSource
     /************************************************************/
@@ -288,7 +313,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     }
     
     public var playAdsAfterTime: TimeInterval {
-        return self.prepareMediaConfig?.startTime ?? 0
+        return prepareMediaConfig?.startTime ?? 0
     }
     
     /************************************************************/
@@ -296,52 +321,35 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     /************************************************************/
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String) {
-        if stateMachine.getState() == .waitingForPrepare {
-            self.preparePlayerIfNeeded()
-            if let mediaSource = self.mediaSource, let handler = self.handler {
-                super.loadMedia(from: mediaSource, handler: handler)
-            }
-            if self.playPerformed {
-                super.play()
-                self.adsPlugin.didPlay()
-            }
-        }
+        playOriginalMedia()
     }
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String) {
-        if stateMachine.getState() == .waitingForPrepare {
-            self.preparePlayerIfNeeded()
-            if self.playPerformed {
-                super.play()
-                self.adsPlugin.didPlay()
-            }
-        }
+        playOriginalMedia()
     }
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent) {
         switch event {
         case is AdEvent.StreamLoaded:
-            self.preparePlayerIfNeeded()
+            preparePlayerIfNeeded()
         case is AdEvent.AdCuePointsUpdate:
             if let adDAICuePoints = event.adDAICuePoints {
-                self.pkAdDAICuePoints = adDAICuePoints
+                pkAdDAICuePoints = adDAICuePoints
             }
         case is AdEvent.AdBreakStarted, is AdEvent.AdLoaded:
-            if self.shouldPreventContentResume == true { return } // no need to handle twice if already true
-            if event.adInfo?.positionType == .postRoll {
-                self.shouldPreventContentResume = true
-            }
+//            if event.adInfo?.positionType == .postRoll {
+            break
         case is AdEvent.AdBreakEnded:
-            if self.snapbackMode {
-                self.snapbackMode = false
-                self.playerEngine?.seek(to: self.seekTo)
+            if snapbackMode {
+                snapbackMode = false
+                playerEngine?.seek(to: snapbackTime)
             }
         case is AdEvent.AllAdsCompleted:
-            self.shouldPreventContentResume = false
+            break
         case is AdEvent.AdsRequested:
             break
         case is AdEvent.RequestTimedOut:
-            self.adsRequestTimedOut(shouldPlay: playPerformed)
+            adsRequestTimedOut(shouldPlay: playPerformed)
         case is AdEvent.Error:
             print("Nilit")
         default:
@@ -352,21 +360,22 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     
     public func adsRequestTimedOut(shouldPlay: Bool) {
         if shouldPlay {
-            self.preparePlayerIfNeeded()
-            self.play()
+            preparePlayerIfNeeded()
+            play()
         }
     }
     
     public func play(_ playType: PlayType) {
-        self.preparePlayerIfNeeded()
+        preparePlayerIfNeeded()
         if playType == .play {
             if isFirstPlay {
                 isFirstPlay = false
                 delegate?.streamStarted()
             }
             
+            // PreRoll is not being caught in the BoundaryTimeObserver
             if playerEngine?.currentPosition == 0 && pkAdDAICuePoints.hasPreRoll {
-                let ad = self.adsPlugin.canPlayAd(atStreamTime: 0)
+                let ad = adsPlugin.canPlayAd(atStreamTime: 0)
                 if ad.canPlay {
                     super.play()
                     delegate?.adPlaying(startTime: 0, duration: ad.duration)
@@ -388,7 +397,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 delegate?.adResumed()
             }
         }
-        self.adsPlugin.didPlay()
+        adsPlugin.didPlay()
     }
 }
 
@@ -401,13 +410,15 @@ extension AdsDAIPlayerEngineWrapper: AppStateObservable {
     public var observations: Set<NotificationObservation> {
         return [
             NotificationObservation(name: .UIApplicationDidEnterBackground) { [weak self] in
+                guard let strongSelf = self else { return }
                 // When we enter background make sure to pause if we were playing.
-                self?.pause()
+                strongSelf.pause()
                 // Notify the ads plugin we are entering to the background.
-                self?.adsPlugin.didEnterBackground()
+                strongSelf.adsPlugin.didEnterBackground()
             },
             NotificationObservation(name: .UIApplicationWillEnterForeground) { [weak self] in
-                self?.adsPlugin.willEnterForeground()
+                guard let strongSelf = self else { return }
+                strongSelf.adsPlugin.willEnterForeground()
             }
         ]
     }
