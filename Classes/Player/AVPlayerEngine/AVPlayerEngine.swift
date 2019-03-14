@@ -211,10 +211,10 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func stop() {
-        guard let _ = self.currentItem else {
-            PKLog.error("current item is empty")
-            return
-        }
+//        guard let _ = self.currentItem else {
+//            PKLog.error("current item is empty")
+//            return
+//        }
         
         PKLog.verbose("stop player")
         self.pause()
@@ -224,10 +224,10 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func replay() {
-        guard let _ = self.currentItem else {
-            PKLog.error("current item is empty")
-            return
-        }
+//        guard let _ = self.currentItem else {
+//            PKLog.error("current item is empty")
+//            return
+//        }
         
         PKLog.verbose("Replay item in player")
         self.pause()
@@ -237,10 +237,10 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     override public func pause() {
-        guard let _ = self.currentItem else {
-            PKLog.error("current item is empty")
-            return
-        }
+//        guard let _ = self.currentItem else {
+//            PKLog.error("current item is empty")
+//            return
+//        }
         
         if self.rate > 0 {
             // Playing, so pause.
@@ -250,10 +250,10 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     override public func play() {
-        guard let _ = self.currentItem else {
-            PKLog.error("current item is empty")
-            return
-        }
+//        guard let _ = self.currentItem else {
+//            PKLog.error("current item is empty")
+//            return
+//        }
         
         if self.rate == 0 {
             PKLog.debug("play player")
