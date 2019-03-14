@@ -42,10 +42,9 @@ public protocol AdsPluginDelegate : class {
     func play(_ playType: PlayType)
 }
 
-public protocol AdsPlugin: PKPlugin, AVPictureInPictureControllerDelegate {
+public protocol AdsPlugin: PKPlugin {
     var dataSource: AdsPluginDataSource? { get set }
     var delegate: AdsPluginDelegate? { get set }
-    var pipDelegate: AVPictureInPictureControllerDelegate? { get set }
     /// is ad playing currently.
     var isAdPlaying: Bool { get }
     
@@ -71,3 +70,8 @@ public protocol AdsPlugin: PKPlugin, AVPictureInPictureControllerDelegate {
     func willEnterForeground()
 }
 
+#if os(iOS)
+public protocol AdsPIP: AVPictureInPictureControllerDelegate {
+    var pipDelegate: AVPictureInPictureControllerDelegate? { get set }
+}
+#endif
