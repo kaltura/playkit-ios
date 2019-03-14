@@ -21,6 +21,7 @@ public protocol AdsDAIPlayerEngineWrapperDelegate {
     func adPaused()
     func adResumed()
     func adCompleted()
+//    func receivedTimedMetadata(_ metadata: [String : String])
 }
 
 public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, AdsPluginDataSource {
@@ -72,7 +73,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                             strongSelf.delegate?.adPlaying(startTime: currentPosition, duration: ad.duration)
                         } else {
                             let seekTime = currentPosition + ad.duration
-                            print("Nilit: seek over")
+//                            print("Nilit: seek over")
                             strongSelf.seek(to: seekTime)
                         }
                     }
@@ -146,8 +147,9 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
             return mediaPosition
         }
         set {
-            let streamPosition = adsPlugin.streamTime(forContentTime: newValue)
-            playerEngine?.currentPosition = streamPosition
+//            let streamPosition = adsPlugin.streamTime(forContentTime: newValue)
+//            playerEngine?.currentPosition = streamPosition
+            self.seek(to: newValue)
         }
     }
     
@@ -176,7 +178,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     }
     
     public override func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
-        print("Nilit: loadMedia")
+//        print("Nilit: loadMedia")
         reset()
         
         self.mediaSource = mediaSource
@@ -243,10 +245,12 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     
     override public func destroy() {
         if let avPlayerWrapper = playerEngine as? AVPlayerWrapper {
+            // Remove Ad Start Time Observer
             if let token = adStartTimeObserverToken {
                 avPlayerWrapper.currentPlayer.removeTimeObserver(token)
                 adStartTimeObserverToken = nil
             }
+            // Remove Ad End Time Observer
             if let token = adEndTimeObserverToken {
                 avPlayerWrapper.currentPlayer.removeTimeObserver(token)
                 adEndTimeObserverToken = nil
@@ -294,6 +298,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         }
         if let mediaSource = mediaSource, let handler = handler {
             super.loadMedia(from: mediaSource, handler: handler)
+            
             preparePlayerIfNeeded()
             if playPerformed {
                 play()
@@ -351,7 +356,8 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         case is AdEvent.RequestTimedOut:
             adsRequestTimedOut(shouldPlay: playPerformed)
         case is AdEvent.Error:
-            print("Nilit")
+//            print("Nilit")
+            break
         default:
 //            print("Nilit: \(event) not taken care of (AdsDAIPlayerEngineWrapper:adsPlugin:)")
             break
