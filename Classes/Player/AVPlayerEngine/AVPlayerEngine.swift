@@ -84,7 +84,8 @@ public class AVPlayerEngine: AVPlayer {
             return time.isNaN ? 0 : time
         }
         set {
-            let newTime = self.rangeStart + CMTimeMakeWithSeconds(newValue, self.rangeStart.timescale)
+            let value = newValue > duration ? duration : (newValue < 0 ? 0 : newValue)
+            let newTime = self.rangeStart + CMTimeMakeWithSeconds(value, self.rangeStart.timescale)
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) { [weak self] (isSeeked: Bool) in
                 guard let strongSelf = self else { return }
