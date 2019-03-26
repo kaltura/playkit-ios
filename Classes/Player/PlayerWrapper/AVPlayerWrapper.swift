@@ -116,6 +116,15 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         }
     }
     
+    public var volume: Float {
+        get {
+            return self.currentPlayer.volume
+        }
+        set {
+            self.currentPlayer.volume = newValue
+        }
+    }
+    
     public var loadedTimeRanges: [PKTimeRange]? {
         return self.currentPlayer.currentItem?.loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
     }
