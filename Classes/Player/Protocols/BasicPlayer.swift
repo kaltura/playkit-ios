@@ -48,6 +48,9 @@ import Foundation
     /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
     @objc var rate: Float { get set }
     
+    // The audio playback volume for the player, ranging from 0.0 through 1.0 on a linear scale.
+    @objc var volume: Float { get set }
+    
     /// Provides a collection of time ranges for which the player has the media data readily available. The ranges provided might be discontinuous.
     @objc var loadedTimeRanges: [PKTimeRange]? { get }
     

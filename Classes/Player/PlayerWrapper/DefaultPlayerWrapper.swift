@@ -98,6 +98,14 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
+    public var volume: Float {
+        get {
+            printInvocationWarning("\(#function)")
+            return 0.0
+        }
+        set { printInvocationWarning("\(#function)") }
+    }
+    
     func play() {
         printInvocationWarning("\(#function)")
     }

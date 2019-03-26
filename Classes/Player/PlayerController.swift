@@ -101,6 +101,15 @@ class PlayerController: NSObject, Player {
         }
     }
     
+    public var volume: Float {
+        get {
+            return self.currentPlayer.volume
+        }
+        set {
+            self.currentPlayer.volume = newValue
+        }
+    }
+    
     public var loadedTimeRanges: [PKTimeRange]? {
         return self.currentPlayer.loadedTimeRanges
     }

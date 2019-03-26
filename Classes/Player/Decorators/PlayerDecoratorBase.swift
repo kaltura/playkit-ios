@@ -92,6 +92,15 @@ import AVKit
         }
     }
     
+    public var volume: Float {
+        get {
+            return self.player.volume
+        }
+        set {
+            self.player.volume = newValue
+        }
+    }
+    
     @objc public var loadedTimeRanges: [PKTimeRange]? {
         return self.player.loadedTimeRanges
     }
