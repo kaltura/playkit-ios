@@ -101,7 +101,7 @@ import Foundation
         self.isBumper = isBumper
         self.podIndex = podIndex
         self.mediaBitrate = mediaBitrate
-        self.creativeID = creativeID
+        self.creativeId = creativeId
         self.advertiserName = advertiserName
     }
     
