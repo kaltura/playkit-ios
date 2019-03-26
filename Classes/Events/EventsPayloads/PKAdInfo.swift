@@ -52,9 +52,9 @@ import Foundation
     @objc public var podIndex: Int
     // The bitrate of the selected creative.
     @objc public var mediaBitrate: Int
-    // The CreativeID for the ad, taken from Google Interactive Media Ads
-    @objc public var creativeID: String
-    // The Advertiser Name for the ad, taken from Google Interactive Media Ads
+    // The CreativeId for the ad.
+    @objc public var creativeId: String
+    // The Advertiser Name for the ad.
     @objc public var advertiserName: String   
  
     /// returns the position type of the ad (pre, mid, post)
@@ -83,7 +83,7 @@ import Foundation
          isBumper: Bool,
          podIndex: Int,
          mediaBitrate: Int,
-         creativeID: String,
+         creativeId: String,
          advertiserName: String) {
         
         self.adDescription = adDescription
@@ -121,6 +121,8 @@ import Foundation
             "isBumper: \(isBumper)\n" +
             "podIndex: \(podIndex)\n" +
             "mediaBitrate: \(mediaBitrate)\n" +
-            "positionType: \(positionType)"
+            "positionType: \(positionType)" + 
+            "creativeId: \(creativeId)" +
+            "advertiserName: \(advertiserName)"
     }
 }
