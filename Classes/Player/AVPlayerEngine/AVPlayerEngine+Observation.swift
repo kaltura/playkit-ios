@@ -327,8 +327,7 @@ extension AVPlayerEngine {
         }
         // handle audio selection mode, default is to let AVPlayer decide.
         switch trackSelection.audioSelectionMode {
-        case .off: break
-        case .auto:
+        case .off, .auto:
             handleAutoMode(for: tracks.audioTracks)
         case .selection:
             handleSelectionMode(for: tracks.audioTracks, language: trackSelection.audioSelectionLanguage)
