@@ -287,13 +287,13 @@ extension AVPlayerWrapper {
     private func addAppStateChangeObserver() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(AVPlayerWrapper.applicationDidBecomeActive),
-                                               name: .UIApplicationDidBecomeActive,
+                                               name: UIApplication.didBecomeActiveNotification,
                                                object: nil)
     }
     
     private func removeAppStateChangeObserver() {
         NotificationCenter.default.removeObserver(self,
-                                                  name: .UIApplicationDidBecomeActive,
+                                                  name: UIApplication.didBecomeActiveNotification,
                                                   object: nil)
     }
     
