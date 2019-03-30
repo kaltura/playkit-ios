@@ -45,8 +45,9 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             }
             
             settings.onChange = { [weak self] (settingsType) in
+                guard let strongSelf = self else { return }
                 switch settingsType {
-                case .preferredPeakBitRate(let preferredPeakBitRate): self?.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+                case .preferredPeakBitRate(let preferredPeakBitRate): strongSelf.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
                 }
             }
         }
@@ -138,8 +139,9 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         super.init()
         
         self.currentPlayer.onEventBlock = { [weak self] event in
+            guard let strongSelf = self else { return }
             PKLog.verbose("postEvent:: \(event)")
-            self?.onEventBlock?(event)
+            strongSelf.onEventBlock?(event)
         }
         self.onEventBlock = nil
     }
@@ -240,9 +242,10 @@ extension AVPlayerWrapper {
         guard let preferredMediaSource = self.preferredMediaSource,
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
-        refreshableHandler.shouldRefreshAsset(mediaSource: preferredMediaSource) { [unowned self] (shouldRefresh) in
+        refreshableHandler.shouldRefreshAsset(mediaSource: preferredMediaSource) { [weak self] (shouldRefresh) in
+            guard let strongSelf = self else { return }
             if shouldRefresh {
-                self.shouldRefresh = true
+                strongSelf.shouldRefresh = true
             }
         }
     }
@@ -274,8 +277,9 @@ extension AVPlayerWrapper {
         reachability.onUnreachable = { reachability in
             PKLog.warning("network unreachable")
         }
-        reachability.onReachable = { [unowned self] reachability in
-            self.handleRefreshAsset()
+        reachability.onReachable = { [weak self] reachability in
+            guard let strongSelf = self else { return }
+            strongSelf.handleRefreshAsset()
         }
     }
     
