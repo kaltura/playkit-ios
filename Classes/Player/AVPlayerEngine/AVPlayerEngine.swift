@@ -88,9 +88,9 @@ public class AVPlayerEngine: AVPlayer {
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(value, preferredTimescale: self.rangeStart.timescale)
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero) { [weak self] (isSeeked: Bool) in
-                guard let strongSelf = self else { return }
+                guard let self = self else { return }
                 if isSeeked {
-                    strongSelf.post(event: PlayerEvent.Seeked())
+                    self.post(event: PlayerEvent.Seeked())
                     PKLog.debug("seeked")
                 } else {
                     PKLog.error("seek faild")
@@ -321,22 +321,22 @@ extension AVPlayerEngine: AppStateObservable {
     public var observations: Set<NotificationObservation> {
         return [
             NotificationObservation(name: UIApplication.willTerminateNotification, onObserve: { [weak self] in
-                guard let strongSelf = self else { return }
+                guard let self = self else { return }
                 
-                PKLog.debug("player: \(strongSelf)\n Will terminate, destroying...")
-                strongSelf.destroy()
+                PKLog.debug("player: \(self)\n Will terminate, destroying...")
+                self.destroy()
             }),
             NotificationObservation(name: UIApplication.didEnterBackgroundNotification, onObserve: { [weak self] in
-                guard let strongSelf = self else { return }
+                guard let self = self else { return }
                 
-                PKLog.debug("player: \(strongSelf)\n Did enter background, finishing up...")
-                strongSelf.startBackgroundTask()
+                PKLog.debug("player: \(self)\n Did enter background, finishing up...")
+                self.startBackgroundTask()
             }),
             NotificationObservation(name: UIApplication.willEnterForegroundNotification, onObserve: { [weak self] in
-                guard let strongSelf = self else { return }
+                guard let self = self else { return }
                 
-                PKLog.debug("player: \(strongSelf)\n Will enter foreground...")
-                strongSelf.endBackgroundTask()
+                PKLog.debug("player: \(self)\n Will enter foreground...")
+                self.endBackgroundTask()
             })
         ]
     }
@@ -344,10 +344,10 @@ extension AVPlayerEngine: AppStateObservable {
     func startBackgroundTask() {
         
         self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(withName: "AVPlayerEngineBackgroundTask", expirationHandler: { [weak self] in
-            guard let strongSelf = self else { return }
+            guard let self = self else { return }
             
-            PKLog.debug("player: \(strongSelf)\n Reached the expirationHandler")
-            strongSelf.endBackgroundTask()
+            PKLog.debug("player: \(self)\n Reached the expirationHandler")
+            self.endBackgroundTask()
         })
 
         if self.backgroundTaskIdentifier == UIBackgroundTaskIdentifier.invalid {

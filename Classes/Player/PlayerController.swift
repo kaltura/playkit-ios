@@ -133,14 +133,14 @@ class PlayerController: NSObject, Player {
         super.init()
 
         self.currentPlayer.onEventBlock = { [weak self] event in
-            guard let strongSelf = self else { return }
+            guard let self = self else { return }
             PKLog.verbose("postEvent:: \(event)")
-            strongSelf.onEventBlock?(event)
+            self.onEventBlock?(event)
         }
         
         self.playheadObserverUUID = self.timeObserver.addPeriodicObserver(interval: 0.1, observeOn: DispatchQueue.global()) { [weak self] (time) in
-            guard let strongSelf = self else { return }
-            strongSelf.onEventBlock?(PlayerEvent.PlayheadUpdate(currentTime: time))
+            guard let self = self else { return }
+            self.onEventBlock?(PlayerEvent.PlayheadUpdate(currentTime: time))
         }
         
         self.onEventBlock = nil
@@ -363,9 +363,9 @@ extension PlayerController {
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
         refreshableHandler.shouldRefreshAsset(mediaSource: selectedSource) { [weak self] (shouldRefresh) in
-            guard let strongSelf = self else { return }
+            guard let self = self else { return }
             if shouldRefresh {
-                strongSelf.shouldRefresh = true
+                self.shouldRefresh = true
             }
         }
     }
@@ -398,9 +398,9 @@ extension PlayerController {
             PKLog.warning("network unreachable")
         }
         reachability.onReachable = { [weak self] reachability in
-            guard let strongSelf = self else { return }
-            if strongSelf.shouldRefresh {
-                strongSelf.handleRefreshAsset()
+            guard let self = self else { return }
+            if self.shouldRefresh {
+                self.handleRefreshAsset()
             }
         }
     }
