@@ -133,12 +133,14 @@ class PlayerController: NSObject, Player {
         super.init()
 
         self.currentPlayer.onEventBlock = { [weak self] event in
+            guard let self = self else { return }
             PKLog.verbose("postEvent:: \(event)")
-            self?.onEventBlock?(event)
+            self.onEventBlock?(event)
         }
         
         self.playheadObserverUUID = self.timeObserver.addPeriodicObserver(interval: 0.1, observeOn: DispatchQueue.global()) { [weak self] (time) in
-            self?.onEventBlock?(PlayerEvent.PlayheadUpdate(currentTime: time))
+            guard let self = self else { return }
+            self.onEventBlock?(PlayerEvent.PlayheadUpdate(currentTime: time))
         }
         
         self.onEventBlock = nil
@@ -360,7 +362,8 @@ extension PlayerController {
         guard let selectedSource = self.selectedSource,
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
-        refreshableHandler.shouldRefreshAsset(mediaSource: selectedSource) { [unowned self] (shouldRefresh) in
+        refreshableHandler.shouldRefreshAsset(mediaSource: selectedSource) { [weak self] (shouldRefresh) in
+            guard let self = self else { return }
             if shouldRefresh {
                 self.shouldRefresh = true
             }
@@ -394,7 +397,8 @@ extension PlayerController {
         reachability.onUnreachable = { reachability in
             PKLog.warning("network unreachable")
         }
-        reachability.onReachable = { [unowned self] reachability in
+        reachability.onReachable = { [weak self] reachability in
+            guard let self = self else { return }
             if self.shouldRefresh {
                 self.handleRefreshAsset()
             }
@@ -409,13 +413,13 @@ extension PlayerController {
     private func addAppStateChangeObserver() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(PlayerController.applicationDidBecomeActive),
-                                               name: .UIApplicationDidBecomeActive,
+                                               name: UIApplication.didBecomeActiveNotification,
                                                object: nil)
     }
     
     private func removeAppStateChangeObserver() {
         NotificationCenter.default.removeObserver(self,
-                                                  name: .UIApplicationDidBecomeActive,
+                                                  name: UIApplication.didBecomeActiveNotification,
                                                   object: nil)
     }
     

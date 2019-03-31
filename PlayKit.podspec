@@ -10,9 +10,9 @@ s.homepage          = 'https://github.com/kaltura/playkit-ios'
 s.license           = { :type => 'AGPLv3', :text => 'AGPLv3' }
 s.author            = { 'Kaltura' => 'community@kaltura.com' }
 s.source            = { :git => 'https://github.com/kaltura/playkit-ios.git', :tag => 'v' + s.version.to_s }
-s.swift_version     = '4.0'
+s.swift_version     = '4.2'
 
-s.ios.deployment_target = '8.0'
+s.ios.deployment_target = '9.0'
 s.tvos.deployment_target = '9.0'
 
 s.subspec 'Core' do |sp|
@@ -20,12 +20,12 @@ s.subspec 'Core' do |sp|
     sp.dependency 'SwiftyJSON', '3.1.4'
     sp.dependency 'XCGLogger', '~> 6.1.0'
     sp.dependency 'SwiftyXMLParser', '3.0.3'
-    sp.dependency 'KalturaNetKit', '~> 1.0.0'
-    sp.dependency 'PlayKitUtils', '~> 0.1.6'
+    sp.dependency 'KalturaNetKit', '~> 1.0.0' + suffix
+    sp.dependency 'PlayKitUtils', '~> 0.1.6' + suffix
 end
 
 s.subspec 'WidevineClassic' do |ssp|
-  ssp.ios.deployment_target = '8.0'  
+  ssp.ios.deployment_target = '9.0'  
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKit/Core'
   #ssp.dependency 'PlayKitWV'
