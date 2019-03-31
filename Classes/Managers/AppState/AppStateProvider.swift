@@ -60,13 +60,10 @@ public final class AppStateProvider: AppStateProviderProtocol {
     public let notificationsManager = NotificationsManager()
     
     public let observationNames: Set<ObservationName> = [
-        .UIApplicationWillTerminate,
-        .UIApplicationDidEnterBackground,
-        .UIApplicationDidBecomeActive,
-        .UIApplicationWillResignActive,
-        .UIApplicationWillEnterForeground
+        UIApplication.willTerminateNotification,
+        UIApplication.didEnterBackgroundNotification,
+        UIApplication.didBecomeActiveNotification,
+        UIApplication.willResignActiveNotification,
+        UIApplication.willEnterForegroundNotification
     ]
-    
 }
-
-

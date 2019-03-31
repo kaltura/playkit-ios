@@ -82,9 +82,9 @@ class FPSLicenseHelper {
     func handleLicenseRequest(_ request: FPSLicenseRequest, done callback: @escaping (Error?) -> Void) {
         
         let done: (Error?) -> Void = { [weak self] error in
-            guard let strongSelf = self else { return }
+            guard let self = self else { return }
             callback(error)
-            strongSelf.doneCallback?(error)
+            self.doneCallback?(error)
         }
         
         let assetId = self.assetId
@@ -117,7 +117,7 @@ class FPSLicenseHelper {
         
         request.getSPC(cert: params.cert, id: assetId, shouldPersist: shouldPersist) { [weak self] (spcData, error) in                                                                
             
-            guard let strongSelf = self else { return }
+            guard let self = self else { return }
             if let error = error {
                 request.processContentKeyResponseError(error)
                 done(error)
@@ -127,7 +127,7 @@ class FPSLicenseHelper {
             guard let spcData = spcData else { return }
             
             // Send SPC to Key Server and obtain CKC
-            strongSelf.performCKCRequest(spcData, url: params.url) { (license, error) in 
+            self.performCKCRequest(spcData, url: params.url) { (license, error) in
                 guard let license = license else {
                     request.processContentKeyResponseError(error)
                     done(error)

@@ -275,43 +275,43 @@ class TimeObserver: TimeMonitor {
         self.lastObservedTime = self.timeProvider?.currentTime ?? 0
         // set event handler
         self.dispatchTimer!.setEventHandler { [weak self] in
-            guard let strongSelf = self, let timeProvider = strongSelf.timeProvider else { return }
+            guard let self = self, let timeProvider = self.timeProvider else { return }
             // take a snapshot of the current time to use for all checks
             let currentTime = timeProvider.currentTime
             let currentTimePercentage = currentTime / timeProvider.duration
             // only handle when current time is greater then 0, if we have 0 it means nothing to handle.
             guard currentTime > 0 else { return }
             // make sure current time is not equal last observed time (means we were stopped or paused or seeked)
-            guard currentTime != strongSelf.lastObservedTime else {
+            guard currentTime != self.lastObservedTime else {
                 // update next boundary only once when we found out current time hasn't changed.
-                if strongSelf.cycles > 1 {
-                    strongSelf.updateNextBoundary()
+                if self.cycles > 1 {
+                    self.updateNextBoundary()
                 }
                 // player stopped for some reason (paused/buffering/seeking/ended)
-                strongSelf.cycles = 1
+                self.cycles = 1
                 return
             }
             // check periodic observations for current cycle
-            strongSelf.handlePeriodicObservations(currentTime: currentTime)
+            self.handlePeriodicObservations(currentTime: currentTime)
             // if the difference between current time and last observed is greater then the threshold,
             // we probably had a seek and we shouldn't handle boundary observation
-            let lastObservedTimeGap = currentTime - strongSelf.lastObservedTime
-            if abs(lastObservedTimeGap) < (Double(strongSelf.interval / 100) * 2) { // jump is lower then threshold
+            let lastObservedTimeGap = currentTime - self.lastObservedTime
+            if abs(lastObservedTimeGap) < (Double(self.interval / 100) * 2) { // jump is lower then threshold
                 // check boundary observations
-                strongSelf.handleBoundaryObservations(currentTime: currentTime, currentTimePercentage: currentTimePercentage)
+                self.handleBoundaryObservations(currentTime: currentTime, currentTimePercentage: currentTimePercentage)
             } else if lastObservedTimeGap < 0 { // seeked backward
-                strongSelf.updateNextBoundary()
+                self.updateNextBoundary()
             } else { // seeked forward
-                strongSelf.handleBoundaryObservations(currentTime: currentTime, currentTimePercentage: currentTimePercentage)
+                self.handleBoundaryObservations(currentTime: currentTime, currentTimePercentage: currentTimePercentage)
             }
             // update cycles count
-            strongSelf.cycles += 1
+            self.cycles += 1
             // if we reached the highest cycle reset
-            if strongSelf.cycles > strongSelf.maxInterval / strongSelf.interval {
-                strongSelf.cycles = 1
+            if self.cycles > self.maxInterval / self.interval {
+                self.cycles = 1
             }
             // update last observed time
-            strongSelf.lastObservedTime = currentTime
+            self.lastObservedTime = currentTime
         }
         // start the timer
         dispatchTimer!.resume()
