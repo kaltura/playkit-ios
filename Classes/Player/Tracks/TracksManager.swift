@@ -43,12 +43,17 @@ public class TracksManager: NSObject {
         
     }
     
+    private func parseTrackId(_ string: String) -> (String, Int)? {
+        guard let theRange = string.range(of: ":", options: .backwards), let i = Int(string[theRange.upperBound...]) else { return nil }
+        return (String(string[...theRange.lowerBound]), i)
+    }
+    
     @objc public func selectTrack(item: AVPlayerItem, trackId: String) -> Track? {
         PKLog.verbose("selectTrack")
+        guard let tupleTrackId = parseTrackId(trackId) else { return nil }
         
-        let idArr : [String] = trackId.components(separatedBy: ":")
-        let type: String = idArr[0]
-        let index: Int = Int(idArr[1])!
+        let type: String = tupleTrackId.0
+        let index: Int = tupleTrackId.1
         
         if let audioTrack = self.audioTracks?.first(where: { $0.id == trackId }) {
             self.selectAudioTrack(item: item, index: index)
