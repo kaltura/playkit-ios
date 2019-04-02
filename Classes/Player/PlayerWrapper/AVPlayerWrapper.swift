@@ -46,8 +46,9 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             }
             
             settings.onChange = { [weak self] (settingsType) in
+                guard let self = self else { return }
                 switch settingsType {
-                case .preferredPeakBitRate(let preferredPeakBitRate): self?.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+                case .preferredPeakBitRate(let preferredPeakBitRate): self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
                 }
             }
         }
@@ -139,8 +140,9 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         super.init()
         
         self.currentPlayer.onEventBlock = { [weak self] event in
+            guard let self = self else { return }
             PKLog.verbose("postEvent:: \(event)")
-            self?.onEventBlock?(event)
+            self.onEventBlock?(event)
         }
         self.onEventBlock = nil
     }
@@ -242,10 +244,9 @@ extension AVPlayerWrapper {
             let refreshableHandler = assetHandler as? RefreshableAssetHandler else { return }
         
         refreshableHandler.shouldRefreshAsset(mediaSource: preferredMediaSource) { [weak self] (shouldRefresh) in
-            guard let strongSelf = self else { return }
-            
+            guard let self = self else { return }
             if shouldRefresh {
-                strongSelf.shouldRefresh = true
+                self.shouldRefresh = true
             }
         }
     }
@@ -278,9 +279,8 @@ extension AVPlayerWrapper {
             PKLog.warning("network unreachable")
         }
         reachability.onReachable = { [weak self] reachability in
-            guard let strongSelf = self else { return }
-            
-            strongSelf.handleRefreshAsset()
+            guard let self = self else { return }
+            self.handleRefreshAsset()
         }
     }
     
@@ -292,13 +292,13 @@ extension AVPlayerWrapper {
     private func addAppStateChangeObserver() {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(AVPlayerWrapper.applicationDidBecomeActive),
-                                               name: .UIApplicationDidBecomeActive,
+                                               name: UIApplication.didBecomeActiveNotification,
                                                object: nil)
     }
     
     private func removeAppStateChangeObserver() {
         NotificationCenter.default.removeObserver(self,
-                                                  name: .UIApplicationDidBecomeActive,
+                                                  name: UIApplication.didBecomeActiveNotification,
                                                   object: nil)
     }
     

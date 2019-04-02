@@ -165,14 +165,14 @@ extension AVPlayerEngine {
             self.post(event: PlayerEvent.LoadedTimeRanges(timeRanges: timeRanges))
         case #keyPath(rate): self.handleRate()
         case #keyPath(status):
-            guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerStatus = AVPlayerStatus(rawValue: statusChange.intValue) else {
+            guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerStatus = AVPlayer.Status(rawValue: statusChange.intValue) else {
                 PKLog.error("unknown player status")
                 return
             }
             self.handle(status: newPlayerStatus)
         case #keyPath(currentItem): self.handleItemChange()
         case #keyPath(currentItem.status):
-            guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerItemStatus = AVPlayerItemStatus(rawValue: statusChange.intValue) else {
+            guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerItemStatus = AVPlayerItem.Status(rawValue: statusChange.intValue) else {
                 PKLog.error("unknown player item status")
                 return
             }
@@ -221,7 +221,7 @@ extension AVPlayerEngine {
         PKLog.debug("player rate was changed, now: \(self.rate)")
     }
     
-    private func handle(status: AVPlayerStatus) {
+    private func handle(status: AVPlayer.Status) {
         switch status {
         case .readyToPlay:
             PKLog.debug("player is ready to play player items")
@@ -238,7 +238,7 @@ extension AVPlayerEngine {
         }
     }
     
-    private func handle(playerItemStatus status: AVPlayerItemStatus) {
+    private func handle(playerItemStatus status: AVPlayerItem.Status) {
         switch status {
         case .readyToPlay:
             let newState = PlayerState.ready
@@ -327,8 +327,7 @@ extension AVPlayerEngine {
         }
         // handle audio selection mode, default is to let AVPlayer decide.
         switch trackSelection.audioSelectionMode {
-        case .off: break
-        case .auto:
+        case .off, .auto:
             handleAutoMode(for: tracks.audioTracks)
         case .selection:
             handleSelectionMode(for: tracks.audioTracks, language: trackSelection.audioSelectionLanguage)
