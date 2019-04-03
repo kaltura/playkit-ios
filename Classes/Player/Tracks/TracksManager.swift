@@ -43,12 +43,17 @@ public class TracksManager: NSObject {
         
     }
     
+    private func parseTrackId(_ string: String) -> (String, Int)? {
+        guard let theRange = string.range(of: ":", options: .backwards), let i = Int(string[theRange.upperBound...]) else { return nil }
+        return (String(string[..<theRange.lowerBound]), i)
+    }
+    
     @objc public func selectTrack(item: AVPlayerItem, trackId: String) -> Track? {
         PKLog.verbose("selectTrack")
+        guard let tupleTrackId = parseTrackId(trackId) else { return nil }
         
-        let idArr : [String] = trackId.components(separatedBy: ":")
-        let type: String = idArr[0]
-        let index: Int = Int(idArr[1])!
+        let type: String = tupleTrackId.0
+        let index: Int = tupleTrackId.1
         
         if let audioTrack = self.audioTracks?.first(where: { $0.id == trackId }) {
             self.selectAudioTrack(item: item, index: index)
@@ -126,7 +131,7 @@ public class TracksManager: NSObject {
             
             PKLog.verbose("option:: \(option)")
             
-            if !cea608CaptionsEnabled && option.mediaType == AVMediaType.closedCaption.rawValue {
+            if !cea608CaptionsEnabled && option.mediaType.rawValue == AVMediaType.closedCaption.rawValue {
                 return
             }
             
@@ -138,7 +143,7 @@ public class TracksManager: NSObject {
                 self.textTracks = [Track]()
             }
             
-            optionMediaType = option.mediaType
+            optionMediaType = option.mediaType.rawValue
             let trackId = "\(optionMediaType):\(String(index))"
             
             var title: String = option.displayName
@@ -173,7 +178,7 @@ public class TracksManager: NSObject {
                 if trackIndex == index {
                     PKLog.verbose("option:: \(option)")
                     
-                    if option.mediaType == type {
+                    if option.mediaType.rawValue == type {
                         item.select(option, in: textSelectionGroup!)
                     }
                 }

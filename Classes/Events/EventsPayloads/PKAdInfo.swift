@@ -52,7 +52,11 @@ import Foundation
     @objc public var podIndex: Int
     // The bitrate of the selected creative.
     @objc public var mediaBitrate: Int
-    
+    // The CreativeId for the ad.
+    @objc public var creativeId: String
+    // The Advertiser Name for the ad.
+    @objc public var advertiserName: String   
+ 
     /// returns the position type of the ad (pre, mid, post)
     @objc public var positionType: AdPositionType {
         if timeOffset > 0 {
@@ -78,7 +82,9 @@ import Foundation
          timeOffset: TimeInterval,
          isBumper: Bool,
          podIndex: Int,
-         mediaBitrate: Int) {
+         mediaBitrate: Int,
+         creativeId: String,
+         advertiserName: String) {
         
         self.adDescription = adDescription
         self.duration = adDuration
@@ -95,6 +101,8 @@ import Foundation
         self.isBumper = isBumper
         self.podIndex = podIndex
         self.mediaBitrate = mediaBitrate
+        self.creativeId = creativeId
+        self.advertiserName = advertiserName
     }
     
     public override var description: String {
@@ -113,6 +121,8 @@ import Foundation
             "isBumper: \(isBumper)\n" +
             "podIndex: \(podIndex)\n" +
             "mediaBitrate: \(mediaBitrate)\n" +
-            "positionType: \(positionType)"
+            "positionType: \(positionType)" + 
+            "creativeId: \(creativeId)" +
+            "advertiserName: \(advertiserName)"
     }
 }

@@ -62,14 +62,14 @@ private struct Observation {
     
     @objc public func post(_ event: PKEvent) {
         self.dispatchQueue.sync { [weak self] in
-            guard let strongSelf = self else { return }
+            guard let self = self else { return }
             PKLog.verbose("post event: \(event), with data: \(event.data ?? [:])")
             let typeId = NSStringFromClass(type(of: event))
             
-            if let array = strongSelf.observations[typeId] {
+            if let array = self.observations[typeId] {
                 // remove nil observers replace current observations with new ones, and call block with the event
                 let newObservations = array.filter { $0.observer != nil }
-                strongSelf.observations[typeId] = newObservations
+                self.observations[typeId] = newObservations
                 newObservations.forEach { observation in
                     observation.observeOn.async {
                         observation.block(event)
