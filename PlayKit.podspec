@@ -1,5 +1,5 @@
-suffix = '-dev'   # Dev mode
-# suffix = ''       # Release
+#suffix = '-dev'   # Dev mode
+suffix = ''       # Release
 
 Pod::Spec.new do |s|
 
