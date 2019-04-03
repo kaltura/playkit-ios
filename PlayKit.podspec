@@ -4,7 +4,7 @@ suffix = '-dev'   # Dev mode
 Pod::Spec.new do |s|
 
 s.name              = 'PlayKit'
-s.version           = '3.8.0' + suffix
+s.version           = '3.9.0' + suffix
 s.summary           = 'PlayKit: Kaltura Mobile Player SDK - iOS'
 s.homepage          = 'https://github.com/kaltura/playkit-ios'
 s.license           = { :type => 'AGPLv3', :text => 'AGPLv3' }
@@ -20,8 +20,8 @@ s.subspec 'Core' do |sp|
     sp.dependency 'SwiftyJSON', '3.1.4'
     sp.dependency 'XCGLogger', '~> 6.1.0'
     sp.dependency 'SwiftyXMLParser', '3.0.3'
-    sp.dependency 'KalturaNetKit', '~> 1.0.0' + suffix
-    sp.dependency 'PlayKitUtils', '~> 0.1.6' + suffix
+    sp.dependency 'KalturaNetKit', '~> 1.1.0' + suffix
+    sp.dependency 'PlayKitUtils', '~> 0.2.0' + suffix
 end
 
 s.subspec 'WidevineClassic' do |ssp|
