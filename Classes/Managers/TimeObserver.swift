@@ -59,8 +59,8 @@ struct PeriodicObservation: Hashable {
         self.observations = observations
     }
     
-    var hashValue: Int {
-        return self.interval
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(interval)
     }
     
     public static func == (lhs: PeriodicObservation, rhs: PeriodicObservation) -> Bool {
@@ -215,7 +215,7 @@ class TimeObserver: TimeMonitor {
         guard var periodicObservation = periodicObservations.first(where: { $0.observations.contains(where: { $0.token == token }) }) else { return }
         if periodicObservation.observations.count > 1 {
             // can force unwrap because we made sure in the guard observations contains the token.
-            periodicObservation.observations.remove(at: periodicObservation.observations.index(where: { $0.token == token })!)
+            periodicObservation.observations.remove(at: periodicObservation.observations.firstIndex(where: { $0.token == token })!)
             // periodic observation is a struct so in order to make the change we must remove and insert again
             self.periodicObservations.remove(periodicObservation)
             self.periodicObservations.insert(periodicObservation)

@@ -40,7 +40,7 @@ public let PKLog: XCGLogger = {
 
 // For compatibility with the old logger -- in XCGLogger 'trace' is called 'verbose'.
 public extension XCGLogger {
-    public func trace(_ closure: @autoclosure () -> Any?, functionName: StaticString = #function, fileName: StaticString = #file, lineNumber: Int = #line, userInfo: [String: Any] = [:]) {
+    func trace(_ closure: @autoclosure () -> Any?, functionName: StaticString = #function, fileName: StaticString = #file, lineNumber: Int = #line, userInfo: [String: Any] = [:]) {
         self.logln(.verbose, functionName: functionName, fileName: fileName, lineNumber: lineNumber, userInfo: userInfo, closure: closure)
     }
 }

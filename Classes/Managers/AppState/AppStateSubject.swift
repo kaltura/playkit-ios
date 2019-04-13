@@ -166,8 +166,8 @@ public struct NotificationObservation: Hashable {
     public var name: ObservationName
     public var onObserve: () -> Void
     
-    public var hashValue: Int {
-        return name.rawValue.hash
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
     }
 }
 

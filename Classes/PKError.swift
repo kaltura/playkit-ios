@@ -181,12 +181,12 @@ public protocol PKError: Error, CustomStringConvertible {
 
 public extension PKError {
     /// description string
-    public var description: String {
+    var description: String {
         return "\(type(of: self)) ,domain: \(type(of: self).domain), errorCode: \(self.code)"
     }
     
     /// creates an `NSError` from the selected case.
-    public var asNSError: NSError {
+    var asNSError: NSError {
         var userInfo = self.userInfo
         userInfo[NSLocalizedDescriptionKey] = self.errorDescription
         return NSError(domain: Self.domain, code: self.code, userInfo: userInfo)

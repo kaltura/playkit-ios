@@ -30,7 +30,8 @@ trunkPush() {
 justBuild() {
   cd TestApp
   pod install
-  xcodebuild build -workspace TestApp.xcworkspace -scheme TestApp -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO | xcpretty
+  xcodebuild build -workspace TestApp.xcworkspace -scheme TestApp_v4_2 -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO | xcpretty
+  xcodebuild build -workspace TestApp.xcworkspace -scheme TestApp_v5 -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO | xcpretty
 }
 
 libLint() {

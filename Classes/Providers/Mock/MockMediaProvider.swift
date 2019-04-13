@@ -70,7 +70,7 @@ import SwiftyJSON
                  callback(nil, MockError.fileIsEmptyOrNotFound)
                 return
             }
-            json = JSON(data: data as Data)
+            json = try? JSON(data: data as Data)
         }
 
         guard let jsonContent = json else {

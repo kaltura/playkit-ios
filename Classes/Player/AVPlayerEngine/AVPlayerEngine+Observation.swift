@@ -234,7 +234,10 @@ extension AVPlayerEngine {
             if let error = (self.error as NSError?) {
                 self.post(event: PlayerEvent.Error(error: PlayerError.failed(rootError: error)))
             }
-        case .unknown: break
+        case .unknown:
+            break
+        @unknown default:
+            break
         }
     }
     
@@ -271,7 +274,10 @@ extension AVPlayerEngine {
             if let error = currentItem?.error as NSError? {
                 self.post(event: PlayerEvent.Error(error: PlayerError.playerItemFailed(rootError: error)))
             }
-        case .unknown: break
+        case .unknown:
+            break
+        @unknown default:
+            break
         }
     }
     

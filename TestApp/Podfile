@@ -4,11 +4,16 @@ platform :ios, '9.0'
 # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
 use_frameworks!
 
-abstract_target 'SharedPods' do
+def sharedPods
+  pod 'PlayKit', :path => '..'
+  pod 'KalturaNetKit', :path => '../../netkit-ios'
+  pod 'PlayKitUtils', :path => '../../playkit-ios-utils'
+end
 
-    # Pods for TestApp
-    pod 'PlayKit', :path => '..'
-    
-    target 'TestApp'
+target 'TestApp_v4_2' do
+  sharedPods
+end
 
+target 'TestApp_v5' do
+  sharedPods
 end
