@@ -1,13 +1,10 @@
-language: objective-c
-osx_image: xcode10.1
-
+language: swift
+osx_image: xcode10.2
 before_install:
-  - gem install cocoapods # Since Travis is not always on latest version
+  - gem install cocoapods xcpretty
   - pod repo update
-
 script:
- - ./travis-build.sh
-
+  - ./travis-build.sh
 notifications:
   email:
     recipients:

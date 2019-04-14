@@ -60,42 +60,42 @@ public extension PKEvent {
     // MARK: Player Data Accessors
     
     /// Duration Value, PKEvent Data Accessor
-    @objc public var duration: NSNumber? {
+    @objc var duration: NSNumber? {
         return self.data?[EventDataKeys.duration] as? NSNumber
     }
     
     /// Current Time Value, PKEvent Data Accessor
-    @objc public var currentTime: NSNumber? {
+    @objc var currentTime: NSNumber? {
         return self.data?[EventDataKeys.currentTime] as? NSNumber
     }
     
     /// Duration Value, PKEvent Data Accessor
-    @objc public var targetSeekPosition: NSNumber? {
+    @objc var targetSeekPosition: NSNumber? {
         return self.data?[EventDataKeys.targetSeekPosition] as? NSNumber
     }
     
     /// Tracks Value, PKEvent Data Accessor
-    @objc public var tracks: PKTracks? {
+    @objc var tracks: PKTracks? {
         return self.data?[EventDataKeys.tracks] as? PKTracks
     }
     
     /// Selected Track Value, PKEvent Data Accessor
-    @objc public var selectedTrack: Track? {
+    @objc var selectedTrack: Track? {
         return self.data?[EventDataKeys.selectedTrack] as? Track
     }
     
     /// Indicated Bitrate, PKEvent Data Accessor
-    @objc public var bitrate: NSNumber? {
+    @objc var bitrate: NSNumber? {
         return self.data?[EventDataKeys.bitrate] as? NSNumber
     }
     
     /// Current Bitrate Value, PKEvent Data Accessor
-    @objc public var playbackInfo: PKPlaybackInfo? {
+    @objc var playbackInfo: PKPlaybackInfo? {
         return self.data?[EventDataKeys.playbackInfo] as? PKPlaybackInfo
     }
     
     /// Current Old State Value, PKEvent Data Accessor
-    @objc public var oldState: PlayerState {
+    @objc var oldState: PlayerState {
         guard let oldState = self.data?[EventDataKeys.oldState] as? PlayerState else {
             return PlayerState.unknown
         }
@@ -104,7 +104,7 @@ public extension PKEvent {
     }
     
     /// Current New State Value, PKEvent Data Accessor
-    @objc public var newState: PlayerState {
+    @objc var newState: PlayerState {
         guard let newState = self.data?[EventDataKeys.newState] as? PlayerState else {
             return PlayerState.unknown
         }
@@ -113,22 +113,22 @@ public extension PKEvent {
     }
     
     /// Associated error from error event, PKEvent Data Accessor
-    @objc public var error: NSError? {
+    @objc var error: NSError? {
         return self.data?[EventDataKeys.error] as? NSError
     }
     
     /// Associated metadata from the event, PKEvent Data Accessor
-    @objc public var timedMetadata: [AVMetadataItem]? {
+    @objc var timedMetadata: [AVMetadataItem]? {
         return self.data?[EventDataKeys.metadata] as? [AVMetadataItem]
     }
     
     /// Content url, PKEvent Data Accessor
-    @objc public var mediaSource: PKMediaSource? {
+    @objc var mediaSource: PKMediaSource? {
         return self.data?[EventDataKeys.mediaSource] as? PKMediaSource
     }
     
     /// Content url, PKEvent Data Accessor
-    @objc public var timeRanges: [PKTimeRange]? {
+    @objc var timeRanges: [PKTimeRange]? {
         return self.data?[EventDataKeys.timeRanges] as? [PKTimeRange]
     }
 }
