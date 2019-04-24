@@ -77,8 +77,15 @@ fileprivate let durationKey = "duration"
         }
         
         if let mediaTypeStr = jsonObject[mediaTypeKey].string {
-            if mediaTypeStr == "Live" {
-                self.mediaType = MediaType.live
+            switch mediaTypeStr {
+            case "Live":
+                self.mediaType = .live
+            case "DvrLive":
+                self.mediaType = .dvrLive
+            case "Vod":
+                self.mediaType = .vod
+            default:
+                break // leave as unknown
             }
         }
         
