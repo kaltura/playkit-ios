@@ -160,7 +160,7 @@ fileprivate let durationKey = "duration"
 public class FairPlayDRMParams: DRMParams {
     @objc public var fpsCertificate: Data?
     
-    internal var requestDelegate: FPSLicenseRequestDelegate?
+    internal var licenseProvider: FairPlayLicenseProvider?
     
     @objc public init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)

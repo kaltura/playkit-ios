@@ -86,7 +86,7 @@ enum PlayerSettingsType {
     @objc public var contentRequestAdapter: PKRequestParamsAdapter?
     @objc public var licenseRequestAdapter: PKRequestParamsAdapter?
     
-    @objc public var fpsLicenseRequestDelegate: FPSLicenseRequestDelegate?
+    @objc public var fairPlayLicenseProvider: FairPlayLicenseProvider?
     
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()

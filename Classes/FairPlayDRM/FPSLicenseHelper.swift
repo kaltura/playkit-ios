@@ -13,7 +13,7 @@ import Foundation
 import AVFoundation
 import SwiftyJSON
 
-@objc public protocol FPSLicenseRequestDelegate {
+@objc public protocol FairPlayLicenseProvider {
     @objc func performLicenseRequest(spc: Data, requestParams: PKRequestParams,
                                      callback: @escaping (_ ckc: Data?, _ offlineDuration: TimeInterval, _ error: Error?) -> Void)
 }
@@ -23,9 +23,9 @@ struct KalturaLicenseResponseContainer: Codable {
     var persistence_duration: TimeInterval?
 }
 
-class KalturaFPSLicenseRequestDelegate: FPSLicenseRequestDelegate {
+class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
     
-    static let sharedInstance = KalturaFPSLicenseRequestDelegate()
+    static let sharedInstance = KalturaFairPlayLicenseProvider()
     
     func performLicenseRequest(spc: Data, requestParams: PKRequestParams, callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
         var request = URLRequest(url: requestParams.url)
@@ -50,7 +50,7 @@ class KalturaFPSLicenseRequestDelegate: FPSLicenseRequestDelegate {
                 PKLog.debug("Got response in \(endTime-startTime) sec")
                 
                 guard let data = data else {
-                    callback(nil, 0, NSError(domain: "KalturaFPSLicenseRequestDelegate", code: 1, userInfo: nil))
+                    callback(nil, 0, NSError(domain: "KalturaFairPlayLicenseProvider", code: 1, userInfo: nil))
                     return
                 }
                 
@@ -105,9 +105,9 @@ class FPSLicenseHelper {
             requestParams = adapter.adapt(requestParams: requestParams)
         }
         
-        let fpsDelegate = self.params?.requestDelegate ?? KalturaFPSLicenseRequestDelegate.sharedInstance
+        let licenseProvider = self.params?.licenseProvider ?? KalturaFairPlayLicenseProvider.sharedInstance
 
-        fpsDelegate.performLicenseRequest(spc: spcData, 
+        licenseProvider.performLicenseRequest(spc: spcData, 
                                                requestParams: requestParams) { (ckc, duration, error) in
                                                 
                                                 guard let ckc = ckc else {
