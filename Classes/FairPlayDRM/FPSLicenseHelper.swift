@@ -13,6 +13,58 @@ import Foundation
 import AVFoundation
 import SwiftyJSON
 
+@objc public protocol FPSLicenseRequestDelegate {
+    @objc func performLicenseRequest(spc: Data, requestParams: PKRequestParams,
+                                     callback: @escaping (_ ckc: Data?, _ offlineDuration: TimeInterval, _ error: Error?) -> Void)
+}
+
+struct KalturaLicenseResponseContainer: Codable {
+    var ckc: String?
+    var persistence_duration: TimeInterval?
+}
+
+class KalturaFPSLicenseRequestDelegate: FPSLicenseRequestDelegate {
+    
+    static let sharedInstance = KalturaFPSLicenseRequestDelegate()
+    
+    func performLicenseRequest(spc: Data, requestParams: PKRequestParams, callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
+        var request = URLRequest(url: requestParams.url)
+        if let headers = requestParams.headers {
+            for (header, value) in headers {
+                request.setValue(value, forHTTPHeaderField: header)
+            }
+        }
+        
+        if request.value(forHTTPHeaderField: "Content-Type") == nil {
+            request.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+        }
+        
+        request.httpBody = spc.base64EncodedData()
+        request.httpMethod = "POST"
+        
+        PKLog.debug("Sending SPC to server")
+        let startTime = Date.timeIntervalSinceReferenceDate
+        let dataTask = URLSession.shared.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+            do {
+                let endTime: Double = Date.timeIntervalSinceReferenceDate
+                PKLog.debug("Got response in \(endTime-startTime) sec")
+                
+                guard let data = data else {
+                    callback(nil, 0, NSError(domain: "KalturaFPSLicenseRequestDelegate", code: 1, userInfo: nil))
+                    return
+                }
+                
+                let lic = try JSONDecoder().decode(KalturaLicenseResponseContainer.self, from: data)
+                callback(Data(base64Encoded: lic.ckc ?? ""), lic.persistence_duration ?? 0, nil)
+                
+            } catch let e {
+                callback(nil, 0, e)
+            }
+        }
+        dataTask.resume()
+    }
+}
+
 class FPSLicenseHelper {
     
     let assetId: String
@@ -47,36 +99,24 @@ class FPSLicenseHelper {
     func performCKCRequest(_ spcData: Data, url: URL, callback: @escaping (FPSLicense?, Error?) -> Void) {
         
         
-        var requestParams = PKRequestParams(url: url, headers: ["Content-Type": "application/octet-stream"])
-
+        var requestParams = PKRequestParams(url: url, headers: nil)
+        
         if let adapter = self.params?.requestAdapter {
             requestParams = adapter.adapt(requestParams: requestParams)
         }
         
-        var request = URLRequest(url: requestParams.url)
-        if let headers = requestParams.headers {
-            for (header, value) in headers {
-                request.setValue(value, forHTTPHeaderField: header)
-            }
-        }
+        let fpsDelegate = self.params?.requestDelegate ?? KalturaFPSLicenseRequestDelegate.sharedInstance
 
-        request.httpBody = spcData.base64EncodedData()
-        request.httpMethod = "POST"
-        
-        PKLog.debug("Sending SPC to server")
-        let startTime = Date.timeIntervalSinceReferenceDate
-        let dataTask = URLSession.shared.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) -> Void in
-            do {
-                let endTime: Double = Date.timeIntervalSinceReferenceDate
-                PKLog.debug("Got response in \(endTime-startTime) sec")
-                let lic = try FPSLicense(jsonResponse: data)
-                callback(lic, nil)
-                
-            } catch let e {
-                callback(nil, e)
-            }
+        fpsDelegate.performLicenseRequest(spc: spcData, 
+                                               requestParams: requestParams) { (ckc, duration, error) in
+                                                
+                                                guard let ckc = ckc else {
+                                                    callback(nil, error)
+                                                    return
+                                                }
+                                                
+                                                callback(FPSLicense(ckc: ckc, duration: duration), nil)
         }
-        dataTask.resume()
     }
 
     func handleLicenseRequest(_ request: FPSLicenseRequest, done callback: @escaping (Error?) -> Void) {

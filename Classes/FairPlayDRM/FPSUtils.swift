@@ -89,6 +89,11 @@ class FPSLicense: Codable {
         self.expiryDate = Date(timeIntervalSinceNow: offlineExpiry)
     }
     
+    init(ckc: Data, duration: TimeInterval) {
+        self.data = ckc
+        self.expiryDate = Date(timeIntervalSinceNow: duration)
+    }
+    
     init(legacyData: Data) {
         self.data = legacyData
         self.expiryDate = nil
