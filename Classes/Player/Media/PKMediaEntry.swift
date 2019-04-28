@@ -167,3 +167,8 @@ public class FairPlayDRMParams: DRMParams {
         super.init(licenseUri: licenseUri, scheme: scheme)
     }
 }
+
+@objc public protocol FairPlayLicenseProvider {
+    @objc func getLicense(spc: Data, requestParams: PKRequestParams,
+                          callback: @escaping (_ ckc: Data?, _ offlineDuration: TimeInterval, _ error: Error?) -> Void)
+}

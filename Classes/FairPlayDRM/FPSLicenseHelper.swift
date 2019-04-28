@@ -13,11 +13,6 @@ import Foundation
 import AVFoundation
 import SwiftyJSON
 
-@objc public protocol FairPlayLicenseProvider {
-    @objc func getLicense(spc: Data, requestParams: PKRequestParams,
-                                     callback: @escaping (_ ckc: Data?, _ offlineDuration: TimeInterval, _ error: Error?) -> Void)
-}
-
 struct KalturaLicenseResponseContainer: Codable {
     var ckc: String?
     var persistence_duration: TimeInterval?
