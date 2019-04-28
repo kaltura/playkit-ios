@@ -14,7 +14,7 @@ import AVFoundation
 import SwiftyJSON
 
 @objc public protocol FairPlayLicenseProvider {
-    @objc func performLicenseRequest(spc: Data, requestParams: PKRequestParams,
+    @objc func getLicense(spc: Data, requestParams: PKRequestParams,
                                      callback: @escaping (_ ckc: Data?, _ offlineDuration: TimeInterval, _ error: Error?) -> Void)
 }
 
@@ -27,7 +27,7 @@ class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
     
     static let sharedInstance = KalturaFairPlayLicenseProvider()
     
-    func performLicenseRequest(spc: Data, requestParams: PKRequestParams, callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
+    func getLicense(spc: Data, requestParams: PKRequestParams, callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
         var request = URLRequest(url: requestParams.url)
         if let headers = requestParams.headers {
             for (header, value) in headers {
@@ -35,6 +35,8 @@ class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
             }
         }
         
+        // If a specific content-type was requested by the adapter, use it. 
+        // Otherwise, the uDRM requires application/octet-stream.
         if request.value(forHTTPHeaderField: "Content-Type") == nil {
             request.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
         }
@@ -107,7 +109,7 @@ class FPSLicenseHelper {
         
         let licenseProvider = self.params?.licenseProvider ?? KalturaFairPlayLicenseProvider.sharedInstance
 
-        licenseProvider.performLicenseRequest(spc: spcData, 
+        licenseProvider.getLicense(spc: spcData, 
                                                requestParams: requestParams) { (ckc, duration, error) in
                                                 
                                                 guard let ckc = ckc else {
