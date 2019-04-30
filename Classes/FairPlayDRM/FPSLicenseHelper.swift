@@ -22,7 +22,7 @@ class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
     
     static let sharedInstance = KalturaFairPlayLicenseProvider()
     
-    func getLicense(spc: Data, requestParams: PKRequestParams, callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
+    func getLicense(spc: Data, assetId: String, requestParams: PKRequestParams, callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
         var request = URLRequest(url: requestParams.url)
         if let headers = requestParams.headers {
             for (header, value) in headers {
@@ -93,7 +93,7 @@ class FPSLicenseHelper {
         self.dataStore = dataStore
     }
     
-    func performCKCRequest(_ spcData: Data, url: URL, callback: @escaping (FPSLicense?, Error?) -> Void) {
+    func performCKCRequest(_ spcData: Data, assetId: String, url: URL, callback: @escaping (FPSLicense?, Error?) -> Void) {
         
         
         var requestParams = PKRequestParams(url: url, headers: nil)
@@ -104,7 +104,7 @@ class FPSLicenseHelper {
         
         let licenseProvider = self.params?.licenseProvider ?? KalturaFairPlayLicenseProvider.sharedInstance
 
-        licenseProvider.getLicense(spc: spcData, 
+        licenseProvider.getLicense(spc: spcData, assetId: assetId,
                                                requestParams: requestParams) { (ckc, duration, error) in
                                                 
                                                 guard let ckc = ckc else {
@@ -164,7 +164,7 @@ class FPSLicenseHelper {
             guard let spcData = spcData else { return }
             
             // Send SPC to Key Server and obtain CKC
-            self.performCKCRequest(spcData, url: params.url) { (license, error) in
+            self.performCKCRequest(spcData, assetId: assetId, url: params.url) { (license, error) in
                 guard let license = license else {
                     request.processContentKeyResponseError(error)
                     done(error)
