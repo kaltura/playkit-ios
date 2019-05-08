@@ -86,6 +86,8 @@ enum PlayerSettingsType {
     @objc public var contentRequestAdapter: PKRequestParamsAdapter?
     @objc public var licenseRequestAdapter: PKRequestParamsAdapter?
     
+    @objc public var fairPlayLicenseProvider: FairPlayLicenseProvider?
+    
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()
         copy.cea608CaptionsEnabled = self.cea608CaptionsEnabled
