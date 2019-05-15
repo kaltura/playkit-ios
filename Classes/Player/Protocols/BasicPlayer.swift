@@ -78,6 +78,6 @@ import Foundation
     /// Release the player's resources.
     @objc func destroy()
     
-    /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
+    /// Prepare for playing an entry. Play when it's ready. Preparing starts buffering the entry.
     @objc func prepare(_ config: MediaConfig)
 }
