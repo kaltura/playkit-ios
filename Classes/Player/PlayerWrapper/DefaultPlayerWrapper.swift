@@ -12,9 +12,50 @@ import Foundation
 
 class DefaultPlayerWrapper: NSObject, PlayerEngine {
     
+    private func printInvocationWarning(_ action: String) {
+        PKLog.warning("Attempt to invoke \(action) on null instance of the player")
+    }
+    
+    // ***************************** //
+    // MARK: - PlayerEngine
+    // ***************************** //
+    
     var onEventBlock: ((PKEvent) -> Void)?
+    
+    public var startPosition: TimeInterval {
+        get {
+            printInvocationWarning("\(#function)")
+            return 0.0
+        }
+        set { printInvocationWarning("\(#function)") }
+    }
+    
+    public var currentPosition: TimeInterval {
+        get {
+            printInvocationWarning("\(#function)")
+            return 0.0
+        }
+        set { printInvocationWarning("\(#function)") }
+    }
 
     var mediaConfig: MediaConfig?
+    
+    public var playbackType: String? {
+        printInvocationWarning("\(#function)")
+        return nil
+    }
+    
+    func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
+        printInvocationWarning("\(#function)")
+    }
+    
+    func playFromLiveEdge() {
+        printInvocationWarning("\(#function)")
+    }
+    
+    // ***************************** //
+    // MARK: - BasicPlayer
+    // ***************************** //
     
     public var duration: Double {
         printInvocationWarning("\(#function)")
@@ -31,6 +72,9 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         return false
     }
     
+    /// Save view reference till prepare
+    public weak var view: PlayerView?
+    
     public var currentTime: TimeInterval {
         get {
             printInvocationWarning("\(#function)")
@@ -39,26 +83,9 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
 
-    public var currentPosition: TimeInterval {
-        get {
-            printInvocationWarning("\(#function)")
-            return 0.0
-        }
-        set { printInvocationWarning("\(#function)") }
-    }
-    
     public var currentProgramTime: Date? {
         printInvocationWarning("\(#function)")
         return nil
-    }
-    
-
-    public var startPosition: TimeInterval {
-        get {
-            printInvocationWarning("\(#function)")
-            return 0.0
-        }
-        set { printInvocationWarning("\(#function)") }
     }
     
     public var currentAudioTrack: String? {
@@ -77,19 +104,6 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
-    public var loadedTimeRanges: [PKTimeRange]? {
-        printInvocationWarning("\(#function)")
-        return nil
-    }
-    
-    public var playbackType: String? {
-        printInvocationWarning("\(#function)")
-        return nil
-    }
-    
-    /// Save view reference till prepare
-    public weak var view: PlayerView?
-    
     public var rate: Float {
         get {
             printInvocationWarning("\(#function)")
@@ -106,11 +120,12 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
-    func play() {
+    public var loadedTimeRanges: [PKTimeRange]? {
         printInvocationWarning("\(#function)")
+        return nil
     }
     
-    func playFromLiveEdge() {
+    func play() {
         printInvocationWarning("\(#function)")
     }
     
@@ -142,13 +157,13 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
-    func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
-        printInvocationWarning("\(#function)")
-    }
-    
     func prepare(_ mediaConfig: MediaConfig) {
         printInvocationWarning("\(#function)")
     }
+    
+    // ***************************** //
+    // MARK: - Time Observation
+    // ***************************** //
     
     func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using block: @escaping (TimeInterval) -> Void) -> UUID {
         printInvocationWarning("\(#function)")
@@ -174,9 +189,5 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
     
     func removeBoundaryObservers() {
         printInvocationWarning("\(#function)")
-    }
-    
-    private func printInvocationWarning(_ action: String) {
-        PKLog.warning("Attempt to invoke \(action) on null instance of the player")
     }
 }
