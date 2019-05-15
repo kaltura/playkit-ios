@@ -16,6 +16,18 @@ import AVKit
     
     fileprivate var player: Player!
     
+    public func setPlayer(_ player: Player!) {
+        self.player = player
+    }
+    
+    public func getPlayer() -> Player {
+        return self.player
+    }
+    
+    // ***************************** //
+    // MARK: - Player
+    // ***************************** //
+    
     public var delegate: PlayerDelegate? {
         get {
             return self.player.delegate
@@ -37,29 +49,60 @@ import AVKit
         return self.player.mediaFormat
     }
     
-    public var currentTime: TimeInterval {
-        get {
-            return self.player.currentTime
-        }
-        set {
-            self.player.currentTime = newValue
-        }
+    public var sessionId: String {
+        return self.player.sessionId
     }
     
-    public var currentProgramTime: Date? {
-        return self.player.currentProgramTime
+    public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
     }
+    
+    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
+        //Assert.shouldNeverHappen();
+    }
+    
+    public func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
+        //Assert.shouldNeverHappen();
+    }
+    
+    public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
+        //Assert.shouldNeverHappen();
+    }
+    
+    public func updatePluginConfig(pluginName: String, config: Any) {
+        self.player.updatePluginConfig(pluginName: pluginName, config: config)
+    }
+    
+    public func isLive() -> Bool {
+        return self.player.isLive()
+    }
+    
+    public func getController(type: PKController.Type) -> PKController? {
+        return self.player.getController(type: type)
+    }
+    
+    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) -> UUID {
+        return self.player.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
+    }
+    
+    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
+        return self.player.addBoundaryObserver(boundaries: boundaries, observeOn: dispatchQueue, using: block)
+    }
+    
+    public func removePeriodicObserver(_ token: UUID) {
+        self.player.removePeriodicObserver(token)
+    }
+    
+    public func removeBoundaryObserver(_ token: UUID) {
+        self.player.removeBoundaryObserver(token)
+    }
+    
+    // ***************************** //
+    // MARK: - BasicPlayer
+    // ***************************** //
     
     public var duration: Double {
         return self.player.duration
-    }
-    
-    public var currentAudioTrack: String? {
-        return self.player.currentAudioTrack
-    }
-
-    public var currentTextTrack: String? {
-        return self.player.currentTextTrack
     }
     
     open var currentState: PlayerState {
@@ -79,8 +122,25 @@ import AVKit
         }
     }
     
-    public var sessionId: String {
-        return self.player.sessionId
+    public var currentTime: TimeInterval {
+        get {
+            return self.player.currentTime
+        }
+        set {
+            self.player.currentTime = newValue
+        }
+    }
+    
+    public var currentProgramTime: Date? {
+        return self.player.currentProgramTime
+    }
+    
+    public var currentAudioTrack: String? {
+        return self.player.currentAudioTrack
+    }
+
+    public var currentTextTrack: String? {
+        return self.player.currentTextTrack
     }
     
     public var rate: Float {
@@ -105,32 +165,12 @@ import AVKit
         return self.player.loadedTimeRanges
     }
     
-    open func prepare(_ config: MediaConfig) {
-        self.player.prepare(config)
-    }
-    
-    public func setPlayer(_ player: Player!) {
-        self.player = player
-    }
-    
-    public func getPlayer() -> Player {
-        return self.player
-    }
-    
-    open func destroy() {
-        self.player.destroy()
-    }
-    
     open func play() {
         self.player.play()
     }
     
     open func pause() {
         self.player.pause()
-    }
-    
-    open func seek(to time: TimeInterval) {
-        self.player.seek(to: time)
     }
     
     open func resume() {
@@ -145,51 +185,19 @@ import AVKit
         self.player.replay()
     }
     
-    public func updatePluginConfig(pluginName: String, config: Any) {
-        self.player.updatePluginConfig(pluginName: pluginName, config: config)
-    }
-    
-    public func isLive() -> Bool {
-        return self.player.isLive()
-    }
-    
-    public func addObserver(_ observer: AnyObject, event: PKEvent.Type, block: @escaping (PKEvent) -> Void) {
-        //Assert.shouldNeverHappen();
-    }
-    
-    public func addObserver(_ observer: AnyObject, events: [PKEvent.Type], block: @escaping (PKEvent) -> Void) {
-        //Assert.shouldNeverHappen();
-    }
-    
-    public func removeObserver(_ observer: AnyObject, event: PKEvent.Type) {
-        //Assert.shouldNeverHappen();
-    }
-    
-    public func removeObserver(_ observer: AnyObject, events: [PKEvent.Type]) {
-        //Assert.shouldNeverHappen();
+    open func seek(to time: TimeInterval) {
+        self.player.seek(to: time)
     }
     
     public func selectTrack(trackId: String) {
         self.player.selectTrack(trackId: trackId)
     }
     
-    public func getController(type: PKController.Type) -> PKController? {
-        return self.player.getController(type: type)
+    open func destroy() {
+        self.player.destroy()
     }
     
-    public func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval) -> Void) -> UUID {
-        return self.player.addPeriodicObserver(interval: interval, observeOn: dispatchQueue, using: block)
-    }
-    
-    public func addBoundaryObserver(boundaries: [PKBoundary], observeOn dispatchQueue: DispatchQueue? = nil, using block: @escaping (TimeInterval, Double) -> Void) -> UUID {
-        return self.player.addBoundaryObserver(boundaries: boundaries, observeOn: dispatchQueue, using: block)
-    }
-    
-    public func removePeriodicObserver(_ token: UUID) {
-        self.player.removePeriodicObserver(token)
-    }
-    
-    public func removeBoundaryObserver(_ token: UUID) {
-        self.player.removeBoundaryObserver(token)
+    open func prepare(_ config: MediaConfig) {
+        self.player.prepare(config)
     }
 }
