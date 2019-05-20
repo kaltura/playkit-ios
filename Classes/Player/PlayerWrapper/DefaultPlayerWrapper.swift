@@ -53,6 +53,10 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
+    public func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling) {
+        printInvocationWarning("\(#function)")
+    }
+    
     // ***************************** //
     // MARK: - BasicPlayer
     // ***************************** //

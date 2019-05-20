@@ -114,6 +114,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         self.currentPlayer.playFromLiveEdge()
     }
     
+    public func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling) {
+        currentPlayer.updateTextTrackStyling(textTrackStyling)
+    }
+    
     // ***************************** //
     // MARK: - BasicPlayer
     // ***************************** //

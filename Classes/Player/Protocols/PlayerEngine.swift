@@ -31,4 +31,7 @@ import Foundation
     
     /// Plays the live media from the live edge.
     func playFromLiveEdge()
+    
+    /// Update the text tracks styling.
+    func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling)
 }
