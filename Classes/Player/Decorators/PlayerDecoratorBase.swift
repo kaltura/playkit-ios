@@ -73,6 +73,10 @@ import AVKit
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
     }
     
+    public func updateTextTrackStyling() {
+        self.player.updateTextTrackStyling()
+    }
+    
     public func isLive() -> Bool {
         return self.player.isLive()
     }

@@ -138,6 +138,10 @@ class PlayerController: NSObject, Player {
         //Assert.shouldNeverHappen();
     }
     
+    func updateTextTrackStyling() {
+        self.currentPlayer.updateTextTrackStyling(self.settings.textTrackStyling)
+    }
+    
     // ***************************** //
     // MARK: - BasicPlayer
     // ***************************** //
