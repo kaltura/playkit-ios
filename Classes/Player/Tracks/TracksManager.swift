@@ -45,7 +45,7 @@ public class TracksManager: NSObject {
     
     private func parseTrackId(_ string: String) -> (String, Int)? {
         guard let theRange = string.range(of: ":", options: .backwards), let i = Int(string[theRange.upperBound...]) else { return nil }
-        return (String(string[...theRange.lowerBound]), i)
+        return (String(string[..<theRange.lowerBound]), i)
     }
     
     @objc public func selectTrack(item: AVPlayerItem, trackId: String) -> Track? {

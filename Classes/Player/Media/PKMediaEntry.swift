@@ -77,8 +77,15 @@ fileprivate let durationKey = "duration"
         }
         
         if let mediaTypeStr = jsonObject[mediaTypeKey].string {
-            if mediaTypeStr == "Live" {
-                self.mediaType = MediaType.live
+            switch mediaTypeStr {
+            case "Live":
+                self.mediaType = .live
+            case "DvrLive":
+                self.mediaType = .dvrLive
+            case "Vod":
+                self.mediaType = .vod
+            default:
+                break // leave as unknown
             }
         }
         
@@ -153,8 +160,15 @@ fileprivate let durationKey = "duration"
 public class FairPlayDRMParams: DRMParams {
     @objc public var fpsCertificate: Data?
     
+    internal var licenseProvider: FairPlayLicenseProvider?
+    
     @objc public init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
         super.init(licenseUri: licenseUri, scheme: scheme)
     }
+}
+
+@objc public protocol FairPlayLicenseProvider {
+    @objc func getLicense(spc: Data, assetId: String, requestParams: PKRequestParams,
+                          callback: @escaping (_ ckc: Data?, _ offlineDuration: TimeInterval, _ error: Error?) -> Void)
 }

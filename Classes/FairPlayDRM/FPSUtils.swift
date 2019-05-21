@@ -20,6 +20,7 @@ import SwiftyJSON
 
 enum FPSError: Error {
     case emptyServerResponse
+    case failedToConvertServerResponse
     case malformedServerResponse
     case noCKCInResponse
     case malformedCKCInResponse
@@ -66,7 +67,9 @@ class FPSLicense: Codable {
             throw FPSError.emptyServerResponse
         }
         
-        let json = JSON(data: data, options: [])
+        guard let json = try? JSON(data: data, options: []) else {
+            throw FPSError.failedToConvertServerResponse
+        }
         
         guard let b64CKC = json["ckc"].string else {
             throw FPSError.noCKCInResponse
@@ -84,6 +87,11 @@ class FPSLicense: Codable {
         
         self.data = ckc
         self.expiryDate = Date(timeIntervalSinceNow: offlineExpiry)
+    }
+    
+    init(ckc: Data, duration: TimeInterval) {
+        self.data = ckc
+        self.expiryDate = Date(timeIntervalSinceNow: duration)
     }
     
     init(legacyData: Data) {

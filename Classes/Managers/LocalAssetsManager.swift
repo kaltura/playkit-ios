@@ -10,7 +10,7 @@
 
 
 
-// NOTE: LocalAssetsManager (and other offline features) is only working in iOS 
+// NOTE: LocalAssetsManager and other offline features only work in iOS 
 
 #if os(iOS)
 import Foundation
@@ -20,6 +20,9 @@ import AVFoundation
 @objc public class LocalAssetsManager: NSObject {
     let storage: LocalDataStore
     var delegates = Set<FPSAssetLoaderDelegate>()
+    
+    @objc public var licenseRequestAdapter: PKRequestParamsAdapter?
+    @objc public var fairPlayLicenseProvider: FairPlayLicenseProvider?
     
     private override init() {
         fatalError("Private initializer, use one of the factory methods")
@@ -113,6 +116,23 @@ extension LocalAssetsManager {
     }
     
     @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
+        
+        
+        // Maybe update licenseRequestAdapter and fpsLicenseRequestDelegate in params
+        let drmAdapter = self.licenseRequestAdapter
+        let fpsProvider = self.fairPlayLicenseProvider
+        
+        if let drmData = mediaSource.drmData {
+            for d in drmData {
+                d.requestAdapter = drmAdapter
+                
+                if let fps = d as? FairPlayDRMParams {
+                    fps.licenseProvider = fpsProvider
+                }
+            }
+        }
+
+        
         if mediaSource.isFairPlay() {
             if #available(iOS 10.3, *), !Platform.isSimulator {
                 do {
@@ -209,6 +229,9 @@ extension LocalAssetsManager {
             PKLog.error("Downloading FairPlay content is not supported on device")
             return
         }
+        
+        drmData.requestAdapter = self.licenseRequestAdapter
+        drmData.licenseProvider = self.fairPlayLicenseProvider
         
         let resourceLoaderDelegate = FPSAssetLoaderDelegate.configureDownload(asset: asset, drmData: drmData, storage: storage)
         

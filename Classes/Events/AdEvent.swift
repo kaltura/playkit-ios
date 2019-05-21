@@ -144,7 +144,7 @@ import Foundation
     
     public class WebOpenerEvent: AdEvent {
         public convenience init(webOpener: NSObject!) {
-            self.init([AdEventDataKeys.webOpener: webOpener])
+            self.init([AdEventDataKeys.webOpener: webOpener as Any])
         }
     }
     
