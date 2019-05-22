@@ -58,8 +58,8 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 var adStartTimes: [NSValue] = []
                 var adEndTimes: [NSValue] = []
                 for cuepoint in pkAdDAICuePoints.cuePoints {
-                    adStartTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.startTime, 1)))
-                    adEndTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.endTime, 1)))
+                    adStartTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.startTime, preferredTimescale: 1)))
+                    adEndTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.endTime, preferredTimescale: 1)))
                 }
                 
                 if let avPlayerWrapper = playerEngine as? AVPlayerWrapper {
@@ -415,16 +415,16 @@ extension AdsDAIPlayerEngineWrapper: AppStateObservable {
     
     public var observations: Set<NotificationObservation> {
         return [
-            NotificationObservation(name: .UIApplicationDidEnterBackground) { [weak self] in
-                guard let strongSelf = self else { return }
+            NotificationObservation(name: UIApplication.didEnterBackgroundNotification) { [weak self] in
+                guard let self = self else { return }
                 // When we enter background make sure to pause if we were playing.
-                strongSelf.pause()
+                self.pause()
                 // Notify the ads plugin we are entering to the background.
-                strongSelf.adsPlugin.didEnterBackground()
+                self.adsPlugin.didEnterBackground()
             },
-            NotificationObservation(name: .UIApplicationWillEnterForeground) { [weak self] in
-                guard let strongSelf = self else { return }
-                strongSelf.adsPlugin.willEnterForeground()
+            NotificationObservation(name: UIApplication.willEnterForegroundNotification) { [weak self] in
+                guard let self = self else { return }
+                self.adsPlugin.willEnterForeground()
             }
         ]
     }
