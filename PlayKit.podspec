@@ -20,7 +20,7 @@ s.subspec 'Core' do |sp|
     sp.dependency 'SwiftyJSON', '4.3.0'
     sp.dependency 'XCGLogger', '7.0.0'
     sp.dependency 'KalturaNetKit', '~> 1.2.0'
-    sp.dependency 'PlayKitUtils', '~> 0.4.0' + suffix
+    sp.dependency 'PlayKitUtils', '~> 0.4.0'
 end
 
 s.subspec 'WidevineClassic' do |ssp|
