@@ -150,7 +150,7 @@ fileprivate let durationKey = "duration"
         let scheme: Scheme = Scheme(rawValue: schemeValue) ?? .unknown
         
         if let fpsCertificate = sj["fpsCertificate"].string {
-            return FairPlayDRMParams(licenseUri: licenseUri, scheme: .fairplay, base64EncodedCertificate: fpsCertificate)
+            return FairPlayDRMParams(licenseUri: licenseUri, base64EncodedCertificate: fpsCertificate)
         } else {
             return DRMParams(licenseUri: licenseUri, scheme: scheme)
         }
