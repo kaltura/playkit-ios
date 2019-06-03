@@ -162,9 +162,15 @@ public class FairPlayDRMParams: DRMParams {
     
     internal var licenseProvider: FairPlayLicenseProvider?
     
+    @available(*, deprecated, message: "Use init(licenseUri:base64EncodedCertificate:) instead")
     @objc public init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
         super.init(licenseUri: licenseUri, scheme: scheme)
+    }
+
+    @objc public init(licenseUri: String, base64EncodedCertificate: String) {
+        fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
+        super.init(licenseUri: licenseUri, scheme: .fairplay)
     }
 }
 
