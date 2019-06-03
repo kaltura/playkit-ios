@@ -27,13 +27,13 @@ import Foundation
     /// The player's currentState.
     @objc var currentState: PlayerState { get }
     
-    /// Indicates if player is playing.
+    /// Indicates if the player is playing.
     @objc var isPlaying: Bool { get }
     
     /// The player's view component.
     @objc weak var view: PlayerView? { get set }
     
-    /// The current player position.
+    /// The current player's time.
     @objc var currentTime: TimeInterval { get set }
     
     /// The current program time (PROGRAM-DATE-TIME).
@@ -48,36 +48,36 @@ import Foundation
     /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
     @objc var rate: Float { get set }
     
-    // The audio playback volume for the player, ranging from 0.0 through 1.0 on a linear scale.
+    /// The audio playback volume for the player, ranging from 0.0 through 1.0 on a linear scale.
     @objc var volume: Float { get set }
     
     /// Provides a collection of time ranges for which the player has the media data readily available. The ranges provided might be discontinuous.
     @objc var loadedTimeRanges: [PKTimeRange]? { get }
     
-    /// Send play action for the player.
+    /// Send a play action for the player.
     @objc func play()
     
-    /// Send pause action for the player.
+    /// Send a pause action for the player.
     @objc func pause()
     
-    /// Send resume action for the player.
+    /// Send a resume action for the player.
     @objc func resume()
     
-    /// Send stop action for the player.
+    /// Send a stop action for the player.
     @objc func stop()
     
-    /// Send replay action for the player.
+    /// Send a replay action for the player.
     @objc func replay()
     
-    /// Send seek action for the player.
+    /// Send a seek action for the player.
     @objc func seek(to time: TimeInterval)
     
-    /// Select Track
+    /// Select a Track
     @objc func selectTrack(trackId: String)
     
-    /// Release player resources.
+    /// Release the player's resources.
     @objc func destroy()
     
-    /// Prepare for playing an entry. play when it's ready. (preparing starts buffering the entry)
+    /// Prepare for playing an entry. Play when it's ready. Preparing starts buffering the entry.
     @objc func prepare(_ config: MediaConfig)
 }

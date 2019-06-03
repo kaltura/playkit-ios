@@ -23,7 +23,6 @@ import AVFoundation
 import AVKit
 
 open class AVPlayerWrapper: NSObject, PlayerEngine {
-    public var onEventBlock: ((PKEvent) -> Void)?
     
     public var currentPlayer: AVPlayerEngine
     
@@ -52,13 +51,76 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             }
         }
     }
-
-    /// the current media config that was set
-    public  var mediaConfig: MediaConfig?
     
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
     }
+    
+    // Every player that is created should own a Reachability instance
+    let reachability = PKReachability()
+    var shouldRefresh: Bool = false
+    
+    public override init() {
+        self.currentPlayer = AVPlayerEngine()
+        super.init()
+        
+        self.currentPlayer.onEventBlock = { [weak self] event in
+            guard let self = self else { return }
+            PKLog.verbose("postEvent:: \(event)")
+            self.onEventBlock?(event)
+        }
+        self.onEventBlock = nil
+    }
+    
+    // ***************************** //
+    // MARK: - PlayerEngine
+    // ***************************** //
+    
+    public var onEventBlock: ((PKEvent) -> Void)?
+
+    public var startPosition: TimeInterval {
+        get { return self.currentPlayer.startPosition }
+        set { self.currentPlayer.startPosition = newValue }
+    }
+    
+    public var currentPosition: TimeInterval {
+        get { return self.currentPlayer.currentPosition }
+        set { self.currentPlayer.currentPosition = newValue }
+    }
+    
+    public  var mediaConfig: MediaConfig?
+    
+    public var playbackType: String? {
+        return self.currentPlayer.playbackType
+    }
+    
+    open func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
+        
+        guard let mediaSrc = mediaSource else {
+            PKLog.error("Media Source is empty")
+            return
+        }
+        
+        handler.build(from: mediaSrc) { error, asset in
+            if asset != nil {
+                self.assetToPrepare = asset
+            }
+            // send signal when assetToPrepare is set
+            self.prepareSemaphore.signal()
+        }
+    }
+    
+    public func playFromLiveEdge() {
+        self.currentPlayer.playFromLiveEdge()
+    }
+    
+    public func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling) {
+        currentPlayer.updateTextTrackStyling(textTrackStyling)
+    }
+    
+    // ***************************** //
+    // MARK: - BasicPlayer
+    // ***************************** //
     
     public var duration: Double {
         return self.currentPlayer.duration
@@ -72,6 +134,15 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         return self.currentPlayer.isPlaying
     }
     
+    open weak var view: PlayerView? {
+        get {
+            return self.currentPlayer.view
+        }
+        set {
+            self.currentPlayer.view = newValue
+        }
+    }
+    
     public var currentTime: TimeInterval {
         get { return self.currentPlayer.currentPosition }
         set { self.currentPlayer.currentPosition = newValue }
@@ -81,31 +152,12 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         return self.currentPlayer.currentItem?.currentDate()
     }
     
-    public var currentPosition: TimeInterval {
-        get { return self.currentPlayer.currentPosition }
-        set { self.currentPlayer.currentPosition = newValue }
-    }
-    
-    public var startPosition: TimeInterval {
-        get { return self.currentPlayer.startPosition }
-        set { self.currentPlayer.startPosition = newValue }
-    }
- 
     public var currentAudioTrack: String? {
         return self.currentPlayer.currentAudioTrack
     }
     
     public var currentTextTrack: String? {
         return self.currentPlayer.currentTextTrack
-    }
-    
-    open weak var view: PlayerView? {
-        get {
-            return self.currentPlayer.view
-        }
-        set {
-            self.currentPlayer.view = newValue
-        }
     }
     
     public var rate: Float {
@@ -130,76 +182,8 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         return self.currentPlayer.currentItem?.loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
     }
     
-    public var playbackType: String? {
-        return self.currentPlayer.playbackType
-    }
-    
-    public override init() {
-        self.currentPlayer = AVPlayerEngine()
-        super.init()
-        
-        self.currentPlayer.onEventBlock = { [weak self] event in
-            guard let self = self else { return }
-            PKLog.verbose("postEvent:: \(event)")
-            self.onEventBlock?(event)
-        }
-        self.onEventBlock = nil
-    }
-    
-    // Every player that is created should own Reachability instance
-    let reachability = PKReachability()
-    var shouldRefresh: Bool = false
-    
-    /// Load media on player
-    open func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
-
-        guard let mediaSrc = mediaSource else {
-            PKLog.error("Media Source is empty")
-            return
-        }
-        
-        handler.build(from: mediaSrc) { error, asset in
-            if asset != nil {
-                self.assetToPrepare = asset
-            }
-            // send signal when assetToPrepare is set
-            self.prepareSemaphore.signal()
-        }
-    }
-    
-    public func prepare(_ mediaConfig: MediaConfig) {
-        // set background thread to make sure main thread is not stuck while waiting
-        DispatchQueue.global().async {
-            // wait till assetToPrepare is set
-            self.prepareSemaphore.wait()
-            
-            guard let assetToPrepare = self.assetToPrepare else { return }
-            
-            if let startTime = self.mediaConfig?.startTime {
-                self.currentPlayer.startPosition = startTime
-            }
-            
-            guard let settings = self.settings else {
-                PKLog.error("settings are not set")
-                return
-            }
-            
-            let asset = PKAsset(avAsset: assetToPrepare, playerSettings: settings)
-            self.currentPlayer.asset = asset
-            
-            if DRMSupport.widevineClassicHandler != nil {
-                self.removeAssetRefreshObservers()
-                self.addAssetRefreshObservers()
-            }
-        }
-    }
-    
     public func play() {
         self.currentPlayer.play()
-    }
-    
-    public func playFromLiveEdge() {
-        self.currentPlayer.playFromLiveEdge()
     }
     
     public func pause() {
@@ -230,11 +214,38 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
     }
+    
+    public func prepare(_ mediaConfig: MediaConfig) {
+        // set background thread to make sure main thread is not stuck while waiting
+        DispatchQueue.global().async {
+            // wait till assetToPrepare is set
+            self.prepareSemaphore.wait()
+            
+            guard let assetToPrepare = self.assetToPrepare else { return }
+            
+            if let startTime = self.mediaConfig?.startTime {
+                self.currentPlayer.startPosition = startTime
+            }
+            
+            guard let settings = self.settings else {
+                PKLog.error("settings are not set")
+                return
+            }
+            
+            let asset = PKAsset(avAsset: assetToPrepare, playerSettings: settings)
+            self.currentPlayer.asset = asset
+            
+            if DRMSupport.widevineClassicHandler != nil {
+                self.removeAssetRefreshObservers()
+                self.addAssetRefreshObservers()
+            }
+        }
+    }
 }
 
-/************************************************************/
+// ********************************************************** //
 // MARK: - Reachability & Application States Handling
-/************************************************************/
+// ********************************************************** //
 
 extension AVPlayerWrapper {
     
