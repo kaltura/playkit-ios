@@ -140,13 +140,13 @@ extension LocalDataStore {
 
 @objc public class FPSExpirationInfo: NSObject {
     
-    public let expirationDate: Date
+    @objc public let expirationDate: Date
     
     init(date: Date) {
         self.expirationDate = date
     }
     
-    public func isValid() -> Bool {
+    @objc public func isValid() -> Bool {
         return self.expirationDate > Date()
     }
 }
