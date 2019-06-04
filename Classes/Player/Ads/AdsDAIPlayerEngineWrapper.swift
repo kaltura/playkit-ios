@@ -56,6 +56,9 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     /// A semaphore to make sure prepare will not be called from 2 threads.
     private let prepareSemaphore = DispatchSemaphore(value: 1)
     
+    private let maxAdRequestTimedOutRetries = 5
+    private var adRequestTimedOutRetries = 0
+    
     var adStartTimeObserverToken: Any?
     var adEndTimeObserverToken: Any?
     var setCuePointsObserver: Bool = false
@@ -292,8 +295,8 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     }
     
     override public func prepare(_ config: MediaConfig) {
-        stateMachine.set(state: .waitingForPrepare)
         prepareMediaConfig = config
+        stateMachine.set(state: .waitingForPrepare)
         do {
             try adsPlugin.requestAds()
         } catch {
@@ -314,6 +317,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         handler = nil
         playPerformed = false
         isFirstPlay = true
+        adRequestTimedOutRetries = 0
         setCuePointsObserver = false
         pkAdDAICuePoints = PKAdDAICuePoints([])
         snapbackTime = 0
@@ -356,7 +360,13 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     /************************************************************/
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String) {
-        playOriginalMedia()
+        // The loader can fail also when going to the background, therefore adding the retry here as well.
+        if adRequestTimedOutRetries < maxAdRequestTimedOutRetries {
+            adRequestTimedOutRetries += 1
+            prepare(prepareMediaConfig)
+        } else {
+            playOriginalMedia()
+        }
     }
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String) {
@@ -397,9 +407,11 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     }
     
     public func adsRequestTimedOut(shouldPlay: Bool) {
-        if shouldPlay {
-            preparePlayerIfNeeded()
-            play()
+        if stateMachine.getState() == .waitingForPrepare, adRequestTimedOutRetries < maxAdRequestTimedOutRetries {
+            adRequestTimedOutRetries += 1
+            prepare(prepareMediaConfig)
+        } else {
+            playOriginalMedia()
         }
     }
     
@@ -450,7 +462,9 @@ extension AdsDAIPlayerEngineWrapper: AppStateObservable {
             NotificationObservation(name: UIApplication.didEnterBackgroundNotification) { [weak self] in
                 guard let self = self else { return }
                 // When we enter background make sure to pause if we were playing.
-                self.pause()
+                if self.isPlaying {
+                    self.pause()
+                }
                 // Notify the ads plugin we are entering to the background.
                 self.adsPlugin.didEnterBackground()
             },
