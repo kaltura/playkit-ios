@@ -342,7 +342,7 @@ extension AVPlayerEngine: AppStateObservable {
     }
     
     func startBackgroundTask() {
-        
+        print("startBackgroundTask")
         self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(withName: "AVPlayerEngineBackgroundTask", expirationHandler: { [weak self] in
             guard let self = self else { return }
             

@@ -17,7 +17,7 @@ import Foundation
     /************************************************************/
     
     @objc public static let allEventTypes: [AdEvent.Type] = [
-        streamLoaded, streamStarted, adBreakReady, adBreakStarted, adBreakEnded, allAdsCompleted, adComplete, adClicked,
+        streamLoaded, streamStarted, adBreakReady, adBreakStarted, adBreakEnded, adPeriodStarted, adPeriodEnded, allAdsCompleted, adComplete, adClicked,
         adFirstQuartile, adLoaded, adLog, adMidpoint, adPaused, adResumed, adSkipped, adStarted, adTapped, adThirdQuartile,
         adDidProgressToTime, adDidRequestContentPause, adDidRequestContentResume, webOpenerEvent, adWebOpenerWillOpenExternalBrowser,
         adWebOpenerWillOpenInAppBrowser, adWebOpenerDidOpenInAppBrowser, adWebOpenerWillCloseInAppBrowser, adWebOpenerDidCloseInAppBrowser,
@@ -29,6 +29,8 @@ import Foundation
     @objc public static let adBreakReady: AdEvent.Type = AdBreakReady.self
     @objc public static let adBreakStarted: AdEvent.Type = AdBreakStarted.self // DAI
     @objc public static let adBreakEnded: AdEvent.Type = AdBreakEnded.self // DAI
+    @objc public static let adPeriodStarted: AdEvent.Type = AdPeriodStarted.self // DAI
+    @objc public static let adPeriodEnded: AdEvent.Type = AdPeriodEnded.self // DAI
     @objc public static let allAdsCompleted: AdEvent.Type = AllAdsCompleted.self
     @objc public static let adComplete: AdEvent.Type = AdComplete.self
     @objc public static let adClicked: AdEvent.Type = AdClicked.self
@@ -87,6 +89,8 @@ import Foundation
     public class AdBreakReady: AdEvent {}
     public class AdBreakStarted: AdEvent {} // DAI
     public class AdBreakEnded: AdEvent {} // DAI
+    public class AdPeriodStarted: AdEvent {} // DAI
+    public class AdPeriodEnded: AdEvent {} // DAI
     public class AllAdsCompleted: AdEvent {}
     public class AdComplete: AdEvent {}
     public class AdClicked: AdEvent {

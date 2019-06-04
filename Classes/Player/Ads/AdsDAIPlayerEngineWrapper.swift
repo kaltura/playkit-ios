@@ -2,6 +2,7 @@
 
 import Foundation
 import CoreMedia
+import AVFoundation
 
 /// `AdsPlayerEngineWrapperState` represents `AdsPlayerEngineWrapper` state machine states.
 enum AdsDAIPlayerEngineWrapperState: Int, StateProtocol {
@@ -21,10 +22,19 @@ public protocol AdsDAIPlayerEngineWrapperDelegate {
     func adPaused()
     func adResumed()
     func adCompleted()
-//    func receivedTimedMetadata(_ metadata: [String : String])
+    func receivedTimedMetadata(_ metadata: [String : String])
 }
 
 public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, AdsPluginDataSource {
+
+    public override var playerEngine: PlayerEngine? {
+        didSet {
+            // Add timedMetadata observer
+            if let avPlayerWrapper = playerEngine as? AVPlayerWrapper {
+                avPlayerWrapper.currentPlayer.addObserver(self, forKeyPath: "currentItem.timedMetadata", options: NSKeyValueObservingOptions.new, context: nil)
+            }
+        }
+    }
 
     public var delegate: AdsDAIPlayerEngineWrapperDelegate?
     
@@ -58,6 +68,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 var adStartTimes: [NSValue] = []
                 var adEndTimes: [NSValue] = []
                 for cuepoint in pkAdDAICuePoints.cuePoints {
+                    
                     adStartTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.startTime, preferredTimescale: 1)))
                     adEndTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.endTime, preferredTimescale: 1)))
                 }
@@ -73,7 +84,6 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                             strongSelf.delegate?.adPlaying(startTime: currentPosition, duration: ad.duration)
                         } else {
                             let seekTime = currentPosition + ad.duration
-//                            print("Nilit: seek over")
                             strongSelf.seek(to: seekTime)
                         }
                     }
@@ -105,13 +115,37 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         self.adsPlugin.dataSource = self
     }
     
+    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        switch keyPath {
+        case "currentItem.timedMetadata":
+            if let avPlayerEngine = object as? AVPlayerEngine {
+                if let timedMetadata = avPlayerEngine.currentItem?.timedMetadata {
+                    for avMetadataItem in timedMetadata {
+                        
+                        let value = avMetadataItem.value as? String ?? ""
+                        if value.contains("google") {
+
+                            if let key = avMetadataItem.key, let value = avMetadataItem.stringValue {
+                                delegate?.receivedTimedMetadata([key.description : value])
+                            }
+                            
+                            return
+                        }
+                    }
+                }
+            }
+        default:
+            break
+        }
+    }
+    
     /************************************************************/
     // MARK: - Private
     /************************************************************/
     
     /// Prepare the player only if it wasn't prepared yet.
     private func preparePlayerIfNeeded() {
-        prepareSemaphore.wait() // Use semaphore to make sure will not be called from more than one thread by mistake.
+        prepareSemaphore.wait() // Use semaphore to make sure it will not be called from more than one thread by mistake.
         
         if stateMachine.getState() == .waitingForPrepare {
             stateMachine.set(state: .preparing)
@@ -147,8 +181,6 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
             return mediaPosition
         }
         set {
-//            let streamPosition = adsPlugin.streamTime(forContentTime: newValue)
-//            playerEngine?.currentPosition = streamPosition
             self.seek(to: newValue)
         }
     }
@@ -178,7 +210,6 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     }
     
     public override func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
-//        print("Nilit: loadMedia")
         reset()
         
         self.mediaSource = mediaSource
@@ -231,7 +262,6 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
             if let previousCuePoint = adsPlugin.previousCuepoint(forStreamTime: endTime), previousCuePoint.played == false {
                 snapbackMode = true
                 snapbackTime = endTime < previousCuePoint.endTime ? previousCuePoint.endTime : endTime
-                // Add 1 to the seek time to get the keyframe at the start of the ad to be our landing place.
                 super.seek(to: previousCuePoint.startTime)
                 let duration = previousCuePoint.endTime - previousCuePoint.startTime
                 delegate?.adPlaying(startTime: previousCuePoint.startTime, duration: duration)
@@ -342,7 +372,6 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 pkAdDAICuePoints = adDAICuePoints
             }
         case is AdEvent.AdBreakStarted, is AdEvent.AdLoaded:
-//            if event.adInfo?.positionType == .postRoll {
             break
         case is AdEvent.AdBreakEnded:
             if snapbackMode {
@@ -356,10 +385,13 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         case is AdEvent.RequestTimedOut:
             adsRequestTimedOut(shouldPlay: playPerformed)
         case is AdEvent.Error:
-//            print("Nilit")
+            break
+        case is AdEvent.AdDidRequestContentResume:
+            break
+        case is AdEvent.AdDidRequestContentPause:
+            // Can't perform pause because the ad is embedded therefore the ad will be paused.
             break
         default:
-//            print("Nilit: \(event) not taken care of (AdsDAIPlayerEngineWrapper:adsPlugin:)")
             break
         }
     }
