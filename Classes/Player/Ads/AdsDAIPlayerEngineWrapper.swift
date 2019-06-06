@@ -71,9 +71,12 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 var adStartTimes: [NSValue] = []
                 var adEndTimes: [NSValue] = []
                 for cuepoint in pkAdDAICuePoints.cuePoints {
-                    
-                    adStartTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.startTime, preferredTimescale: 1)))
-                    adEndTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.endTime, preferredTimescale: 1)))
+                    var playerTimescale: Int32 = 1
+                    if let avPlayerWrapper = playerEngine as? AVPlayerWrapper {
+                        playerTimescale = avPlayerWrapper.currentPlayer.currentItem?.asset.duration.timescale ?? 1
+                    }
+                    adStartTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.startTime, preferredTimescale: playerTimescale)))
+                    adEndTimes.append(NSValue(time: CMTimeMakeWithSeconds(cuepoint.endTime, preferredTimescale: playerTimescale)))
                 }
                 
                 if let avPlayerWrapper = playerEngine as? AVPlayerWrapper {
@@ -81,13 +84,14 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                         // The PreRoll is not called, taken cared of in the play func
                         guard let strongSelf = self else { return }
                         guard let player = strongSelf.playerEngine else { return }
-                        let currentPosition = player.currentPosition
-                        let ad = strongSelf.adsPlugin.canPlayAd(atStreamTime: currentPosition)
-                        if ad.canPlay {
-                            strongSelf.delegate?.adPlaying(startTime: currentPosition, duration: ad.duration)
-                        } else {
-                            let seekTime = currentPosition + ad.duration
-                            strongSelf.seek(to: seekTime)
+                        let streamCurrentPosition = player.currentPosition
+                        if let ad = strongSelf.adsPlugin.canPlayAd(atStreamTime: streamCurrentPosition) {
+                            if ad.canPlay {
+                                strongSelf.delegate?.adPlaying(startTime: streamCurrentPosition, duration: ad.duration)
+                            } else {
+                                let seekTime = strongSelf.adsPlugin.contentTime(forStreamTime: (ad.endTime + 1))
+                                strongSelf.seek(to: seekTime)
+                            }
                         }
                     }
                     
@@ -256,19 +260,20 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     
     override public func seek(to time: TimeInterval) {
         let endTime = adsPlugin.streamTime(forContentTime: time)
-        
         guard !adsPlugin.isAdPlaying else { return }
         
-        let startTime = super.currentPosition
-        if startTime < endTime {
-            // Seeking forward
-            if let previousCuePoint = adsPlugin.previousCuepoint(forStreamTime: endTime), previousCuePoint.played == false {
-                snapbackMode = true
-                snapbackTime = endTime < previousCuePoint.endTime ? previousCuePoint.endTime : endTime
-                super.seek(to: previousCuePoint.startTime)
-                let duration = previousCuePoint.endTime - previousCuePoint.startTime
-                delegate?.adPlaying(startTime: previousCuePoint.startTime, duration: duration)
-                return
+        if !isFirstPlay {
+            let startTime = super.currentPosition
+            if startTime < endTime {
+                // Seeking forward
+                if let previousCuePoint = adsPlugin.previousCuepoint(forStreamTime: endTime), previousCuePoint.played == false {
+                    snapbackMode = true
+                    snapbackTime = endTime < previousCuePoint.endTime ? previousCuePoint.endTime : endTime
+                    super.seek(to: previousCuePoint.startTime)
+                    let duration = previousCuePoint.endTime - previousCuePoint.startTime
+                    delegate?.adPlaying(startTime: previousCuePoint.startTime, duration: duration)
+                    return
+                }
             }
         }
         
@@ -377,6 +382,9 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         switch event {
         case is AdEvent.StreamLoaded:
             preparePlayerIfNeeded()
+            if let startTime = prepareMediaConfig?.startTime, startTime > 0 {
+                seek(to: startTime)
+            }
         case is AdEvent.AdCuePointsUpdate:
             if let adDAICuePoints = event.adDAICuePoints {
                 pkAdDAICuePoints = adDAICuePoints
@@ -420,19 +428,21 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         if playType == .play {
             if isFirstPlay {
                 isFirstPlay = false
+                super.play()
                 delegate?.streamStarted()
             }
             
             // PreRoll is not being caught in the BoundaryTimeObserver
             if playerEngine?.currentPosition == 0 && pkAdDAICuePoints.hasPreRoll {
-                let ad = adsPlugin.canPlayAd(atStreamTime: 0)
-                if ad.canPlay {
-                    super.play()
-                    delegate?.adPlaying(startTime: 0, duration: ad.duration)
-                } else {
-                    let seekTime = ad.duration
-                    seek(to: seekTime)
-                    super.play()
+                if let ad = adsPlugin.canPlayAd(atStreamTime: 0) {
+                    if ad.canPlay {
+                        super.play()
+                        delegate?.adPlaying(startTime: 0, duration: ad.duration)
+                    } else {
+                        let seekTime = adsPlugin.contentTime(forStreamTime: ad.endTime)
+                        seek(to: seekTime)
+                        super.play()
+                    }
                 }
             } else {
                 super.play()
