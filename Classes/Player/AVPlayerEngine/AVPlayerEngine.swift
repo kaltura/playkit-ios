@@ -195,7 +195,7 @@ public class AVPlayerEngine: AVPlayer {
         }
     }
     
-    // MARK: Player Methods
+    // MARK: - Player Methods
     
     override init() {
         PKLog.verbose("init AVPlayer")
@@ -309,6 +309,45 @@ public class AVPlayerEngine: AVPlayer {
         PKLog.debug("stateChanged:: new:\(newState) old:\(oldState)")
         let stateChangedEvent: PKEvent = PlayerEvent.StateChanged(newState: newState, oldState: oldState)
         self.post(event: stateChangedEvent)
+    }
+    
+    func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling) {
+        // Currently we only support these, there are more.
+        let foregroundColorARGBKey: String = kCMTextMarkupAttribute_ForegroundColorARGB as String
+        let backgroundColorARGBKey: String = kCMTextMarkupAttribute_BackgroundColorARGB as String
+        let baseFontSizePercentageRelativeToVideoHeightKey: String = kCMTextMarkupAttribute_BaseFontSizePercentageRelativeToVideoHeight as String
+        let characterEdgeStyleKey: String = kCMTextMarkupAttribute_CharacterEdgeStyle as String
+        let characterBackgroundColorARGBKey: String = kCMTextMarkupAttribute_CharacterBackgroundColorARGB as String
+        let fontFamilyNameKey: String = kCMTextMarkupAttribute_FontFamilyName as String
+        
+        var attributes: [String : Any] = [:]
+        if let foregroundColor = textTrackStyling.textColor {
+            attributes.updateValue([foregroundColor.alpha, foregroundColor.red, foregroundColor.green, foregroundColor.blue], forKey: foregroundColorARGBKey)
+        }
+        
+        if let backgroundColor = textTrackStyling.backgroundColor {
+            attributes.updateValue([backgroundColor.alpha, backgroundColor.red, backgroundColor.green, backgroundColor.blue], forKey: backgroundColorARGBKey)
+        }
+        
+        if let baseFontSize = textTrackStyling.textSize {
+            attributes.updateValue(baseFontSize, forKey: baseFontSizePercentageRelativeToVideoHeightKey)
+        }
+        
+        attributes.updateValue(textTrackStyling.edgeStyle.description, forKey: characterEdgeStyleKey)
+        
+        if let characterBackgroundColor = textTrackStyling.edgeColor {
+            attributes.updateValue([characterBackgroundColor.alpha, characterBackgroundColor.red, characterBackgroundColor.green, characterBackgroundColor.blue], forKey: characterBackgroundColorARGBKey)
+        }
+        
+        if let fontFamily = textTrackStyling.fontFamily {
+            attributes.updateValue(fontFamily, forKey: fontFamilyNameKey)
+        }
+        
+        guard let textStyleRule = AVTextStyleRule(textMarkupAttributes: attributes) else {
+            PKLog.debug("Couldn't create AVTextStyleRule.")
+            return
+        }
+        self.currentItem?.textStyleRules = [textStyleRule]
     }
 }
 

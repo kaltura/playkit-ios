@@ -82,6 +82,7 @@ enum PlayerSettingsType {
     /// The settings for network data consumption.
     @objc public var network = PKNetworkSettings()
     @objc public var trackSelection = PKTrackSelectionSettings()
+    @objc public var textTrackStyling = PKTextTrackStyling()
     
     @objc public var contentRequestAdapter: PKRequestParamsAdapter?
     @objc public var licenseRequestAdapter: PKRequestParamsAdapter?
@@ -93,6 +94,7 @@ enum PlayerSettingsType {
         copy.cea608CaptionsEnabled = self.cea608CaptionsEnabled
         copy.network = self.network
         copy.trackSelection = self.trackSelection
+        copy.textTrackStyling = self.textTrackStyling
         copy.contentRequestAdapter = self.contentRequestAdapter
         copy.licenseRequestAdapter = self.licenseRequestAdapter
         return copy

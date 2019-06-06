@@ -118,6 +118,10 @@ public class PlayerEngineWrapper: NSObject, PlayerEngine {
         playerEngine?.playFromLiveEdge()
     }
     
+    public func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling) {
+        playerEngine?.updateTextTrackStyling(textTrackStyling)
+    }
+    
     public func play() {
         playerEngine?.play()
     }

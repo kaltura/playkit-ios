@@ -46,6 +46,9 @@ import UIKit
     /// Update Plugin Config.
     @objc func updatePluginConfig(pluginName: String, config: Any)
     
+    /// Updates the styling from the settings textTrackStyling object
+    @objc func updateTextTrackStyling()
+    
     
     /// Indicates if current media is Live.
     ///

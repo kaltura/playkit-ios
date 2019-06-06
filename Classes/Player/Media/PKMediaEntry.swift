@@ -150,7 +150,7 @@ fileprivate let durationKey = "duration"
         let scheme: Scheme = Scheme(rawValue: schemeValue) ?? .unknown
         
         if let fpsCertificate = sj["fpsCertificate"].string {
-            return FairPlayDRMParams(licenseUri: licenseUri, scheme: .fairplay, base64EncodedCertificate: fpsCertificate)
+            return FairPlayDRMParams(licenseUri: licenseUri, base64EncodedCertificate: fpsCertificate)
         } else {
             return DRMParams(licenseUri: licenseUri, scheme: scheme)
         }
@@ -162,9 +162,15 @@ public class FairPlayDRMParams: DRMParams {
     
     internal var licenseProvider: FairPlayLicenseProvider?
     
+    @available(*, deprecated, message: "Use init(licenseUri:base64EncodedCertificate:) instead")
     @objc public init(licenseUri: String, scheme: Scheme, base64EncodedCertificate: String) {
         fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
         super.init(licenseUri: licenseUri, scheme: scheme)
+    }
+
+    @objc public init(licenseUri: String, base64EncodedCertificate: String) {
+        fpsCertificate = Data(base64Encoded: base64EncodedCertificate)
+        super.init(licenseUri: licenseUri, scheme: .fairplay)
     }
 }
 

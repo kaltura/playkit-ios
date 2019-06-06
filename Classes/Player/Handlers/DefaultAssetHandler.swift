@@ -10,12 +10,15 @@
 
 import Foundation
 import AVFoundation
+import PlayKitUtils
 
 class DefaultAssetHandler: AssetHandler {
     
     var assetLoaderDelegate: FPSAssetLoaderDelegate?
     var avAsset: AVURLAsset?
     
+    static let userAgent = UserAgent.build(clientTag: PlayKitManager.clientTag)
+
     required init() {
         
     }
@@ -28,7 +31,7 @@ class DefaultAssetHandler: AssetHandler {
             return
         }
         
-        let headers = ["User-Agent": PlayKitManager.clientTag]
+        let headers = ["User-Agent": DefaultAssetHandler.userAgent]
         let assetOptions = ["AVURLAssetHTTPHeaderFieldsKey": headers]
         
         if let localSource = mediaSource as? LocalMediaSource {

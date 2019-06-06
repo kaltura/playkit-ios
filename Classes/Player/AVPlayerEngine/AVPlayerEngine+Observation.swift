@@ -285,6 +285,11 @@ extension AVPlayerEngine {
         let newState = PlayerState.idle
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
+        
+        // Update new current item with the text track styling which was set.
+        if let textTrackStyling = self.asset?.playerSettings.textTrackStyling {
+            self.updateTextTrackStyling(textTrackStyling)
+        }
     }
     
     private func handleTimedMedia() {
