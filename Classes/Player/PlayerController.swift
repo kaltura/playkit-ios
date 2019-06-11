@@ -310,7 +310,6 @@ class PlayerController: NSObject, Player {
         
         if let playerEW = playerEngineWrapper {
             playerEW.playerEngine = currentPlayer
-//            playerEW.delegate = delegate
             currentPlayer = playerEW
         }
         
