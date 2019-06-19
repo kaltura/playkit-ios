@@ -247,6 +247,7 @@ class PlayerController: NSObject, Player {
         self.timeObserver.stopTimer()
         self.timeObserver.removePeriodicObservers()
         self.timeObserver.removeBoundaryObservers()
+        self.currentPlayer.stop()
         self.currentPlayer.destroy()
         self.removeAssetRefreshObservers()
     }
