@@ -42,32 +42,34 @@ public protocol AdsPluginDelegate : class {
     func play(_ playType: PlayType)
 }
 
-public protocol AdsPlugin: PKPlugin, AVPictureInPictureControllerDelegate {
+public protocol AdsPlugin: PKPlugin {
     var dataSource: AdsPluginDataSource? { get set }
     var delegate: AdsPluginDelegate? { get set }
-    var pipDelegate: AVPictureInPictureControllerDelegate? { get set }
-    /// is ad playing currently.
+    /// Is ad currently playing.
     var isAdPlaying: Bool { get }
-    
-    /// request ads from the server.
+    /// Request ads from the server.
     func requestAds() throws
-    /// resume ad
+    /// Resume ad.
     func resume()
-    /// pause ad
+    /// Pause ad.
     func pause()
-    /// ad content complete
+    /// Ad content complete.
     func contentComplete()
-    /// destroy the ads manager
+    /// Destroy the ads manager.
     func destroyManager()
-    /// called after player called `super.play()`
+    /// Called after player called `super.play()`.
     func didPlay()
-    /// called when play() or resume() was called.
-    /// used to make the neccery checks with the ads plugin if can play or resume the content.
+    /// Called when play() or resume() was called.
+    /// Used to make the neccery checks with the ads plugin if can play or resume the content.
     func didRequestPlay(ofType type: PlayType)
-    
-    /// called when entered to background
+    /// Called when entering the background.
     func didEnterBackground()
-    /// called when coming back from background
+    /// Called when coming back from background.
     func willEnterForeground()
 }
 
+#if os(iOS)
+public protocol PIPEnabledAdsPlugin: AdsPlugin, AVPictureInPictureControllerDelegate {
+    var pipDelegate: AVPictureInPictureControllerDelegate? { get set }
+}
+#endif
