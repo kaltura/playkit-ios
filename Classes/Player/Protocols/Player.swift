@@ -105,3 +105,7 @@ extension Player {
 public protocol PlayerDecoratorProvider {
     func getPlayerDecorator() -> PlayerDecoratorBase?
 }
+
+public protocol PlayerEngineWrapperProvider {
+    func getPlayerEngineWrapper() -> PlayerEngineWrapper?
+}

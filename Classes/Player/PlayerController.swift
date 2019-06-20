@@ -26,6 +26,8 @@ class PlayerController: NSObject, Player {
         }
     }
     
+    var playerEngineWrapper: PlayerEngineWrapper?
+    
     /// Current selected media source
     fileprivate var selectedSource: PKMediaSource?
     /// Current handler for the selected source
@@ -224,7 +226,11 @@ class PlayerController: NSObject, Player {
     }
     
     func resume() {
-        self.play()
+        if self.mediaEntry?.mediaType == .live {
+            self.currentPlayer.playFromLiveEdge()
+        } else {
+            self.currentPlayer.resume()
+        }
     }
     
     func stop() {
@@ -301,6 +307,11 @@ class PlayerController: NSObject, Player {
         
         if let currentPlayer = self.currentPlayer as? AVPlayerWrapper {
             currentPlayer.settings = self.settings
+        }
+        
+        if let playerEW = playerEngineWrapper {
+            playerEW.playerEngine = currentPlayer
+            currentPlayer = playerEW
         }
         
         return isCreated
