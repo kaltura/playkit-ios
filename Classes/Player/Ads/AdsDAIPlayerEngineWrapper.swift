@@ -258,6 +258,11 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         playPerformed = false
     }
     
+    public override func replay() {
+        super.replay()
+        adsPlugin.didRequestPlay(ofType: .play)
+    }
+    
     override public func seek(to time: TimeInterval) {
         let endTime = adsPlugin.streamTime(forContentTime: time)
         guard !adsPlugin.isAdPlaying else { return }
