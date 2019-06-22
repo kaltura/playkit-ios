@@ -126,7 +126,7 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
         guard let player = adsPlugin.player else {
             return false
         }
-        return player.delegate?.playerShouldPlayAd?(player) ?? false
+        return player.delegate?.playerShouldPlayAd?(player) ?? true
     }
     
     public var playAdsAfterTime: TimeInterval {
