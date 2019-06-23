@@ -371,7 +371,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String) {
         // The loader can fail also when going to the background, therefore adding the retry here as well.
-        if adRequestTimedOutRetries < maxAdRequestTimedOutRetries {
+        if adRequestTimedOutRetries < maxAdRequestTimedOutRetries, prepareMediaConfig != nil {
             adRequestTimedOutRetries += 1
             prepare(prepareMediaConfig)
         } else {
