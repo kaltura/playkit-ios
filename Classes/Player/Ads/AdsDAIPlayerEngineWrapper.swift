@@ -267,6 +267,17 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         let endTime = adsPlugin.streamTime(forContentTime: time)
         guard !adsPlugin.isAdPlaying else { return }
         
+        if snapbackMode {
+            return
+        }
+        
+        if isFirstPlay && startPosition != 0 && adsPlugin.startWithPreroll && pkAdDAICuePoints.hasPreRoll {
+            startPosition = 0
+            snapbackMode = true
+            snapbackTime = endTime
+            return
+        }
+        
         if !isFirstPlay {
             let startTime = super.currentPosition
             if startTime < endTime {
