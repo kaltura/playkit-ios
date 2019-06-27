@@ -258,9 +258,25 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         playPerformed = false
     }
     
+    public override func replay() {
+        super.replay()
+        adsPlugin.didRequestPlay(ofType: .play)
+    }
+    
     override public func seek(to time: TimeInterval) {
         let endTime = adsPlugin.streamTime(forContentTime: time)
         guard !adsPlugin.isAdPlaying else { return }
+        
+        if snapbackMode {
+            return
+        }
+        
+        if isFirstPlay && startPosition != 0 && adsPlugin.startWithPreroll && pkAdDAICuePoints.hasPreRoll {
+            startPosition = 0
+            snapbackMode = true
+            snapbackTime = endTime
+            return
+        }
         
         if !isFirstPlay {
             let startTime = super.currentPosition
@@ -366,7 +382,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     
     public func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String) {
         // The loader can fail also when going to the background, therefore adding the retry here as well.
-        if adRequestTimedOutRetries < maxAdRequestTimedOutRetries {
+        if adRequestTimedOutRetries < maxAdRequestTimedOutRetries, prepareMediaConfig != nil {
             adRequestTimedOutRetries += 1
             prepare(prepareMediaConfig)
         } else {
