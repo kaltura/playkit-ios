@@ -25,8 +25,7 @@ public enum PlayType: CustomStringConvertible {
 }
 
 public protocol AdsPluginDataSource : class {
-    func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool
-    /// the player's media config start time.
+    /// The player's media config start time.
     var playAdsAfterTime: TimeInterval { get }
 }
 
