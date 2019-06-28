@@ -142,13 +142,6 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
     // MARK: - AdsPluginDataSource
     /************************************************************/
     
-    public func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
-        guard let player = adsPlugin.player else {
-            return false
-        }
-        return player.delegate?.playerShouldPlayAd?(player) ?? false
-    }
-    
     public var playAdsAfterTime: TimeInterval {
         return self.prepareMediaConfig?.startTime ?? 0
     }
