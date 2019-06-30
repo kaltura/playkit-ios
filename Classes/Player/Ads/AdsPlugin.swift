@@ -25,8 +25,7 @@ public enum PlayType: CustomStringConvertible {
 }
 
 public protocol AdsPluginDataSource : class {
-    func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool
-    /// the player's media config start time.
+    /// The player's media config start time.
     var playAdsAfterTime: TimeInterval { get }
 }
 
@@ -47,6 +46,8 @@ public protocol AdsPlugin: PKPlugin {
     var delegate: AdsPluginDelegate? { get set }
     /// Is ad currently playing.
     var isAdPlaying: Bool { get }
+    /// Whether or not the pre-roll should be played upon start position different than 0.
+    var startWithPreroll: Bool { get }
     /// Request ads from the server.
     func requestAds() throws
     /// Resume ad.

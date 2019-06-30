@@ -83,8 +83,6 @@ class PlayerController: NSObject, Player {
     // MARK: - Player
     // ***************************** //
     
-    weak var delegate: PlayerDelegate?
-    
     public var mediaEntry: PKMediaEntry? {
         return self.mediaConfig?.mediaEntry
     }

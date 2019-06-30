@@ -27,6 +27,7 @@ enum FPSError: Error {
     case missingDRMParams
     case invalidKeyRequest
     case invalidMediaFormat
+    case invalidLicenseDuration
     case persistenceNotSupported
     case serverError(_ error: Error, _ url: URL)
 }

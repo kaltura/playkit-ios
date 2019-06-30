@@ -182,6 +182,14 @@ class FPSLicenseHelper {
                 }
                                 
                 if shouldPersist {
+                    
+                    if license.isExpired() {
+                        let error = FPSError.invalidLicenseDuration
+                        request.processContentKeyResponseError(error)
+                        done(error)
+                        return
+                    }
+                    
                     do {
                         let pck = try request.persistableContentKey(fromKeyVendorResponse: license.data, options: nil)
                         license.data = pck
