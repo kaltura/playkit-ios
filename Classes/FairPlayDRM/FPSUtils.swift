@@ -28,6 +28,7 @@ enum FPSError: Error {
     case invalidKeyRequest
     case invalidMediaFormat
     case persistenceNotSupported
+    case invalidLicenseDuration
 }
 
 enum FPSInternalError: Error {
