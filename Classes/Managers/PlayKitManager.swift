@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import UIKit
+import PlayKitUtils
 
 /**
  Manager class used for:
@@ -29,6 +30,9 @@ import UIKit
     @objc public static let clientTag = "playkit/ios-\(versionString)"
     
     @objc(sharedInstance) public static let shared: PlayKitManager = PlayKitManager()
+    
+    
+    internal static let userAgent = UserAgent.build(clientTag: clientTag)
     
     var pluginRegistry = Dictionary<String, PKPlugin.Type>()
     
