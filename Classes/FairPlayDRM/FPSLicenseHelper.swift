@@ -46,13 +46,24 @@ class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
                 let endTime: Double = Date.timeIntervalSinceReferenceDate
                 PKLog.debug("Got response in \(endTime-startTime) sec")
                 
-                guard let data = data else {
-                    callback(nil, 0, NSError(domain: "KalturaFairPlayLicenseProvider", code: 1, userInfo: nil))
+                guard let data = data, data.count > 0 else {
+                    callback(nil, 0, FPSError.malformedServerResponse)
                     return
                 }
                 
                 let lic = try JSONDecoder().decode(KalturaLicenseResponseContainer.self, from: data)
-                callback(Data(base64Encoded: lic.ckc ?? ""), lic.persistence_duration ?? 0, nil)
+                
+                guard let ckc = lic.ckc else {
+                    callback(nil, 0, FPSError.noCKCInResponse)
+                    return
+                }
+                
+                guard let ckcData = Data(base64Encoded: ckc) else {
+                    callback(nil, 0, FPSError.malformedCKCInResponse)
+                    return
+                }
+                
+                callback(ckcData, lic.persistence_duration ?? 0, nil)
                 
             } catch let e {
                 callback(nil, 0, e)
