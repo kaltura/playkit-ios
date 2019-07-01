@@ -13,6 +13,8 @@ import Foundation
 import AVFoundation
 import SwiftyJSON
 
+import PlayKitUtils
+
 struct KalturaLicenseResponseContainer: Codable {
     var ckc: String?
     var persistence_duration: TimeInterval?
@@ -24,16 +26,18 @@ class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
     
     func getLicense(spc: Data, assetId: String, requestParams: PKRequestParams, callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
         var request = URLRequest(url: requestParams.url)
+        
+        // uDRM requires application/octet-stream as the content type.
+        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+        
+        // Also add the user agent
+        request.setValue(PlayKitManager.userAgent, forHTTPHeaderField: "User-Agent")
+        
+        // Add other optional headers
         if let headers = requestParams.headers {
             for (header, value) in headers {
                 request.setValue(value, forHTTPHeaderField: header)
             }
-        }
-        
-        // If a specific content-type was requested by the adapter, use it. 
-        // Otherwise, the uDRM requires application/octet-stream.
-        if request.value(forHTTPHeaderField: "Content-Type") == nil {
-            request.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
         }
         
         request.httpBody = spc.base64EncodedData()
@@ -42,6 +46,12 @@ class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
         PKLog.debug("Sending SPC to server")
         let startTime = Date.timeIntervalSinceReferenceDate
         let dataTask = URLSession.shared.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+            
+            if let error = error {
+                callback(nil, 0, FPSError.serverError(error, requestParams.url))
+                return
+            }
+
             do {
                 let endTime: Double = Date.timeIntervalSinceReferenceDate
                 PKLog.debug("Got response in \(endTime-startTime) sec")

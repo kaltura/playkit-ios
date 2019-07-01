@@ -11,23 +11,20 @@
 import Foundation
 
 public enum FPSError: Error {
+    
+    // License response errors
     case malformedServerResponse
     case noCKCInResponse
     case malformedCKCInResponse
     case serverError(_ error: Error, _ url: URL)
     case invalidLicenseDuration
 
+    // License requests errors (can't generate request)
     case missingDRMParams
     case invalidKeyRequest
     case invalidMediaFormat
     case persistenceNotSupported
     case missingAssetId(_ url: URL)
-}
-
-enum FPSInternalError: Error {
-    case unknownAssetKeyId
-    case unknownAssetMode
-    case invalidAssetKeyId
 }
 
 protocol FPSLicenseRequest {
