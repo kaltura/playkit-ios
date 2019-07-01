@@ -271,7 +271,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
             return
         }
         
-        if isFirstPlay && startPosition != 0 && adsPlugin.startWithPreroll && pkAdDAICuePoints.hasPreRoll {
+        if isFirstPlay && startPosition > 0 && adsPlugin.startWithPreroll && pkAdDAICuePoints.hasPreRoll {
             startPosition = 0
             snapbackMode = true
             snapbackTime = endTime
@@ -435,9 +435,19 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
     public func play(_ playType: PlayType) {
         preparePlayerIfNeeded()
         if playType == .play {
+            if isPlaying {
+                return
+            }
+            
+            // If there is a start position set it to the real time. Do this before play().
+            if startPosition > 0 {
+                let streamTime = adsPlugin.streamTime(forContentTime: startPosition)
+                startPosition = streamTime
+            }
+            super.play()
+            
             if isFirstPlay {
                 isFirstPlay = false
-                super.play()
                 delegate?.streamStarted()
             }
             
@@ -445,16 +455,13 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
             if playerEngine?.currentPosition == 0 && pkAdDAICuePoints.hasPreRoll {
                 if let ad = adsPlugin.canPlayAd(atStreamTime: 0) {
                     if ad.canPlay {
-                        super.play()
                         delegate?.adPlaying(startTime: 0, duration: ad.duration)
                     } else {
                         let seekTime = adsPlugin.contentTime(forStreamTime: ad.endTime)
                         seek(to: seekTime)
-                        super.play()
                     }
                 }
             } else {
-                super.play()
                 if adsPlugin.isAdPlaying {
                     delegate?.adResumed()
                 }
