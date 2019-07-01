@@ -8,28 +8,20 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
-//
-//  FPSUtils.swift
-//  PlayKit
-//
-//  Created by Noam Tamim on 30/05/2018.
-//
-
 import Foundation
-import SwiftyJSON
 
-enum FPSError: Error {
-    case emptyServerResponse
-    case failedToConvertServerResponse
+public enum FPSError: Error {
     case malformedServerResponse
     case noCKCInResponse
     case malformedCKCInResponse
+    case serverError(_ error: Error, _ url: URL)
+    case invalidLicenseDuration
+
     case missingDRMParams
     case invalidKeyRequest
     case invalidMediaFormat
-    case invalidLicenseDuration
     case persistenceNotSupported
-    case serverError(_ error: Error, _ url: URL)
+    case missingAssetId(_ url: URL)
 }
 
 enum FPSInternalError: Error {
@@ -63,33 +55,6 @@ class FPSLicense: Codable {
     static let defaultExpiry: TimeInterval = 7*24*60*60
     let expiryDate: Date?
     var data: Data
-    
-    init(jsonResponse: Data?) throws {
-        guard let data = jsonResponse else {
-            throw FPSError.emptyServerResponse
-        }
-        
-        guard let json = try? JSON(data: data, options: []) else {
-            throw FPSError.failedToConvertServerResponse
-        }
-        
-        guard let b64CKC = json["ckc"].string else {
-            throw FPSError.noCKCInResponse
-        }
-        
-        guard let ckc = Data(base64Encoded: b64CKC) else {
-            throw FPSError.malformedCKCInResponse
-        }
-        
-        let offlineExpiry = json["persistence_duration"].double ?? FPSLicense.defaultExpiry
-        
-        if ckc.count == 0 {
-            throw FPSError.malformedCKCInResponse
-        }
-        
-        self.data = ckc
-        self.expiryDate = Date(timeIntervalSinceNow: offlineExpiry)
-    }
     
     init(ckc: Data, duration: TimeInterval) {
         self.data = ckc
