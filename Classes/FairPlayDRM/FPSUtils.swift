@@ -27,12 +27,6 @@ public enum FPSError: Error {
     case missingAssetId(_ url: URL)
 }
 
-enum FPSInternalError: Error {
-    case unknownAssetKeyId
-    case unknownAssetMode
-    case invalidAssetKeyId
-}
-
 protocol FPSLicenseRequest {
     func getSPC(cert: Data, id: String, shouldPersist: Bool, callback: @escaping (Data?, Error?) -> Void)
     func processContentKeyResponse(_ keyResponse: Data)
