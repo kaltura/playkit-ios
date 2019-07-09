@@ -267,10 +267,6 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
         let endTime = adsPlugin.streamTime(forContentTime: time)
         guard !adsPlugin.isAdPlaying else { return }
         
-        if snapbackMode {
-            return
-        }
-        
         if isFirstPlay && startPosition > 0 && adsPlugin.startWithPreroll && pkAdDAICuePoints.hasPreRoll {
             startPosition = 0
             snapbackMode = true
@@ -285,9 +281,10 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 if let previousCuePoint = adsPlugin.previousCuepoint(forStreamTime: endTime), previousCuePoint.played == false {
                     snapbackMode = true
                     snapbackTime = endTime < previousCuePoint.endTime ? previousCuePoint.endTime : endTime
-                    super.seek(to: previousCuePoint.startTime)
+                    
                     let duration = previousCuePoint.endTime - previousCuePoint.startTime
                     delegate?.adPlaying(startTime: previousCuePoint.startTime, duration: duration)
+                    super.seek(to: previousCuePoint.startTime)
                     return
                 }
             }
@@ -355,9 +352,6 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
             super.loadMedia(from: mediaSource, handler: handler)
             
             preparePlayerIfNeeded()
-            if playPerformed {
-                play()
-            }
         }
     }
     
@@ -444,7 +438,6 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                 let streamTime = adsPlugin.streamTime(forContentTime: startPosition)
                 startPosition = streamTime
             }
-            super.play()
             
             if isFirstPlay {
                 isFirstPlay = false
@@ -452,7 +445,7 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
             }
             
             // PreRoll is not being caught in the BoundaryTimeObserver
-            if playerEngine?.currentPosition == 0 && pkAdDAICuePoints.hasPreRoll {
+            if (playerEngine?.currentPosition == 0 || Float(currentPosition) >= Float(duration)) && pkAdDAICuePoints.hasPreRoll {
                 if let ad = adsPlugin.canPlayAd(atStreamTime: 0) {
                     if ad.canPlay {
                         delegate?.adPlaying(startTime: 0, duration: ad.duration)
@@ -466,6 +459,8 @@ public class AdsDAIPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, 
                     delegate?.adResumed()
                 }
             }
+            
+            super.play()
             
         } else {
             super.resume()
