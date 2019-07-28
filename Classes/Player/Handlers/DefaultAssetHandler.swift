@@ -30,7 +30,8 @@ class DefaultAssetHandler: AssetHandler {
         }
         
         let headers = ["User-Agent": PlayKitManager.userAgent]
-        let assetOptions = ["AVURLAssetHTTPHeaderFieldsKey": headers]
+        let cookies = HTTPCookieStorage.shared.cookies
+        let assetOptions = ["AVURLAssetHTTPHeaderFieldsKey": headers, "AVURLAssetHTTPCookiesKey": cookies as Any] as [String : Any]
         
         if let localSource = mediaSource as? LocalMediaSource {
             PKLog.debug("Creating local asset")
