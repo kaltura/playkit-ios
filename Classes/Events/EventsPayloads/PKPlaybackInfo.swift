@@ -20,11 +20,17 @@ import AVFoundation
     public let indicatedBitrate: Double
     /// The throughput of the playback (download speed)
     public let observedBitrate: Double
+    /// The total number of dropped frames during playback
+    @objc public let numberOfDroppedVideoFrames: Int    
     
-    init(bitrate: Double, indicatedBitrate: Double, observedBitrate: Double) {
+    init(bitrate: Double, 
+         indicatedBitrate: Double, 
+         observedBitrate: Double,
+         numberOfDroppedVideoFrames: Int) {
         self.bitrate = bitrate
         self.indicatedBitrate = indicatedBitrate
         self.observedBitrate = observedBitrate
+        self.numberOfDroppedVideoFrames = numberOfDroppedVideoFrames
     }
     
     convenience init(logEvent: AVPlayerItemAccessLogEvent) {
@@ -38,6 +44,10 @@ import AVFoundation
         }
         let indicatedBitrate = logEvent.indicatedBitrate
         let observedBitrate = logEvent.observedBitrate
-        self.init(bitrate: bitrate, indicatedBitrate: indicatedBitrate, observedBitrate: observedBitrate)
+        let numberOfDroppedVideoFrames = logEvent.numberOfDroppedVideoFrames
+        self.init(bitrate: bitrate, 
+                  indicatedBitrate: indicatedBitrate, 
+                  observedBitrate: observedBitrate,
+                  numberOfDroppedVideoFrames: numberOfDroppedVideoFrames)
     }
 }
