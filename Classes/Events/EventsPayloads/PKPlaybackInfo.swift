@@ -20,14 +20,21 @@ import AVFoundation
     public let indicatedBitrate: Double
     /// The throughput of the playback (download speed)
     public let observedBitrate: Double
+    /// The playback framerate (this value is zero if it is not reported)
+    @objc public let framesPerSecond: Float 
     
-    init(bitrate: Double, indicatedBitrate: Double, observedBitrate: Double) {
+    init(bitrate: Double, 
+         indicatedBitrate: Double, 
+         observedBitrate: Double,
+         framesPerSecond: Float) {
         self.bitrate = bitrate
         self.indicatedBitrate = indicatedBitrate
         self.observedBitrate = observedBitrate
+        self.framesPerSecond = framesPerSecond
     }
     
-    convenience init(logEvent: AVPlayerItemAccessLogEvent) {
+    convenience init(logEvent: AVPlayerItemAccessLogEvent, 
+                     playerItem: AVPlayerItem) {
         let bitrate: Double
         if logEvent.segmentsDownloadedDuration > 0 {
             // bitrate is equal to:
@@ -38,6 +45,18 @@ import AVFoundation
         }
         let indicatedBitrate = logEvent.indicatedBitrate
         let observedBitrate = logEvent.observedBitrate
-        self.init(bitrate: bitrate, indicatedBitrate: indicatedBitrate, observedBitrate: observedBitrate)
+
+        var framesPerSecond: Float = 0
+
+        for track in playerItem.tracks {
+            if track.assetTrack.mediaType == AVMediaType.video {
+               framesPerSecond = track.currentVideoFrameRate 
+            }
+        }
+
+        self.init(bitrate: bitrate, 
+                  indicatedBitrate: indicatedBitrate, 
+                  observedBitrate: observedBitrate,
+                  framesPerSecond: framesPerSecond)
     }
 }
