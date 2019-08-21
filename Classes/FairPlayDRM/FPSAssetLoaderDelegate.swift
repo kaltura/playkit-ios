@@ -64,8 +64,8 @@ class FPSAssetLoaderDelegate: NSObject {
         let delegate = FPSAssetLoaderDelegate.init(storage: storage)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
-        asset.resourceLoader.preloadsEligibleContentKeys = true
-        
+        asset.resourceLoader.preloadsEligibleContentKeys = false
+
         return delegate
     }
     
