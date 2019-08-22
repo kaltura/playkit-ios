@@ -45,7 +45,7 @@ class FPSAssetLoaderDelegate: NSObject {
         let delegate = FPSAssetLoaderDelegate.init(drmData: drmData)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
-        
+
         return delegate
     }
     
@@ -64,8 +64,8 @@ class FPSAssetLoaderDelegate: NSObject {
         let delegate = FPSAssetLoaderDelegate.init(storage: storage)
         
         asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
-        asset.resourceLoader.preloadsEligibleContentKeys = true
-        
+        asset.resourceLoader.preloadsEligibleContentKeys = false
+
         return delegate
     }
     
@@ -125,6 +125,10 @@ extension FPSAssetLoaderDelegate: AVAssetResourceLoaderDelegate {
         PKLog.verbose("\(#function) was called in FPSAssetLoaderDelegate with renewalRequest: \(renewalRequest)")
         
         return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: renewalRequest)
+    }
+    
+    func resourceLoader(_ resourceLoader: AVAssetResourceLoader, didCancel loadingRequest: AVAssetResourceLoadingRequest) {
+        PKLog.verbose("\(#function) was called in FPSAssetLoaderDelegate with loadingRequest: \(loadingRequest)")
     }
 }
 
