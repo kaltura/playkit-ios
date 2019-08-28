@@ -14,8 +14,16 @@ import PlayKitUtils
 
 class DefaultAssetHandler: AssetHandler {
     
-    var assetLoaderDelegate: FPSAssetLoaderDelegate?
-    var avAsset: AVURLAsset?
+    /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
+    fileprivate let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
+    
+    var assetLoaderDelegate = PKAssetResourceLoaderDelegate()
+    var avAsset: AVURLAsset? {
+        didSet {
+            guard let asset = avAsset else { return }
+            asset.resourceLoader.setDelegate(assetLoaderDelegate, queue: resourceLoadingRequestQueue)
+        }
+    }
 
     required init() {
         
@@ -37,9 +45,9 @@ class DefaultAssetHandler: AssetHandler {
             PKLog.debug("Creating local asset")
             let asset = AVURLAsset(url: contentUrl, options: assetOptions)
             
-            
             if #available(iOS 10.0, *) {
-                self.assetLoaderDelegate = FPSAssetLoaderDelegate.configureLocalPlay(asset: asset, storage: localSource.storage)
+                let fpsAssetLoaderDelegate = FPSAssetLoaderDelegate.configureLocalPlay(asset: asset, storage: localSource.storage)
+                self.assetLoaderDelegate.setDelegate(fpsAssetLoaderDelegate, forScheme: FPSAssetLoaderDelegate.customScheme)
             } else {
                 // On earlier versions, this will only work for non-FairPlay content.
                 PKLog.warning("Preparing local asset in iOS<10: \(contentUrl)")
@@ -72,7 +80,8 @@ class DefaultAssetHandler: AssetHandler {
 
         let asset = AVURLAsset(url: playbackUrl, options: assetOptions)
         
-        self.assetLoaderDelegate = FPSAssetLoaderDelegate.configureRemotePlay(asset: asset, drmData: fpsData)
+        let fpsAssetLoaderDelegate = FPSAssetLoaderDelegate.configureRemotePlay(asset: asset, drmData: fpsData)
+        self.assetLoaderDelegate.setDelegate(fpsAssetLoaderDelegate, forScheme: FPSAssetLoaderDelegate.customScheme)
         
         self.avAsset = asset  
         readyCallback(nil, self.avAsset)

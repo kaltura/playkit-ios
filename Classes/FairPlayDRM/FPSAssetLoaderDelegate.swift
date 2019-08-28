@@ -17,9 +17,6 @@ class FPSAssetLoaderDelegate: NSObject {
     /// The URL scheme for FPS content.
     static let customScheme = "skd"
     
-    /// The DispatchQueue to use for AVAssetResourceLoaderDelegate callbacks.
-    fileprivate static let resourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.resourcerequests")
-    
     private let storage: LocalDataStore?
     
     private let drmData: FairPlayDRMParams?
@@ -43,8 +40,6 @@ class FPSAssetLoaderDelegate: NSObject {
     
     static func configureRemotePlay(asset: AVURLAsset, drmData: FairPlayDRMParams) -> FPSAssetLoaderDelegate {
         let delegate = FPSAssetLoaderDelegate.init(drmData: drmData)
-        
-        asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
 
         return delegate
     }
@@ -53,7 +48,6 @@ class FPSAssetLoaderDelegate: NSObject {
     static func configureDownload(asset: AVURLAsset, drmData: FairPlayDRMParams, storage: LocalDataStore) -> FPSAssetLoaderDelegate {
         let delegate = FPSAssetLoaderDelegate.init(drmData: drmData, storage: storage, forceDownload: true)
         
-        asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
         asset.resourceLoader.preloadsEligibleContentKeys = true
         
         return delegate
@@ -63,7 +57,6 @@ class FPSAssetLoaderDelegate: NSObject {
     static func configureLocalPlay(asset: AVURLAsset, storage: LocalDataStore) -> FPSAssetLoaderDelegate {
         let delegate = FPSAssetLoaderDelegate.init(storage: storage)
         
-        asset.resourceLoader.setDelegate(delegate, queue: resourceLoadingRequestQueue)
         asset.resourceLoader.preloadsEligibleContentKeys = false
 
         return delegate
@@ -91,9 +84,9 @@ class FPSAssetLoaderDelegate: NSObject {
         }
     }
 
-    func shouldLoadOrRenewRequestedResource(resourceLoadingRequest: AVAssetResourceLoadingRequest) -> Bool {
+    func shouldLoadOrRenewRequestedResource(_ resourceLoader: AVAssetResourceLoader, loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         
-        guard let url = resourceLoadingRequest.request.url else {
+        guard let url = loadingRequest.request.url else {
             return false
         }
         
@@ -102,8 +95,8 @@ class FPSAssetLoaderDelegate: NSObject {
             return false
         }
         
-        FPSAssetLoaderDelegate.resourceLoadingRequestQueue.async {
-            self.prepareAndSendContentKeyRequest(resourceLoadingRequest: resourceLoadingRequest)
+        resourceLoader.delegateQueue?.async {
+            self.prepareAndSendContentKeyRequest(resourceLoadingRequest: loadingRequest)
         }
         
         return true
@@ -117,14 +110,14 @@ extension FPSAssetLoaderDelegate: AVAssetResourceLoaderDelegate {
         
         PKLog.verbose("\(#function) was called in FPSAssetLoaderDelegate with loadingRequest: \(loadingRequest)")
         
-        return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: loadingRequest)
+        return shouldLoadOrRenewRequestedResource(resourceLoader, loadingRequest: loadingRequest)
     }
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForRenewalOfRequestedResource renewalRequest: AVAssetResourceRenewalRequest) -> Bool {
         
         PKLog.verbose("\(#function) was called in FPSAssetLoaderDelegate with renewalRequest: \(renewalRequest)")
         
-        return shouldLoadOrRenewRequestedResource(resourceLoadingRequest: renewalRequest)
+        return shouldLoadOrRenewRequestedResource(resourceLoader, loadingRequest: renewalRequest)
     }
     
     func resourceLoader(_ resourceLoader: AVAssetResourceLoader, didCancel loadingRequest: AVAssetResourceLoadingRequest) {
