@@ -45,7 +45,7 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
     
     func processPlaylistWithData(_ data: Data) {
         guard let string = String(data: data, encoding: .utf8) else { return }
-        print(string)
+        PKLog.debug("Received m3u8:\n\(string)")
         let lines = string.components(separatedBy: "\n")
         var newLines = [String]()
         var iterator = lines.makeIterator()
@@ -61,7 +61,7 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
             }
         }
         m3u8String = newLines.joined(separator: "\n")
-        print(m3u8String ?? "m3u8String is empty")
+        PKLog.debug("Updated m3u8:\n\(m3u8String ?? "m3u8 is empty")")
     }
     
     func finishRequestWithMainPlaylist(_ loadingRequest: AVAssetResourceLoadingRequest) {
@@ -83,7 +83,7 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
         guard let subtitle = subtitleOfId else { return false }
         
         let subtitlem3u8 = getSubtitlem3u8(forSubtitle: subtitle)
-        print(subtitlem3u8)
+        PKLog.debug("Subtitle (\(subtitleId)) m3u8:\n\(subtitlem3u8)")
         let data = subtitlem3u8.data(using: .utf8)!
         loadingRequest.dataRequest?.respond(with: data)
         loadingRequest.finishLoading()
