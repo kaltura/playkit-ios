@@ -331,6 +331,9 @@ class PlayerController: NSObject, Player {
         self.selectedSource = selectedSource
         self.assetHandler = handler
         
+        // Update the selected source if there are external subtitles.
+        selectedSource.externalSubtitle = mediaConfig.mediaEntry.externalSubtitles
+        
         // update the media source request adapter with new media uuid if using kaltura request adapter
         var pms = selectedSource
         self.updateRequestAdapter(in: &pms)

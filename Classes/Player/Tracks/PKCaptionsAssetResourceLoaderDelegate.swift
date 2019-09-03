@@ -75,7 +75,9 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
     }
     
     func handleSubtitles(_ loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
-        guard let subtitleId = loadingRequest.request.url?.path else { return false }
+        let stringURL = loadingRequest.request.url?.absoluteString
+        let stringToRemove = PKCaptionsAssetResourceLoaderDelegate.subtitlesScheme + "://"
+        guard let subtitleId = stringURL?.replacingOccurrences(of: stringToRemove, with: "") else { return false }
         
         let subtitleOfId = externalSubtitles.first { $0.id == subtitleId }
         guard let subtitle = subtitleOfId else { return false }
@@ -91,9 +93,45 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
     func getSubtitlesEXT() -> String {
         var allSubtitles = ""
         for subtitle in externalSubtitles {
-            allSubtitles.append("""
-                #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="\(groupID)",NAME="\(subtitle.name)",DEFAULT=\(subtitle.isDefault),FORCED=\(subtitle.forced),URI="subtitlesm3u8://\(subtitle.id)",LANGUAGE="\(subtitle.language)"
-                """)
+            var string = """
+            #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="\(groupID)",NAME="\(subtitle.name)",URI="subtitlesm3u8://\(subtitle.id)"
+            """
+            
+            /*
+             The value is an enumerated-string; valid strings are YES and NO.
+             If the value is YES, then the client SHOULD play this Rendition of
+             the content in the absence of information from the user indicating
+             a different choice.  This attribute is OPTIONAL.  Its absence
+             indicates an implicit value of NO.
+             */
+            if subtitle.isDefault {
+                string.append(",DEFAULT=YES")
+            }
+            
+            /*
+             The value is an enumerated-string; valid strings are YES and NO.
+             This attribute is OPTIONAL.  Its absence indicates an implicit
+             value of NO.  The FORCED attribute MUST NOT be present unless the
+             TYPE is SUBTITLES.
+             */
+            if subtitle.forced {
+                string.append(",FORCED=YES")
+            }
+            
+            /*
+             The value is a quoted-string containing one of the standard Tags
+             for Identifying Languages [RFC5646], which identifies the primary
+             language used in the Rendition.  This attribute is OPTIONAL.
+             */
+            if !subtitle.language.isEmpty {
+                string.append("""
+                    ,LANGUAGE="\(subtitle.language)"
+                    """)
+            }
+            
+            string.append("\n")
+            
+            allSubtitles.append(string)
         }
         return allSubtitles
     }

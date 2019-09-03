@@ -29,9 +29,17 @@ class DefaultAssetHandler: AssetHandler {
         
     }
     
+    private func replaceURL(_ url: URL, withScheme scheme: String) -> URL {
+        let urlString = url.absoluteString
+        guard let index = urlString.firstIndex(of: ":") else { return url }
+        let rest = urlString[index...]
+        let newUrlString = scheme + rest
+        return URL(string: newUrlString) ?? url
+    }
+    
     func build(from mediaSource: PKMediaSource, readyCallback: @escaping (Error?, AVURLAsset?) -> Void) {
 
-        guard let contentUrl = mediaSource.contentUrl, let playbackUrl = mediaSource.playbackUrl else {
+        guard let contentUrl = mediaSource.contentUrl, var playbackUrl = mediaSource.playbackUrl else {
             PKLog.error("Invalid media: no url")
             readyCallback(AssetError.invalidContentUrl(nil), nil)
             return
@@ -58,10 +66,22 @@ class DefaultAssetHandler: AssetHandler {
             return
         }
 
+        // Set the custom scheme for the external subtitles, if exists.
+        if let externalSubtitles = mediaSource.externalSubtitle, !externalSubtitles.isEmpty {
+            let captionsAssetResourceLoaderDelegate = PKCaptionsAssetResourceLoaderDelegate(m3u8URL: playbackUrl,
+                                                                                            externalSubtitles: externalSubtitles)
+            self.assetLoaderDelegate.setDelegate(captionsAssetResourceLoaderDelegate,
+                                                 forScheme: PKCaptionsAssetResourceLoaderDelegate.mainScheme)
+            self.assetLoaderDelegate.setDelegate(captionsAssetResourceLoaderDelegate,
+                                                 forScheme: PKCaptionsAssetResourceLoaderDelegate.subtitlesScheme)
+            let customURL = replaceURL(playbackUrl, withScheme: PKCaptionsAssetResourceLoaderDelegate.mainScheme)
+            playbackUrl = customURL
+        }
         
         guard let drmData = mediaSource.drmData?.first else {
             PKLog.debug("Creating clear AVURLAsset")
-            readyCallback(nil, AVURLAsset(url: playbackUrl, options: assetOptions))
+            self.avAsset = AVURLAsset(url: playbackUrl, options: assetOptions)
+            readyCallback(nil, self.avAsset)
             return
         }
 

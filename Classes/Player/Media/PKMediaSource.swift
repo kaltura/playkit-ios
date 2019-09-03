@@ -70,6 +70,8 @@ fileprivate let formatTypeKey: String = "sourceType"
     @objc public var mimeType: String?
     @objc public var drmData: [DRMParams]?
     @objc public var mediaFormat: MediaFormat = .unknown
+    @objc public var externalSubtitle: [PKExternalSubtitle]?
+    
     private var fileExt: String {
         return contentUrl?.pathExtension ?? ""
     }
