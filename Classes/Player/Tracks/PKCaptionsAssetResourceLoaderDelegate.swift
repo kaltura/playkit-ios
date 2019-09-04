@@ -129,6 +129,24 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
                     """)
             }
             
+            /*
+             The value is a quoted-string containing one or more Uniform Type
+             Identifiers [UTI] separated by comma (,) characters.  This
+             attribute is OPTIONAL.  Each UTI indicates an individual
+             characteristic of the Rendition.
+             
+             A SUBTITLES Rendition MAY include the following characteristics:
+             "public.accessibility.transcribes-spoken-dialog",
+             "public.accessibility.describes-music-and-sound", and
+             "public.easy-to-read" (which indicates that the subtitles have
+             been edited for ease of reading).
+             */
+            if !subtitle.characteristics.isEmpty {
+                string.append("""
+                    ,CHARACTERISTICS="\(subtitle.characteristics)"
+                    """)
+            }
+            
             string.append("\n")
             
             allSubtitles.append(string)
