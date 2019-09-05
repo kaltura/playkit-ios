@@ -111,6 +111,21 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
             /*
              The value is an enumerated-string; valid strings are YES and NO.
              This attribute is OPTIONAL.  Its absence indicates an implicit
+             value of NO.  If the value is YES, then the client MAY choose to
+             play this Rendition in the absence of explicit user preference
+             because it matches the current playback environment, such as
+             chosen system language.
+             
+             If the AUTOSELECT attribute is present, its value MUST be YES if
+             the value of the DEFAULT attribute is YES.
+             */
+            if subtitle.autoSelect {
+                string.append(",AUTOSELECT=YES")
+            }
+            
+            /*
+             The value is an enumerated-string; valid strings are YES and NO.
+             This attribute is OPTIONAL.  Its absence indicates an implicit
              value of NO.  The FORCED attribute MUST NOT be present unless the
              TYPE is SUBTITLES.
              */
