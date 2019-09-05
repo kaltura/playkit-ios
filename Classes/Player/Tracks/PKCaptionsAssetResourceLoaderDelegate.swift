@@ -16,7 +16,6 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
     
     private let extM3UPrefix = "#EXTM3U"
     private let extXStreamInfPrefix = "#EXT-X-STREAM-INF"
-    private let groupID = "subs"
     
     private var m3u8URL: URL
     private var externalSubtitles: [PKExternalSubtitle]
@@ -51,7 +50,7 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
         var iterator = lines.makeIterator()
         while var line = iterator.next() {
             if line.hasPrefix(extXStreamInfPrefix) {
-                line.append(",SUBTITLES=\"\(groupID)\"")
+                line.append(",SUBTITLES=\"\(PKExternalSubtitle.groupID)\"")
             }
             
             newLines.append(line)
@@ -82,9 +81,10 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
         let subtitleOfId = externalSubtitles.first { $0.id == subtitleId }
         guard let subtitle = subtitleOfId else { return false }
         
-        let subtitlem3u8 = getSubtitlem3u8(forSubtitle: subtitle)
-        PKLog.debug("Subtitle (\(subtitleId)) m3u8:\n\(subtitlem3u8)")
-        let data = subtitlem3u8.data(using: .utf8)!
+        let m3u8Playlist = subtitle.buildM3u8Playlist()
+        
+        PKLog.debug("Subtitle (\(subtitleId)) m3u8:\n\(m3u8Playlist)")
+        let data = m3u8Playlist.data(using: .utf8)!
         loadingRequest.dataRequest?.respond(with: data)
         loadingRequest.finishLoading()
         return true
@@ -93,97 +93,10 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
     func getSubtitlesEXT() -> String {
         var allSubtitles = ""
         for subtitle in externalSubtitles {
-            var string = """
-            #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="\(groupID)",NAME="\(subtitle.name)",URI="subtitlesm3u8://\(subtitle.id)"
-            """
-            
-            /*
-             The value is an enumerated-string; valid strings are YES and NO.
-             If the value is YES, then the client SHOULD play this Rendition of
-             the content in the absence of information from the user indicating
-             a different choice.  This attribute is OPTIONAL.  Its absence
-             indicates an implicit value of NO.
-             */
-            if subtitle.isDefault {
-                string.append(",DEFAULT=YES")
-            }
-            
-            /*
-             The value is an enumerated-string; valid strings are YES and NO.
-             This attribute is OPTIONAL.  Its absence indicates an implicit
-             value of NO.  If the value is YES, then the client MAY choose to
-             play this Rendition in the absence of explicit user preference
-             because it matches the current playback environment, such as
-             chosen system language.
-             
-             If the AUTOSELECT attribute is present, its value MUST be YES if
-             the value of the DEFAULT attribute is YES.
-             */
-            if subtitle.autoSelect {
-                string.append(",AUTOSELECT=YES")
-            }
-            
-            /*
-             The value is an enumerated-string; valid strings are YES and NO.
-             This attribute is OPTIONAL.  Its absence indicates an implicit
-             value of NO.  The FORCED attribute MUST NOT be present unless the
-             TYPE is SUBTITLES.
-             */
-            if subtitle.forced {
-                string.append(",FORCED=YES")
-            }
-            
-            /*
-             The value is a quoted-string containing one of the standard Tags
-             for Identifying Languages [RFC5646], which identifies the primary
-             language used in the Rendition.  This attribute is OPTIONAL.
-             */
-            if !subtitle.language.isEmpty {
-                string.append("""
-                    ,LANGUAGE="\(subtitle.language)"
-                    """)
-            }
-            
-            /*
-             The value is a quoted-string containing one or more Uniform Type
-             Identifiers [UTI] separated by comma (,) characters.  This
-             attribute is OPTIONAL.  Each UTI indicates an individual
-             characteristic of the Rendition.
-             
-             A SUBTITLES Rendition MAY include the following characteristics:
-             "public.accessibility.transcribes-spoken-dialog",
-             "public.accessibility.describes-music-and-sound", and
-             "public.easy-to-read" (which indicates that the subtitles have
-             been edited for ease of reading).
-             */
-            if !subtitle.characteristics.isEmpty {
-                string.append("""
-                    ,CHARACTERISTICS="\(subtitle.characteristics)"
-                    """)
-            }
-            
-            string.append("\n")
-            
-            allSubtitles.append(string)
+            let masterLine = subtitle.buildMasterLine()
+            allSubtitles.append(masterLine)
         }
         return allSubtitles
-    }
-    
-    func getSubtitlem3u8(forSubtitle subtitle: PKExternalSubtitle) -> String {
-        let durationString = String(format: "%.3f", subtitle.duration)
-        let intDuration = Int(subtitle.duration)
-        let subtitlem3u8 = """
-        #EXTM3U
-        #EXT-X-VERSION:3
-        #EXT-X-MEDIA-SEQUENCE:1
-        #EXT-X-PLAYLIST-TYPE:VOD
-        #EXT-X-ALLOW-CACHE:NO
-        #EXT-X-TARGETDURATION:\(intDuration)
-        #EXTINF:\(durationString), no desc
-        \(subtitle.vttURLString)
-        #EXT-X-ENDLIST
-        """
-        return subtitlem3u8
     }
     
     // MARK: - AVAssetResourceLoaderDelegate

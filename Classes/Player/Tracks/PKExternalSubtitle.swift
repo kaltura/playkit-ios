@@ -18,6 +18,8 @@ import Foundation
     @objc public let vttURLString: String
     @objc public let duration: Double
     
+    static let groupID = "subs"
+    
     /**
      Initializes a new PKExternalSubtitle which enables the configuration of external subtitles.
     
@@ -64,5 +66,97 @@ import Foundation
         vttURLString: \(vttURLString)
         duration: \(duration)
         """
+    }
+    
+    func buildM3u8Playlist() -> String {
+        let durationString = String(format: "%.3f", duration)
+        let intDuration = Int(duration)
+        let m3u8Playlist = """
+        #EXTM3U
+        #EXT-X-VERSION:3
+        #EXT-X-MEDIA-SEQUENCE:1
+        #EXT-X-PLAYLIST-TYPE:VOD
+        #EXT-X-ALLOW-CACHE:NO
+        #EXT-X-TARGETDURATION:\(intDuration)
+        #EXTINF:\(durationString), no desc
+        \(vttURLString)
+        #EXT-X-ENDLIST
+        """
+        return m3u8Playlist
+    }
+    
+    func buildMasterLine() -> String {
+        var masterLine = """
+        #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="\(PKExternalSubtitle.groupID)",NAME="\(name)",URI="subtitlesm3u8://\(id)"
+        """
+        
+        /*
+         The value is an enumerated-string; valid strings are YES and NO.
+         If the value is YES, then the client SHOULD play this Rendition of
+         the content in the absence of information from the user indicating
+         a different choice.  This attribute is OPTIONAL.  Its absence
+         indicates an implicit value of NO.
+         */
+        if isDefault {
+            masterLine.append(",DEFAULT=YES")
+        }
+        
+        /*
+         The value is an enumerated-string; valid strings are YES and NO.
+         This attribute is OPTIONAL.  Its absence indicates an implicit
+         value of NO.  If the value is YES, then the client MAY choose to
+         play this Rendition in the absence of explicit user preference
+         because it matches the current playback environment, such as
+         chosen system language.
+         
+         If the AUTOSELECT attribute is present, its value MUST be YES if
+         the value of the DEFAULT attribute is YES.
+         */
+        if autoSelect {
+            masterLine.append(",AUTOSELECT=YES")
+        }
+        
+        /*
+         The value is an enumerated-string; valid strings are YES and NO.
+         This attribute is OPTIONAL.  Its absence indicates an implicit
+         value of NO.  The FORCED attribute MUST NOT be present unless the
+         TYPE is SUBTITLES.
+         */
+        if forced {
+            masterLine.append(",FORCED=YES")
+        }
+        
+        /*
+         The value is a quoted-string containing one of the standard Tags
+         for Identifying Languages [RFC5646], which identifies the primary
+         language used in the Rendition.  This attribute is OPTIONAL.
+         */
+        if !language.isEmpty {
+            masterLine.append("""
+                ,LANGUAGE="\(language)"
+                """)
+        }
+        
+        /*
+         The value is a quoted-string containing one or more Uniform Type
+         Identifiers [UTI] separated by comma (,) characters.  This
+         attribute is OPTIONAL.  Each UTI indicates an individual
+         characteristic of the Rendition.
+         
+         A SUBTITLES Rendition MAY include the following characteristics:
+         "public.accessibility.transcribes-spoken-dialog",
+         "public.accessibility.describes-music-and-sound", and
+         "public.easy-to-read" (which indicates that the subtitles have
+         been edited for ease of reading).
+         */
+        if !characteristics.isEmpty {
+            masterLine.append("""
+                ,CHARACTERISTICS="\(characteristics)"
+                """)
+        }
+        
+        masterLine.append("\n")
+        
+        return masterLine
     }
 }

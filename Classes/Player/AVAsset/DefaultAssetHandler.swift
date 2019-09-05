@@ -30,11 +30,11 @@ class DefaultAssetHandler: AssetHandler {
     }
     
     private func replaceURL(_ url: URL, withScheme scheme: String) -> URL {
-        let urlString = url.absoluteString
-        guard let index = urlString.firstIndex(of: ":") else { return url }
-        let rest = urlString[index...]
-        let newUrlString = scheme + rest
-        return URL(string: newUrlString) ?? url
+        var components = URLComponents.init(url: url, resolvingAgainstBaseURL: true)
+        components?.scheme = scheme
+        let newURL = components?.url
+        
+        return newURL ?? url
     }
     
     func build(from mediaSource: PKMediaSource, readyCallback: @escaping (Error?, AVURLAsset?) -> Void) {
