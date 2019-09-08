@@ -87,7 +87,7 @@ import Foundation
     
     func buildMasterLine() -> String {
         var masterLine = """
-        #EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="\(PKExternalSubtitle.groupID)",NAME="\(name)",URI="subtitlesm3u8://\(id)"
+        \n#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="\(PKExternalSubtitle.groupID)",NAME="\(name)",URI="subtitlesm3u8://\(id)"
         """
         
         /*

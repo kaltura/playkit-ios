@@ -17,9 +17,19 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
     private let extM3UPrefix = "#EXTM3U"
     private let extXStreamInfPrefix = "#EXT-X-STREAM-INF"
     
+    private var extXStreamInfPrefixIndexes: [Int] = []
+    private var hasInternalSubtitles: Bool = false
+    
+    private let uriPrefix = "URI="
+    // Tags to check the URI for relative paths
+    private let extXMediaPrefix = "#EXT-X-MEDIA"
+    private let extXIFrameStreamInfPrefix = "#EXT-X-I-FRAME-STREAM-INF"
+    
     private var m3u8URL: URL
     private var externalSubtitles: [PKExternalSubtitle]
     private var m3u8String: String? = nil
+    
+    private var addedSubtitlesEXT: Bool = false
     
     init(m3u8URL: URL, externalSubtitles: [PKExternalSubtitle]) {
         self.m3u8URL = m3u8URL
@@ -27,7 +37,7 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
         super.init()
     }
     
-    func handleMainRequest(_ request: AVAssetResourceLoadingRequest) -> Bool {
+    private func handleMainRequest(_ request: AVAssetResourceLoadingRequest) -> Bool {
         let task = URLSession.shared.dataTask(with: m3u8URL) { [weak self] (data, response, error) in
             guard let self = self else { return }
             guard error == nil,
@@ -42,28 +52,81 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
         return true
     }
     
-    func processPlaylistWithData(_ data: Data) {
+    private func absoluteURI(for uri: String) -> String {
+        let urlComponents = URLComponents(string: uri)
+        
+        guard (urlComponents?.scheme) == nil else {
+            // If we have a scheme return as is. It's not a relative one.
+            return uri
+        }
+        
+        let newURL = urlComponents?.url(relativeTo: m3u8URL)
+        return newURL?.absoluteString ?? uri
+    }
+    
+    private func processPlaylistWithData(_ data: Data) {
         guard let string = String(data: data, encoding: .utf8) else { return }
         PKLog.debug("Received m3u8:\n\(string)")
         let lines = string.components(separatedBy: "\n")
         var newLines = [String]()
         var iterator = lines.makeIterator()
         while var line = iterator.next() {
+            
+            // Check and save the first #EXT-X-STREAM-INF index
             if line.hasPrefix(extXStreamInfPrefix) {
-                line.append(",SUBTITLES=\"\(PKExternalSubtitle.groupID)\"")
+                extXStreamInfPrefixIndexes.append(newLines.count)
+            }
+            
+            // Check if we have internal subtitles
+            if line.hasPrefix(extXMediaPrefix) {
+                if line.contains("TYPE=SUBTITLES") {
+                    hasInternalSubtitles = true
+                }
+            }
+            
+            // Check all URIs, if they are relative, change them to absolute.
+            var urlString: String = ""
+            if line.hasPrefix(extXMediaPrefix) || line.hasPrefix(extXIFrameStreamInfPrefix) {
+                let components = line.split(separator: Character(","))
+                if let uriIndex = components.firstIndex(where: { $0.hasPrefix(uriPrefix) }) {
+                    let component = components[uriIndex]
+                    urlString = component.replacingOccurrences(of: uriPrefix, with: "")
+                }
+            } else if !line.isEmpty, !line.hasPrefix("#") {
+                // If the line doesn't start with '#', and not an empty line, it's a URI
+                urlString = line
+            }
+            
+            // If we found a url, replace it with an absolute url if it's a relative one.
+            if !urlString.isEmpty {
+                let absoluteURLSring = absoluteURI(for: urlString)
+                
+                // Replace URI
+                line = line.replacingOccurrences(of: urlString, with: absoluteURLSring)
             }
             
             newLines.append(line)
-            if line.hasPrefix(extM3UPrefix) {
-                // Add external subtitle
-                newLines.append(getSubtitlesEXT())
+        }
+        
+        // If there are no internal subtitles:
+        // Add the subtitles a row above the #EXT-X-STREAM-INF tag.
+        // Add the SUBTITLES=<groupID> to all the #EXT-X-STREAM-INF tags.
+        if !hasInternalSubtitles {
+            for index in extXStreamInfPrefixIndexes {
+                newLines[index].append(",SUBTITLES=\"\(PKExternalSubtitle.groupID)\"")
+            }
+            
+            // Add external subtitle before the first X-Stream-Inf
+            if let firstIndex = extXStreamInfPrefixIndexes.first {
+                newLines.insert(getSubtitlesEXT(), at: firstIndex)
             }
         }
+        
         m3u8String = newLines.joined(separator: "\n")
         PKLog.debug("Updated m3u8:\n\(m3u8String ?? "m3u8 is empty")")
     }
     
-    func finishRequestWithMainPlaylist(_ loadingRequest: AVAssetResourceLoadingRequest) {
+    private func finishRequestWithMainPlaylist(_ loadingRequest: AVAssetResourceLoadingRequest) {
         guard let mainm3u8 = m3u8String else {
             loadingRequest.finishLoading()
             return
@@ -73,7 +136,7 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
         loadingRequest.finishLoading()
     }
     
-    func handleSubtitles(_ loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
+    private func handleSubtitles(_ loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         let stringURL = loadingRequest.request.url?.absoluteString
         let stringToRemove = PKCaptionsAssetResourceLoaderDelegate.subtitlesScheme + "://"
         guard let subtitleId = stringURL?.replacingOccurrences(of: stringToRemove, with: "") else { return false }
@@ -90,7 +153,7 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
         return true
     }
     
-    func getSubtitlesEXT() -> String {
+    private func getSubtitlesEXT() -> String {
         var allSubtitles = ""
         for subtitle in externalSubtitles {
             let masterLine = subtitle.buildMasterLine()
