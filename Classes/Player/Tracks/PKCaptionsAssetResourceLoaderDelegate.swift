@@ -8,28 +8,26 @@
 import Foundation
 import AVFoundation
 
+private struct PlaylistTags {
+    static let extXStreamInf = "#EXT-X-STREAM-INF"
+    static let extXMedia = "#EXT-X-MEDIA"
+    static let extXIFrameStreamInf = "#EXT-X-I-FRAME-STREAM-INF"
+}
+
 class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelegate {
     /// The URL scheme for the m3u8 content.
     static let mainScheme = "mainm3u8"
     /// The URL scheme for the subtitle content.
     static let subtitlesScheme = "subtitlesm3u8"
     
-    private let extM3UPrefix = "#EXTM3U"
-    private let extXStreamInfPrefix = "#EXT-X-STREAM-INF"
+    private let uriPrefix = "URI="
     
     private var extXStreamInfPrefixIndexes: [Int] = []
     private var hasInternalSubtitles: Bool = false
     
-    private let uriPrefix = "URI="
-    // Tags to check the URI for relative paths
-    private let extXMediaPrefix = "#EXT-X-MEDIA"
-    private let extXIFrameStreamInfPrefix = "#EXT-X-I-FRAME-STREAM-INF"
-    
     private var m3u8URL: URL
     private var externalSubtitles: [PKExternalSubtitle]
     private var m3u8String: String? = nil
-    
-    private var addedSubtitlesEXT: Bool = false
     
     init(m3u8URL: URL, externalSubtitles: [PKExternalSubtitle]) {
         self.m3u8URL = m3u8URL
@@ -72,13 +70,13 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
         var iterator = lines.makeIterator()
         while var line = iterator.next() {
             
-            // Check and save the first #EXT-X-STREAM-INF index
-            if line.hasPrefix(extXStreamInfPrefix) {
+            // Check and save the #EXT-X-STREAM-INF indexes
+            if line.hasPrefix(PlaylistTags.extXStreamInf) {
                 extXStreamInfPrefixIndexes.append(newLines.count)
             }
             
             // Check if we have internal subtitles
-            if line.hasPrefix(extXMediaPrefix) {
+            if line.hasPrefix(PlaylistTags.extXMedia) {
                 if line.contains("TYPE=SUBTITLES") {
                     hasInternalSubtitles = true
                 }
@@ -86,7 +84,7 @@ class PKCaptionsAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDele
             
             // Check all URIs, if they are relative, change them to absolute.
             var urlString: String = ""
-            if line.hasPrefix(extXMediaPrefix) || line.hasPrefix(extXIFrameStreamInfPrefix) {
+            if line.hasPrefix(PlaylistTags.extXMedia) || line.hasPrefix(PlaylistTags.extXIFrameStreamInf) {
                 let components = line.split(separator: Character(","))
                 if let uriIndex = components.firstIndex(where: { $0.hasPrefix(uriPrefix) }) {
                     let component = components[uriIndex]
