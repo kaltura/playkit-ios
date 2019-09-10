@@ -11,12 +11,12 @@ import Foundation
     @objc public let id: String
     @objc public let name: String
     @objc public let language: String
+    @objc public let vttURLString: String
+    @objc public let duration: Double
     @objc public let isDefault: Bool
     @objc public let autoSelect: Bool
     @objc public let forced: Bool
     @objc public let characteristics: String
-    @objc public let vttURLString: String
-    @objc public let duration: Double
     
     static let groupID = "subs"
     
@@ -28,7 +28,11 @@ import Foundation
      
         - name:             The value is a quoted-string containing a human-readable description of the Rendition.
      
-        - language:         The value is a one of the standard Tags for Identifying Languages [RFC5646], which identifies the primary language used in the Rendition. This attribute is OPTIONAL.
+        - language:         The value is a one of the standard Tags for Identifying Languages [RFC5646], which identifies the primary language used in the Rendition.
+     
+        - vttURLString:     This is the string URL of the vtt.
+     
+        - duration:         This is the media's duration.
      
         - isDefault:        If the value is true, then the client SHOULD play this Rendition of the content in the absence of information from the user indicating a different choice. This attribute is OPTIONAL. It's absence indicates an implicit value of false.
      
@@ -37,21 +41,18 @@ import Foundation
         - forced:           A value of true indicates that the Rendition contains content that is considered essential to play. When selecting a FORCED Rendition, a client SHOULD choose the one that best matches the current playback environment (e.g., language). This attribute is OPTIONAL. It's absence indicates an implicit value of false.
      
         - characteristics:  The value contains one or more Uniform Type Identifiers [UTI] separated by comma (,) characters. This attribute is OPTIONAL. Each UTI indicates an individual characteristic of the Rendition.
-     
-        - vttURLString:     This is the string URL of the vtt.
-     
-        - duration:         This is the media's duration.
      */
-    @objc public init(id: String, name: String, language: String? = "", isDefault: Bool = false, autoSelect: Bool = false, forced: Bool = false, characteristics: String? = "", vttURLString: String, duration: Double) {
+    @objc public init(id: String, name: String, language: String, vttURLString: String, duration: Double, isDefault: Bool = false, autoSelect: Bool = false, forced: Bool = false, characteristics: String? = "") {
+        
         self.id = id
         self.name = name
-        self.language = language ?? ""
+        self.language = language
+        self.vttURLString = vttURLString
+        self.duration = duration
         self.isDefault = isDefault
         self.autoSelect = autoSelect
         self.forced = forced
         self.characteristics = characteristics ?? ""
-        self.vttURLString = vttURLString
-        self.duration = duration
     }
     
     public override var description: String {
@@ -59,12 +60,12 @@ import Foundation
         id: \(id)
         name: \(name)
         language: \(language)
+        vttURLString: \(vttURLString)
+        duration: \(duration)
         isDefault: \(isDefault)
         autoSelect: \(autoSelect)
         forced: \(forced)
         characteristics: \(characteristics)
-        vttURLString: \(vttURLString)
-        duration: \(duration)
         """
     }
     
