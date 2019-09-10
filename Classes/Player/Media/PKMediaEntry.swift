@@ -40,6 +40,7 @@ fileprivate let durationKey = "duration"
     @objc public var mediaType: MediaType = .unknown
     @objc public var metadata: [String: String]?
     @objc public var name: String?
+    @objc public var externalSubtitles: [PKExternalSubtitle]?
    
     var vrData: VRData?
     public var tags: String? {
