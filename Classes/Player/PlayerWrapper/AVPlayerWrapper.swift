@@ -46,7 +46,8 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             settings.onChange = { [weak self] (settingsType) in
                 guard let self = self else { return }
                 switch settingsType {
-                case .preferredPeakBitRate(let preferredPeakBitRate): self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+                case .preferredPeakBitRate(let preferredPeakBitRate):
+                    self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
                 }
             }
         }
@@ -231,6 +232,8 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 PKLog.error("settings are not set")
                 return
             }
+            
+            self.currentPlayer.usesExternalPlaybackWhileExternalScreenIsActive = settings.allowFairPlayOnExternalScreens
             
             let asset = PKAsset(avAsset: assetToPrepare, playerSettings: settings)
             self.currentPlayer.asset = asset
