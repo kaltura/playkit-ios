@@ -77,11 +77,7 @@ extension AVPlayerEngine {
                  */
                 let playerItem = AVPlayerItem(asset: newAsset.avAsset)
                 playerItem.preferredPeakBitRate = newAsset.playerSettings.network.preferredPeakBitRate
-                // set start position, position is valid and player is ready to play (will only work on change media).
-                if self.startPosition > 0 && self.status == .readyToPlay {
-                    self.currentPosition = self.startPosition
-                    self.startPosition = 0
-                }
+                
                 // add observers
                 self.removeObservers()
                 self.addObservers()
