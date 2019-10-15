@@ -95,6 +95,7 @@ enum PlayerSettingsType {
     @objc public var licenseRequestAdapter: PKRequestParamsAdapter?
     
     @objc public var fairPlayLicenseProvider: FairPlayLicenseProvider?
+    @objc public var allowFairPlayOnExternalScreens = false
     
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()

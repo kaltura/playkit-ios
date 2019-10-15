@@ -23,6 +23,21 @@ import AVFoundation
         }
     }
     
+    public override var contentMode: UIView.ContentMode {
+        didSet {
+            switch self.contentMode {
+            case .scaleAspectFill:
+                playerLayer.videoGravity = .resizeAspectFill
+            case .scaleAspectFit:
+                playerLayer.videoGravity = .resizeAspect
+            case .scaleToFill:
+                playerLayer.videoGravity = .resize
+            default:
+                playerLayer.videoGravity = .resizeAspect
+            }
+        }
+    }
+    
     var playerLayer: AVPlayerLayer {
         return self.layer as! AVPlayerLayer
     }

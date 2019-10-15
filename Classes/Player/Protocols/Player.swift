@@ -10,14 +10,7 @@
 
 import UIKit
 
-@objc public protocol PlayerDelegate {
-    @objc optional func playerShouldPlayAd(_ player: Player) -> Bool
-}
-
 @objc public protocol Player: BasicPlayer {
-    
-    /// The player's delegate.
-    @objc weak var delegate: PlayerDelegate? { get set }
     
     /// The player's associated media entry.
     @objc weak var mediaEntry: PKMediaEntry? { get }

@@ -115,10 +115,6 @@ public class AdsEnabledPlayerController : PlayerDecoratorBase, AdsPluginDelegate
     // MARK: - AdsPluginDataSource
     /************************************************************/
     
-    public func adsPluginShouldPlayAd(_ adsPlugin: AdsPlugin) -> Bool {
-        return self.delegate?.playerShouldPlayAd?(self) ?? false
-    }
-    
     public var playAdsAfterTime: TimeInterval {
         return self.prepareMediaConfig?.startTime ?? 0
     }

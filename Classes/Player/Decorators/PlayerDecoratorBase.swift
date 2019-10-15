@@ -27,15 +27,6 @@ import AVKit
     // ***************************** //
     // MARK: - Player
     // ***************************** //
-    
-    public var delegate: PlayerDelegate? {
-        get {
-            return self.player.delegate
-        }
-        set {
-            self.player.delegate = newValue
-        }
-    }
 
     weak public var mediaEntry: PKMediaEntry? {
         return self.player.mediaEntry

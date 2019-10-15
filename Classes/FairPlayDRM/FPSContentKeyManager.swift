@@ -44,7 +44,11 @@ class FPSContentKeyManager {
         
         let drmParams = try mediaSource.fairPlayParams()
 
-        guard let id = FPSUtils.extractAssetId(at: location) else {return}
+        guard let id = FPSUtils.extractAssetId(at: location) else {
+            PKLog.error("Asset at \(location.absoluteString) is missing the asset id")
+            throw FPSError.missingAssetId(location)
+        }
+        
         let skdUrl = "skd://" + id
         let helper = FPSLicenseHelper(assetId: id, params: drmParams, dataStore: dataStore, forceDownload: true)
         helper?.doneCallback = callback

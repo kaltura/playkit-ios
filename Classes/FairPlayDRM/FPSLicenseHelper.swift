@@ -13,6 +13,8 @@ import Foundation
 import AVFoundation
 import SwiftyJSON
 
+import PlayKitUtils
+
 struct KalturaLicenseResponseContainer: Codable {
     var ckc: String?
     var persistence_duration: TimeInterval?
@@ -24,16 +26,18 @@ class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
     
     func getLicense(spc: Data, assetId: String, requestParams: PKRequestParams, callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
         var request = URLRequest(url: requestParams.url)
+        
+        // uDRM requires application/octet-stream as the content type.
+        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+        
+        // Also add the user agent
+        request.setValue(PlayKitManager.userAgent, forHTTPHeaderField: "User-Agent")
+        
+        // Add other optional headers
         if let headers = requestParams.headers {
             for (header, value) in headers {
                 request.setValue(value, forHTTPHeaderField: header)
             }
-        }
-        
-        // If a specific content-type was requested by the adapter, use it. 
-        // Otherwise, the uDRM requires application/octet-stream.
-        if request.value(forHTTPHeaderField: "Content-Type") == nil {
-            request.addValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
         }
         
         request.httpBody = spc.base64EncodedData()
@@ -42,17 +46,34 @@ class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
         PKLog.debug("Sending SPC to server")
         let startTime = Date.timeIntervalSinceReferenceDate
         let dataTask = URLSession.shared.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) -> Void in
+            
+            if let error = error {
+                callback(nil, 0, FPSError.serverError(error, requestParams.url))
+                return
+            }
+
             do {
                 let endTime: Double = Date.timeIntervalSinceReferenceDate
                 PKLog.debug("Got response in \(endTime-startTime) sec")
                 
-                guard let data = data else {
-                    callback(nil, 0, NSError(domain: "KalturaFairPlayLicenseProvider", code: 1, userInfo: nil))
+                guard let data = data, data.count > 0 else {
+                    callback(nil, 0, FPSError.malformedServerResponse)
                     return
                 }
                 
                 let lic = try JSONDecoder().decode(KalturaLicenseResponseContainer.self, from: data)
-                callback(Data(base64Encoded: lic.ckc ?? ""), lic.persistence_duration ?? 0, nil)
+                
+                guard let ckc = lic.ckc else {
+                    callback(nil, 0, FPSError.noCKCInResponse)
+                    return
+                }
+                
+                guard let ckcData = Data(base64Encoded: ckc) else {
+                    callback(nil, 0, FPSError.malformedCKCInResponse)
+                    return
+                }
+                
+                callback(ckcData, lic.persistence_duration ?? 0, nil)
                 
             } catch let e {
                 callback(nil, 0, e)
@@ -172,6 +193,14 @@ class FPSLicenseHelper {
                 }
                                 
                 if shouldPersist {
+                    
+                    if license.isExpired() {
+                        let error = FPSError.invalidLicenseDuration
+                        request.processContentKeyResponseError(error)
+                        done(error)
+                        return
+                    }
+                    
                     do {
                         let pck = try request.persistableContentKey(fromKeyVendorResponse: license.data, options: nil)
                         license.data = pck

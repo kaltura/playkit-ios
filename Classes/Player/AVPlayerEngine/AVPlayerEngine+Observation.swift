@@ -25,7 +25,8 @@ extension AVPlayerEngine {
             #keyPath(currentItem.isPlaybackBufferEmpty),
             #keyPath(currentItem.isPlaybackBufferFull),
             #keyPath(currentItem.loadedTimeRanges),
-            #keyPath(currentItem.timedMetadata)
+            #keyPath(currentItem.timedMetadata),
+            #keyPath(currentItem.duration)
         ]
     }
     
@@ -178,6 +179,7 @@ extension AVPlayerEngine {
             }
             self.handle(playerItemStatus: newPlayerItemStatus)
         case #keyPath(currentItem.timedMetadata): self.handleTimedMedia()
+        case #keyPath(currentItem.duration): self.handleDurationChanged()
         default: super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
@@ -225,9 +227,10 @@ extension AVPlayerEngine {
         switch status {
         case .readyToPlay:
             PKLog.debug("player is ready to play player items")
-            if self.startPosition > 0 {
+            // Try to set the start position before the player item is ready, to avoid a glitch on VOD
+            if self.duration != 0 {
+                PKLog.debug("duration in seconds: \(duration)")
                 self.currentPosition = self.startPosition
-                self.startPosition = 0
             }
         case .failed:
             PKLog.error("player failed you must recreate the player instance")
@@ -259,10 +262,10 @@ extension AVPlayerEngine {
                     self.handleTracksSelection(tracks)
                     self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
                 })
-                // when player item is readyToPlay for the first time it is safe to assume we have a valid duration.
-                if let duration = self.currentItem?.duration, !CMTIME_IS_INDEFINITE(duration) {
-                    PKLog.debug("duration in seconds: \(CMTimeGetSeconds(duration))")
-                    self.post(event: PlayerEvent.DurationChanged(duration: CMTimeGetSeconds(duration)))
+                // When player item is readyToPlay for the first time it is safe to assume we have a valid duration for VOD.
+                if self.duration != 0 {
+                    PKLog.debug("duration in seconds: \(duration)")
+                    self.currentPosition = self.startPosition
                 }
                 self.post(event: PlayerEvent.LoadedMetadata())
                 self.post(event: PlayerEvent.CanPlay())
@@ -342,6 +345,13 @@ extension AVPlayerEngine {
             handleAutoMode(for: tracks.audioTracks)
         case .selection:
             handleSelectionMode(for: tracks.audioTracks, language: trackSelection.audioSelectionLanguage)
+        }
+    }
+    
+    func handleDurationChanged() {
+        if let duration = self.currentItem?.duration, !CMTIME_IS_INDEFINITE(duration) {
+            PKLog.debug("Duration in seconds: \(CMTimeGetSeconds(duration))")
+            internalDuration = CMTimeGetSeconds(duration)
         }
     }
 }
