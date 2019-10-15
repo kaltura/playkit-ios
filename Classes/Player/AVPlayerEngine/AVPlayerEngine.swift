@@ -92,6 +92,7 @@ public class AVPlayerEngine: AVPlayer {
             return time.isNaN ? 0 : time
         }
         set {
+            if newValue.isNaN { return }
             let duration = self.duration
             let value = newValue > duration ? duration : (newValue < 0 ? 0 : newValue)
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(value, preferredTimescale: self.rangeStart.timescale)
