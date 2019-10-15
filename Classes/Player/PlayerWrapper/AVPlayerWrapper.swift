@@ -47,7 +47,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 guard let self = self else { return }
                 switch settingsType {
                 case .preferredPeakBitRate(let preferredPeakBitRate): 
-                  self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
+                    self.currentPlayer.currentItem?.preferredPeakBitRate = preferredPeakBitRate
                 case .preferredForwardBufferDuration(let preferredForwardBufferDuration):
                     if #available(iOS 10.0, tvOS 10.0, *) {
                         self.currentPlayer.currentItem?.preferredForwardBufferDuration = preferredForwardBufferDuration
