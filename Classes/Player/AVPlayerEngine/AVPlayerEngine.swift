@@ -42,6 +42,14 @@ public class AVPlayerEngine: AVPlayer {
     var tracksManager = TracksManager()
     static var observerContext = 0
     
+    var internalDuration: TimeInterval = 0.0 {
+        didSet {
+            if oldValue != internalDuration {
+                self.post(event: PlayerEvent.DurationChanged(duration: internalDuration))
+            }
+        }
+    }
+    
     var onEventBlock: ((PKEvent) -> Void)?
     
     public weak var view: PlayerView? {
@@ -84,6 +92,8 @@ public class AVPlayerEngine: AVPlayer {
             return time.isNaN ? 0 : time
         }
         set {
+            if newValue.isNaN { return }
+            let duration = self.duration
             let value = newValue > duration ? duration : (newValue < 0 ? 0 : newValue)
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(value, preferredTimescale: self.rangeStart.timescale)
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
@@ -124,7 +134,9 @@ public class AVPlayerEngine: AVPlayer {
         
         PKLog.verbose("get duration: \(result)")
         // in some rare cases duration can be nan, in that case we will return 0.
-        return result.isNaN ? 0.0 : result
+        let duration = result.isNaN ? 0.0 : result
+        internalDuration = duration
+        return duration
     }
     
     var isPlaying: Bool {
