@@ -16,10 +16,36 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     
     var onChange: SettingsChange?
     
+    /// Indicates the desired limit of network bandwidth consumption for this item.
+    ///
+    /// Set preferredPeakBitRate to non-zero to indicate that the player should attempt to limit item playback to that bit rate, expressed in bits per second.
+    /// If network bandwidth consumption cannot be lowered to meet the preferredPeakBitRate, it will be reduced as much as possible while continuing to play the item.
+    ///
+    /// @available(iOS 8.0, *) via AVPlayerItem
     @objc public var preferredPeakBitRate: Double = 0 {
         didSet {
             self.onChange?(.preferredPeakBitRate(preferredPeakBitRate))
         }
+    }
+    
+    /// Indicates the media duration the caller prefers the player to buffer from the network ahead of the playhead to guard against playback disruption.
+    ///
+    /// The value is in seconds. If it is set to 0, the player will choose an appropriate level of buffering for most use cases.
+    /// Note that setting this property to a low value will increase the chance that playback will stall and re-buffer, while setting it to a high value will increase demand on system resources.
+    /// Note that the system may buffer less than the value of this property in order to manage resource consumption.
+    ///
+    /// @available(iOS 10.0, *) via AVPlayerItem
+    @objc public var preferredForwardBufferDuration: Double = 0 {
+        didSet {
+            self.onChange?(.preferredForwardBufferDuration(preferredForwardBufferDuration))
+        }
+    }
+    
+    @objc public func createCopy() -> PKNetworkSettings {
+        let copy = PKNetworkSettings()
+        copy.preferredPeakBitRate = self.preferredPeakBitRate
+        copy.preferredForwardBufferDuration = self.preferredForwardBufferDuration
+        return copy
     }
 }
 
@@ -80,12 +106,6 @@ enum PlayerSettingsType {
     
     @objc public var cea608CaptionsEnabled = false
 
-    @objc public var preferredForwardBufferDuration: Double = 0 {
-        didSet {
-            self.onChange?(.preferredForwardBufferDuration(preferredForwardBufferDuration))
-        }
-    }
-
     /// The settings for network data consumption.
     @objc public var network = PKNetworkSettings()
     @objc public var trackSelection = PKTrackSelectionSettings()
@@ -100,8 +120,7 @@ enum PlayerSettingsType {
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()
         copy.cea608CaptionsEnabled = self.cea608CaptionsEnabled
-        copy.preferredForwardBufferDuration = self.preferredForwardBufferDuration
-        copy.network = self.network
+        copy.network = self.network.createCopy()
         copy.trackSelection = self.trackSelection
         copy.textTrackStyling = self.textTrackStyling
         copy.contentRequestAdapter = self.contentRequestAdapter
