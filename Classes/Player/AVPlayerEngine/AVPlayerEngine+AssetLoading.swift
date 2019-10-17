@@ -79,7 +79,7 @@ extension AVPlayerEngine {
                 playerItem.preferredPeakBitRate = newAsset.playerSettings.network.preferredPeakBitRate
 
                 if #available(iOS 10.0, tvOS 10.0, *) {
-                    playerItem.preferredForwardBufferDuration = newAsset.playerSettings.preferredForwardBufferDuration
+                    playerItem.preferredForwardBufferDuration = newAsset.playerSettings.network.preferredForwardBufferDuration
                 }
 
                 // add observers
