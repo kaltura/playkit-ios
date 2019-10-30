@@ -332,7 +332,7 @@ extension AVPlayerEngine {
         // handle text selection mode, default is to turn subtitles off.
         switch trackSelection.textSelectionMode {
         case .off:
-            guard let track = tracks.textTracks?.first(where: { $0.title == TracksManager.textOffDisplay && $0.language == nil }) else { return }
+            guard let track = tracks.textTracks?.first(where: { $0.title == TracksManager.textOffDisplay && $0.language == nil }) else { break }
             self.selectTrack(trackId: track.id)
         case .auto:
             handleAutoMode(for: tracks.textTracks)
