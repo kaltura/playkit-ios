@@ -224,7 +224,7 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     public func stop() {
-        PKLog.verbose("stop player")
+        PKLog.verbose("Stop player")
         self.pause()
         self.seek(to: CMTime.zero)
         self.replaceCurrentItem(with: nil)
@@ -242,14 +242,14 @@ public class AVPlayerEngine: AVPlayer {
     override public func pause() {
         if self.rate > 0 {
             // Playing, so pause.
-            PKLog.debug("pause player")
+            PKLog.debug("Pause player")
             super.pause()
         }
     }
     
     override public func play() {
         if self.rate == 0 {
-            PKLog.debug("play player")
+            PKLog.debug("Play player")
             self.post(event: PlayerEvent.Play())
             super.play()
         }
@@ -257,7 +257,10 @@ public class AVPlayerEngine: AVPlayer {
     
     func playFromLiveEdge() {
         guard let currentItem = self.currentItem else {
-            PKLog.error("current item is empty")
+            PKLog.error("Current item is empty, can't seek to live edge.")
+            // This will happen only if play is called straight after prepare.
+            // We will let the AVPlayer know that it should play straight away.
+            self.play()
             return
         }
         
@@ -285,7 +288,7 @@ public class AVPlayerEngine: AVPlayer {
     }
     
     func destroy() {
-        PKLog.verbose("destroy player")
+        PKLog.verbose("Destroy player")
         self.onEventBlock = nil
         // removes app state observer
         AppStateSubject.shared.remove(observer: self)
@@ -294,7 +297,7 @@ public class AVPlayerEngine: AVPlayer {
     
     public func selectTrack(trackId: String) {
         guard let currentItem = self.currentItem else {
-            PKLog.error("current item is empty")
+            PKLog.error("Current item is empty")
             return
         }
         
@@ -308,7 +311,7 @@ public class AVPlayerEngine: AVPlayer {
                 }
             }
         } else {
-            PKLog.error("trackId is nil")
+            PKLog.error("TrackId is nil")
         }
     }
     
