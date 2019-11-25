@@ -17,6 +17,8 @@ class FPSAssetLoaderDelegate: NSObject {
     /// The URL scheme for FPS content.
     static let customScheme = "skd"
     
+    fileprivate static let fpsDownloadResourceLoadingRequestQueue = DispatchQueue(label: "com.kaltura.playkit.fps_resourcerequests")
+    
     private let storage: LocalDataStore?
     
     private let drmData: FairPlayDRMParams?
@@ -48,6 +50,7 @@ class FPSAssetLoaderDelegate: NSObject {
     static func configureDownload(asset: AVURLAsset, drmData: FairPlayDRMParams, storage: LocalDataStore) -> FPSAssetLoaderDelegate {
         let delegate = FPSAssetLoaderDelegate.init(drmData: drmData, storage: storage, forceDownload: true)
         
+        asset.resourceLoader.setDelegate(delegate, queue: fpsDownloadResourceLoadingRequestQueue)
         asset.resourceLoader.preloadsEligibleContentKeys = true
         
         return delegate
