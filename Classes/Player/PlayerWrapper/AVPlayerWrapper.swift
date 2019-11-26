@@ -116,7 +116,11 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     }
     
     public func playFromLiveEdge() {
-        self.currentPlayer.playFromLiveEdge()
+        if #available(iOS 10.0, *), let shouldPlayImmediately = settings?.shouldPlayImmediately, shouldPlayImmediately == true {
+            self.currentPlayer.playFromLiveEdgeImmediately(atRate: 1.0)
+        } else {
+            self.currentPlayer.playFromLiveEdge()
+        }
     }
     
     public func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling) {
@@ -188,7 +192,11 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     }
     
     public func play() {
-        self.currentPlayer.play()
+        if #available(iOS 10.0, *), let shouldPlayImmediately = settings?.shouldPlayImmediately, shouldPlayImmediately == true {
+            self.currentPlayer.playImmediately(atRate: 1.0)
+        } else {
+            self.currentPlayer.play()
+        }
     }
     
     public func pause() {

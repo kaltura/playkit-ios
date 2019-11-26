@@ -117,6 +117,8 @@ enum PlayerSettingsType {
     @objc public var fairPlayLicenseProvider: FairPlayLicenseProvider?
     @objc public var allowFairPlayOnExternalScreens = false
     
+    @objc public var shouldPlayImmediately = false
+    
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()
         copy.cea608CaptionsEnabled = self.cea608CaptionsEnabled
