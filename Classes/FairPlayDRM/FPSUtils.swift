@@ -119,12 +119,7 @@ class FPSUtils {
     
     static let skdUrlPattern = try! NSRegularExpression(pattern: "URI=\"skd://([\\w-]+)\"", options: [])
     
-    enum FindResult {
-        case keys([String])
-        case lists([URL])
-    }
-    
-    static func findKeys(url: URL, isMaster: Bool, stopOnKey: Bool = true) -> FindResult? {
+    static func findKeys(url: URL, isMaster: Bool, stopOnKey: Bool = true) -> [String]? {
         
         let playlist: String
         do {
@@ -158,6 +153,7 @@ class FPSUtils {
                 }
             
             } else if isMaster && !trimmed.isEmpty && !trimmed.hasPrefix("#") {
+                // Look for chunk lists too
                 guard let list = URL(string: trimmed, relativeTo: url) else {
                     PKLog.warning("Failed to create URL from \(url) and \(trimmed)")
                     continue
@@ -167,64 +163,37 @@ class FPSUtils {
         }
         
         if keys.count > 0 {
-            return .keys(keys)
+            return keys
         }
-        if lists.count > 0 {
-            return .lists(lists)
+        
+        if isMaster {
+            // If we're in a master playlist and there are chunklists, call this function
+            // recursively to find the keys in chunklists.
+            for list in lists {
+                if let keys = findKeys(url: list, isMaster: false) {
+                    return keys
+                }
+            }
         }
+        
         return nil
     }
-    
-    static func equals(o1: String?, o2: String?) -> Bool {
-        // If both are nil return true.
-        if o1 == nil && o2 == nil {
-            return true
-        }
         
-        // Unwrap. If one is nil return false.
-        guard let o1 = o1, let o2 = o2 else {
-            return false
-        }
-        
-        // Compare
-        return o1 == o2
-    }
-    
     // Find the FairPlay assetId (also called keyId) for a downloaded asset.
     static func extractAssetId(at location: URL) -> String? {
         
         // Require a downloaded asset.
-        if !equals(o1: location.scheme, o2: "file") && !equals(o1: location.host, o2: "localhost") {
+        if !"file".equals(location.scheme) && !"localhost".equals(location.host) {
             PKLog.error("Can only extract assetId from local resources")
             return nil
         }
         
-        guard let result = findKeys(url: location, isMaster: true) else {
-            PKLog.error("No keys and no chunklists")
+        guard let keys = findKeys(url: location, isMaster: true) else {
+            PKLog.error("No keys")
             return nil
         }
         
-        // If result is of type .keys, we have at least one key -- just return it.
-        if case let FindResult.keys(keys) = result {
-            return keys[0]  // findKeys() guarantees at least one key.
-        }
-        
-        // If the master playlist didn't contain the id, maybe the chunklists have it, so look there.
-
-        guard case let FindResult.lists(lists) = result else {
-            PKLog.error("No keys and no chunklists (logic error, we shouldn't be here)")
-            return nil
-        }
-        
-        // Go over all chunklists, load each one until we find a key.
-        for list in lists {
-            guard let result = findKeys(url: list, isMaster: false) else { continue }
-            if case let FindResult.keys(keys) = result {
-                return keys[0]
-            }
-        }
-                
-        return nil
+        return keys[0]  // if keys is not nil, there's at least one key.
     }
     
     static func removeOfflineLicense(for location: URL, dataStore: LocalDataStore) -> Bool {
@@ -264,5 +233,16 @@ extension PKMediaSource {
     
     func isWidevineClassic() -> Bool {
         return mediaFormat == .wvm
+    }
+}
+
+extension String {
+    func equals(_ other: String?) -> Bool {
+        
+        guard let other = other else {
+            return false // other is nil
+        }
+        
+        return self == other
     }
 }
