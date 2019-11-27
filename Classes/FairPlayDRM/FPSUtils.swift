@@ -145,6 +145,8 @@ class FPSUtils {
                 // #EXT-X-KEY:METHOD=SAMPLE-AES,URI="skd://entry-1_mq299xmb",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
                 guard let match = skdUrlPattern.firstMatch(in: line, options: [], range: NSMakeRange(0, line.count)) else { continue }
                 if match.numberOfRanges < 2 { continue }
+                
+                // Extract the actual assetId from the match (see pattern).
                 let assetIdRange = match.range(at: 1)
                 let start = line.index(line.startIndex, offsetBy: assetIdRange.location)
                 let end = line.index(line.startIndex, offsetBy: assetIdRange.location + assetIdRange.length - 1)
@@ -188,8 +190,10 @@ class FPSUtils {
         return o1 == o2
     }
     
+    // Find the FairPlay assetId (also called keyId) for a downloaded asset.
     static func extractAssetId(at location: URL) -> String? {
         
+        // Require a downloaded asset.
         if !equals(o1: location.scheme, o2: "file") && !equals(o1: location.host, o2: "localhost") {
             PKLog.error("Can only extract assetId from local resources")
             return nil
@@ -200,16 +204,19 @@ class FPSUtils {
             return nil
         }
         
+        // If result is of type .keys, we have at least one key -- just return it.
         if case let FindResult.keys(keys) = result {
-            return keys[0]
+            return keys[0]  // findKeys() guarantees at least one key.
         }
         
-        // No keys - look in the chunk lists
+        // If the master playlist didn't contain the id, maybe the chunklists have it, so look there.
+
         guard case let FindResult.lists(lists) = result else {
             PKLog.error("No keys and no chunklists (logic error, we shouldn't be here)")
             return nil
         }
         
+        // Go over all chunklists, load each one until we find a key.
         for list in lists {
             guard let result = findKeys(url: list, isMaster: false) else { continue }
             if case let FindResult.keys(keys) = result {
