@@ -255,12 +255,19 @@ public class AVPlayerEngine: AVPlayer {
         }
     }
     
-    func playFromLiveEdge() {
+    @available(iOS 10.0, *)
+    override public func playImmediately(atRate rate: Float) {
+        if self.rate == 0 {
+            PKLog.debug("Play immediately player")
+            self.post(event: PlayerEvent.Play())
+            
+            super.playImmediately(atRate: rate)
+        }
+    }
+    
+    private func seekToLiveEdge() {
         guard let currentItem = self.currentItem else {
             PKLog.error("Current item is empty, can't seek to live edge.")
-            // This will happen only if play is called straight after prepare.
-            // We will let the AVPlayer know that it should play straight away.
-            self.play()
             return
         }
         
@@ -284,7 +291,17 @@ public class AVPlayerEngine: AVPlayer {
                 PKLog.debug("Seekable range is invalid")
             }
         }
+    }
+    
+    func playFromLiveEdge() {
+        seekToLiveEdge()
         self.play()
+    }
+    
+    @available(iOS 10.0, *)
+    func playFromLiveEdgeImmediately(atRate rate: Float) {
+        seekToLiveEdge()
+        self.playImmediately(atRate: rate)
     }
     
     func destroy() {

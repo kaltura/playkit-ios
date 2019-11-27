@@ -117,6 +117,12 @@ enum PlayerSettingsType {
     @objc public var fairPlayLicenseProvider: FairPlayLicenseProvider?
     @objc public var allowFairPlayOnExternalScreens = false
     
+    /// If this value is set to true, playImmediatelyAtRate will be called.
+    /// When the player's currentItem has a value of NO for playbackBufferEmpty, this method causes the value of rate to change to the specified rate, the value of timeControlStatus to change to AVPlayerTimeControlStatusPlaying, and the receiver to play the available media immediately, whether or not prior buffering of media data is sufficient to ensure smooth playback.
+    /// If insufficient media data is buffered for playback to start (e.g. if the current item has a value of YES for playbackBufferEmpty), the receiver will act as if the buffer became empty during playback, except that no AVPlayerItemPlaybackStalledNotification will be posted.
+    /// @available(iOS 10.0, *)
+    @objc public var shouldPlayImmediately = false
+    
     @objc public func createCopy() -> PKPlayerSettings {
         let copy = PKPlayerSettings()
         copy.cea608CaptionsEnabled = self.cea608CaptionsEnabled
