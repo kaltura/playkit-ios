@@ -119,31 +119,104 @@ class FPSUtils {
     
     static let skdUrlPattern = try! NSRegularExpression(pattern: "URI=\"skd://([\\w-]+)\"", options: [])
     
-    static func extractAssetId(at location: URL) -> String? {
-        // Master should have the following line:
-        // #EXT-X-SESSION-KEY:METHOD=SAMPLE-AES,URI="skd://entry-1_x14v3p06",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
-        // The following code looks for the first line with "EXT-X-SESSION-KEY" tag.
-        guard let master = try? String(contentsOf: location) else { 
-            PKLog.error("Can't read master playlist \(location)"); 
-            return nil 
+    enum FindResult {
+        case keys([String])
+        case lists([URL])
+    }
+    
+    static func findKeys(url: URL, isMaster: Bool, stopOnKey: Bool = true) -> FindResult? {
+        
+        let playlist: String
+        do {
+            playlist = try String(contentsOf: url)
+        } catch {
+            PKLog.error("Can't read playlist at \(url)"); 
+            return nil
         }
         
-        let lines = master.components(separatedBy: .newlines)
-        var assetId: String? = nil
-        
-        for line in lines {
-            if line.trimmingCharacters(in: .whitespaces).hasPrefix("#EXT-X-SESSION-KEY") {
+        var keys = [String]()
+        var lists = [URL]()
+
+        for line in playlist.components(separatedBy: .newlines) {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.hasPrefix("#EXT-X-SESSION-KEY") || trimmed.hasPrefix("#EXT-X-KEY") {
+                // #EXT-X-SESSION-KEY:METHOD=SAMPLE-AES,URI="skd://entry-1_x14v3p06",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
+                // - OR -
+                // #EXT-X-KEY:METHOD=SAMPLE-AES,URI="skd://entry-1_mq299xmb",KEYFORMAT="com.apple.streamingkeydelivery",KEYFORMATVERSIONS="1"
                 guard let match = skdUrlPattern.firstMatch(in: line, options: [], range: NSMakeRange(0, line.count)) else { continue }
                 if match.numberOfRanges < 2 { continue }
                 let assetIdRange = match.range(at: 1)
                 let start = line.index(line.startIndex, offsetBy: assetIdRange.location)
                 let end = line.index(line.startIndex, offsetBy: assetIdRange.location + assetIdRange.length - 1)
-                assetId = String(line[start...end])
+                let assetId = String(line[start...end])
                 
-                return assetId
+                keys.append(assetId)
+                if stopOnKey {
+                    break
+                }
+            
+            } else if isMaster && !trimmed.isEmpty && !trimmed.hasPrefix("#") {
+                guard let list = URL(string: trimmed, relativeTo: url) else {
+                    PKLog.warning("Failed to create URL from \(url) and \(trimmed)")
+                    continue
+                }
+                lists.append(list)
             }
         }
         
+        if keys.count > 0 {
+            return .keys(keys)
+        }
+        if lists.count > 0 {
+            return .lists(lists)
+        }
+        return nil
+    }
+    
+    static func equals(o1: String?, o2: String?) -> Bool {
+        // If both are nil return true.
+        if o1 == nil && o2 == nil {
+            return true
+        }
+        
+        // Unwrap. If one is nil return false.
+        guard let o1 = o1, let o2 = o2 else {
+            return false
+        }
+        
+        // Compare
+        return o1 == o2
+    }
+    
+    static func extractAssetId(at location: URL) -> String? {
+        
+        if !equals(o1: location.scheme, o2: "file") && !equals(o1: location.host, o2: "localhost") {
+            PKLog.error("Can only extract assetId from local resources")
+            return nil
+        }
+        
+        guard let result = findKeys(url: location, isMaster: true) else {
+            PKLog.error("No keys and no chunklists")
+            return nil
+        }
+        
+        if case let FindResult.keys(keys) = result {
+            return keys[0]
+        }
+        
+        // No keys - look in the chunk lists
+        guard case let FindResult.lists(lists) = result else {
+            PKLog.error("No keys and no chunklists (logic error, we shouldn't be here)")
+            return nil
+        }
+        
+        for list in lists {
+            guard let result = findKeys(url: list, isMaster: false) else { continue }
+            if case let FindResult.keys(keys) = result {
+                return keys[0]
+            }
+        }
+                
         return nil
     }
     
