@@ -39,7 +39,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     var settings: PKPlayerSettings? {
         didSet {
             guard let settings = self.settings else {
-                PKLog.error("settings are not set")
+                PKLog.error("Settings are not set")
                 return
             }
             
@@ -51,6 +51,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 case .preferredForwardBufferDuration(let preferredForwardBufferDuration):
                     if #available(iOS 10.0, tvOS 10.0, *) {
                         self.currentPlayer.currentItem?.preferredForwardBufferDuration = preferredForwardBufferDuration
+                    }
+                case .automaticallyWaitsToMinimizeStalling(let automaticallyWaitsToMinimizeStalling):
+                    if #available(iOS 10.0, *) {
+                        self.currentPlayer.automaticallyWaitsToMinimizeStalling = automaticallyWaitsToMinimizeStalling
                     }
                 }
             }
@@ -241,11 +245,15 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             }
             
             guard let settings = self.settings else {
-                PKLog.error("settings are not set")
+                PKLog.error("Settings are not set")
                 return
             }
             
             self.currentPlayer.usesExternalPlaybackWhileExternalScreenIsActive = settings.allowFairPlayOnExternalScreens
+            
+            if #available(iOS 10.0, *) {
+                self.currentPlayer.automaticallyWaitsToMinimizeStalling = settings.network.automaticallyWaitsToMinimizeStalling
+            }
             
             let asset = PKAsset(avAsset: assetToPrepare, playerSettings: settings)
             self.currentPlayer.asset = asset

@@ -41,10 +41,22 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
         }
     }
     
+    /// Indicates that the player is allowed to delay playback at the specified rate in order to minimize stalling
+    ///
+    /// For further details please see Apple's documentation: https://developer.apple.com/documentation/avfoundation/avplayer/1643482-automaticallywaitstominimizestal
+    ///
+    /// @available(iOS 10.0, *) via AVPlayer
+    @objc public var automaticallyWaitsToMinimizeStalling = true {
+        didSet {
+            self.onChange?(.automaticallyWaitsToMinimizeStalling(automaticallyWaitsToMinimizeStalling))
+        }
+    }
+    
     @objc public func createCopy() -> PKNetworkSettings {
         let copy = PKNetworkSettings()
         copy.preferredPeakBitRate = self.preferredPeakBitRate
         copy.preferredForwardBufferDuration = self.preferredForwardBufferDuration
+        copy.automaticallyWaitsToMinimizeStalling = self.automaticallyWaitsToMinimizeStalling
         return copy
     }
 }
@@ -89,6 +101,7 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
 enum PlayerSettingsType {
     case preferredPeakBitRate(Double)
     case preferredForwardBufferDuration(Double)
+    case automaticallyWaitsToMinimizeStalling(Bool)
 }
 
 /************************************************************/
