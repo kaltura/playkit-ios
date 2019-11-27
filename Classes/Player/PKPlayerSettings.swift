@@ -43,14 +43,11 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     
     /// Indicates that the player is allowed to delay playback at the specified rate in order to minimize stalling
     ///
-    /// When this property is YES, whenever 1) the rate is set from zero to non-zero or 2) the playback buffer becomes empty and playback stalls, the player will attempt to determine if, at the specified rate, its currentItem will play to the end without interruptions. Should it determine that such interruptions would occur and these interruptions can be avoided by delaying the start or resumption of playback, the value of timeControlStatus will become AVPlayerTimeControlStatusWaitingToPlayAtSpecifiedRate and playback will start automatically when the likelihood of stalling has been minimized.
-    ///
-    /// You may want to set this property to NO when you need precise control over playback start times, e.g., when synchronizing multiple instances of AVPlayer. If the value of this property is NO, reasonForWaitingToPlay cannot assume a value of AVPlayerWaitingToMinimizeStallsReason. This implies that setting rate to a non-zero value in AVPlayerTimeControlStatusPaused will cause playback to start immediately as long as the playback buffer is not empty. When the playback buffer becomes empty during AVPlayerTimeControlStatusPlaying and playback stalls, playback state will switch to AVPlayerTimeControlStatusPaused and the rate will become 0.0.
+    /// For further details please see Apple's documentation: https://developer.apple.com/documentation/avfoundation/avplayer/1643482-automaticallywaitstominimizestal
     ///
     /// @available(iOS 10.0, *) via AVPlayer
     @objc public var automaticallyWaitsToMinimizeStalling = true {
         didSet {
-            print("Nilit did set \(automaticallyWaitsToMinimizeStalling)")
             self.onChange?(.automaticallyWaitsToMinimizeStalling(automaticallyWaitsToMinimizeStalling))
         }
     }
