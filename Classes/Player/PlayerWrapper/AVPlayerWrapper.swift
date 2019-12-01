@@ -53,7 +53,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                         self.currentPlayer.currentItem?.preferredForwardBufferDuration = preferredForwardBufferDuration
                     }
                 case .automaticallyWaitsToMinimizeStalling(let automaticallyWaitsToMinimizeStalling):
-                    if #available(iOS 10.0, *) {
+                    if #available(iOS 10.0, tvOS 10.0, *) {
                         self.currentPlayer.automaticallyWaitsToMinimizeStalling = automaticallyWaitsToMinimizeStalling
                     }
                 }
@@ -120,7 +120,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     }
     
     public func playFromLiveEdge() {
-        if #available(iOS 10.0, *), let shouldPlayImmediately = settings?.shouldPlayImmediately, shouldPlayImmediately == true {
+        if #available(iOS 10.0, tvOS 10.0, *), let shouldPlayImmediately = settings?.shouldPlayImmediately, shouldPlayImmediately == true {
             self.currentPlayer.playFromLiveEdgeImmediately(atRate: 1.0)
         } else {
             self.currentPlayer.playFromLiveEdge()
@@ -196,7 +196,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     }
     
     public func play() {
-        if #available(iOS 10.0, *), let shouldPlayImmediately = settings?.shouldPlayImmediately, shouldPlayImmediately == true {
+        if #available(iOS 10.0, tvOS 10.0, *), let shouldPlayImmediately = settings?.shouldPlayImmediately, shouldPlayImmediately == true {
             self.currentPlayer.playImmediately(atRate: 1.0)
         } else {
             self.currentPlayer.play()
@@ -251,7 +251,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             
             self.currentPlayer.usesExternalPlaybackWhileExternalScreenIsActive = settings.allowFairPlayOnExternalScreens
             
-            if #available(iOS 10.0, *) {
+            if #available(iOS 10.0, tvOS 10.0, *) {
                 self.currentPlayer.automaticallyWaitsToMinimizeStalling = settings.network.automaticallyWaitsToMinimizeStalling
             }
             
