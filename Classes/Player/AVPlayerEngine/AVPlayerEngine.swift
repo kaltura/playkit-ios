@@ -255,7 +255,7 @@ public class AVPlayerEngine: AVPlayer {
         }
     }
     
-    @available(iOS 10.0, *)
+    @available(iOS 10.0, tvOS 10.0,  *)
     override public func playImmediately(atRate rate: Float) {
         if self.rate == 0 {
             PKLog.debug("Play immediately player")
@@ -298,7 +298,7 @@ public class AVPlayerEngine: AVPlayer {
         self.play()
     }
     
-    @available(iOS 10.0, *)
+    @available(iOS 10.0, tvOS 10.0, *)
     func playFromLiveEdgeImmediately(atRate rate: Float) {
         seekToLiveEdge()
         self.playImmediately(atRate: rate)
