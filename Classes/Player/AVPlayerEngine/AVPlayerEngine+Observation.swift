@@ -222,6 +222,10 @@ extension AVPlayerEngine {
     /// Handles changes in player rate
     private func handleRate() {
         PKLog.debug("player rate was changed, now: \(self.rate)")
+        // When setting automaticallyWaitsToMinimizeStalling and shouldPlayImmediately, the player may be stalled and the rate will be changed to 0, player paused, by the AVPlayer. Therefor we are sending a paused event.
+        if self.rate == 0, self.currentState == .buffering || self.currentState == .ready {
+            self.post(event: PlayerEvent.Pause())
+        }
     }
     
     private func handle(status: AVPlayer.Status) {
