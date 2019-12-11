@@ -46,11 +46,20 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     /// For further details please see Apple's documentation: https://developer.apple.com/documentation/avfoundation/avplayer/1643482-automaticallywaitstominimizestal
     ///
     /// @available(iOS 10.0, *) via AVPlayer
-    @objc public var automaticallyWaitsToMinimizeStalling = true {
+    @objc public var automaticallyWaitsToMinimizeStalling: Bool = true {
         didSet {
             self.onChange?(.automaticallyWaitsToMinimizeStalling(automaticallyWaitsToMinimizeStalling))
         }
     }
+    
+    /// Tells the player whether or not to buffer the media, or stop after initializing the asset and fetching the keys.
+    ///
+    /// Default value is true, initialize the asset, fetch the keys and buffer the media.
+    /// If the value is set to false, the player will stop after initializing the asset and fetching the keys. A manual call to player startBuffering is needed.
+    ///
+    /// This comes in handy when you would like to divide between the views and initialize the media before the user interacts with the player to show it, start buffering and playing.
+    /// In another case if you would like to start initializing the next media without buffering it, so that once the media is switched to the next one, it will be smother.
+    @objc public var autoBuffer: Bool = true
     
     @objc public func createCopy() -> PKNetworkSettings {
         let copy = PKNetworkSettings()
@@ -90,10 +99,10 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
 }
 
 @objc public class PKTrackSelectionSettings: NSObject {
-    // text selection settings
+    // Text selection settings
     @objc public var textSelectionMode: TrackSelectionMode = .off
     @objc public var textSelectionLanguage: String?
-    // audio selection settings
+    // Audio selection settings
     @objc public var audioSelectionMode: TrackSelectionMode = .off
     @objc public var audioSelectionLanguage: String?
 }

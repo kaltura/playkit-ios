@@ -72,7 +72,7 @@ extension AVPlayerEngine {
         if let playerItem = notification.object as? AVPlayerItem, let accessLog = playerItem.accessLog(),
             let lastEvent = accessLog.events.last, playerItem === self.currentItem {
             if #available(iOS 10.0, tvOS 10.0, *) {
-                PKLog.verbose("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)")
+                PKLog.debug("event log:\n event log: averageAudioBitrate - \(lastEvent.averageAudioBitrate)\n event log: averageVideoBitrate - \(lastEvent.averageVideoBitrate)\n event log: indicatedAverageBitrate - \(lastEvent.indicatedAverageBitrate)\n event log: indicatedBitrate - \(lastEvent.indicatedBitrate)\n event log: observedBitrate - \(lastEvent.observedBitrate)\n event log: observedMaxBitrate - \(lastEvent.observedMaxBitrate)\n event log: observedMinBitrate - \(lastEvent.observedMinBitrate)\n event log: switchBitrate - \(lastEvent.switchBitrate)\n event log: numberOfBytesTransferred - \(lastEvent.numberOfBytesTransferred)\n event log: numberOfStalls - \(lastEvent.numberOfStalls)\n event log: URI - \(String(describing: lastEvent.uri))\n event log: startupTime - \(lastEvent.startupTime)")
             }
             
             self.post(event: PlayerEvent.PlaybackInfo(playbackInfo: PKPlaybackInfo(logEvent: lastEvent)))
@@ -143,19 +143,16 @@ extension AVPlayerEngine {
         switch keyPath {
         case #keyPath(currentItem.isPlaybackLikelyToKeepUp):
             guard let isPlaybackLikelyToKeepUp = currentItem?.isPlaybackLikelyToKeepUp else { return }
-            
             if (isPlaybackLikelyToKeepUp) {
                 self.handleLikelyToKeepUp()
             }
         case #keyPath(currentItem.isPlaybackBufferEmpty):
             guard let isPlaybackBufferEmpty = currentItem?.isPlaybackBufferEmpty else { return }
-            
             if (isPlaybackBufferEmpty) {
                 self.handleBufferEmptyChange()
             }
         case #keyPath(currentItem.isPlaybackBufferFull):
             guard let isPlaybackBufferFull = currentItem?.isPlaybackBufferFull else { return }
-            
             if (isPlaybackBufferFull) {
                 PKLog.debug("Buffer Full")
             }
@@ -164,22 +161,26 @@ extension AVPlayerEngine {
             // convert values to PKTimeRange
             let timeRanges = loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
             self.post(event: PlayerEvent.LoadedTimeRanges(timeRanges: timeRanges))
-        case #keyPath(rate): self.handleRate()
+        case #keyPath(rate):
+            self.handleRate()
         case #keyPath(status):
             guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerStatus = AVPlayer.Status(rawValue: statusChange.intValue) else {
                 PKLog.error("unknown player status")
                 return
             }
             self.handle(status: newPlayerStatus)
-        case #keyPath(currentItem): self.handleItemChange()
+        case #keyPath(currentItem):
+            self.handleItemChange()
         case #keyPath(currentItem.status):
             guard let statusChange = change?[.newKey] as? NSNumber, let newPlayerItemStatus = AVPlayerItem.Status(rawValue: statusChange.intValue) else {
                 PKLog.error("unknown player item status")
                 return
             }
             self.handle(playerItemStatus: newPlayerItemStatus)
-        case #keyPath(currentItem.timedMetadata): self.handleTimedMedia()
-        case #keyPath(currentItem.duration): self.handleDurationChanged()
+        case #keyPath(currentItem.timedMetadata):
+            self.handleTimedMedia()
+        case #keyPath(currentItem.duration):
+            self.handleDurationChanged()
         default: super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
@@ -202,7 +203,7 @@ extension AVPlayerEngine {
     
     /// Handles changes in player timebase
     @objc func timebaseChanged(notification: Notification) {
-        // for some reason timebase rate changed is received on a background thread.
+        // For some reason timebase rate changed is received on a background thread.
         // in order to check self.rate we must make sure we are on the main thread.
         DispatchQueue.main.async {
             guard let timebase = self.currentItem?.timebase else { return }
@@ -213,7 +214,7 @@ extension AVPlayerEngine {
             } else if timebaseRate == 0 && self.rate == 0 && self.lastTimebaseRate != timebaseRate {
                 self.post(event: PlayerEvent.Pause())
             }
-            // make sure to save the last value so we could only post events only when currentTimebase != lastTimebase
+            // Make sure to save the last value so we could only post events only when currentTimebase != lastTimebase
             self.lastTimebaseRate = timebaseRate
         }
     }

@@ -62,10 +62,33 @@ public class AVPlayerEngine: AVPlayer {
         return view?.playerLayer
     }
 
-    var asset: PKAsset? {
+    @objc var asset: PKAsset? {
+        willSet {
+            assetStatusObservation?.invalidate()
+        }
         didSet {
+            assetStatusObservation = observe(\.asset?.status,
+                                             changeHandler: { [weak self] (object, change) in
+                                                guard let self = self else { return }
+                                                guard let asset = self.asset else { return }
+                                                PKLog.debug("The asset status changed to: \(asset.status)")
+                                                if asset.status == .prepared, self.shouldStartBuffering == true {
+                                                    self.initializePlayerItem(asset)
+                                                }
+            })
+            
             guard let newAsset = asset else { return }
             self.asynchronouslyLoadURLAsset(newAsset)
+        }
+    }
+    var assetStatusObservation: NSKeyValueObservation?
+    
+    /// Indicates if the startBuffering was called
+    var shouldStartBuffering: Bool = false {
+        didSet {
+            if shouldStartBuffering == true, self.currentItem == nil, let asset = asset, asset.status == .prepared {
+                initializePlayerItem(asset)
+            }
         }
     }
     
@@ -228,6 +251,7 @@ public class AVPlayerEngine: AVPlayer {
         self.pause()
         self.seek(to: CMTime.zero)
         self.replaceCurrentItem(with: nil)
+        self.shouldStartBuffering = false
         self.post(event: PlayerEvent.Stopped())
     }
     

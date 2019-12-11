@@ -68,6 +68,11 @@ import Foundation
     /// Release the player's resources.
     @objc func destroy()
     
-    /// Prepare for playing an entry. Play when it's ready. Preparing starts buffering the entry.
+    /// Prepare for playing an entry.
+    /// If player network setting autoBuffer is set to true, prepare starts buffering the entry.
+    /// Otherwise, if autoBuffer is set to false, need to call startBuffering manually.
     @objc func prepare(_ config: MediaConfig)
+    
+    /// Starts buffering the entry.
+    @objc func startBuffering()
 }

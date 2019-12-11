@@ -104,7 +104,6 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     }
     
     open func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
-        
         guard let mediaSrc = mediaSource else {
             PKLog.error("Media Source is empty")
             return
@@ -255,7 +254,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 self.currentPlayer.automaticallyWaitsToMinimizeStalling = settings.network.automaticallyWaitsToMinimizeStalling
             }
             
-            let asset = PKAsset(avAsset: assetToPrepare, playerSettings: settings)
+            let asset = PKAsset(avAsset: assetToPrepare, playerSettings: settings, autoBuffer: settings.network.autoBuffer)
             self.currentPlayer.asset = asset
             
             if DRMSupport.widevineClassicHandler != nil {
@@ -263,6 +262,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 self.addAssetRefreshObservers()
             }
         }
+    }
+    
+    public func startBuffering() {
+        currentPlayer.shouldStartBuffering = true
     }
 }
 

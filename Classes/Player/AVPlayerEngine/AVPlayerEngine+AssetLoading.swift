@@ -14,15 +14,35 @@ import AVFoundation
 extension AVPlayerEngine {
     
     override public func replaceCurrentItem(with item: AVPlayerItem?) {
-        // when changing asset reset last timebase
+        // When changing asset, reset last timebase.
         self.lastTimebaseRate = 0
-        // When changing media (loading new asset) we want to reset isFirstReady in order to receive `CanPlay` & `LoadedMetadata` accuratly.
+        // When changing media (loading new asset) we want to reset isFirstReady, in order to receive `CanPlay` & `LoadedMetadata` accurately.
         self.isFirstReady = true
         self.lastIndicatedBitrate = 0
         super.replaceCurrentItem(with: item)
     }
     
+    func initializePlayerItem(_ newAsset: PKAsset) {
+        /*
+         We can play this asset. Create a new `AVPlayerItem` and make
+         it our player's current item.
+         */
+        let playerItem = AVPlayerItem(asset: newAsset.avAsset)
+        playerItem.preferredPeakBitRate = newAsset.playerSettings.network.preferredPeakBitRate
+
+        if #available(iOS 10.0, tvOS 10.0, *) {
+            playerItem.preferredForwardBufferDuration = newAsset.playerSettings.network.preferredForwardBufferDuration
+        }
+
+        // Add observers
+        self.removeObservers()
+        self.addObservers()
+        // Update the player with the new player item
+        self.replaceCurrentItem(with: playerItem)
+    }
+    
     func asynchronouslyLoadURLAsset(_ newAsset: PKAsset) {
+        newAsset.status = .preparing
         /*
          Using AVAsset now runs the risk of blocking the current thread (the
          main UI thread) whilst I/O happens to populate the properties. It's
@@ -50,6 +70,7 @@ extension AVPlayerEngine {
                     var error: NSError?
                     
                     if newAsset.avAsset.statusOfValue(forKey: key, error: &error) == .failed {
+                        newAsset.status = .faild
                         let stringFormat = NSLocalizedString("error.asset_key_%@_failed.description", comment: "Can't use this AVAsset because one of its keys failed to load")
                         
                         let message = String.localizedStringWithFormat(stringFormat, key)
@@ -63,6 +84,7 @@ extension AVPlayerEngine {
                 
                 // We can't play this asset.
                 if !newAsset.avAsset.isPlayable {
+                    newAsset.status = .faild
                     let message = NSLocalizedString("error.asset_not_playable.description", comment: "Can't use this AVAsset because it isn't playable")
                     
                     PKLog.error(message)
@@ -71,22 +93,15 @@ extension AVPlayerEngine {
                     return
                 }
                 
+                newAsset.status = .prepared
                 /*
-                 We can play this asset. Create a new `AVPlayerItem` and make
-                 it our player's current item.
-                 */
-                let playerItem = AVPlayerItem(asset: newAsset.avAsset)
-                playerItem.preferredPeakBitRate = newAsset.playerSettings.network.preferredPeakBitRate
-
-                if #available(iOS 10.0, tvOS 10.0, *) {
-                    playerItem.preferredForwardBufferDuration = newAsset.playerSettings.network.preferredForwardBufferDuration
+                We can play this asset.
+                If we are set to autoBuffer, create a new `AVPlayerItem` and make
+                it our player's current item.
+                */
+                if newAsset.autoBuffer {
+                    self.initializePlayerItem(newAsset)
                 }
-
-                // add observers
-                self.removeObservers()
-                self.addObservers()
-                // update the player with the new player item
-                self.replaceCurrentItem(with: playerItem)
             }
         }
     }

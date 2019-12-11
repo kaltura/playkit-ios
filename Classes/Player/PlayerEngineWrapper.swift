@@ -157,4 +157,8 @@ public class PlayerEngineWrapper: NSObject, PlayerEngine {
     public func prepare(_ config: MediaConfig) {
         playerEngine?.prepare(config)
     }
+    
+    public func startBuffering() {
+        playerEngine?.startBuffering()
+    }
 }

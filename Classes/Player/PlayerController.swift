@@ -264,6 +264,10 @@ class PlayerController: NSObject, Player {
         }
     }
     
+    func startBuffering() {
+        currentPlayer.startBuffering()
+    }
+    
     // ****************************************** //
     // MARK: - Private Functions
     // ****************************************** //
