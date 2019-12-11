@@ -195,4 +195,8 @@ import AVKit
     open func prepare(_ config: MediaConfig) {
         self.player.prepare(config)
     }
+    
+    public func startBuffering() {
+        self.player.startBuffering()
+    }
 }

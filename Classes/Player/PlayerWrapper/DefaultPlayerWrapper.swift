@@ -165,6 +165,10 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
+    func startBuffering() {
+        printInvocationWarning("\(#function)")
+    }
+    
     // ***************************** //
     // MARK: - Time Observation
     // ***************************** //
