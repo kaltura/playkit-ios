@@ -32,7 +32,7 @@ import PlayKitUtils
     @objc(sharedInstance) public static let shared: PlayKitManager = PlayKitManager()
     
     
-    internal static let userAgent = UserAgent.build(clientTag: clientTag)
+    public static let userAgent = UserAgent.build(clientTag: clientTag)
     
     var pluginRegistry = Dictionary<String, PKPlugin.Type>()
     
