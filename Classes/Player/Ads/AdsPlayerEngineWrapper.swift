@@ -111,6 +111,10 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
         self.adsPlugin.didRequestPlay(ofType: .play)
     }
     
+    override public func playFromLiveEdge() {
+        play()
+    }
+    
     override public func resume() {
         self.isPlayEnabled = true
         self.adsPlugin.didRequestPlay(ofType: .resume)
