@@ -242,8 +242,15 @@ public class AVPlayerEngine: AVPlayer {
     
     deinit {
         PKLog.debug("\(String(describing: type(of: self))), was deinitialized")
-        // removes the observers only on deinit to prevent chances of being removed twice.
+        // Removes the observers only on deinit to prevent chances of being removed twice.
         self.removeObservers()
+        
+        // There is a crash with the release of the KVO observer on previous versions up to iOS 11.3.
+        if #available(iOS 11.3, *) {
+            // No need to do anything, from iOS 11.3 the bug was fixed and the KVO observer is released.
+        } else if let observer = assetStatusObservation {
+            removeObserver(observer, forKeyPath: "asset.status")
+        }
     }
     
     public func stop() {
