@@ -131,6 +131,10 @@ class PlayerController: NSObject, Player {
             return PKVRController(player: self.currentPlayer)
         }
         
+        if type is PKAVController.Type && self.currentPlayer is AVPlayerWrapper {
+            return PKAVController(player: self.currentPlayer)
+        }
+        
         return nil
     }
     
