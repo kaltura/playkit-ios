@@ -42,7 +42,7 @@ import AVFoundation
     @objc public static let seeking: PlayerEvent.Type = Seeking.self
     /// Sent when a seek operation completes.
     @objc public static let seeked: PlayerEvent.Type = Seeked.self
-    /// Sent when a replay operation performed
+    /// Sent when a replay operation is performed.
     @objc public static let replay: PlayerEvent.Type = Replay.self
     /// Sent when tracks available.
     @objc public static let tracksAvailable: PlayerEvent.Type = TracksAvailable.self
@@ -61,7 +61,7 @@ import AVFoundation
     /// Sent when source was selected.
     @objc public static let sourceSelected: PlayerEvent.Type = SourceSelected.self
     /// Sent when loaded time ranges was changed, loaded time ranges represent the buffered content.
-    /// could be used to show amount buffered on the playhead UI.
+    /// Could be used to show amount buffered on the playhead UI.
     @objc public static let loadedTimeRanges: PlayerEvent.Type = LoadedTimeRanges.self
     /// Sent when the playhead (current time) has moved.
     @objc public static let playheadUpdate: PlayerEvent.Type = PlayheadUpdate.self
