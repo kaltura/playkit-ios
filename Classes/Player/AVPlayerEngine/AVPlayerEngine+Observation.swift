@@ -296,9 +296,14 @@ extension AVPlayerEngine {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         
-        // Update new current item with the text track styling which was set.
-        if let textTrackStyling = self.asset?.playerSettings.textTrackStyling {
+        // Update new current item with the text track styling which was set, when we have a currentItem.
+        if currentItem != nil, let textTrackStyling = self.asset?.playerSettings.textTrackStyling {
             self.updateTextTrackStyling(textTrackStyling)
+        }
+        
+        // If seek to live edge was triggered, perform it when we have a currentItem.
+        if currentItem != nil, seekToLiveEdgeTriggered {
+            self.seekToLiveEdge()
         }
     }
     
