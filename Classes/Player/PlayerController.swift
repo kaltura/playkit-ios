@@ -247,11 +247,12 @@ class PlayerController: NSObject, Player {
     }
     
     func pause() {
-        self.currentPlayer.pause()
-        
-        if mediaEntry?.mediaType == .dvrLive {
+        // Save the paused position only if the player is playing, not every time the pause is called.
+        if mediaEntry?.mediaType == .dvrLive, currentPlayer.isPlaying {
             liveDVRPausedPosition = PausePosition(currentTime)
         }
+        
+        self.currentPlayer.pause()
     }
     
     func resume() {
