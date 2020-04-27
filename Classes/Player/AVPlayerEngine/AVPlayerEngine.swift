@@ -41,6 +41,8 @@ public class AVPlayerEngine: AVPlayer {
     var currentState: PlayerState = PlayerState.idle
     var tracksManager = TracksManager()
     static var observerContext = 0
+    /// Indicates if a seek to live edge was triggered prior setting the current item
+    var seekToLiveEdgeTriggered = false
     
     var internalDuration: TimeInterval = 0.0 {
         didSet {
@@ -297,11 +299,15 @@ public class AVPlayerEngine: AVPlayer {
         }
     }
     
-    private func seekToLiveEdge() {
+    func seekToLiveEdge() {
         guard let currentItem = self.currentItem else {
-            PKLog.error("Current item is empty, can't seek to live edge.")
+            seekToLiveEdgeTriggered = true
+            PKLog.error("Current item is empty, postpond seek to live edge.")
             return
         }
+        
+        seekToLiveEdgeTriggered = false
+        PKLog.debug("Calculating seek to live edge")
         
         let seekableRanges = currentItem.seekableTimeRanges
         if seekableRanges.count > 0 {
