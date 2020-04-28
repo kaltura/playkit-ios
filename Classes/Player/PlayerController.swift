@@ -394,9 +394,11 @@ class PlayerController: NSObject, Player {
             // After Setting PlayerWrapper set saved player's params
             self.currentPlayer.onEventBlock = eventBlock
             self.currentPlayer.view = playerView
-            self.currentPlayer.mediaConfig = mediaConfig
         }
         
+        // Update the mediaConfig
+        self.currentPlayer.mediaConfig = mediaConfig
+       
         // Reset the pause position
         liveDVRPausedPosition = nil
         
