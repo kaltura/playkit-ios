@@ -96,11 +96,11 @@ fileprivate let durationKey = "duration"
     @objc override public var description: String {
         get {
             return "id : \(self.id)," +
-                "\n sources: \(String(describing: self.sources))," +
-                "\n duration: \(duration)," +
-                "\n mediaType: \(mediaType.description)," +
-                "\n metadata: \(String(describing: metadata))," +
-                "\n name: \(String(describing: name))"
+                " sources: \(String(describing: self.sources))," +
+                " duration: \(duration)," +
+                " mediaType: \(mediaType.description)," +
+                " metadata: \(String(describing: metadata))," +
+                " name: \(String(describing: name))"
         }
     }
     

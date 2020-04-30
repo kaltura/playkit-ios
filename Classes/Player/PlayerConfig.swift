@@ -17,7 +17,7 @@ import Foundation
     @objc public var startTime: TimeInterval = TimeInterval.nan
     
     @objc public override var description: String {
-        return "Media config, mediaEntry: \(self.mediaEntry)\nstartTime: \(self.startTime)"
+        return "Media config, mediaEntry: \(self.mediaEntry) startTime: \(self.startTime)"
     }
     
     @objc public init(mediaEntry: PKMediaEntry) {
