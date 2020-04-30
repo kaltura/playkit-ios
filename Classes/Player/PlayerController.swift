@@ -232,7 +232,12 @@ class PlayerController: NSObject, Player {
     }
     
     func play() {
-        switch mediaEntry?.mediaType {
+        guard let mediaEntry = self.mediaEntry else {
+            currentPlayer.play()
+            return
+        }
+        
+        switch mediaEntry.mediaType {
         case .live:
             currentPlayer.playFromLiveEdge()
         case .dvrLive:
@@ -256,7 +261,12 @@ class PlayerController: NSObject, Player {
     }
     
     func resume() {
-        switch mediaEntry?.mediaType {
+        guard let mediaEntry = self.mediaEntry else {
+            currentPlayer.resume()
+            return
+        }
+        
+        switch mediaEntry.mediaType {
         case .live:
             currentPlayer.playFromLiveEdge()
         case .dvrLive:
