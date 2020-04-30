@@ -70,6 +70,7 @@ public protocol AdsPlugin: PKPlugin {
 }
 
 #if os(iOS)
+@available(iOS 9.0, *)
 public protocol PIPEnabledAdsPlugin: AdsPlugin, AVPictureInPictureControllerDelegate {
     var pipDelegate: AVPictureInPictureControllerDelegate? { get set }
 }

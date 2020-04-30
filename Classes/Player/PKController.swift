@@ -8,6 +8,8 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
+import Foundation
+
 @objc public protocol PKController {
     init(player: PlayerEngine?)
 }
