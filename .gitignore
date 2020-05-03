@@ -22,3 +22,5 @@ xcuserdata/
 
 # CocoaPods
 Pods/
+.build
+Package.resolved
