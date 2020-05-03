@@ -25,9 +25,6 @@ let package = Package(
                 "SwiftyJSON"
             ],
             path: "Classes"
-        ),
-        .testTarget(
-            name: "PlayKitTests",
-            dependencies: ["PlayKit"]),
+        )
     ]
 )
