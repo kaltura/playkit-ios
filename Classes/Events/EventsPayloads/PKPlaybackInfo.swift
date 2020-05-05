@@ -20,11 +20,14 @@ import AVFoundation
     @objc public let indicatedBitrate: Double
     /// The throughput of the playback (download speed)
     @objc public let observedBitrate: Double
+    /// The URI of the playback item
+    @objc public let mediaUri: String?
     
-    init(bitrate: Double, indicatedBitrate: Double, observedBitrate: Double) {
+    init(bitrate: Double, indicatedBitrate: Double, observedBitrate: Double, mediaUri: String?) {
         self.bitrate = bitrate
         self.indicatedBitrate = indicatedBitrate
         self.observedBitrate = observedBitrate
+        self.mediaUri = mediaUri
     }
     
     convenience init(logEvent: AVPlayerItemAccessLogEvent) {
@@ -38,6 +41,7 @@ import AVFoundation
         }
         let indicatedBitrate = logEvent.indicatedBitrate
         let observedBitrate = logEvent.observedBitrate
-        self.init(bitrate: bitrate, indicatedBitrate: indicatedBitrate, observedBitrate: observedBitrate)
+        let mediaUri = logEvent.uri
+        self.init(bitrate: bitrate, indicatedBitrate: indicatedBitrate, observedBitrate: observedBitrate, mediaUri: uri)
     }
 }
