@@ -36,6 +36,7 @@ import Foundation
     @objc var currentTextTrack: String? { get }
     
     /// Indicates the desired rate of playback, 0.0 means "paused", 1.0 indicates a desire to play at the natural rate of the current item.
+    /// Note: Do not use the rate to indicate whether to play or pause! Use the isPlaying property.
     @objc var rate: Float { get set }
     
     /// The audio playback volume for the player, ranging from 0.0 through 1.0 on a linear scale.

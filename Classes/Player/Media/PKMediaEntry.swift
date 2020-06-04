@@ -47,8 +47,13 @@ fileprivate let durationKey = "duration"
         didSet {
             //creating media entry with the above sources
             let vrKey = "360"
-            if let mediaTags = self.tags, mediaTags.contains(vrKey) {
-                self.vrData = VRData()
+            if let mediaTags = self.tags {
+                for tag in mediaTags.components(separatedBy: ",") {
+                    if tag.equals(vrKey) {
+                        self.vrData = VRData()
+                        break
+                    }
+                }
             }
         }
     }
@@ -96,11 +101,11 @@ fileprivate let durationKey = "duration"
     @objc override public var description: String {
         get {
             return "id : \(self.id)," +
-                "\n sources: \(String(describing: self.sources))," +
-                "\n duration: \(duration)," +
-                "\n mediaType: \(mediaType.description)," +
-                "\n metadata: \(String(describing: metadata))," +
-                "\n name: \(String(describing: name))"
+                " sources: \(String(describing: self.sources))," +
+                " duration: \(duration)," +
+                " mediaType: \(mediaType.description)," +
+                " metadata: \(String(describing: metadata))," +
+                " name: \(String(describing: name))"
         }
     }
     

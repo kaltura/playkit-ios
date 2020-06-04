@@ -48,6 +48,16 @@ class PlayerController: NSObject, Player {
     lazy var timeObserver = TimeObserver(timeProvider: self)
     var playheadObserverUUID: UUID?
     
+    struct PausePosition {
+        let date: Date = Date()
+        let savedPosition: TimeInterval
+        
+        init(_ position: TimeInterval) {
+            self.savedPosition = position
+        }
+    }
+    var liveDVRPausedPosition: PausePosition?
+    
     /************************************************************/
     // MARK: - Initialization
     /************************************************************/
@@ -215,23 +225,62 @@ class PlayerController: NSObject, Player {
         return self.currentPlayer.loadedTimeRanges
     }
     
+    private func shouldDVRLivePlayFromLiveEdge() -> Bool {
+        if let pausedPosition = liveDVRPausedPosition, currentTime == 0 {
+            let timePassed: TimeInterval = Date().timeIntervalSince(pausedPosition.date)
+            let shouldPlayFromLiveEdge = timePassed > pausedPosition.savedPosition
+            liveDVRPausedPosition = nil
+            return shouldPlayFromLiveEdge
+        }
+        return false
+    }
+    
     func play() {
-        if self.mediaEntry?.mediaType == .live {
-            self.currentPlayer.playFromLiveEdge()
-        } else {
-            self.currentPlayer.play()
+        guard let mediaEntry = self.mediaEntry else {
+            currentPlayer.play()
+            return
+        }
+        
+        switch mediaEntry.mediaType {
+        case .live:
+            currentPlayer.playFromLiveEdge()
+        case .dvrLive:
+            if shouldDVRLivePlayFromLiveEdge() {
+                currentPlayer.playFromLiveEdge()
+            } else {
+                currentPlayer.play()
+            }
+        default:
+            currentPlayer.play()
         }
     }
     
     func pause() {
+        // Save the paused position only if the player is playing, not every time the pause is called.
+        if mediaEntry?.mediaType == .dvrLive, currentPlayer.isPlaying {
+            liveDVRPausedPosition = PausePosition(currentTime)
+        }
+        
         self.currentPlayer.pause()
     }
     
     func resume() {
-        if self.mediaEntry?.mediaType == .live {
-            self.currentPlayer.playFromLiveEdge()
-        } else {
-            self.currentPlayer.resume()
+        guard let mediaEntry = self.mediaEntry else {
+            currentPlayer.resume()
+            return
+        }
+        
+        switch mediaEntry.mediaType {
+        case .live:
+            currentPlayer.playFromLiveEdge()
+        case .dvrLive:
+            if shouldDVRLivePlayFromLiveEdge() {
+                currentPlayer.playFromLiveEdge()
+            } else {
+                currentPlayer.resume()
+            }
+        default:
+            currentPlayer.resume()
         }
     }
     
@@ -359,8 +408,13 @@ class PlayerController: NSObject, Player {
             // After Setting PlayerWrapper set saved player's params
             self.currentPlayer.onEventBlock = eventBlock
             self.currentPlayer.view = playerView
-            self.currentPlayer.mediaConfig = mediaConfig
         }
+        
+        // Update the mediaConfig
+        self.currentPlayer.mediaConfig = mediaConfig
+       
+        // Reset the pause position
+        liveDVRPausedPosition = nil
         
         self.currentPlayer.loadMedia(from: self.selectedSource, handler: handler)
     }

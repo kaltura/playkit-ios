@@ -223,8 +223,10 @@ extension AVPlayerEngine {
     private func handleRate() {
         PKLog.debug("player rate was changed, now: \(self.rate)")
         // When setting automaticallyWaitsToMinimizeStalling and shouldPlayImmediately, the player may be stalled and the rate will be changed to 0, player paused, by the AVPlayer. Therefor we are sending a paused event.
-        if self.rate == 0, self.currentState == .buffering || self.currentState == .ready {
-            self.post(event: PlayerEvent.Pause())
+        if let isPlaybackLikelyToKeepUp = self.currentItem?.isPlaybackLikelyToKeepUp, isPlaybackLikelyToKeepUp == false {
+            if self.rate == 0, self.currentState == .buffering || self.currentState == .ready {
+                self.post(event: PlayerEvent.Pause())
+            }
         }
     }
     
@@ -294,9 +296,14 @@ extension AVPlayerEngine {
         self.postStateChange(newState: newState, oldState: self.currentState)
         self.currentState = newState
         
-        // Update new current item with the text track styling which was set.
-        if let textTrackStyling = self.asset?.playerSettings.textTrackStyling {
+        // Update new current item with the text track styling which was set, when we have a currentItem.
+        if currentItem != nil, let textTrackStyling = self.asset?.playerSettings.textTrackStyling {
             self.updateTextTrackStyling(textTrackStyling)
+        }
+        
+        // If seek to live edge was triggered, perform it when we have a currentItem.
+        if currentItem != nil, seekToLiveEdgeTriggered {
+            self.seekToLiveEdge()
         }
     }
     
