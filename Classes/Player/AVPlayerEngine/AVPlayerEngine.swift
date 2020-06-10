@@ -248,9 +248,10 @@ public class AVPlayerEngine: AVPlayer {
         // Removes the observers only on deinit to prevent chances of being removed twice.
         self.removeObservers()
         
-        // There is a crash with the release of the KVO observer on previous versions up to iOS 11.3.
-        if #available(iOS 11.3, *) {
-            // No need to do anything, from iOS 11.3 the bug was fixed and the KVO observer is released.
+        // There is a crash with the release of the KVO observer on previous versions up to iOS 11.3 and tvOS 11.3.
+        // Which the release was not done automatically.
+        if #available(iOS 11.3, tvOS 11.3, *) {
+            // No need to do anything, from iOS 11.3 and tvOS 11.3 the bug was fixed and the KVO observer is released.
         } else if let observer = assetStatusObservation {
             removeObserver(observer, forKeyPath: "asset.status")
         }
