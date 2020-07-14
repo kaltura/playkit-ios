@@ -47,8 +47,13 @@ fileprivate let durationKey = "duration"
         didSet {
             //creating media entry with the above sources
             let vrKey = "360"
-            if let mediaTags = self.tags, mediaTags.contains(vrKey) {
-                self.vrData = VRData()
+            if let mediaTags = self.tags {
+                for tag in mediaTags.components(separatedBy: ",") {
+                    if tag.equals(vrKey) {
+                        self.vrData = VRData()
+                        break
+                    }
+                }
             }
         }
     }
