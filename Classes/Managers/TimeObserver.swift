@@ -155,7 +155,7 @@ class TimeObserver: TimeMonitor {
     
     func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval) -> Void) -> UUID {
         // calculate interval in millis and remove reminder to make sure intervals are in 100ms gaps
-        var intervalMs = Int(interval * 1000) - (Int(interval * 1000) % 100)
+        var intervalMs = Int(interval * 1000)
         // make sure intervalMs is not 0 if 0 give 100 instead.
         intervalMs = intervalMs == 0 ? 100 : intervalMs
         let dispatch = dispatchQueue ?? DispatchQueue.main
