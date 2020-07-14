@@ -84,19 +84,19 @@ struct BoundaryObservation {
 
 /// `TimeObserver` is used to observe time changes both periodic and boundary.
 /// 
-/// For performance reasons we are using one timer with 100ms interval as our base
-/// and only timers in 100ms intervals can be used for example 0.5s 1s 1.1s are good.
-/// In case and interval is not divisable by 100ms we will round it down for example: 1.565s will be changed to 1.5s interval.
+/// For performance reasons we are using one timer with 16ms interval as our base
+/// and only timers in 16ms intervals can be used for example 0.4s 0.6s 1s are good.
+/// In case and interval is not divisable by 16ms we will round it down for example: 1.565s will be changed to 1.560s interval.
 ///
-/// Using 100ms interval gives us error margin of 100ms at most.
+/// Using 16ms interval gives us error margin of 16ms at most.
 ///
 /// In order to not go over all the observation every time we are building a special dictionary
 /// with interval values and the related boundary/periodic observers, 
 /// this way only one fetch is made which is between O(1) and O(log n) where n is number of observations.
 class TimeObserver: TimeMonitor {
     
-    let interval: Int = 100
-    let dispatchTimeInterval: DispatchTimeInterval = .milliseconds(100)
+    let interval: Int = 16
+    let dispatchTimeInterval: DispatchTimeInterval = .milliseconds(16)
     /// the dispatch queue that we will receive the event block on.
     let dispatchQueue = DispatchQueue(label: "com.kaltura.playkit.time-observer")
     /// The timer source that will be used to fire the events.
@@ -154,10 +154,10 @@ class TimeObserver: TimeMonitor {
     /************************************************************/
     
     func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval) -> Void) -> UUID {
-        // calculate interval in millis and remove reminder to make sure intervals are in 100ms gaps
-        var intervalMs = Int(interval * 1000)
-        // make sure intervalMs is not 0 if 0 give 100 instead.
-        intervalMs = intervalMs == 0 ? 100 : intervalMs
+        // calculate interval in millis and remove reminder to make sure intervals are in self.interval gaps
+        var intervalMs = Int(interval * 1000) - (Int(interval * 1000) % self.interval)
+        // make sure intervalMs is not 0 if 0 give self.interval instead.
+        intervalMs = intervalMs == 0 ? self.interval : intervalMs
         let dispatch = dispatchQueue ?? DispatchQueue.main
         if periodicObservations.count == 0 { // first observation just add
             self.maxInterval = intervalMs
@@ -296,7 +296,7 @@ class TimeObserver: TimeMonitor {
             // if the difference between current time and last observed is greater then the threshold,
             // we probably had a seek and we shouldn't handle boundary observation
             let lastObservedTimeGap = currentTime - self.lastObservedTime
-            if abs(lastObservedTimeGap) < (Double(self.interval / 100) * 2) { // jump is lower then threshold
+            if abs(lastObservedTimeGap) < Double(self.interval)/1000 { // jump is lower then threshold
                 // check boundary observations
                 self.handleBoundaryObservations(currentTime: currentTime, currentTimePercentage: currentTimePercentage)
             } else if lastObservedTimeGap < 0 { // seeked backward
