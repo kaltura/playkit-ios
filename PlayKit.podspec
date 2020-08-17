@@ -12,8 +12,8 @@ s.author            = { 'Kaltura' => 'community@kaltura.com' }
 s.source            = { :git => 'https://github.com/kaltura/playkit-ios.git', :tag => 'v' + s.version.to_s }
 s.swift_version     = '5.0'
 
-s.ios.deployment_target = '9.0'
-s.tvos.deployment_target = '9.0'
+s.ios.deployment_target = '10.0'
+s.tvos.deployment_target = '10.0'
 
 s.subspec 'Core' do |sp|
     sp.source_files = 'Classes/**/*'
@@ -24,7 +24,7 @@ s.subspec 'Core' do |sp|
 end
 
 s.subspec 'WidevineClassic' do |ssp|
-  ssp.ios.deployment_target = '9.0'  
+  ssp.ios.deployment_target = '10.0'  
   ssp.source_files = 'Widevine'
   ssp.dependency 'PlayKit/Core'
   #ssp.dependency 'PlayKitWV'
