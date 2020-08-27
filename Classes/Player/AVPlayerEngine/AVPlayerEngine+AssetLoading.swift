@@ -19,6 +19,9 @@ extension AVPlayerEngine {
         // When changing media (loading new asset) we want to reset isFirstReady, in order to receive `CanPlay` & `LoadedMetadata` accurately.
         self.isFirstReady = true
         self.lastIndicatedBitrate = 0
+        // Reset internalDuration in order to get an update of durationChanged.
+        // If the previous media had the same duration as the new media, the durationChange was not fired.
+        self.internalDuration = 0
         super.replaceCurrentItem(with: item)
     }
     
