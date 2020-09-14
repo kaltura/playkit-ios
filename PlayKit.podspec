@@ -19,8 +19,8 @@ s.subspec 'Core' do |sp|
     sp.source_files = 'Classes/**/*'
     sp.dependency 'SwiftyJSON', '5.0.0'
     sp.dependency 'XCGLogger', '7.0.0'
-    sp.dependency 'KalturaNetKit', '~> 1.3'
-    sp.dependency 'PlayKitUtils', '~> 0.4'
+    sp.dependency 'KalturaNetKit', '~> 1.4'
+    sp.dependency 'PlayKitUtils', '~> 0.5'
 end
 
 s.subspec 'WidevineClassic' do |ssp|
