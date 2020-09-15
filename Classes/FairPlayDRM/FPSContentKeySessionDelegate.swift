@@ -75,7 +75,15 @@ class FPSContentKeySessionDelegate: NSObject, AVContentKeySessionDelegate {
                 
         if helper.forceDownload, !(keyRequest is AVPersistableContentKeyRequest) {
             // We want to download but we're given a non-download request
-            keyRequest.respondByRequestingPersistableContentKeyRequest()
+            if #available(iOS 11.2, *) {
+                do {
+                    try keyRequest.respondByRequestingPersistableContentKeyRequestAndReturnError()
+                } catch {
+                    PKLog.error("RequestingPersistableContentKey encontered an error: \(error)")
+                }
+            } else {
+                keyRequest.respondByRequestingPersistableContentKeyRequest()
+            }
             return
         }
         

@@ -120,7 +120,13 @@ public class AVPlayerEngine: AVPlayer {
             if newValue.isNaN { return }
             if newValue.isEqual(to: self.currentPosition) { return }
             let duration = self.duration
-            let value = newValue > duration ? duration : (newValue < 0 ? 0 : newValue)
+            var value = newValue > duration ? duration : (newValue < 0 ? 0 : newValue)
+            // Seeking to the duration in iOS 14 doesn't work
+            if #available(iOS 14.0, *) {
+                if value == duration {
+                    value -= 0.1
+                }
+            }
             let newTime = self.rangeStart + CMTimeMakeWithSeconds(value, preferredTimescale: self.rangeStart.timescale)
             PKLog.debug("set currentPosition: \(CMTimeGetSeconds(newTime))")
             super.seek(to: newTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero) { [weak self] (isSeeked: Bool) in
