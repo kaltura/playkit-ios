@@ -51,16 +51,22 @@ class SourceSelector {
             }
         }
         
-        if DRMSupport.fairplay {
-            if let source = sources.first(where: {$0.mediaFormat == .hls}) {
-                return (source, defaultHandler.init())
-            }
-        } else {
-            if let source = sources.first(where: {$0.mediaFormat == .hls && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
-                return (source, defaultHandler.init())
+        if let source = sources.first(where: {$0.mediaFormat == .hls}) {
+            if let drmData = source.drmData {
+                if drmData.isEmpty {
+                    PKLog.error("The DRM Data can't be empty.")
+                } else if !DRMSupport.fairplay {
+                    PKLog.error("FairPlay is not available in simulators and before iOS8.")
+                } else {
+                    return (source, defaultHandler.init())
+                }
+                    
+                // Look for a hls format without DRM
+                if let source = sources.first(where: {$0.mediaFormat == .hls && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
+                        return (source, defaultHandler.init())
+                }
             } else {
-                // The DRM Data is not empty, DRMSupport.fairplay check faild on device support.
-                PKLog.error("FairPlay is not available in simulators and before iOS8.")
+                return (source, defaultHandler.init())
             }
         }
         
