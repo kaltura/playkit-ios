@@ -58,6 +58,9 @@ class SourceSelector {
         } else {
             if let source = sources.first(where: {$0.mediaFormat == .hls && ($0.drmData == nil || $0.drmData!.isEmpty) }) {
                 return (source, defaultHandler.init())
+            } else {
+                // The DRM Data is not empty, DRMSupport.fairplay check faild on device support.
+                PKLog.error("FairPlay is not available in simulators and before iOS8.")
             }
         }
         
