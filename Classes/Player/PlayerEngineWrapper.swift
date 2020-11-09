@@ -110,6 +110,10 @@ public class PlayerEngineWrapper: NSObject, PlayerEngine {
         return playerEngine?.loadedTimeRanges
     }
     
+    public var bufferedTime: TimeInterval {
+        return playerEngine?.bufferedTime ?? self.currentTime
+    }
+    
     public func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
         playerEngine?.loadMedia(from: mediaSource, handler: handler)
     }

@@ -89,7 +89,7 @@ public extension PKEvent {
         return self.data?[EventDataKeys.bitrate] as? NSNumber
     }
     
-    /// Current Bitrate Value, PKEvent Data Accessor
+    /// The PlaybackInfo object, PKEvent Data Accessor
     @objc var playbackInfo: PKPlaybackInfo? {
         return self.data?[EventDataKeys.playbackInfo] as? PKPlaybackInfo
     }
@@ -122,12 +122,12 @@ public extension PKEvent {
         return self.data?[EventDataKeys.metadata] as? [AVMetadataItem]
     }
     
-    /// Content url, PKEvent Data Accessor
+    /// The MediaSource object, PKEvent Data Accessor
     @objc var mediaSource: PKMediaSource? {
         return self.data?[EventDataKeys.mediaSource] as? PKMediaSource
     }
     
-    /// Content url, PKEvent Data Accessor
+    /// The loaded time ranges, PKEvent Data Accessor
     @objc var timeRanges: [PKTimeRange]? {
         return self.data?[EventDataKeys.timeRanges] as? [PKTimeRange]
     }

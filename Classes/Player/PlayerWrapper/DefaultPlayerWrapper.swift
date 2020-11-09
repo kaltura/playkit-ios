@@ -129,6 +129,11 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         return nil
     }
     
+    public var bufferedTime: TimeInterval {
+        printInvocationWarning("\(#function)")
+        return 0.0
+    }
+    
     func play() {
         printInvocationWarning("\(#function)")
     }

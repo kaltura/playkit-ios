@@ -160,6 +160,10 @@ import AVKit
         return self.player.loadedTimeRanges
     }
     
+    @objc public var bufferedTime: TimeInterval {
+        return self.player.bufferedTime
+    }
+    
     open func play() {
         self.player.play()
     }
