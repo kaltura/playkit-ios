@@ -211,7 +211,7 @@ public class AVPlayerEngine: AVPlayer {
             if let currentItem = self.currentItem {
                 let seekableRanges = currentItem.seekableTimeRanges
                 if seekableRanges.count > 0 {
-                    if let lastSeekableTimeRange = seekableRanges.last as? CMTimeRange, lastSeekableTimeRange.isValid {
+                    if let lastSeekableTimeRange = seekableRanges.last?.timeRangeValue, lastSeekableTimeRange.isValid {
                         result = lastSeekableTimeRange.start
                     } else {
                         PKLog.debug("Seekable range is invalid")
@@ -318,7 +318,7 @@ public class AVPlayerEngine: AVPlayer {
         
         let seekableRanges = currentItem.seekableTimeRanges
         if seekableRanges.count > 0 {
-            if let lastSeekableTimeRange = seekableRanges.last as? CMTimeRange, lastSeekableTimeRange.isValid {
+            if let lastSeekableTimeRange = seekableRanges.last?.timeRangeValue, lastSeekableTimeRange.isValid {
                 var result = CMTimeRangeGetEnd(lastSeekableTimeRange)
                 let liveEdgeThreshold: Double = 2.0
                 result = CMTimeSubtract(result, CMTime(seconds: liveEdgeThreshold, preferredTimescale: result.timescale))
