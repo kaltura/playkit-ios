@@ -45,6 +45,9 @@ import Foundation
     /// Provides a collection of time ranges for which the player has the media data readily available. The ranges provided might be discontinuous.
     @objc var loadedTimeRanges: [PKTimeRange]? { get }
     
+    /// The current player's buffered time.
+    @objc var bufferedTime: TimeInterval { get }
+    
     /// Send a play action for the player.
     @objc func play()
     

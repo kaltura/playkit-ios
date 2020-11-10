@@ -194,6 +194,18 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         return self.currentPlayer.currentItem?.loadedTimeRanges.map { PKTimeRange(timeRange: $0.timeRangeValue) }
     }
     
+    public var bufferedTime: TimeInterval {
+        if let loadedTimeRanges = self.loadedTimeRanges {
+            for timeRange in loadedTimeRanges {
+                if currentTime.isLess(than: timeRange.end) {
+                    return timeRange.end
+                }
+            }
+        }
+        
+        return currentTime
+    }
+    
     public func play() {
         if #available(iOS 10.0, tvOS 10.0, *), let shouldPlayImmediately = settings?.shouldPlayImmediately, shouldPlayImmediately == true {
             self.currentPlayer.playImmediately(atRate: 1.0)

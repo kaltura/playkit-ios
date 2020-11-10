@@ -221,6 +221,10 @@ class PlayerController: NSObject, Player {
         return self.currentPlayer.loadedTimeRanges
     }
     
+    public var bufferedTime: TimeInterval {
+        return self.currentPlayer.bufferedTime
+    }
+    
     private func shouldDVRLivePlayFromLiveEdge() -> Bool {
         if let pausedPosition = liveDVRPausedPosition, currentTime == 0 {
             let timePassed: TimeInterval = Date().timeIntervalSince(pausedPosition.date)
