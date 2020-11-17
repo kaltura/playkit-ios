@@ -16,12 +16,9 @@ public protocol PlayerPluginsDataSource {
 }
 
 extension PlayerLoader: PlayerPluginsDataSource {
-    
     public func getLoadedPlugins<T>(ofType type: T.Type) -> [T] {
-        
         return self.loadedPlugins
             .filter { $0.value.plugin is T }
             .compactMap { $0.value.plugin as? T }
     }
-    
 }
