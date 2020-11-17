@@ -11,7 +11,6 @@
 import Foundation
 
 public protocol PlayerPluginsDataSource {
-    
     /// Filtering loaded plugins by certain type.
     func getLoadedPlugins<T>(ofType type: T.Type) -> [T]
 }
