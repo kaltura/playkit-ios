@@ -49,7 +49,7 @@ fileprivate let durationKey = "duration"
             let vrKey = "360"
             if let mediaTags = self.tags {
                 for tag in mediaTags.components(separatedBy: ",") {
-                    if tag.equals(vrKey) {
+                    if tag.trimmingCharacters(in: .whitespaces).equals(vrKey) {
                         self.vrData = VRData()
                         break
                     }
