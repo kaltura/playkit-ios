@@ -17,24 +17,31 @@ import PlayKitUtils
   - creating and registering plugins.
  */
 @objc public class PlayKitManager: NSObject {
+    
+    @objc public static let versionString: String = Bundle(for: PlayKitManager.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    @objc public static let clientTag = "playkit/ios-\(versionString)"
+    @objc public static let userAgent = UserAgent.build(clientTag: clientTag)
+    
+    @objc(sharedInstance) public static let shared: PlayKitManager = PlayKitManager()
 
-    // private init to prevent initializing this singleton
+    var pluginRegistry = Dictionary<String, PKPlugin.Type>()
+    
+    // Private init to prevent initializing this singleton
     private override init() {
         if type(of: self) != PlayKitManager.self {
             fatalError("Private initializer, use shared instance instead")
         }
     }
     
-    @objc public static let versionString: String = Bundle(for: PlayKitManager.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) throws -> PKPlugin {
+        guard let pluginClass = pluginRegistry[name] else {
+            PKLog.error("plugin with name: \(name) doesn't exist in pluginRegistry")
+            throw PKPluginError.failedToCreatePlugin(pluginName: name).asNSError
+        }
+        return try pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
+    }
     
-    @objc public static let clientTag = "playkit/ios-\(versionString)"
-    
-    @objc(sharedInstance) public static let shared: PlayKitManager = PlayKitManager()
-    
-    
-    public static let userAgent = UserAgent.build(clientTag: clientTag)
-    
-    var pluginRegistry = Dictionary<String, PKPlugin.Type>()
+    // MARK: - Public
     
     /// Loads and returns a player object using a provided configuration.
     ///
@@ -54,7 +61,6 @@ import PlayKitUtils
     }
     
     @objc public func registerPlugin(_ pluginClass: BasePlugin.Type) {
-        
         PKLog.info("Registering plugin \(pluginClass.pluginName)/\(pluginClass.pluginVersion)")
         
         if let pluginWarmUp = pluginClass as? PKPluginWarmUp.Type {
@@ -71,15 +77,7 @@ import PlayKitUtils
         return dict
     }
     
-    func createPlugin(name: String, player: Player, pluginConfig: Any?, messageBus: MessageBus) throws -> PKPlugin {
-        guard let pluginClass = pluginRegistry[name] else {
-            PKLog.error("plugin with name: \(name) doesn't exist in pluginRegistry")
-            throw PKPluginError.failedToCreatePlugin(pluginName: name).asNSError
-        }
-        return try pluginClass.init(player: player, pluginConfig: pluginConfig, messageBus: messageBus)
-    }
-    
-    /// sets the logging level for our logger.
+    /// Sets the logging level for our logger.
     @objc public static var logLevel: PKLogLevel = .default {
         didSet {
             PKLog.outputLevel = logLevel.toLoggerLevel
