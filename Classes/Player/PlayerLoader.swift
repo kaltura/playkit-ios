@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 class LoadedPlugin: NSObject {
     var plugin: PKPlugin
@@ -72,9 +73,9 @@ class PlayerLoader: PlayerDecoratorBase {
         setPlayer(player)
     }
     
-    override func prepare(_ config: MediaConfig) {
-        self.concreatePlayerController?.setMedia(from: config)
-        super.prepare(config)
+    override func prepare(_ config: MediaConfig, mediaAsset: AVURLAsset?) {
+        self.concreatePlayerController?.setMedia(from: config, mediaAsset: mediaAsset)
+        super.prepare(config, mediaAsset: mediaAsset)
         // update all loaded plugins with media config
         for (pluginName, loadedPlugin) in loadedPlugins {
             PKLog.verbose("Preparing plugin \(pluginName)")

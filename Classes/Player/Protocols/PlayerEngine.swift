@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 @objc public protocol PlayerEngine: BasicPlayer {
     /// Fired when an event is triggred.
@@ -27,7 +28,7 @@ import Foundation
     var playbackType: String? { get }
     
     /// Load the media to the player.
-    func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler)
+    func loadMedia(from mediaSource: PKMediaSource?, mediaAsset: AVURLAsset?, handler: AssetHandler)
     
     /// Plays the live media from the live edge.
     func playFromLiveEdge()

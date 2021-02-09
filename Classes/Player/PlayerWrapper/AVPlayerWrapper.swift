@@ -27,7 +27,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     public var currentPlayer: AVPlayerEngine
     
     /// the asset to prepare and pass to the player engine to start buffering.
-    private var assetToPrepare: AVURLAsset?
+    public var assetToPrepare: AVURLAsset?
     /// the current selected media source
     fileprivate var preferredMediaSource: PKMediaSource?
     /// the current handler for the selected source
@@ -103,18 +103,23 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         return self.currentPlayer.playbackType
     }
     
-    open func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
-        guard let mediaSrc = mediaSource else {
-            PKLog.error("Media Source is empty")
-            return
-        }
-        
-        handler.build(from: mediaSrc) { error, asset in
-            if asset != nil {
-                self.assetToPrepare = asset
-            }
-            // send signal when assetToPrepare is set
+    open func loadMedia(from mediaSource: PKMediaSource?, mediaAsset: AVURLAsset?, handler: AssetHandler) {
+        if mediaAsset != nil {
+            self.assetToPrepare = mediaAsset
             self.prepareSemaphore.signal()
+        } else {
+            guard let mediaSrc = mediaSource else {
+                PKLog.error("Media Source is empty")
+                return
+            }
+
+            handler.build(from: mediaSrc) { error, asset in
+                if asset != nil {
+                    self.assetToPrepare = asset
+                }
+                // send signal when assetToPrepare is set
+                self.prepareSemaphore.signal()
+            }
         }
     }
     
@@ -231,7 +236,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         self.removeAssetRefreshObservers()
     }
     
-    public func prepare(_ mediaConfig: MediaConfig) {
+    public func prepare(_ mediaConfig: MediaConfig, mediaAsset: AVURLAsset?) {
         // set background thread to make sure main thread is not stuck while waiting
         DispatchQueue.global().async {
             // wait till assetToPrepare is set

@@ -9,8 +9,12 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 @objc public protocol BasicPlayer {
+    /// The player item's asset.
+    @objc var assetToPrepare: AVURLAsset? { get set }
+
     /// The player's duration.
     @objc var duration: TimeInterval { get }
     
@@ -72,7 +76,7 @@ import Foundation
     /// Prepare for playing an entry.
     /// If player network setting autoBuffer is set to true, prepare starts buffering the entry.
     /// Otherwise, if autoBuffer is set to false, need to call startBuffering manually.
-    @objc func prepare(_ config: MediaConfig)
+    @objc func prepare(_ config: MediaConfig, mediaAsset: AVURLAsset?)
     
     /// Starts buffering the entry.
     @objc func startBuffering()

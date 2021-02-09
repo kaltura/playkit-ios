@@ -1,6 +1,7 @@
 
 
 import Foundation
+import AVFoundation
 
 /// `AdsPlayerEngineWrapperState` represents `AdsPlayerEngineWrapper` state machine states.
 enum AdsPlayerEngineWrapperState: Int, StateProtocol {
@@ -63,7 +64,7 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
         if self.stateMachine.getState() == .waitingForPrepare {
             self.stateMachine.set(state: .preparing)
             PKLog.debug("will prepare player")
-            super.prepare(self.prepareMediaConfig)
+            super.prepare(self.prepareMediaConfig, mediaAsset: nil)
             self.stateMachine.set(state: .prepared)
         }
         
@@ -79,7 +80,7 @@ public class AdsPlayerEngineWrapper: PlayerEngineWrapper, AdsPluginDelegate, Ads
         }
     }
     
-    override public func prepare(_ config: MediaConfig) {
+    override public func prepare(_ config: MediaConfig, mediaAsset: AVURLAsset?) {
         self.stateMachine.set(state: .start)
         self.adsPlugin.destroyManager()
         self.isPlayEnabled = false

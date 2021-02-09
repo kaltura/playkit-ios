@@ -116,6 +116,15 @@ import AVKit
             self.player.view = newValue
         }
     }
+
+    public var assetToPrepare: AVURLAsset? {
+        get {
+            return self.player.assetToPrepare
+        }
+        set {
+            self.player.assetToPrepare = newValue
+        }
+    }
     
     public var currentTime: TimeInterval {
         get {
@@ -192,8 +201,8 @@ import AVKit
         self.player.destroy()
     }
     
-    open func prepare(_ config: MediaConfig) {
-        self.player.prepare(config)
+    open func prepare(_ config: MediaConfig, mediaAsset: AVURLAsset?) {
+        self.player.prepare(config, mediaAsset: mediaAsset)
     }
     
     public func startBuffering() {

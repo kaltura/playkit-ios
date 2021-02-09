@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 class DefaultPlayerWrapper: NSObject, PlayerEngine {
     
@@ -45,7 +46,7 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         return nil
     }
     
-    func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
+    func loadMedia(from mediaSource: PKMediaSource?, mediaAsset: AVURLAsset?, handler: AssetHandler) {
         printInvocationWarning("\(#function)")
     }
     
@@ -78,6 +79,14 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
     
     /// Save view reference till prepare
     public weak var view: PlayerView?
+
+    public var assetToPrepare: AVURLAsset? {
+        get {
+            printInvocationWarning("\(#function)")
+            return nil
+        }
+        set { printInvocationWarning("\(#function)") }
+    }
     
     public var currentTime: TimeInterval {
         get {
@@ -161,7 +170,7 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
-    func prepare(_ mediaConfig: MediaConfig) {
+    func prepare(_ mediaConfig: MediaConfig, mediaAsset: AVURLAsset?) {
         printInvocationWarning("\(#function)")
     }
     

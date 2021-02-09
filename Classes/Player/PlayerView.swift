@@ -14,7 +14,7 @@ import AVFoundation
 /// A simple `UIView` subclass that is backed by an `AVPlayerLayer` layer.
 @objc public class PlayerView: UIView {
     
-    var player: AVPlayer? {
+    @objc public var player: AVPlayer? {
         get {
             return playerLayer.player
         }

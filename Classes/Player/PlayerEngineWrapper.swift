@@ -1,6 +1,7 @@
 
 
 import Foundation
+import AVFoundation
 
 public class PlayerEngineWrapper: NSObject, PlayerEngine {
     
@@ -66,6 +67,15 @@ public class PlayerEngineWrapper: NSObject, PlayerEngine {
             playerEngine?.view = newValue
         }
     }
+
+    public var assetToPrepare: AVURLAsset? {
+        get {
+            return playerEngine?.assetToPrepare
+        }
+        set {
+            playerEngine?.assetToPrepare = newValue
+        }
+    }
     
     public var currentTime: TimeInterval {
         get {
@@ -110,8 +120,8 @@ public class PlayerEngineWrapper: NSObject, PlayerEngine {
         return playerEngine?.loadedTimeRanges
     }
     
-    public func loadMedia(from mediaSource: PKMediaSource?, handler: AssetHandler) {
-        playerEngine?.loadMedia(from: mediaSource, handler: handler)
+    public func loadMedia(from mediaSource: PKMediaSource?, mediaAsset: AVURLAsset?, handler: AssetHandler) {
+        playerEngine?.loadMedia(from: mediaSource, mediaAsset: mediaAsset, handler: handler)
     }
     
     public func playFromLiveEdge() {
@@ -154,8 +164,8 @@ public class PlayerEngineWrapper: NSObject, PlayerEngine {
         playerEngine?.destroy()
     }
     
-    public func prepare(_ config: MediaConfig) {
-        playerEngine?.prepare(config)
+    public func prepare(_ config: MediaConfig, mediaAsset: AVURLAsset?) {
+        playerEngine?.prepare(config, mediaAsset: mediaAsset)
     }
     
     public func startBuffering() {

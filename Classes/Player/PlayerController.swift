@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 class PlayerController: NSObject, Player {
     
@@ -172,6 +173,11 @@ class PlayerController: NSObject, Player {
         get { return self.currentPlayer.view }
         set { self.currentPlayer.view = newValue }
     }
+
+    public var assetToPrepare: AVURLAsset? {
+        get { return self.currentPlayer.assetToPrepare }
+        set { self.currentPlayer.assetToPrepare = newValue }
+    }
     
     public var currentTime: TimeInterval {
         get {
@@ -305,8 +311,8 @@ class PlayerController: NSObject, Player {
         self.removeAssetRefreshObservers()
     }
     
-    func prepare(_ mediaConfig: MediaConfig) {
-        self.currentPlayer.prepare(mediaConfig)
+    func prepare(_ mediaConfig: MediaConfig, mediaAsset: AVURLAsset?) {
+        self.currentPlayer.prepare(mediaConfig, mediaAsset: mediaAsset)
         
         if let source = self.selectedSource {
             self.mediaFormat = source.mediaFormat
@@ -372,7 +378,7 @@ class PlayerController: NSObject, Player {
     // MARK: - Public Functions
     // ****************************************** //
     
-    func setMedia(from mediaConfig: MediaConfig) {
+    func setMedia(from mediaConfig: MediaConfig, mediaAsset: AVURLAsset?) {
         self.mediaConfig = mediaConfig
         
         // create new media session uuid
@@ -412,7 +418,7 @@ class PlayerController: NSObject, Player {
         // Reset the pause position
         liveDVRPausedPosition = nil
         
-        self.currentPlayer.loadMedia(from: self.selectedSource, handler: handler)
+        self.currentPlayer.loadMedia(from: self.selectedSource, mediaAsset: mediaAsset, handler: handler)
     }
 }
 
