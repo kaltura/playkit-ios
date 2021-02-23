@@ -154,38 +154,37 @@ class TimeObserver: TimeMonitor {
     /************************************************************/
     
     func addPeriodicObserver(interval: TimeInterval, observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval) -> Void) -> UUID {
+        
         // calculate interval in millis and remove reminder to make sure intervals are in 100ms gaps
         var intervalMs = Int(interval * 1000) - (Int(interval * 1000) % 100)
+        
         // make sure intervalMs is not 0 if 0 give 100 instead.
         intervalMs = intervalMs == 0 ? 100 : intervalMs
+        
         let dispatch = dispatchQueue ?? DispatchQueue.main
-        if periodicObservations.count == 0 { // first observation just add
-            self.maxInterval = intervalMs
-            let timeObservation = TimeObservation(block: eventHandler, dispatchQueue: dispatch)
+        
+        // Create a TimeObservation
+        let timeObservation = TimeObservation(block: eventHandler, dispatchQueue: dispatch)
+        
+        if var periodicObservation = periodicObservations.first(where: { $0.interval == intervalMs }) { // we already have a PeriodicObservation with this interval
+            
+            // Remove the (old) PeriodicObservation from the set (as adding an item to a set in which a matching item already exists is a no-op)
+            self.periodicObservations.remove(periodicObservation)
+            
+            // Append the new timeObservation
+            periodicObservation.observations.append(timeObservation)
+            
+            // Re-add the periodic observation to periodicObservations
+            self.periodicObservations.insert(periodicObservation)
+            
+        } else { // We don't have an existing observation for this interval
             let periodicObservation = PeriodicObservation(interval: intervalMs, observations: [timeObservation])
             self.periodicObservations.insert(periodicObservation)
-            self.periodicObservationsMap[intervalMs] = [periodicObservation]
-            return timeObservation.token
-        } else if let periodicObservations = self.periodicObservationsMap[intervalMs] { // we already have this interval
-            // get the observation with same interval
-            var periodicObservation = periodicObservations.first(where: { $0.interval == intervalMs })!
-            // add the observation
-            let timeObservation = TimeObservation(block: eventHandler, dispatchQueue: dispatch)
-            periodicObservation.observations.append(timeObservation)
-            // periodic observation is a struct so in order to make the change we must remove and insert again
-            self.periodicObservations.remove(periodicObservation)
-            self.periodicObservations.insert(periodicObservation)
-            self.updatePeriodicObservationsMap()
-            return timeObservation.token
-        } else { // not the first and we don't have this interval yet
-            if intervalMs > self.maxInterval {
-                self.maxInterval = intervalMs
-            }
-            let timeObservation = TimeObservation(block: eventHandler, dispatchQueue: dispatch)
-            self.periodicObservations.insert(PeriodicObservation(interval: intervalMs, observations: [timeObservation]))
-            self.updatePeriodicObservationsMap()
-            return timeObservation.token
         }
+        
+        self.updatePeriodicObservationsMap()
+        return timeObservation.token
+        
     }
     
     func addBoundaryObserver(times: [TimeInterval], observeOn dispatchQueue: DispatchQueue?, using eventHandler: @escaping (TimeInterval, Double) -> Void) -> UUID {
