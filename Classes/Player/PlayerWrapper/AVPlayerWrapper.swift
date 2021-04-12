@@ -85,6 +85,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     // MARK: - PlayerEngine
     // ***************************** //
     
+    public var imagesTrack: [Int: UIImage] {
+        get { return self.currentPlayer.imagesTrack }
+    }
+    
     public var onEventBlock: ((PKEvent) -> Void)?
 
     public var startPosition: TimeInterval {

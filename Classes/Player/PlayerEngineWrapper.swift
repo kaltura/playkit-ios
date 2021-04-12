@@ -4,6 +4,12 @@ import Foundation
 
 public class PlayerEngineWrapper: NSObject, PlayerEngine {
     
+    public var imagesTrack: [Int: UIImage] {
+        get{
+            return playerEngine?.imagesTrack ?? [:]
+        }
+    }
+    
     public var playerEngine: PlayerEngine?
     
     public var onEventBlock: ((PKEvent) -> Void)? {

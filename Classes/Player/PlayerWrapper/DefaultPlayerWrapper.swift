@@ -108,6 +108,14 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
+    public var imagesTrack: [Int: UIImage] {
+        get {
+            printInvocationWarning("\(#function)")
+            return [:]
+        }
+        set { printInvocationWarning("\(#function)") }
+    }
+    
     public var rate: Float {
         get {
             printInvocationWarning("\(#function)")

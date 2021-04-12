@@ -12,6 +12,8 @@ import UIKit
 
 @objc public protocol Player: BasicPlayer {
     
+    @objc func imageForSeekDistance(seek: Float) -> UIImage?
+    
     /// The player's associated media entry.
     @objc weak var mediaEntry: PKMediaEntry? { get }
     

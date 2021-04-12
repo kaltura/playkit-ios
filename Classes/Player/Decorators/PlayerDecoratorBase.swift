@@ -203,4 +203,9 @@ import AVKit
     public func startBuffering() {
         self.player.startBuffering()
     }
+    
+    public func imageForSeekDistance(seek: Float) -> UIImage? {
+        return self.player.imageForSeekDistance(seek: seek)
+    }
+    
 }

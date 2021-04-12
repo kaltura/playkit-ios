@@ -12,6 +12,11 @@ import Foundation
 
 class PlayerController: NSObject, Player {
     
+    func imageForSeekDistance(seek: Float) -> UIImage? {
+        let timePoint = Int(self.duration * Double(seek))
+        return self.currentPlayer.imagesTrack[timePoint]
+    }
+    
     /************************************************************/
     // MARK: - Properties
     /************************************************************/

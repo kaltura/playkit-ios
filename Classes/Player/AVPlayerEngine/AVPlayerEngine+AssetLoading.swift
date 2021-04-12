@@ -44,6 +44,26 @@ extension AVPlayerEngine {
         self.replaceCurrentItem(with: playerItem)
     }
     
+    func asynchronouslyLoadImagesTrack(_ asset: PKAsset) {
+        let imageTrackLoader = ImagesTrackManager()
+        
+        imageTrackLoader.loadImages(asset: asset.avAsset) { (requestedTime: CMTime,
+                                                             image: CGImage?,
+                                                             actualTime: CMTime,
+                                                             result: AVAssetImageGenerator.Result,
+                                                             error: Error?) in
+            
+            if let error = error {
+                print("\(requestedTime.seconds)  \(actualTime.seconds) ERROR: \(error.localizedDescription)")
+            } else {
+                if let image = image {
+                    self.imagesTrack[Int(actualTime.seconds)] = UIImage(cgImage: image)
+                }
+                print("\(requestedTime.seconds)  \(actualTime.seconds)")
+            }
+        }
+    }
+    
     func asynchronouslyLoadURLAsset(_ newAsset: PKAsset) {
         newAsset.status = .preparing
         /*
@@ -97,6 +117,8 @@ extension AVPlayerEngine {
                 }
                 
                 newAsset.status = .prepared
+                
+                self.asynchronouslyLoadImagesTrack(newAsset)
                 /*
                 We can play this asset.
                 If we are set to autoBuffer, create a new `AVPlayerItem` and make

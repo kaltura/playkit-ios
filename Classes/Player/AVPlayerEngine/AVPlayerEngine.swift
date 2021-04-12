@@ -203,6 +203,8 @@ public class AVPlayerEngine: AVPlayer {
         return nil
     }
   
+    var imagesTrack: [Int: UIImage] = [:]
+    
     /// Gives the start time of the last seekable range.
     /// This helps calculate `currentTime` and `duration` for live streams.
     private var rangeStart: CMTime {

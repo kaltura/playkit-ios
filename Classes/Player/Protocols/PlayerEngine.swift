@@ -34,4 +34,6 @@ import Foundation
     
     /// Update the text tracks styling.
     func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling)
+    
+    var imagesTrack: [Int: UIImage] { get }
 }
