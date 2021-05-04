@@ -82,6 +82,7 @@ class DRMSupport {
         if !Platform.isSimulator, #available(iOS 8, *) {
             return true
         } else {
+            PKLog.error("Note: DRM Playback is not supported on simulators!")
             return false
         }
     }()
