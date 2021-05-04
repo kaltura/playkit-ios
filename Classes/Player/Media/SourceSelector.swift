@@ -74,7 +74,9 @@ class SourceSelector {
         }
         
         PKLog.error("no playable media sources!")
-        
+        if !DRMSupport.fairplay  {
+            PKLog.warning("Note: FAIRPLAY Playback is not supported on simulators")
+        }
         return nil
     }
 }
