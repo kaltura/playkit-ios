@@ -20,7 +20,7 @@ class ImagesTrackManager: NSObject {
         var frames: [NSValue] = []
         
         for index in 1...duration {
-            if index % 30 == 0 {
+            if index % 10 == 0 {
                 let time = CMTime.init(seconds: Double(index), preferredTimescale: 1)
                 frames.append(NSValue.init(time: time))
             }
