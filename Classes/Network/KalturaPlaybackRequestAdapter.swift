@@ -63,58 +63,26 @@ import Foundation
 }
 
 
-@objc public class CustomHeadersRequestAdapter: NSObject, PKRequestParamsAdapter {
+@objc public class CustomHeadersRequestAdapter: KalturaPlaybackRequestAdapter {
     
-    var customHTTPHeaders: [String: String]?
+    @objc public var customHTTPHeaders: [String: String]?
     
-    @objc public func addHeaders(_ headers:[String: String]) {
+    public override func adapt(requestParams: PKRequestParams) -> PKRequestParams {
+        let parameters = super.adapt(requestParams: requestParams)
         
-        if self.customHTTPHeaders == nil {
-            customHTTPHeaders = [:]
+        if let customHeaders = self.customHTTPHeaders {
+            var newHeaders: [String: String] = [:]
+            if let headers = parameters.headers {
+                newHeaders = headers
+            }
+                        
+            for (key, value) in customHeaders {
+                newHeaders[key] = value
+            }
+            return PKRequestParams(url: parameters.url, headers: newHeaders)
         }
-        
-        for (key, value) in headers {
-            self.customHTTPHeaders?[key] = value
-        }
-    }
-    
-    
-    @objc public func addCustomHeader(key: String, value: String) {
-        self.customHTTPHeaders?[key] = value
-    }
-    
-    @objc public static func install(in player: Player, withAppName appName: String) {
-        let requestAdapter = CustomHeadersRequestAdapter()
-//        requestAdapter.sessionId = player.sessionId
-//        requestAdapter.applicationName = appName
-        player.settings.contentRequestAdapter = requestAdapter
-    }
-    
-    
-    public func updateRequestAdapter(with player: Player) {
-        
-    }
-    
-    public func adapt(requestParams: PKRequestParams) -> PKRequestParams {
-        var parameters = requestParams
-        
-        var newHeaders: [String: String] = [:]
-        
-        if let headers = parameters.headers {
-            newHeaders = headers
-        }
-        
-        
         
         return parameters
     }
     
 }
-//    public static func getPluginHeaders() -> [String : String] {
-//        let token: String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIndtdmVyIjoyLCJ3bWlkZm10IjoiYXNjaWkiLCJ3bWlkdHlwIjoxLCJ3bWlkbGVuIjo1MTIsIndtb3BpZCI6MzIsIndtaWQiOiIyOTIxNmRmY2M0ZTIifQ.MvauSiNAvboiswsCkwD9_LkpCGSKcrLWaIFUsn2B9uM"
-//
-//        var headers: [String: String] = [:]
-//        headers["Authorization"] = "Bearer " + token
-//
-//        return headers
-//    }

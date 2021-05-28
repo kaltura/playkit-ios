@@ -87,6 +87,14 @@ fileprivate let formatTypeKey: String = "sourceType"
         return contentUrl
     }
     
+    public var playbackHeaders: [String: String]? {
+        guard let contentUrl = self.contentUrl else { return nil }
+        if let contentRequestAdapter = self.contentRequestAdapter {
+            return contentRequestAdapter.adapt(requestParams: PKRequestParams(url: contentUrl, headers: nil)).headers
+        }
+        return nil
+    }
+    
     @objc public convenience init (id: String) {
         self.init(id, contentUrl: nil)
     }
