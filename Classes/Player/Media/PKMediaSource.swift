@@ -87,7 +87,7 @@ fileprivate let formatTypeKey: String = "sourceType"
         return contentUrl
     }
     
-    public var playbackHeaders: [String: String]? {
+    public var playbackRequestHeaders: [String: String]? {
         guard let contentUrl = self.contentUrl else { return nil }
         if let contentRequestAdapter = self.contentRequestAdapter {
             return contentRequestAdapter.adapt(requestParams: PKRequestParams(url: contentUrl, headers: nil)).headers

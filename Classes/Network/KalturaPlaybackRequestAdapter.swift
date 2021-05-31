@@ -62,15 +62,14 @@ import Foundation
     }
 }
 
-
-@objc public class CustomHeadersRequestAdapter: KalturaPlaybackRequestAdapter {
+@objc public class CustomPlaybackRequestAdapter: KalturaPlaybackRequestAdapter {
     
-    @objc public var customHTTPHeaders: [String: String]?
+    @objc public var httpHeaders: [String: String]?
     
     public override func adapt(requestParams: PKRequestParams) -> PKRequestParams {
         let parameters = super.adapt(requestParams: requestParams)
         
-        if let customHeaders = self.customHTTPHeaders {
+        if let customHeaders = self.httpHeaders {
             var newHeaders: [String: String] = [:]
             if let headers = parameters.headers {
                 newHeaders = headers

@@ -47,8 +47,8 @@ class DefaultAssetHandler: AssetHandler {
         
         var headers: [String: String] = [:]
         
-        if let playbackHeaders = mediaSource.playbackHeaders {
-            headers = playbackHeaders
+        if let playbackRequestHeaders = mediaSource.playbackRequestHeaders {
+            headers = playbackRequestHeaders
         }
         
         headers["User-Agent"] = PlayKitManager.userAgent
