@@ -9,12 +9,43 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 class PlayerController: NSObject, Player {
     
-    func imageForSeekDistance(seek: Float) -> UIImage? {
-        let timePoint = Int(self.duration * Double(seek))
-        return self.currentPlayer.imagesTrack[timePoint]
+    func cancellImageDownloading() {
+        self.currentPlayer.cancelAllDownloading()
+    }
+    
+    func closestImageForSeekDistance(seek: Int) -> UIImage? {
+//        let timePoint = Int(self.duration * Double(seek))
+        
+        let numbers = Array(self.currentPlayer.imagesTrack.keys).sorted()
+        
+//        let x = 6
+        //let index = numbers.firstIndex(where: { $0 >= seek })!
+        if let result = numbers.first(where: { $0 >= seek }),
+           let image = self.currentPlayer.imagesTrack[result] {
+            
+//            print("Closest thumbnail \(result)") // 2 7
+            
+            return image
+        }
+        
+        return nil
+    }
+    
+    func loadImageForTimePeriod(time: [Int]) {
+        
+        let numbers = Array(self.currentPlayer.imagesTrack.keys)
+        
+        let difference = numbers.difference(from: time)
+        
+        let timeArray = difference.map {
+            return CMTime.init(seconds: Double($0), preferredTimescale: 1)
+        }
+        
+        self.currentPlayer.asynchronouslyLoadImagesTrack(time: timeArray)
     }
     
     /************************************************************/
@@ -534,5 +565,13 @@ extension PlayerController {
     private func handleRefreshAsset() {
         self.shouldRefresh = false
         self.refreshAsset()
+    }
+}
+
+extension Array where Element: Hashable {
+    func difference(from other: [Element]) -> [Element] {
+        let thisSet = Set(self)
+        let otherSet = Set(other)
+        return Array(thisSet.symmetricDifference(otherSet))
     }
 }

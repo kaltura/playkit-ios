@@ -204,8 +204,15 @@ import AVKit
         self.player.startBuffering()
     }
     
-    public func imageForSeekDistance(seek: Float) -> UIImage? {
-        return self.player.imageForSeekDistance(seek: seek)
+    public func closestImageForSeekDistance(seek: Int) -> UIImage? {
+        return self.player.closestImageForSeekDistance(seek: seek)
     }
     
+    public func loadImageForTimePeriod(time: [Int]) {
+        self.player.loadImageForTimePeriod(time: time)
+    }
+    
+    public func cancellImageDownloading() {
+        self.player.cancellImageDownloading()
+    }
 }

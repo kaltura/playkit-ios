@@ -353,6 +353,9 @@ public class AVPlayerEngine: AVPlayer {
     
     func destroy() {
         PKLog.verbose("Destroy player")
+        
+        self.imageTrackLoader?.stopAll()
+        self.imageTrackLoader = nil
         self.onEventBlock = nil
         // removes app state observer
         AppStateSubject.shared.remove(observer: self)
@@ -427,6 +430,35 @@ public class AVPlayerEngine: AVPlayer {
             return
         }
         self.currentItem?.textStyleRules = [textStyleRule]
+    }
+    
+    var imageTrackLoader: ImagesTrackManager?
+    
+    func cancelAllImagesDownloading() {
+        self.imageTrackLoader?.stopAll()
+    }
+    
+    func asynchronouslyLoadImagesTrack(time: [CMTime]) {
+        
+        self.imageTrackLoader?.loadImages(time: time) { (requestedTime: CMTime,
+                                                         image: CGImage?,
+                                                         actualTime: CMTime,
+                                                         result: AVAssetImageGenerator.Result,
+                                                         error: Error?) in
+            
+        
+            
+            print("LoadImagesTrack with result: \(result.rawValue)")
+            
+            if let error = error {
+                print("*****ImageTrackLoader ERROR! \(requestedTime.seconds)  \(actualTime.seconds) ERROR: \(error.localizedDescription)")
+            } else {
+                if let image = image {
+                    self.imagesTrack[Int(requestedTime.seconds.rounded(.down))] = UIImage(cgImage: image) 
+                }
+                print("requestedTime: \(requestedTime.seconds)  actualTime: \(actualTime.seconds)")
+            }
+        }
     }
 }
 

@@ -9,8 +9,17 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 class DefaultPlayerWrapper: NSObject, PlayerEngine {
+    
+    func cancelAllDownloading() {
+        printInvocationWarning("\(#function)")
+    }
+    
+    func asynchronouslyLoadImagesTrack(time: [CMTime]) {
+        printInvocationWarning("\(#function)")
+    }
     
     private func printInvocationWarning(_ action: String) {
         PKLog.warning("Attempt to invoke \(action) on null instance of the player")
@@ -108,7 +117,7 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         set { printInvocationWarning("\(#function)") }
     }
     
-    public var imagesTrack: [Int: UIImage] {
+    var imagesTrack: [Int: UIImage] {
         get {
             printInvocationWarning("\(#function)")
             return [:]

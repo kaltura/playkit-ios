@@ -89,6 +89,14 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         get { return self.currentPlayer.imagesTrack }
     }
     
+    public func asynchronouslyLoadImagesTrack(time: [CMTime]) {
+        self.currentPlayer.asynchronouslyLoadImagesTrack(time: time)
+    }
+    
+    public func cancelAllDownloading() {
+        self.currentPlayer.cancelAllImagesDownloading()
+    }
+    
     public var onEventBlock: ((PKEvent) -> Void)?
 
     public var startPosition: TimeInterval {

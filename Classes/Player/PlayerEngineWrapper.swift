@@ -1,8 +1,17 @@
 
 
 import Foundation
+import AVFoundation
 
 public class PlayerEngineWrapper: NSObject, PlayerEngine {
+    
+    public func cancelAllDownloading() {
+        self.playerEngine?.cancelAllDownloading()
+    }
+    
+    public func asynchronouslyLoadImagesTrack(time: [CMTime]) {
+        self.playerEngine?.asynchronouslyLoadImagesTrack(time: time)
+    }
     
     public var imagesTrack: [Int: UIImage] {
         get{

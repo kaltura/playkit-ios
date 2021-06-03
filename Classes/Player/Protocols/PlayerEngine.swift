@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 @objc public protocol PlayerEngine: BasicPlayer {
     /// Fired when an event is triggred.
@@ -36,4 +37,8 @@ import Foundation
     func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling)
     
     var imagesTrack: [Int: UIImage] { get }
+    
+    func asynchronouslyLoadImagesTrack(time: [CMTime])
+    
+    func cancelAllDownloading()
 }
