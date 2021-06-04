@@ -383,7 +383,12 @@ class PlayerController: NSObject, Player {
         self.mediaSessionUUID = UUID()
         
         // get the preferred media source and post source selected event
-        guard let (selectedSource, handler) = SourceSelector.selectSource(from: mediaConfig.mediaEntry) else { return }
+        guard let (selectedSource, handler) = SourceSelector.selectSource(from: mediaConfig.mediaEntry) else {
+            PKLog.error("No playable source found for entry")
+            self.onEventBlock?(PlayerEvent.Error(error: PlayerError.missingMediaSource))
+            return
+        }
+        
         self.onEventBlock?(PlayerEvent.SourceSelected(mediaSource: selectedSource))
         self.selectedSource = selectedSource
         self.assetHandler = handler
