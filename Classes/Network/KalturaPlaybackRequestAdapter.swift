@@ -61,3 +61,27 @@ import Foundation
         return from.data(using: .utf8)?.base64EncodedString() ?? ""
     }
 }
+
+@objc public class CustomPlaybackRequestAdapter: KalturaPlaybackRequestAdapter {
+    
+    @objc public var httpHeaders: [String: String]?
+    
+    public override func adapt(requestParams: PKRequestParams) -> PKRequestParams {
+        let parameters = super.adapt(requestParams: requestParams)
+        
+        if let customHeaders = self.httpHeaders {
+            var newHeaders: [String: String] = [:]
+            if let headers = parameters.headers {
+                newHeaders = headers
+            }
+                        
+            for (key, value) in customHeaders {
+                newHeaders[key] = value
+            }
+            return PKRequestParams(url: parameters.url, headers: newHeaders)
+        }
+        
+        return parameters
+    }
+    
+}

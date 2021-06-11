@@ -45,7 +45,13 @@ class DefaultAssetHandler: AssetHandler {
             return
         }
         
-        let headers = ["User-Agent": PlayKitManager.userAgent]
+        var headers: [String: String] = [:]
+        
+        if let playbackRequestHeaders = mediaSource.playbackRequestHeaders {
+            headers = playbackRequestHeaders
+        }
+        
+        headers["User-Agent"] = PlayKitManager.userAgent
         let cookies = HTTPCookieStorage.shared.cookies
         let assetOptions = ["AVURLAssetHTTPHeaderFieldsKey": headers, "AVURLAssetHTTPCookiesKey": cookies as Any] as [String : Any]
         
