@@ -26,8 +26,7 @@ import AVFoundation
     @objc public let averageAudioBitrate: Double
     /// The URI of the playback item
     @objc public let uri: String?
-
-        
+    
     init(bitrate: Double, indicatedBitrate: Double, observedBitrate: Double, averageVideoBitrate: Double, averageAudioBitrate: Double, uri: String?) {
         self.bitrate = bitrate
         self.indicatedBitrate = indicatedBitrate
