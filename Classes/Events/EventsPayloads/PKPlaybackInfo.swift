@@ -66,6 +66,7 @@ import AVFoundation
             averageVideoBitrate = bitrate
             averageAudioBitrate = -1
         }
+        
         let uri:String?
         uri = logEvent.uri ?? ""
     
