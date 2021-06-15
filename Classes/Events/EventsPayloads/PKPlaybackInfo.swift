@@ -35,7 +35,6 @@ import AVFoundation
         self.averageVideoBitrate = averageVideoBitrate
         self.averageAudioBitrate = averageAudioBitrate
         self.uri = uri
-
     }
     
     convenience init(logEvent: AVPlayerItemAccessLogEvent) {
@@ -67,9 +66,11 @@ import AVFoundation
             averageAudioBitrate = -1
         }
         
-        let uri:String?
-        uri = logEvent.uri ?? ""
-    
-        self.init(bitrate: bitrate, indicatedBitrate: indicatedBitrate, observedBitrate: observedBitrate, averageVideoBitrate: averageVideoBitrate, averageAudioBitrate: averageAudioBitrate, uri: uri)
+        self.init(bitrate: bitrate,
+                  indicatedBitrate: indicatedBitrate,
+                  observedBitrate: observedBitrate,
+                  averageVideoBitrate: averageVideoBitrate,
+                  averageAudioBitrate: averageAudioBitrate,
+                  uri: logEvent.uri ?? "")
     }
 }
