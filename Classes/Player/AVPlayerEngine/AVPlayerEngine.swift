@@ -229,6 +229,7 @@ public class AVPlayerEngine: AVPlayer {
         set {
             if newValue >= 0 {
                 super.rate = newValue
+                self.post(event: PlayerEvent.PlaybackRate(rate: newValue))
             }
         }
     }

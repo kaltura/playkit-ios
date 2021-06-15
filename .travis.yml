@@ -1,5 +1,5 @@
 language: swift
-osx_image: xcode10.2
+osx_image: xcode12
 before_install:
   - gem install cocoapods xcpretty
   - pod repo update
@@ -11,5 +11,7 @@ notifications:
       - noam.tamim@kaltura.com
       - nilit.danan@kaltura.com
       - gilad.nadav@kaltura.com
+      - oren.melamed@kaltura.com
+      - sergey.chausov@kaltura.com
     on_success: change
     on_failure: always
