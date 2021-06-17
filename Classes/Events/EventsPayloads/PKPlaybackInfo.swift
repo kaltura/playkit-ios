@@ -49,7 +49,7 @@ import AVFoundation
         let observedBitrate = logEvent.observedBitrate
         let averageAudioBitrate: Double
         let averageVideoBitrate: Double
-        if #available(iOS 10.0, *) {
+        if #available(iOS 10.0, tvOS 10.0, *) {
             if (logEvent.averageVideoBitrate > 0) {
                 averageVideoBitrate = logEvent.averageVideoBitrate
             } else {
