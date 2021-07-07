@@ -56,6 +56,7 @@ public extension PKEvent {
         static let bitrate = "bitrate"
         static let currentTime = "currentTime"
         static let rate = "rate"
+        static let cdnCode = "CNDCode"
     }
     
     // MARK: Player Data Accessors
@@ -136,5 +137,10 @@ public extension PKEvent {
     /// The loaded time ranges, PKEvent Data Accessor
     @objc var timeRanges: [PKTimeRange]? {
         return self.data?[EventDataKeys.timeRanges] as? [PKTimeRange]
+    }
+    
+    /// CDN code provided by plugins (SmartSwitch)
+    @objc var cdnCode: String? {
+        return self.data?[EventDataKeys.cdnCode] as? String
     }
 }

@@ -17,7 +17,7 @@ import AVFoundation
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, stopped, ended, loadedMetadata, play, pause, playing, seeking, seeked, replay,
         tracksAvailable, textTrackChanged, audioTrackChanged, videoTrackChanged, playbackInfo, stateChanged,
-        timedMetadata, sourceSelected, loadedTimeRanges, playheadUpdate, error, errorLog, playbackStalled, playbackRate
+        timedMetadata, sourceSelected, loadedTimeRanges, playheadUpdate, error, errorLog, playbackStalled, playbackRate, cdnSwitched
     ]
     
     // MARK: - Player Events Static Reference
@@ -73,6 +73,8 @@ import AVFoundation
     @objc public static let playbackStalled: PlayerEvent.Type = PlaybackStalled.self
     /// Sent when playback rate changed and rate > 0
     @objc public static let playbackRate: PlayerEvent.Type = PlaybackRate.self
+    /// Sent when playback playback URL changed by SmartSwitch interceptor plugin.
+    @objc public static let cdnSwitched: PlayerEvent.Type = CDNSwitched.self
     
     // MARK: - Player Basic Events
 
@@ -108,6 +110,12 @@ import AVFoundation
     public class SourceSelected: PlayerEvent {
         convenience init(mediaSource: PKMediaSource) {
             self.init([EventDataKeys.mediaSource: mediaSource])
+        }
+    }
+     
+    public class CDNSwitched: PlayerEvent {
+        public convenience init(cdnCode: String) {
+            self.init([EventDataKeys.cdnCode: cdnCode])
         }
     }
     
