@@ -137,5 +137,4 @@ public extension PKEvent {
     @objc var timeRanges: [PKTimeRange]? {
         return self.data?[EventDataKeys.timeRanges] as? [PKTimeRange]
     }
-    
 }
