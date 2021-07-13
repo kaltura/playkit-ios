@@ -16,7 +16,7 @@
 
 import Foundation
 
-/// InterceptorEvent is a class used to reflect specific PKMediaEntryInterceptor events.
+/// InterceptorEvent is a class that is used to reflect specific PKMediaEntryInterceptor events.
 @objc public class InterceptorEvent: PKEvent {
     
     @objc public static let allEventTypes: [InterceptorEvent.Type] = [
@@ -25,9 +25,9 @@ import Foundation
     
     // MARK: - Interceptor Events Static References.
     
-    /// Sent when playback playback URL changed by SmartSwitch interceptor plugin.
+    /// Sent by SmartSwitch interceptor plugin, when the playback URL changed with attached CDN code.
+    /// Currently used by Youbora contentCdn options.
     @objc public static let cdnSwitched: InterceptorEvent.Type = CDNSwitched.self
-    
     
     public class CDNSwitched: InterceptorEvent {
         public convenience init(cdnCode: String) {
