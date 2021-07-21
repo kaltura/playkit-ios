@@ -56,6 +56,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                     if #available(iOS 10.0, tvOS 10.0, *) {
                         self.currentPlayer.automaticallyWaitsToMinimizeStalling = automaticallyWaitsToMinimizeStalling
                     }
+                case .configuredTimeOffsetFromLive(let time):
+                    if #available(iOS 13.0, *) {
+                        self.currentPlayer.currentItem?.configuredTimeOffsetFromLive = time
+                    }
                 }
             }
         }

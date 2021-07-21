@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 typealias SettingsChange = ((PlayerSettingsType) -> Void)
 
@@ -61,11 +62,25 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     /// In another case if you would like to start initializing the next media without buffering it, so that once the media is switched to the next one, it will be smother.
     @objc public var autoBuffer: Bool = true
     
+    @objc public var automaticallyPreservesTimeOffsetFromLive: Bool = false
+    
+    public var configuredTimeOffsetFromLive: CMTime? {
+        didSet {
+            if let time = configuredTimeOffsetFromLive {
+                self.onChange?(.configuredTimeOffsetFromLive(time))
+            }
+        }
+    }
+    
     @objc public func createCopy() -> PKNetworkSettings {
         let copy = PKNetworkSettings()
         copy.preferredPeakBitRate = self.preferredPeakBitRate
         copy.preferredForwardBufferDuration = self.preferredForwardBufferDuration
         copy.automaticallyWaitsToMinimizeStalling = self.automaticallyWaitsToMinimizeStalling
+        
+        copy.automaticallyPreservesTimeOffsetFromLive = self.automaticallyPreservesTimeOffsetFromLive
+        copy.configuredTimeOffsetFromLive = self.configuredTimeOffsetFromLive
+        
         return copy
     }
 }
@@ -111,6 +126,7 @@ enum PlayerSettingsType {
     case preferredPeakBitRate(Double)
     case preferredForwardBufferDuration(Double)
     case automaticallyWaitsToMinimizeStalling(Bool)
+    case configuredTimeOffsetFromLive(CMTime)
 }
 
 /************************************************************/

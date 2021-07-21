@@ -33,6 +33,14 @@ extension AVPlayerEngine {
         let playerItem = AVPlayerItem(asset: newAsset.avAsset)
         playerItem.preferredPeakBitRate = newAsset.playerSettings.network.preferredPeakBitRate
 
+        if #available(iOS 13.0, *) {
+            playerItem.automaticallyPreservesTimeOffsetFromLive = newAsset.playerSettings.network.automaticallyPreservesTimeOffsetFromLive
+            
+            if let time = newAsset.playerSettings.network.configuredTimeOffsetFromLive {
+                playerItem.configuredTimeOffsetFromLive = time
+            }
+        }
+        
         if #available(iOS 10.0, tvOS 10.0, *) {
             playerItem.preferredForwardBufferDuration = newAsset.playerSettings.network.preferredForwardBufferDuration
         }
