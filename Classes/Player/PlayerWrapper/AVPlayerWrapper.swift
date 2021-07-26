@@ -57,7 +57,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                         self.currentPlayer.automaticallyWaitsToMinimizeStalling = automaticallyWaitsToMinimizeStalling
                     }
                 case .configuredTimeOffsetFromLive(let time):
-                    if #available(iOS 13.0, *) {
+                    if #available(iOS 13.0, tvOS 13.0, *) {
                         self.currentPlayer.currentItem?.configuredTimeOffsetFromLive = time
                     }
                 }
