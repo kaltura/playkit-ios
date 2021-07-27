@@ -56,7 +56,17 @@ import Foundation
     @objc public var creativeId: String
     // The Advertiser Name for the ad.
     @objc public var advertiserName: String   
- 
+    
+    @objc public var adPlayHead: TimeInterval
+    @objc public var skipTimeOffset: TimeInterval
+    @objc public var creativeAdId: String?
+    @objc public var dealId: String?
+    @objc public var surveyUrl: String?
+    @objc public var traffickingParams: String?
+    @objc public var adIndexInPod: Int
+    @objc public var podCount: Int
+    @objc public var adPodTimeOffset: TimeInterval
+    
     /// returns the position type of the ad (pre, mid, post)
     @objc public var positionType: AdPositionType {
         if timeOffset > 0 {
@@ -84,7 +94,16 @@ import Foundation
          podIndex: Int,
          mediaBitrate: Int,
          creativeId: String,
-         advertiserName: String) {
+         advertiserName: String,
+         adPlayHead: TimeInterval,
+         skipTimeOffset: TimeInterval,
+         creativeAdId: String?,
+         dealId: String?,
+         surveyUrl: String?,
+         traffickingParams: String?,
+         adIndexInPod: Int,
+         podCount: Int,
+         adPodTimeOffset: TimeInterval) {
         
         self.adDescription = adDescription
         self.duration = adDuration
@@ -103,6 +122,16 @@ import Foundation
         self.mediaBitrate = mediaBitrate
         self.creativeId = creativeId
         self.advertiserName = advertiserName
+        
+        self.adPlayHead = adPlayHead
+        self.skipTimeOffset = skipTimeOffset
+        self.creativeAdId = creativeAdId
+        self.dealId = dealId
+        self.surveyUrl = surveyUrl
+        self.traffickingParams = traffickingParams
+        self.adIndexInPod = adIndexInPod
+        self.podCount = podCount
+        self.adPodTimeOffset = adPodTimeOffset
     }
     
     public override var description: String {
@@ -121,8 +150,17 @@ import Foundation
             "isBumper: \(isBumper)\n" +
             "podIndex: \(podIndex)\n" +
             "mediaBitrate: \(mediaBitrate)\n" +
-            "positionType: \(positionType)" + 
-            "creativeId: \(creativeId)" +
-            "advertiserName: \(advertiserName)"
+            "positionType: \(positionType)\n" +
+            "creativeId: \(creativeId)\n" +
+            "advertiserName: \(advertiserName)\n" +
+            "adPlayHead: \(adPlayHead)\n" +
+            "skipTimeOffset: \(skipTimeOffset)\n" +
+            "creativeAdId: \(creativeAdId ?? "")\n" +
+            "dealId: \(dealId ?? "")\n" +
+            "surveyUrl: \(surveyUrl ?? "")\n" +
+            "traffickingParams: \(traffickingParams ?? "")\n" +
+            "adIndexInPod: \(adIndexInPod)\n" +
+            "podCount: \(podCount)\n" +
+            "adPodTimeOffset: \(adPodTimeOffset)\n"
     }
 }
