@@ -35,6 +35,10 @@ import AVFoundation
      */
     private init(storage: LocalDataStore?) {
         self.storage = storage ?? NullStore.instance
+        
+        let adapter = KalturaUDRMLicenseRequestAdapter()
+        adapter.sessionId = UUID().uuidString + ":Offline"
+        self.licenseRequestAdapter = adapter
     }
 
     /// Create a PKMediaSource for a local asset. This allows the player to play a downloaded asset.
@@ -116,7 +120,6 @@ extension LocalAssetsManager {
     }
     
     @objc public func registerDownloadedAsset(location: URL, mediaSource: PKMediaSource, callback: @escaping (Error?) -> Void) {
-        
         
         // Maybe update licenseRequestAdapter and fpsLicenseRequestDelegate in params
         let drmAdapter = self.licenseRequestAdapter

@@ -30,3 +30,9 @@ import Foundation
         self.headers = headers
     }
 }
+
+extension PKRequestParamsAdapter {
+    func base64(from: String) -> String {
+        return from.data(using: .utf8)?.base64EncodedString() ?? ""
+    }
+}

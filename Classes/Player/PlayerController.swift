@@ -442,6 +442,8 @@ fileprivate extension PlayerController {
         
         // Maybe update licenseRequestAdapter and fpsLicenseRequestDelegate in params
         let drmAdapter = self.settings.licenseRequestAdapter
+        drmAdapter?.updateRequestAdapter(with: self)
+        
         let licenseProvider = self.settings.fairPlayLicenseProvider
         
         if let drmData = mediaSource.drmData {
