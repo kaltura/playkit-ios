@@ -62,24 +62,11 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     /// In another case if you would like to start initializing the next media without buffering it, so that once the media is switched to the next one, it will be smother.
     @objc public var autoBuffer: Bool = true
     
-    @objc public var automaticallyPreservesTimeOffsetFromLive: Bool = false
-    
-    public var configuredTimeOffsetFromLive: CMTime? {
-        didSet {
-            if let time = configuredTimeOffsetFromLive {
-                self.onChange?(.configuredTimeOffsetFromLive(time))
-            }
-        }
-    }
-    
     @objc public func createCopy() -> PKNetworkSettings {
         let copy = PKNetworkSettings()
         copy.preferredPeakBitRate = self.preferredPeakBitRate
         copy.preferredForwardBufferDuration = self.preferredForwardBufferDuration
         copy.automaticallyWaitsToMinimizeStalling = self.automaticallyWaitsToMinimizeStalling
-        
-        copy.automaticallyPreservesTimeOffsetFromLive = self.automaticallyPreservesTimeOffsetFromLive
-        copy.configuredTimeOffsetFromLive = self.configuredTimeOffsetFromLive
         
         return copy
     }
@@ -122,6 +109,30 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     @objc public var audioSelectionLanguage: String?
 }
 
+@objc public class PKLowLatencySettings: NSObject {
+    var onChange: SettingsChange?
+    
+    @objc public var automaticallyPreservesTimeOffsetFromLive: Bool = false
+    
+    public var configuredTimeOffsetFromLive: CMTime? {
+        didSet {
+            if let time = configuredTimeOffsetFromLive {
+                self.onChange?(.configuredTimeOffsetFromLive(time))
+            }
+        }
+    }
+    
+    @objc public func createCopy() -> PKLowLatencySettings {
+        let copy = PKLowLatencySettings()
+        
+        copy.automaticallyPreservesTimeOffsetFromLive = self.automaticallyPreservesTimeOffsetFromLive
+        copy.configuredTimeOffsetFromLive = self.configuredTimeOffsetFromLive
+        
+        return copy
+    }
+    
+}
+
 enum PlayerSettingsType {
     case preferredPeakBitRate(Double)
     case preferredForwardBufferDuration(Double)
@@ -146,6 +157,7 @@ enum PlayerSettingsType {
 
     /// The settings for network data consumption.
     @objc public var network = PKNetworkSettings()
+    @objc public var lowLatency = PKLowLatencySettings()
     @objc public var trackSelection = PKTrackSelectionSettings()
     @objc public var textTrackStyling = PKTextTrackStyling()
     

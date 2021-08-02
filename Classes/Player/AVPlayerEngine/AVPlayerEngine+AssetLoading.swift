@@ -34,9 +34,9 @@ extension AVPlayerEngine {
         playerItem.preferredPeakBitRate = newAsset.playerSettings.network.preferredPeakBitRate
 
         if #available(iOS 13.0, tvOS 13.0, *) {
-            playerItem.automaticallyPreservesTimeOffsetFromLive = newAsset.playerSettings.network.automaticallyPreservesTimeOffsetFromLive
+            playerItem.automaticallyPreservesTimeOffsetFromLive = newAsset.playerSettings.lowLatency.automaticallyPreservesTimeOffsetFromLive
             
-            if let time = newAsset.playerSettings.network.configuredTimeOffsetFromLive {
+            if let time = newAsset.playerSettings.lowLatency.configuredTimeOffsetFromLive {
                 playerItem.configuredTimeOffsetFromLive = time
             }
         }
