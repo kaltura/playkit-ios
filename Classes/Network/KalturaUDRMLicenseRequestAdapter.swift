@@ -35,33 +35,49 @@ import Foundation
     
     /// Adapts the request params
     @objc public func adapt(requestParams: PKRequestParams) -> PKRequestParams {
-//        return requestParams
         guard let sessionId = self.sessionId else { return requestParams }
-        guard var urlComponents = URLComponents(url: requestParams.url, resolvingAgainstBaseURL: false) else { return requestParams }
-        
+        guard let urlComponents = URLComponents(url: requestParams.url, resolvingAgainstBaseURL: false) else { return requestParams }
+        // Prepare clientTag
+        let clientTag = PlayKitManager.clientTag
+        // Prepare referrer
         var referrer = Bundle.main.bundleIdentifier ?? ""
         if let appName = self.applicationName {
             referrer = appName
         }
+        referrer = self.base64(from: referrer)
         
-        let queryItems: [URLQueryItem] = [
-            URLQueryItem(name: "playSessionId", value: sessionId),
-            URLQueryItem(name: "clientTag", value: PlayKitManager.clientTag),
-            URLQueryItem(name: "referrer", value: self.base64(from: referrer))
-        ]
-        
-        if var urlQueryItems = urlComponents.queryItems {
-            urlQueryItems += queryItems
-            urlComponents.queryItems = urlQueryItems
+        if #available(iOS 11.0, tvOS 11.0, *) {
+            let url = requestParams.url
+                .appendingPercentEncodedQueryComponent(key: "playSessionId", value: sessionId)
+                .appendingPercentEncodedQueryComponent(key: "clientTag", value: clientTag)
+                .appendingPercentEncodedQueryComponent(key: "referrer", value: referrer)
+            
+            return PKRequestParams(url: url, headers: requestParams.headers)
         } else {
-            urlComponents.queryItems = queryItems
+            var licenceUrlString = requestParams.url.absoluteString
+            
+            var queryParameters: [String: String] = [
+                "playSessionId": percentEncoded(sessionId),
+                "clientTag": percentEncoded(clientTag),
+                "referrer": percentEncoded(referrer)
+            ]
+            
+            if urlComponents.queryItems == nil,
+               let firstKey = queryParameters.keys.first {
+                licenceUrlString = licenceUrlString.appending("?\(firstKey)=\(queryParameters.removeValue(forKey: firstKey) ?? "")")
+            }
+            
+            for item in queryParameters {
+                licenceUrlString = licenceUrlString.appending("&\(item.key)=\(item.value)")
+            }
+            
+            // create the url
+            guard let url = URL(string: licenceUrlString) else {
+                PKLog.debug("failed to create url after appending query items")
+                return requestParams
+            }
+            return PKRequestParams(url: url, headers: requestParams.headers)
         }
-        // create the url
-        guard let url = urlComponents.url else {
-            PKLog.debug("failed to create url after appending query items")
-            return requestParams
-        }
-        return PKRequestParams(url: url, headers: requestParams.headers)
     }
     
 }
