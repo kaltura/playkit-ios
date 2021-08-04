@@ -135,7 +135,8 @@ import Foundation
     }
     
     public override var description: String {
-        return "adDescription: \(adDescription)\n" +
+        
+        let info = "adDescription: \(adDescription)\n" +
             "duration: \(duration)\n" +
             "title: \(title)\n" +
             "isSkippable: \(isSkippable)\n" +
@@ -162,5 +163,8 @@ import Foundation
             "adIndexInPod: \(adIndexInPod)\n" +
             "podCount: \(podCount)\n" +
             "adPodTimeOffset: \(adPodTimeOffset)\n"
+        
+        return info
     }
+        
 }
