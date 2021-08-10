@@ -85,9 +85,8 @@ class PlayerLoader: PlayerDecoratorBase {
             kavaPluginLoaded = pluginName == "KavaPlugin"
         }
         
-        if !kavaImpressionSent && !kavaPluginLoaded {
-            fireKavaImpression(mediaConfig: config)
-            kavaImpressionSent = true
+        if !kavaPluginLoaded {
+            fireKavaAnalytics(mediaConfig: config)
         }
     }
     
@@ -145,9 +144,21 @@ class PlayerLoader: PlayerDecoratorBase {
         loadedPlugin.plugin.onUpdateConfig(pluginConfig: config)
     }
     
-    private func fireKavaImpression(mediaConfig: MediaConfig) {
+    private func fireKavaAnalytics(mediaConfig: MediaConfig) {
         let impressionInfo = self.getKavaImpressionInfo(mediaConfig: mediaConfig)
-        NetworkUtils().sendKavaImpression(forPartnerId: impressionInfo.kavaPartnerId, entryId: impressionInfo.kavaEntryId, sessionId: self.getPlayer().sessionId)
+        
+        if !kavaImpressionSent {
+            NetworkUtils().sendKavaAnalytics(forPartnerId: impressionInfo.kavaPartnerId,
+                                              entryId: impressionInfo.kavaEntryId,
+                                              eventType: NetworkUtils.KAVA_EVENT_IMPRESSION,
+                                              sessionId: self.getPlayer().sessionId)
+            kavaImpressionSent = true
+        }
+        
+        NetworkUtils().sendKavaAnalytics(forPartnerId: impressionInfo.kavaPartnerId,
+                                          entryId: impressionInfo.kavaEntryId,
+                                          eventType: NetworkUtils.KAVA_EVENT_PLAY_REQUEST,
+                                          sessionId: self.getPlayer().sessionId)
     }
     
     private func getKavaImpressionInfo(mediaConfig: MediaConfig) -> (kavaPartnerId: Int?, kavaEntryId: String?) {

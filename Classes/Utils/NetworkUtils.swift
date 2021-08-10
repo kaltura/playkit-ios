@@ -17,7 +17,10 @@ import KalturaNetKit
     let DEFAULT_KAVA_PARTNER_ID: Int = 2504201
     let DEFAULT_KAVA_ENTRY_ID: String = "1_3bwzbc9o"
     
-    func sendKavaImpression(forPartnerId partnerId: Int?, entryId: String?, sessionId: String?) {
+    static let KAVA_EVENT_IMPRESSION = "1"
+    static let KAVA_EVENT_PLAY_REQUEST = "2"
+    
+    func sendKavaAnalytics(forPartnerId partnerId: Int?, entryId: String?, eventType: String, sessionId: String) {
         guard let request: KalturaRequestBuilder = KalturaRequestBuilder(url: DEFAULT_KAVA_BASE_URL, service: nil, action: nil) else { return }
         
         var defPartnerId: Int = DEFAULT_KAVA_PARTNER_ID
@@ -33,11 +36,11 @@ import KalturaNetKit
         
         request.setParam(key: "service", value: "analytics")
         request.setParam(key: "action", value: "trackEvent")
-        request.setParam(key: "eventType", value: "1")
+        request.setParam(key: "eventType", value: eventType)
         request.setParam(key: "eventIndex", value: "1")
         request.setParam(key: "partnerId", value: String(defPartnerId))
         request.setParam(key: "entryId", value: defEntryId)
-        request.setParam(key: "sessionId", value: sessionId ?? "NO SESSION")
+        request.setParam(key: "sessionId", value: sessionId)
         request.setParam(key: "referrer", value: self.base64(from: Bundle.main.bundleIdentifier ?? ""))
         
         request.setParam(key: "deliveryType", value: "url")
@@ -53,7 +56,6 @@ import KalturaNetKit
         }
         PKLog.debug("Sending Kava Event, Impression (1)")
         KNKRequestExecutor.shared.send(request: request.build())
-        
     }
     
     func base64(from: String) -> String {
