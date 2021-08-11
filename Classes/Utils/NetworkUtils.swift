@@ -26,9 +26,10 @@ import KalturaNetKit
         var defPartnerId: Int = DEFAULT_KAVA_PARTNER_ID
         var defEntryId: String = DEFAULT_KAVA_ENTRY_ID
         
-        if let partnerId = partnerId, partnerId > 0 {
+        if let partnerId = partnerId, partnerId > 0,
+           let entryId = entryId, !entryId.isEmpty {
             defPartnerId = partnerId
-            defEntryId = entryId ?? ""
+            defEntryId = entryId
         }
         
         request.set(method: .get)
@@ -42,9 +43,8 @@ import KalturaNetKit
         request.setParam(key: "entryId", value: defEntryId)
         request.setParam(key: "sessionId", value: sessionId)
         request.setParam(key: "referrer", value: self.base64(from: Bundle.main.bundleIdentifier ?? ""))
-        
         request.setParam(key: "deliveryType", value: "url")
-        //request.setParam(key: "playbackType", value: "vod")
+        request.setParam(key: "playbackType", value: "vod")
         request.setParam(key: "clientVer", value: "\(PlayKitManager.clientTag)")
         request.setParam(key: "position", value: "0")
         if let bundleId = Bundle.main.bundleIdentifier {
