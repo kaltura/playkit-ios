@@ -114,6 +114,14 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     
     @objc public var automaticallyPreservesTimeOffsetFromLive: Bool = false
     
+    /// Alternative setter for configuredTimeOffsetFromLive.
+    /// Accepts Time Offset From Live specified in milliseconds.
+    @objc public var targetOffsetMs: UInt = 0 {
+        didSet {
+            self.configuredTimeOffsetFromLive = CMTime(seconds: Double(targetOffsetMs / 1000), preferredTimescale: CMTimeScale(1.0))
+        }
+    }
+    
     public var configuredTimeOffsetFromLive: CMTime? {
         didSet {
             if let time = configuredTimeOffsetFromLive {
