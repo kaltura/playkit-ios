@@ -17,10 +17,10 @@ import KalturaNetKit
     let DEFAULT_KAVA_PARTNER_ID: Int = 2504201
     let DEFAULT_KAVA_ENTRY_ID: String = "1_3bwzbc9o"
     
-    static let KAVA_EVENT_IMPRESSION = "1"
-    static let KAVA_EVENT_PLAY_REQUEST = "2"
+    static public let KAVA_EVENT_IMPRESSION = "1"
+    static public let KAVA_EVENT_PLAY_REQUEST = "2"
     
-    func sendKavaAnalytics(forPartnerId partnerId: Int?, entryId: String?, eventType: String, sessionId: String) {
+    public func sendKavaAnalytics(forPartnerId partnerId: Int?, entryId: String?, eventType: String, sessionId: String) {
         guard let request: KalturaRequestBuilder = KalturaRequestBuilder(url: DEFAULT_KAVA_BASE_URL, service: nil, action: nil) else { return }
         
         var defPartnerId: Int = DEFAULT_KAVA_PARTNER_ID
