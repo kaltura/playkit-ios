@@ -167,7 +167,7 @@ class PlayerLoader: PlayerDecoratorBase {
         
         guard let metadata = mediaConfig.mediaEntry.metadata else { return (kavaPartnerId, kavaEntryId) }
         
-        if let partnerId = metadata["kavaPartnerId"] {
+        if let partnerId = metadata["partnerId"] {
             kavaPartnerId = Int(partnerId)
         }
         
