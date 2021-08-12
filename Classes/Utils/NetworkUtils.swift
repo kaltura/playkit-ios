@@ -13,18 +13,18 @@ import KalturaNetKit
 
 @objc public class NetworkUtils: NSObject {
     
-    let DEFAULT_KAVA_BASE_URL: String = "https://analytics.kaltura.com/api_v3/index.php"
-    let DEFAULT_KAVA_PARTNER_ID: Int = 2504201
-    let DEFAULT_KAVA_ENTRY_ID: String = "1_3bwzbc9o"
+    let defaultKavaBaseUrl: String = "https://analytics.kaltura.com/api_v3/index.php"
+    let defaultKavaPartnerId: Int = 2504201
+    let defaultKavaEntryId: String = "1_3bwzbc9o"
     
-    static public let KAVA_EVENT_IMPRESSION = "1"
-    static public let KAVA_EVENT_PLAY_REQUEST = "2"
+    static public let kavaEventImpression = "1"
+    static public let kavaEventPlayRequest = "2"
     
     public func sendKavaAnalytics(forPartnerId partnerId: Int?, entryId: String?, eventType: String, sessionId: String) {
-        guard let request: KalturaRequestBuilder = KalturaRequestBuilder(url: DEFAULT_KAVA_BASE_URL, service: nil, action: nil) else { return }
+        guard let request: KalturaRequestBuilder = KalturaRequestBuilder(url: defaultKavaBaseUrl, service: nil, action: nil) else { return }
         
-        var defPartnerId: Int = DEFAULT_KAVA_PARTNER_ID
-        var defEntryId: String = DEFAULT_KAVA_ENTRY_ID
+        var defPartnerId: Int = defaultKavaPartnerId
+        var defEntryId: String = defaultKavaEntryId
         
         if let partnerId = partnerId, partnerId > 0,
            let entryId = entryId, !entryId.isEmpty {

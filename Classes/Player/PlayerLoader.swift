@@ -150,14 +150,14 @@ class PlayerLoader: PlayerDecoratorBase {
         if !kavaImpressionSent {
             NetworkUtils().sendKavaAnalytics(forPartnerId: impressionInfo.kavaPartnerId,
                                               entryId: impressionInfo.kavaEntryId,
-                                              eventType: NetworkUtils.KAVA_EVENT_IMPRESSION,
+                                              eventType: NetworkUtils.kavaEventImpression,
                                               sessionId: self.getPlayer().sessionId)
             kavaImpressionSent = true
         }
         
         NetworkUtils().sendKavaAnalytics(forPartnerId: impressionInfo.kavaPartnerId,
                                           entryId: impressionInfo.kavaEntryId,
-                                          eventType: NetworkUtils.KAVA_EVENT_PLAY_REQUEST,
+                                          eventType: NetworkUtils.kavaEventPlayRequest,
                                           sessionId: self.getPlayer().sessionId)
     }
     
