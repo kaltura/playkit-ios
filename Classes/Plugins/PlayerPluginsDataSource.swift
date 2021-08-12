@@ -13,6 +13,8 @@ import Foundation
 public protocol PlayerPluginsDataSource {
     /// Filtering loaded plugins by certain type.
     func getLoadedPlugins<T>(ofType type: T.Type) -> [T]
+    
+    func isPluginLoaded(pluginName name: String) -> Bool
 }
 
 extension PlayerLoader: PlayerPluginsDataSource {
@@ -21,4 +23,9 @@ extension PlayerLoader: PlayerPluginsDataSource {
             .filter { $0.value.plugin is T }
             .compactMap { $0.value.plugin as? T }
     }
+    
+    public func isPluginLoaded(pluginName name: String) -> Bool {
+        return self.loadedPlugins.contains { $0.key == name }
+    }
+    
 }

@@ -25,6 +25,9 @@ class PlayerLoader: PlayerDecoratorBase {
     var messageBus = MessageBus()
     var concreatePlayerController: PlayerController?
     
+    private var kavaPluginLoaded: Bool = false
+    private var kavaImpressionSent: Bool = false
+    
     func load(pluginConfig: PluginConfig?) {
         var playerController: PlayerController
         
@@ -79,6 +82,11 @@ class PlayerLoader: PlayerDecoratorBase {
         for (pluginName, loadedPlugin) in loadedPlugins {
             PKLog.verbose("Preparing plugin \(pluginName)")
             loadedPlugin.plugin.onUpdateMedia(mediaConfig: config)
+            kavaPluginLoaded = pluginName == "KavaPlugin"
+        }
+        
+        if !kavaPluginLoaded {
+            fireKavaAnalytics(mediaConfig: config)
         }
     }
     
@@ -134,6 +142,40 @@ class PlayerLoader: PlayerDecoratorBase {
         }
         
         loadedPlugin.plugin.onUpdateConfig(pluginConfig: config)
+    }
+    
+    private func fireKavaAnalytics(mediaConfig: MediaConfig) {
+        let impressionInfo = self.getKavaImpressionInfo(mediaConfig: mediaConfig)
+        
+        if !kavaImpressionSent {
+            NetworkUtils().sendKavaAnalytics(forPartnerId: impressionInfo.kavaPartnerId,
+                                              entryId: impressionInfo.kavaEntryId,
+                                              eventType: NetworkUtils.kavaEventImpression,
+                                              sessionId: self.getPlayer().sessionId)
+            kavaImpressionSent = true
+        }
+        
+        NetworkUtils().sendKavaAnalytics(forPartnerId: impressionInfo.kavaPartnerId,
+                                          entryId: impressionInfo.kavaEntryId,
+                                          eventType: NetworkUtils.kavaEventPlayRequest,
+                                          sessionId: self.getPlayer().sessionId)
+    }
+    
+    private func getKavaImpressionInfo(mediaConfig: MediaConfig) -> (kavaPartnerId: Int?, kavaEntryId: String?) {
+        var kavaPartnerId: Int?
+        var kavaEntryId: String?
+        
+        guard let metadata = mediaConfig.mediaEntry.metadata else { return (kavaPartnerId, kavaEntryId) }
+        
+        if let partnerId = metadata["partnerId"] {
+            kavaPartnerId = Int(partnerId)
+        }
+        
+        if let entryId = metadata["entryId"] {
+            kavaEntryId = entryId
+        }
+        
+        return (kavaPartnerId, kavaEntryId)
     }
     
 }
