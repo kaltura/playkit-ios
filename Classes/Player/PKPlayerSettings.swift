@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import Foundation
+import AVFoundation
 
 typealias SettingsChange = ((PlayerSettingsType) -> Void)
 
@@ -66,6 +67,7 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
         copy.preferredPeakBitRate = self.preferredPeakBitRate
         copy.preferredForwardBufferDuration = self.preferredForwardBufferDuration
         copy.automaticallyWaitsToMinimizeStalling = self.automaticallyWaitsToMinimizeStalling
+        
         return copy
     }
 }
@@ -107,10 +109,43 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     @objc public var audioSelectionLanguage: String?
 }
 
+@objc public class PKLowLatencySettings: NSObject {
+    var onChange: SettingsChange?
+    
+    @objc public var automaticallyPreservesTimeOffsetFromLive: Bool = false
+    
+    /// Alternative setter for configuredTimeOffsetFromLive.
+    /// Accepts Time Offset From Live specified in milliseconds.
+    @objc public var targetOffsetMs: UInt = 0 {
+        didSet {
+            self.configuredTimeOffsetFromLive = CMTime(seconds: Double(targetOffsetMs / 1000), preferredTimescale: CMTimeScale(1.0))
+        }
+    }
+    
+    public var configuredTimeOffsetFromLive: CMTime? {
+        didSet {
+            if let time = configuredTimeOffsetFromLive {
+                self.onChange?(.configuredTimeOffsetFromLive(time))
+            }
+        }
+    }
+    
+    @objc public func createCopy() -> PKLowLatencySettings {
+        let copy = PKLowLatencySettings()
+        
+        copy.automaticallyPreservesTimeOffsetFromLive = self.automaticallyPreservesTimeOffsetFromLive
+        copy.configuredTimeOffsetFromLive = self.configuredTimeOffsetFromLive
+        
+        return copy
+    }
+    
+}
+
 enum PlayerSettingsType {
     case preferredPeakBitRate(Double)
     case preferredForwardBufferDuration(Double)
     case automaticallyWaitsToMinimizeStalling(Bool)
+    case configuredTimeOffsetFromLive(CMTime)
 }
 
 /************************************************************/
@@ -130,6 +165,7 @@ enum PlayerSettingsType {
 
     /// The settings for network data consumption.
     @objc public var network = PKNetworkSettings()
+    @objc public var lowLatency = PKLowLatencySettings()
     @objc public var trackSelection = PKTrackSelectionSettings()
     @objc public var textTrackStyling = PKTextTrackStyling()
     

@@ -101,9 +101,25 @@ import Foundation
     public class AdFirstQuartile: AdEvent {}
     public class AdLog: AdEvent {}
     public class AdMidpoint: AdEvent {}
-    public class AdPaused: AdEvent {}
-    public class AdResumed: AdEvent {}
-    public class AdSkipped: AdEvent {}
+    
+    public class AdPaused: AdEvent {
+        public convenience init(adInfo: PKAdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+    
+    public class AdResumed: AdEvent {
+        public convenience init(adInfo: PKAdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+    
+    public class AdSkipped: AdEvent {
+        public convenience init(adInfo: PKAdInfo) {
+            self.init([AdEventDataKeys.adInfo: adInfo])
+        }
+    }
+    
     public class AdTapped: AdEvent {}
     public class AdThirdQuartile: AdEvent {}
     
