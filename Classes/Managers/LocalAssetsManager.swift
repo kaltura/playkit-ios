@@ -37,7 +37,7 @@ import AVFoundation
         self.storage = storage ?? NullStore.instance
         
         let adapter = KalturaUDRMLicenseRequestAdapter()
-        adapter.sessionId = UUID().uuidString + ":Offline"
+        adapter.sessionId = UUID().uuidString
         self.licenseRequestAdapter = adapter
     }
 
