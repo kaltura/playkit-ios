@@ -54,7 +54,7 @@ import KalturaNetKit
         request.set { (response: Response) in
             PKLog.debug("Response:\nStatus Code: \(response.statusCode)\nError: \(response.error?.localizedDescription ?? "")\nData: \(response.data ?? "")")
         }
-        PKLog.debug("Sending Kava Event, Impression (1)")
+        PKLog.debug("Sending Kava Event type: " + eventType)
         KNKRequestExecutor.shared.send(request: request.build())
     }
     
