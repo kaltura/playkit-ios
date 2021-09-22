@@ -71,7 +71,7 @@ import AVFoundation
     @objc public static let errorLog: PlayerEvent.Type = ErrorLog.self
     /// Sent when the player has stalled. Buffering with no available data to play.
     @objc public static let playbackStalled: PlayerEvent.Type = PlaybackStalled.self
-    /// Sent when playback rate changed and rate > 0
+    /// Sent when playback rate changed and rate >= 0
     @objc public static let playbackRate: PlayerEvent.Type = PlaybackRate.self
     
     // MARK: - Player Basic Events
