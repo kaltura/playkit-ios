@@ -246,7 +246,7 @@ extension LocalAssetsManager {
     }
     
     /// Prepare a PKMediaEntry for download using AVAssetDownloadTask.
-    public func prepareForDownload(of mediaEntry: PKMediaEntry) -> (AVURLAsset, PKMediaSource)? {
+    @objc public func prepareForDownload(of mediaEntry: PKMediaEntry) -> (AVURLAsset, PKMediaSource)? {
         guard let source = getPreferredDownloadableMediaSource(for: mediaEntry) else { return nil }
         guard let url = source.contentUrl else { return nil }
         let avAsset = AVURLAsset(url: url)
