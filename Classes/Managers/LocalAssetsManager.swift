@@ -261,7 +261,7 @@ fileprivate class NullStore: LocalDataStore {
         return false
     }
     
-    public func remove(key: String) throws {
+    @objc public func remove(key: String) throws {
         PKLog.error("LocalDataStore not set")
     }
     
