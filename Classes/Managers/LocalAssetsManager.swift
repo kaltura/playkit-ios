@@ -246,7 +246,7 @@ extension LocalAssetsManager {
     }
     
     /// Prepare a PKMediaEntry for download using AVAssetDownloadTask.
-    public func prepareForDownload(of mediaEntry: PKMediaEntry) -> (AVURLAsset, PKMediaSource)? {
+    @objc public func prepareForDownload(of mediaEntry: PKMediaEntry) -> (AVURLAsset, PKMediaSource)? {
         guard let source = getPreferredDownloadableMediaSource(for: mediaEntry) else { return nil }
         guard let url = source.contentUrl else { return nil }
         let avAsset = AVURLAsset(url: url)
@@ -261,7 +261,7 @@ fileprivate class NullStore: LocalDataStore {
         return false
     }
     
-    public func remove(key: String) throws {
+    @objc public func remove(key: String) throws {
         PKLog.error("LocalDataStore not set")
     }
     
