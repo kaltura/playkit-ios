@@ -87,6 +87,9 @@ class FPSLicenseHelper {
     
     let assetId: String
     
+    // Available from iOS 10.3
+    var avContentKeyRequest: AnyObject?
+    
     let params: FairPlayDRMParams?
     
     let forceDownload: Bool
