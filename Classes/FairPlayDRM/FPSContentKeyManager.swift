@@ -50,11 +50,17 @@ class FPSContentKeyManager {
         }
         
         let skdUrl = "skd://" + id
-        let helper = FPSLicenseHelper(assetId: id, params: drmParams, dataStore: dataStore, forceDownload: true)
-        helper?.doneCallback = callback
-        contentKeyDelegate.assetHelpersMap[skdUrl] = helper
-        
-        contentKeySession.processContentKeyRequest(withIdentifier: skdUrl, initializationData: nil, options: nil)
+        if let assetHelper = contentKeyDelegate.assetHelpersMap[skdUrl],
+            let avContentKeyRequest = assetHelper.avContentKeyRequest as? AVContentKeyRequest {
+            assetHelper.doneCallback = callback
+            contentKeySession.renewExpiringResponseData(for: avContentKeyRequest)
+        } else {
+            let helper = FPSLicenseHelper(assetId: id, params: drmParams, dataStore: dataStore, forceDownload: true)
+            helper?.doneCallback = callback
+            contentKeyDelegate.assetHelpersMap[skdUrl] = helper
+            
+            contentKeySession.processContentKeyRequest(withIdentifier: skdUrl, initializationData: nil, options: nil)
+        }
     }
 }
 #endif
