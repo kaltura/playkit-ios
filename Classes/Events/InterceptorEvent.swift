@@ -20,7 +20,8 @@ import Foundation
 @objc public class InterceptorEvent: PKEvent {
     
     @objc public static let allEventTypes: [InterceptorEvent.Type] = [
-        cdnSwitched
+        cdnSwitched,
+        sourceUrlSwitched
     ]
     
     // MARK: - Interceptor Events Static References.
@@ -39,9 +40,28 @@ import Foundation
             return self.data?[InterceptorEventDataKeys.cdnCode] as? String
         }
     }
+    
+    //  Can be sent by any interceptor plugin, when the playback URL is changed with updated url.
+    @objc public static let sourceUrlSwitched: InterceptorEvent.Type = SourceUrlSwitched.self
+    
+    public class SourceUrlSwitched: InterceptorEvent {
+        public convenience init(originalUrl: String, updatedUrl: String) {
+            self.init([InterceptorEventDataKeys.originalUrl: originalUrl, InterceptorEventDataKeys.updatedUrl: updatedUrl])
+        }
+        
+        @objc public var originalUrl: String? {
+            return self.data?[InterceptorEventDataKeys.originalUrl] as? String
+        }
+        
+        @objc public var updatedUrl: String? {
+            return self.data?[InterceptorEventDataKeys.updatedUrl] as? String
+        }
+    }
 }
 
 @objc public class InterceptorEventDataKeys: NSObject {
     
     public static let cdnCode = "CDNCode"
+    public static let originalUrl = "OriginalUrl"
+    public static let updatedUrl = "UpdatedUrl"
 }
