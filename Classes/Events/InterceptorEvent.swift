@@ -34,11 +34,6 @@ import Foundation
         public convenience init(cdnCode: String) {
             self.init([InterceptorEventDataKeys.cdnCode: cdnCode])
         }
-        
-        /// CDN code provided by plugins (SmartSwitch)
-        @objc public var cdnCode: String? {
-            return self.data?[InterceptorEventDataKeys.cdnCode] as? String
-        }
     }
     
     //  Can be sent by any interceptor plugin, when the playback URL is changed with updated url.
@@ -47,14 +42,6 @@ import Foundation
     public class SourceUrlSwitched: InterceptorEvent {
         public convenience init(originalUrl: String, updatedUrl: String) {
             self.init([InterceptorEventDataKeys.originalUrl: originalUrl, InterceptorEventDataKeys.updatedUrl: updatedUrl])
-        }
-        
-        @objc public var originalUrl: String? {
-            return self.data?[InterceptorEventDataKeys.originalUrl] as? String
-        }
-        
-        @objc public var updatedUrl: String? {
-            return self.data?[InterceptorEventDataKeys.updatedUrl] as? String
         }
     }
 }
@@ -65,3 +52,26 @@ import Foundation
     public static let originalUrl = "OriginalUrl"
     public static let updatedUrl = "UpdatedUrl"
 }
+
+// MARK: - CDNSwitched
+extension PKEvent {
+    
+    /// CDN code provided by plugins (SmartSwitch)
+    @objc public var cdnCode: String? {
+        return self.data?[InterceptorEventDataKeys.cdnCode] as? String
+    }
+}
+
+// MARK: - SourceUrlSwitched
+extension PKEvent {
+    
+    /// SourceUrlSwitched values provided by interceptor plugins
+    @objc public var originalUrl: String? {
+        return self.data?[InterceptorEventDataKeys.originalUrl] as? String
+    }
+    
+    @objc public var updatedUrl: String? {
+        return self.data?[InterceptorEventDataKeys.updatedUrl] as? String
+    }
+}
+
