@@ -19,7 +19,7 @@ fileprivate let mediasKey = "medias"
 
 @objc public class PKPlaylist: NSObject {
     
-    @objc public var id: String
+    @objc public var id: String?
     @objc public var name: String?
 //    @objc public var description: String?
     @objc public var thumbnailUrl: String?
@@ -33,12 +33,12 @@ fileprivate let mediasKey = "medias"
         }
     }
     
-    internal init(id: String) {
+    internal init(id: String?) {
         self.id = id
         super.init()
     }
     
-    @objc public init(_ id: String, name: String?, thumbnailUrl: String?, medias: [PKMediaEntry]) {
+    @objc public init(id: String?, name: String?, thumbnailUrl: String?, medias: [PKMediaEntry]) {
         self.id = id
         self.name = name
         self.thumbnailUrl = thumbnailUrl
@@ -48,7 +48,7 @@ fileprivate let mediasKey = "medias"
     
     @objc public init(json: Any) {
         let jsonObject = json as? JSON ?? JSON(json)
-        self.id = jsonObject[idKey].string ?? ""
+        self.id = jsonObject[idKey].string
         self.name = jsonObject[nameKey].string
         
         super.init()
