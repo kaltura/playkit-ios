@@ -19,7 +19,7 @@ import Foundation
 @objc public class PlaylistEvent: PKEvent {
     
     @objc public static let allEventTypes: [PlaylistEvent.Type] = [
-        playListLoaded, playListStarted, playListEnded, playlistCountDownStart, playlistCountDownEnd, playlistLoopStateChanged, playlistLoopStateChanged, playlistAutoContinueStateChanged, playListError, playListLoadMediaError
+        playListLoaded, playListStarted, playListEnded, playlistCountDownStart, playlistCountDownEnd, playlistLoopStateChanged, playlistLoopStateChanged, playlistAutoContinueStateChanged, playListError, playListLoadMediaError, playListCurrentPlayingItemChanged
     ]
     
     @objc public static let playListLoaded: PlaylistEvent.Type = PlayListLoaded.self
@@ -31,6 +31,7 @@ import Foundation
     @objc public static let playlistAutoContinueStateChanged: PlaylistEvent.Type = PlaylistAutoContinueStateChanged.self
     @objc public static let playListError: PlaylistEvent.Type = PlayListError.self
     @objc public static let playListLoadMediaError: PlaylistEvent.Type = PlayListLoadMediaError.self
+    @objc public static let playListCurrentPlayingItemChanged: PlaylistEvent.Type = PlayListCurrentPlayingItemChanged.self
     
     public class PlayListLoaded: PlaylistEvent {}
     
@@ -65,5 +66,7 @@ import Foundation
             self.init([EventDataKeys.error: error.asNSError])
         }
     }
+    
+    public class  PlayListCurrentPlayingItemChanged: PlaylistEvent {}
     
 }
