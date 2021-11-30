@@ -58,8 +58,8 @@ import Foundation
     }
     
     public class PlayListLoadMediaError: PlaylistEvent {
-        public convenience init(nsError: NSError) {
-            self.init([EventDataKeys.error: nsError])
+        public convenience init(entryId: String, nsError: NSError) {
+            self.init([EventDataKeys.entryId: entryId, EventDataKeys.error: nsError])
         }
         
         public convenience init(error: PKError) {
