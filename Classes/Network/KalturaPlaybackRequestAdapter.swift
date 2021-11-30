@@ -20,7 +20,7 @@ import Foundation
     /// - Parameters:
     ///   - player: The player you want to use with the request adapter
     ///   - appName: the application name, if `nil` will use the bundle identifier.
-    @objc public static func install(in player: Player, withAppName appName: String) {
+    @objc public static func install(in player: Player, withAppName appName: String?) {
         let requestAdapter = KalturaPlaybackRequestAdapter()
         requestAdapter.sessionId = player.sessionId
         requestAdapter.applicationName = appName
@@ -57,9 +57,6 @@ import Foundation
         return PKRequestParams(url: url, headers: requestParams.headers)
     }
     
-    private func base64(from: String) -> String {
-        return from.data(using: .utf8)?.base64EncodedString() ?? ""
-    }
 }
 
 @objc public class CustomPlaybackRequestAdapter: KalturaPlaybackRequestAdapter {
