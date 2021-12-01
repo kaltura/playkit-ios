@@ -19,25 +19,25 @@ import Foundation
 @objc public class PlaylistEvent: PKEvent {
     
     @objc public static let allEventTypes: [PlaylistEvent.Type] = [
-        playListLoaded, playListStarted, playListEnded, playlistCountDownStart, playlistCountDownEnd, playlistLoopStateChanged, playlistLoopStateChanged, playlistAutoContinueStateChanged, playListError, playListLoadMediaError, playListCurrentPlayingItemChanged
+        playlistLoaded, playlistStarted, playlistEnded, playlistCountDownStart, playlistCountDownEnd, playlistLoopStateChanged, playlistLoopStateChanged, playlistAutoContinueStateChanged, playlistError, playlistLoadMediaError, playlistCurrentPlayingItemChanged
     ]
     
-    @objc public static let playListLoaded: PlaylistEvent.Type = PlayListLoaded.self
-    @objc public static let playListStarted: PlaylistEvent.Type = PlayListStarted.self // ?
-    @objc public static let playListEnded: PlaylistEvent.Type = PlayListEnded.self
+    @objc public static let playlistLoaded: PlaylistEvent.Type = PlaylistLoaded.self
+    @objc public static let playlistStarted: PlaylistEvent.Type = PlaylistStarted.self // ?
+    @objc public static let playlistEnded: PlaylistEvent.Type = PlaylistEnded.self
     @objc public static let playlistCountDownStart: PlaylistEvent.Type = PlaylistCountDownStart.self // ?
     @objc public static let playlistCountDownEnd: PlaylistEvent.Type = PlaylistCountDownEnd.self // ?
     @objc public static let playlistLoopStateChanged: PlaylistEvent.Type = PlaylistLoopStateChanged.self
     @objc public static let playlistAutoContinueStateChanged: PlaylistEvent.Type = PlaylistAutoContinueStateChanged.self
-    @objc public static let playListError: PlaylistEvent.Type = PlayListError.self
-    @objc public static let playListLoadMediaError: PlaylistEvent.Type = PlayListLoadMediaError.self
-    @objc public static let playListCurrentPlayingItemChanged: PlaylistEvent.Type = PlayListCurrentPlayingItemChanged.self
+    @objc public static let playlistError: PlaylistEvent.Type = PlaylistError.self
+    @objc public static let playlistLoadMediaError: PlaylistEvent.Type = PlaylistLoadMediaError.self
+    @objc public static let playlistCurrentPlayingItemChanged: PlaylistEvent.Type = PlaylistCurrentPlayingItemChanged.self
     
-    public class PlayListLoaded: PlaylistEvent {}
+    public class PlaylistLoaded: PlaylistEvent {}
     
-    public class PlayListStarted: PlaylistEvent {}
+    public class PlaylistStarted: PlaylistEvent {}
     
-    public class PlayListEnded: PlaylistEvent {}
+    public class PlaylistEnded: PlaylistEvent {}
     
     public class PlaylistCountDownStart: PlaylistEvent {}
     
@@ -47,7 +47,7 @@ import Foundation
     
     public class PlaylistAutoContinueStateChanged: PlaylistEvent {}
     
-    public class PlayListError: PlaylistEvent {
+    public class PlaylistError: PlaylistEvent {
         public convenience init(nsError: NSError) {
             self.init([EventDataKeys.error: nsError])
         }
@@ -57,7 +57,7 @@ import Foundation
         }
     }
     
-    public class PlayListLoadMediaError: PlaylistEvent {
+    public class PlaylistLoadMediaError: PlaylistEvent {
         public convenience init(entryId: String, nsError: NSError) {
             self.init([EventDataKeys.entryId: entryId, EventDataKeys.error: nsError])
         }
@@ -67,6 +67,6 @@ import Foundation
         }
     }
     
-    public class  PlayListCurrentPlayingItemChanged: PlaylistEvent {}
+    public class  PlaylistCurrentPlayingItemChanged: PlaylistEvent {}
     
 }
