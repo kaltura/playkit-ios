@@ -21,15 +21,14 @@ fileprivate let mediasKey = "medias"
     
     @objc public var id: String?
     @objc public var name: String?
-//    @objc public var description: String?
     @objc public var thumbnailUrl: String?
     @objc public var medias: [PKMediaEntry]?
     
     @objc override public var description: String {
         get {
-            return "id : \(self.id)," +
-            " name: \(self.name)," +
-            " thumbnailUrl: \(self.thumbnailUrl)"
+            return "id : \(self.id ?? "empty")," +
+            " name: \(self.name ?? "empty")," +
+            " thumbnailUrl: \(self.thumbnailUrl ?? "empty")"
         }
     }
     
