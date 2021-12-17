@@ -23,10 +23,10 @@ import Foundation
     ]
     
     @objc public static let playlistLoaded: PlaylistEvent.Type = PlaylistLoaded.self
-    @objc public static let playlistStarted: PlaylistEvent.Type = PlaylistStarted.self // ?
+    @objc public static let playlistStarted: PlaylistEvent.Type = PlaylistStarted.self
     @objc public static let playlistEnded: PlaylistEvent.Type = PlaylistEnded.self
-    @objc public static let playlistCountDownStart: PlaylistEvent.Type = PlaylistCountDownStart.self // ?
-    @objc public static let playlistCountDownEnd: PlaylistEvent.Type = PlaylistCountDownEnd.self // ?
+    @objc public static let playlistCountDownStart: PlaylistEvent.Type = PlaylistCountDownStart.self
+    @objc public static let playlistCountDownEnd: PlaylistEvent.Type = PlaylistCountDownEnd.self
     @objc public static let playlistLoopStateChanged: PlaylistEvent.Type = PlaylistLoopStateChanged.self
     @objc public static let playlistAutoContinueStateChanged: PlaylistEvent.Type = PlaylistAutoContinueStateChanged.self
     @objc public static let playlistError: PlaylistEvent.Type = PlaylistError.self
