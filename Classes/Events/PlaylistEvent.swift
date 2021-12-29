@@ -39,7 +39,11 @@ import Foundation
     
     public class PlaylistEnded: PlaylistEvent {}
     
-    public class PlaylistCountDownStart: PlaylistEvent {}
+    public class PlaylistCountDownStart: PlaylistEvent {
+        public convenience init(countDownDuration: TimeInterval) {
+            self.init([EventDataKeys.duration: NSNumber(value: countDownDuration)])
+        }
+    }
     
     public class PlaylistCountDownEnd: PlaylistEvent {}
     

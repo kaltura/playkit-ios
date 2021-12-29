@@ -8,7 +8,7 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 //
-//  PublicMessageBus.swift
+//  PKMessageBus.swift
 //  PlayKit
 //
 //  Created by Sergii Chausov on 07.11.2021.
@@ -16,11 +16,11 @@
 
 import Foundation
 
-public protocol PublicMessageBus {
+public protocol PKMessageBus {
     func getMessageBus() -> MessageBus
 }
 
-extension PlayerLoader: PublicMessageBus {
+extension PlayerLoader: PKMessageBus {
     
     func getMessageBus() -> MessageBus {
         return self.messageBus
