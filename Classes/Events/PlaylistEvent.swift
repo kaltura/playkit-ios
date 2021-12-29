@@ -19,14 +19,14 @@ import Foundation
 @objc public class PlaylistEvent: PKEvent {
     
     @objc public static let allEventTypes: [PlaylistEvent.Type] = [
-        playlistLoaded, playlistStarted, playlistEnded, playlistCountDownStart, playlistCountDownEnd, playlistLoopStateChanged, playlistLoopStateChanged, playlistAutoContinueStateChanged, playlistError, playlistLoadMediaError, playlistCurrentPlayingItemChanged
+        playlistLoaded, playlistStarted, playlistEnded, playlistCountdownStart, playlistCountdownEnd, playlistLoopStateChanged, playlistLoopStateChanged, playlistAutoContinueStateChanged, playlistError, playlistLoadMediaError, playlistCurrentPlayingItemChanged
     ]
     
     @objc public static let playlistLoaded: PlaylistEvent.Type = PlaylistLoaded.self
     @objc public static let playlistStarted: PlaylistEvent.Type = PlaylistStarted.self
     @objc public static let playlistEnded: PlaylistEvent.Type = PlaylistEnded.self
-    @objc public static let playlistCountDownStart: PlaylistEvent.Type = PlaylistCountDownStart.self
-    @objc public static let playlistCountDownEnd: PlaylistEvent.Type = PlaylistCountDownEnd.self
+    @objc public static let playlistCountdownStart: PlaylistEvent.Type = PlaylistCountdownStart.self
+    @objc public static let playlistCountdownEnd: PlaylistEvent.Type = PlaylistCountdownEnd.self
     @objc public static let playlistLoopStateChanged: PlaylistEvent.Type = PlaylistLoopStateChanged.self
     @objc public static let playlistAutoContinueStateChanged: PlaylistEvent.Type = PlaylistAutoContinueStateChanged.self
     @objc public static let playlistError: PlaylistEvent.Type = PlaylistError.self
@@ -39,13 +39,13 @@ import Foundation
     
     public class PlaylistEnded: PlaylistEvent {}
     
-    public class PlaylistCountDownStart: PlaylistEvent {
+    public class PlaylistCountdownStart: PlaylistEvent {
         public convenience init(countDownDuration: TimeInterval) {
             self.init([EventDataKeys.duration: NSNumber(value: countDownDuration)])
         }
     }
     
-    public class PlaylistCountDownEnd: PlaylistEvent {}
+    public class PlaylistCountdownEnd: PlaylistEvent {}
     
     public class PlaylistLoopStateChanged: PlaylistEvent {}
     
