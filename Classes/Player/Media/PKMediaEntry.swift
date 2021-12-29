@@ -31,7 +31,7 @@ fileprivate let idKey = "id"
 fileprivate let sourcesKey = "sources"
 fileprivate let mediaTypeKey = "mediaType"
 fileprivate let durationKey = "duration"
-
+fileprivate let thumbnailUrlKey = "thumbnailUrl"
 
 @objc public class PKMediaEntry: NSObject {
     @objc public var id: String
@@ -41,7 +41,8 @@ fileprivate let durationKey = "duration"
     @objc public var metadata: [String: String]?
     @objc public var name: String?
     @objc public var externalSubtitles: [PKExternalSubtitle]?
-   
+    @objc public var thumbnailUrl: String?
+    
     var vrData: VRData?
     public var tags: String? {
         didSet {
@@ -63,7 +64,7 @@ fileprivate let durationKey = "duration"
         super.init()
     }
     
-    @objc public init(_ id: String, sources: [PKMediaSource], duration: TimeInterval = 0) {
+    @objc public init(_ id: String, sources: [PKMediaSource]?, duration: TimeInterval = 0) {
         self.id = id
         self.sources = sources
         self.duration = duration
@@ -77,6 +78,7 @@ fileprivate let durationKey = "duration"
         self.id = jsonObject[idKey].string ?? ""
         
         self.duration = jsonObject[durationKey].double ?? 0.0
+        self.thumbnailUrl = jsonObject[thumbnailUrlKey].string
         
         if let sources = jsonObject[sourcesKey].array {
             self.sources = sources.map { PKMediaSource(json: $0) }
@@ -105,7 +107,8 @@ fileprivate let durationKey = "duration"
                 " duration: \(duration)," +
                 " mediaType: \(mediaType.description)," +
                 " metadata: \(String(describing: metadata))," +
-                " name: \(String(describing: name))"
+                " name: \(String(describing: name))," +
+                " thumbnailUrl: \(String(describing: thumbnailUrl))"
         }
     }
     

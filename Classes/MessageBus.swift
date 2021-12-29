@@ -50,11 +50,16 @@ private struct Observation {
             PKLog.verbose("Remove observer: \(String(describing: observer)) for events: \(String(describing: events))")
             events.forEach { (et) in
                 let typeId = NSStringFromClass(et)
-                
-                if let array = observations[typeId] {
-                    observations[typeId] = array.filter { $0.observer! !== observer }
-                } else {
+                guard let array = observations[typeId], !array.isEmpty else {
                     PKLog.debug("removeObserver:: array is empty")
+                    return
+                }
+                
+                observations[typeId] = array.filter {
+                    if let item = $0.observer {
+                        return item !== observer
+                    }
+                    return false
                 }
             }
         }
