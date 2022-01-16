@@ -11,7 +11,7 @@
 import Foundation
 
 /// The delegate of `AppStateProvider`, allows the delegate to inform on app state notifications.
-public protocol AppStateProviderDelegate: class {
+public protocol AppStateProviderDelegate: AnyObject {
     /// fire this delegate function when received observation event.
     /// for every observer with the same observation event process the on observe block.
     func appStateEventPosted(name: ObservationName)
