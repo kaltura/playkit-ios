@@ -421,10 +421,21 @@ public class AVPlayerEngine: AVPlayer {
             attributes.updateValue(fontFamily, forKey: fontFamilyNameKey)
         }
         
+        if let percentage = textTrackStyling.orthogonalLinePositionPercentage {
+            attributes.updateValue(percentage,
+                                   forKey: kCMTextMarkupAttribute_OrthogonalLinePositionPercentageRelativeToWritingDirection as String)
+        }
+        
+        if let percentage = textTrackStyling.textPositionPercentage {
+            attributes.updateValue(percentage,
+                                   forKey: kCMTextMarkupAttribute_TextPositionPercentageRelativeToWritingDirection as String)
+        }
+        
         guard let textStyleRule = AVTextStyleRule(textMarkupAttributes: attributes) else {
             PKLog.debug("Couldn't create AVTextStyleRule.")
             return
         }
+        
         self.currentItem?.textStyleRules = [textStyleRule]
     }
 }

@@ -51,6 +51,9 @@ struct RGBA: CustomStringConvertible {
     private(set) var edgeStyle: PKTextMarkupCharacterEdgeStyle = .none
     private(set) var edgeColor: RGBA?
     private(set) var fontFamily: String?
+                                
+    private(set) var orthogonalLinePositionPercentage: UInt?
+    private(set) var textPositionPercentage: UInt?
     
     public override var description: String {
         var textSizeString: String
@@ -188,4 +191,45 @@ struct RGBA: CustomStringConvertible {
         
         return self
     }
+    
+    /**
+     CoreMedia Text Markup Attribute
+     kCMTextMarkupAttribute_OrthogonalLinePositionPercentageRelativeToWritingDirection
+     
+     The dimension (e.g., width) of the bounding box containing the text expressed as a percentage.
+     
+     * Parameters:
+        * percentage: orthogonal line position percentage relative to writing direction.
+     * Returns: updated object.
+     */
+    @discardableResult
+    @objc public func setOrthogonalLinePositionPercentage(_ percentage: UInt) -> PKTextTrackStyling {
+        if percentage <= 100 {
+            orthogonalLinePositionPercentage = percentage
+        } else {
+            PKLog.debug("Please specify Position Percentage in a value 0-100 %")
+        }
+        return self
+    }
+    
+    /**
+     CoreMedia Text Markup Attribute
+     kCMTextMarkupAttribute_TextPositionPercentageRelativeToWritingDirection
+     
+     The placement of the block of text specified as a percentage in the writing direction.
+     
+     * Parameters:
+        * percentage: text position percentage relative to writing direction.
+     * Returns: updated object.
+     */
+    @discardableResult
+    @objc public func setTextPositionPercentage(_ percentage: UInt) -> PKTextTrackStyling {
+        if percentage <= 100 {
+            textPositionPercentage = percentage
+        } else {
+            PKLog.debug("Please specify Position Percentage in a value 0-100 %")
+        }
+        return self
+    }
+    
 }
