@@ -238,6 +238,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         self.currentPlayer.currentPosition = time
     }
     
+    public func seekToLiveEdge() {
+        self.currentPlayer.seekToLiveEdge()
+    }
+    
     public func selectTrack(trackId: String) {
         self.currentPlayer.selectTrack(trackId: trackId)
     }

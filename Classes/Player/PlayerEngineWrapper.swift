@@ -150,6 +150,10 @@ public class PlayerEngineWrapper: NSObject, PlayerEngine {
         playerEngine?.seek(to: time)
     }
     
+    public func seekToLiveEdge() {
+        playerEngine?.seekToLiveEdge()
+    }
+    
     public func selectTrack(trackId: String) {
         playerEngine?.selectTrack(trackId: trackId)
     }
