@@ -10,7 +10,7 @@
 
 import Foundation
 
-protocol TimeProvider: class {
+protocol TimeProvider: AnyObject {
     var currentTime: TimeInterval { get }
     var duration: TimeInterval { get }
 }

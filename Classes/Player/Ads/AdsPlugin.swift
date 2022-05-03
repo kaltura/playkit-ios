@@ -24,12 +24,12 @@ public enum PlayType: CustomStringConvertible {
     }
 }
 
-public protocol AdsPluginDataSource : class {
+public protocol AdsPluginDataSource: AnyObject {
     /// The player's media config start time.
     var playAdsAfterTime: TimeInterval { get }
 }
 
-public protocol AdsPluginDelegate : class {
+public protocol AdsPluginDelegate: AnyObject {
     func adsPlugin(_ adsPlugin: AdsPlugin, loaderFailedWith error: String)
     func adsPlugin(_ adsPlugin: AdsPlugin, managerFailedWith error: String)
     func adsPlugin(_ adsPlugin: AdsPlugin, didReceive event: PKEvent)
