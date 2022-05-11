@@ -459,12 +459,14 @@ extension AVPlayerEngine: AppStateObservable {
                 
                 PKLog.debug("player: \(self)\n Did enter background, finishing up...")
                 self.startBackgroundTask()
+                self.playerLayer?.player = nil
             }),
             NotificationObservation(name: UIApplication.willEnterForegroundNotification, onObserve: { [weak self] in
                 guard let self = self else { return }
                 
                 PKLog.debug("player: \(self)\n Will enter foreground...")
                 self.endBackgroundTask()
+                self.playerLayer?.player = self
             })
         ]
     }
