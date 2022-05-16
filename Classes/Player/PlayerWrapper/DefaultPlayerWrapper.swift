@@ -158,6 +158,10 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
+    func seekToLiveEdge() {
+        printInvocationWarning("\(#function)")
+    }
+    
     func selectTrack(trackId: String) {
         printInvocationWarning("\(#function)")
     }

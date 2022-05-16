@@ -188,6 +188,10 @@ import AVKit
         self.player.seek(to: time)
     }
     
+    open func seekToLiveEdge() {
+        self.player.seekToLiveEdge()
+    }
+    
     public func selectTrack(trackId: String) {
         self.player.selectTrack(trackId: trackId)
     }

@@ -66,6 +66,9 @@ import Foundation
     /// Send a seek action for the player.
     @objc func seek(to time: TimeInterval)
     
+    /// Seek to the live edje.
+    @objc func seekToLiveEdge()
+    
     /// Select a Track
     @objc func selectTrack(trackId: String)
     
