@@ -146,6 +146,7 @@ enum PlayerSettingsType {
     case preferredForwardBufferDuration(Double)
     case automaticallyWaitsToMinimizeStalling(Bool)
     case configuredTimeOffsetFromLive(CMTime)
+    case preventsDisplaySleepDuringVideoPlayback(Bool)
 }
 
 /************************************************************/
@@ -171,6 +172,12 @@ enum PlayerSettingsType {
     
     @objc public var contentRequestAdapter: PKRequestParamsAdapter?
     @objc public var licenseRequestAdapter: PKRequestParamsAdapter?
+    
+    @objc public var preventsDisplaySleepDuringVideoPlayback: Bool = true {
+        didSet {
+            self.onChange?(.preventsDisplaySleepDuringVideoPlayback(preventsDisplaySleepDuringVideoPlayback))
+        }
+    }
     
     @objc public var fairPlayLicenseProvider: FairPlayLicenseProvider?
     @objc public var allowFairPlayOnExternalScreens = false
