@@ -173,6 +173,8 @@ enum PlayerSettingsType {
     @objc public var contentRequestAdapter: PKRequestParamsAdapter?
     @objc public var licenseRequestAdapter: PKRequestParamsAdapter?
     
+    /// AVPlayer.preventsDisplaySleepDuringVideoPlayback representation for PlayKit player settings.
+    /// Setting this property to NO does not force the display to sleep, it simply stops preventing display sleep.
     @objc public var preventsDisplaySleepDuringVideoPlayback: Bool = true {
         didSet {
             self.onChange?(.preventsDisplaySleepDuringVideoPlayback(preventsDisplaySleepDuringVideoPlayback))
