@@ -60,6 +60,8 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                     if #available(iOS 13.0, tvOS 13.0, *) {
                         self.currentPlayer.currentItem?.configuredTimeOffsetFromLive = time
                     }
+                case .allowAudioFromVideoAssetInBackground(let allowAudioFromVideoAssetInBackground):
+                    self.currentPlayer.allowAudioFromVideoAssetInBackground = allowAudioFromVideoAssetInBackground
                 }
             }
         }
