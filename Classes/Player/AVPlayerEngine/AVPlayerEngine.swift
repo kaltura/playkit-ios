@@ -43,6 +43,7 @@ public class AVPlayerEngine: AVPlayer {
     static var observerContext = 0
     /// Indicates if a seek to live edge was triggered prior setting the current item
     var seekToLiveEdgeTriggered = false
+    var allowAudioFromVideoAssetInBackground = false
     
     var internalDuration: TimeInterval = 0.0 {
         didSet {
@@ -459,12 +460,20 @@ extension AVPlayerEngine: AppStateObservable {
                 
                 PKLog.debug("player: \(self)\n Did enter background, finishing up...")
                 self.startBackgroundTask()
+                
+                if self.allowAudioFromVideoAssetInBackground {
+                    self.playerLayer?.player = nil
+                }
             }),
             NotificationObservation(name: UIApplication.willEnterForegroundNotification, onObserve: { [weak self] in
                 guard let self = self else { return }
                 
                 PKLog.debug("player: \(self)\n Will enter foreground...")
                 self.endBackgroundTask()
+                
+                if self.playerLayer?.player == nil {
+                    self.playerLayer?.player = self
+                }
             })
         ]
     }

@@ -66,6 +66,8 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                             self.currentPlayer.preventsDisplaySleepDuringVideoPlayback = prevent
                         }
                     }
+                case .allowAudioFromVideoAssetInBackground(let allowAudioFromVideoAssetInBackground):
+                    self.currentPlayer.allowAudioFromVideoAssetInBackground = allowAudioFromVideoAssetInBackground
                 }
             }
         }
@@ -279,6 +281,8 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             if #available(iOS 10.0, tvOS 10.0, *) {
                 self.currentPlayer.automaticallyWaitsToMinimizeStalling = settings.network.automaticallyWaitsToMinimizeStalling
             }
+            
+            self.currentPlayer.allowAudioFromVideoAssetInBackground = settings.allowAudioFromVideoAssetInBackground
             
             let asset = PKAsset(avAsset: assetToPrepare, playerSettings: settings, autoBuffer: settings.network.autoBuffer)
             self.currentPlayer.asset = asset
