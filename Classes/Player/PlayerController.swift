@@ -296,6 +296,10 @@ class PlayerController: NSObject, Player {
         self.currentPlayer.currentPosition = time
     }
     
+    func seekToLiveEdge() {
+        self.currentPlayer.seekToLiveEdge()
+    }
+    
     public func selectTrack(trackId: String) {
         self.currentPlayer.selectTrack(trackId: trackId)
     }

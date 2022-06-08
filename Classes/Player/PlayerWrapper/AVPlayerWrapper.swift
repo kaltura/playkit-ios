@@ -60,6 +60,12 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                     if #available(iOS 13.0, tvOS 13.0, *) {
                         self.currentPlayer.currentItem?.configuredTimeOffsetFromLive = time
                     }
+                case .preventsDisplaySleepDuringVideoPlayback(let prevent):
+                    if #available(iOS 12.0, *) {
+                        DispatchQueue.main.async {
+                            self.currentPlayer.preventsDisplaySleepDuringVideoPlayback = prevent
+                        }
+                    }
                 case .allowAudioFromVideoAssetInBackground(let allowAudioFromVideoAssetInBackground):
                     self.currentPlayer.allowAudioFromVideoAssetInBackground = allowAudioFromVideoAssetInBackground
                 }
@@ -240,6 +246,10 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
         self.currentPlayer.currentPosition = time
     }
     
+    public func seekToLiveEdge() {
+        self.currentPlayer.seekToLiveEdge()
+    }
+    
     public func selectTrack(trackId: String) {
         self.currentPlayer.selectTrack(trackId: trackId)
     }
@@ -280,6 +290,12 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             if DRMSupport.widevineClassicHandler != nil {
                 self.removeAssetRefreshObservers()
                 self.addAssetRefreshObservers()
+            }
+            
+            if #available(iOS 12.0, *) {
+                DispatchQueue.main.async {
+                    self.currentPlayer.preventsDisplaySleepDuringVideoPlayback = settings.preventsDisplaySleepDuringVideoPlayback
+                }
             }
         }
     }
