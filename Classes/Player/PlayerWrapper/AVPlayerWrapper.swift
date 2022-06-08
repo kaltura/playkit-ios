@@ -272,6 +272,8 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 self.currentPlayer.automaticallyWaitsToMinimizeStalling = settings.network.automaticallyWaitsToMinimizeStalling
             }
             
+            self.currentPlayer.allowAudioFromVideoAssetInBackground = settings.allowAudioFromVideoAssetInBackground
+            
             let asset = PKAsset(avAsset: assetToPrepare, playerSettings: settings, autoBuffer: settings.network.autoBuffer)
             self.currentPlayer.asset = asset
             
