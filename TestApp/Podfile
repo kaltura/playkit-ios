@@ -6,8 +6,8 @@ use_frameworks!
 
 def sharedPods
   pod 'PlayKit', :path => '..'
-  pod 'KalturaNetKit'#, :path => '../../netkit-ios'
-  pod 'PlayKitUtils'#, :path => '../../playkit-ios-utils'
+  #pod 'KalturaNetKit'#, :path => '../../netkit-ios'
+  #pod 'PlayKitUtils'#, :path => '../../playkit-ios-utils'
 end
 
 target 'TestApp_v4_2' do
