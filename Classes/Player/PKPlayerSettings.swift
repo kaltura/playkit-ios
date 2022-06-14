@@ -176,7 +176,7 @@ enum PlayerSettingsType {
     
     /// AVPlayer.preventsDisplaySleepDuringVideoPlayback representation for PlayKit player settings.
     /// Setting this property to NO does not force the display to sleep, it simply stops preventing display sleep.
-    /// Available only from iOS 12.0
+    /// Available only from iOS 12.0 tvOS 12.0
     @objc public var preventsDisplaySleepDuringVideoPlayback: Bool = true {
         didSet {
             self.onChange?(.preventsDisplaySleepDuringVideoPlayback(preventsDisplaySleepDuringVideoPlayback))
