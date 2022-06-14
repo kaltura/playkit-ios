@@ -61,7 +61,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                         self.currentPlayer.currentItem?.configuredTimeOffsetFromLive = time
                     }
                 case .preventsDisplaySleepDuringVideoPlayback(let prevent):
-                    if #available(iOS 12.0, *) {
+                    if #available(iOS 12.0, tvOS 12.0, *) {
                         DispatchQueue.main.async {
                             self.currentPlayer.preventsDisplaySleepDuringVideoPlayback = prevent
                         }
@@ -292,7 +292,7 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                 self.addAssetRefreshObservers()
             }
             
-            if #available(iOS 12.0, *) {
+            if #available(iOS 12.0, tvOS 12.0, *) {
                 DispatchQueue.main.async {
                     self.currentPlayer.preventsDisplaySleepDuringVideoPlayback = settings.preventsDisplaySleepDuringVideoPlayback
                 }
