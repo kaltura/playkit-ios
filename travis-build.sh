@@ -12,12 +12,22 @@ keepAlive() {
 }
 
 buildiOSApp() {
-  echo Building the iOS test app
+  echo Building the iOS TestApp
   cd TestApp
-  pod install --repo-update
+  pod install
   CODE=0
-  xcodebuild clean build -workspace TestApp.xcworkspace -scheme TestApp_v4_2 -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO | tee xcodebuild.log | xcpretty -r html || CODE=$?
-  xcodebuild clean build -workspace TestApp.xcworkspace -scheme TestApp_v5 -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO | tee xcodebuild.log | xcpretty -r html || CODE=$?
+  xcodebuild clean build -workspace TestApp.xcworkspace -scheme TestApp_v4_2 ONLY_ACTIVE_ARCH=NO -destination 'platform=iOS Simulator,name=iPhone 11' | tee xcodebuild.log | xcpretty -r html || CODE=$?
+  xcodebuild clean build -workspace TestApp.xcworkspace -scheme TestApp_v5 ONLY_ACTIVE_ARCH=NO -destination 'platform=iOS Simulator,name=iPhone 11' | tee xcodebuild.log | xcpretty -r html || CODE=$?
+  cd ../
+  export CODE
+}
+
+buildtvOSApp() {
+  echo Building the tvOS TestApp
+  cd tvOSTestApp
+  pod install
+  CODE=0
+  xcodebuild clean build -workspace tvOSTestApp.xcworkspace -scheme tvOSTestApp ONLY_ACTIVE_ARCH=NO -destination 'platform=tvOS Simulator,name=Apple TV' | tee xcodebuild.log | xcpretty -r html || CODE=$?
   cd ../
   export CODE
 }
@@ -37,6 +47,7 @@ if [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ -n "$TRAVIS_TAG" ]; then
 else
   # Else just build the test app
   buildiOSApp
+  buildtvOSApp
 fi
 
 rm $FLAG  # stop keepAlive
