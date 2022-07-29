@@ -1,0 +1,51 @@
+name: CocoaPods Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  TAGGING:
+    runs-on: macos-latest
+    environment: Tag
+    outputs:
+      output1: ${{ steps.tagging.outputs.tag }}
+        
+    steps:
+      - uses: actions/checkout@v3
+        
+      - name: Switching Podspec to release mode
+        run: |
+          sh .github/release_mode.sh
+            
+      - id: tagging
+        name: Add git tag
+        run: |
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} sh .github/tag.sh
+          
+  PODS_PUSH:
+    runs-on: macos-latest
+    environment: CocoaPods
+    needs: TAGGING
+
+    steps:
+    - uses: actions/checkout@v3
+    - run: git pull
+    
+    - name: Updating CocoaPods repo
+      run: pod repo update
+      
+#     - name: CocoaPods push
+#       run: |
+#         PODS_USER=${{ secrets.PODS_USER }} PODS_PASS=${{ secrets.PODS_PASS }} sh .github/cocoapods_publish.sh
+    
+    - name: Prepare release notes
+      run: |
+        sh .github/release_notes.sh
+    
+    - uses: ncipollo/release-action@v1
+      with:
+        tag: ${{needs.TAGGING.outputs.output1}}
+        bodyFile: ".github/release_notes_template.md"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        draft: true
