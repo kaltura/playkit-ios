@@ -16,5 +16,11 @@ import UIKit
     
     @objc public init(params: [String: Any]) {
         self.params = params
+        super.init()
+    }
+    
+    @objc public override init() {
+        self.params = [:]
+        super.init()
     }
 }
