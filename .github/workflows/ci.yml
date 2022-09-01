@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ "develop" ]
+    paths-ignore:
+      - 'docs/**'
+      - 'iOSTestApp/**'
+      - 'tvOSTestApp/**'
+      - 'Example/**'
+      - 'TestApp/**'
+      - 'LICENSE'
+      - '*.md'
+      
+concurrency: 
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Updating CocoaPods repo
+      run: pod repo update
+
+    - name: Pod linting
+      run: pod lib lint --fail-fast --verbose --allow-warnings

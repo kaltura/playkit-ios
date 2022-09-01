@@ -1,0 +1,31 @@
+name: PR
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+    paths-ignore:
+            - 'docs/**'
+            - 'iOSTestApp/**'
+            - 'tvOSTestApp/**'
+            - 'Example/**'
+            - 'TestApp/**'
+            - 'LICENSE'
+            - '*.md'
+
+concurrency:
+    group: PR_${{ github.head_ref }}
+    cancel-in-progress: true
+
+jobs:
+  build:
+    environment: PR
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Updating CocoaPods repo
+      run: pod repo update
+
+    - name: Pod linting
+      run: pod lib lint --fail-fast --verbose --allow-warnings
