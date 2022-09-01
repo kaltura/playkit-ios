@@ -28,4 +28,4 @@ jobs:
       run: pod repo update
 
     - name: Pod linting
-      run: pod lib lint --fail-fast --verbose
+      run: pod lib lint --fail-fast --verbose --allow-warnings
