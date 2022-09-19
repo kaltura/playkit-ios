@@ -26,7 +26,8 @@ extension AVPlayerEngine {
             #keyPath(currentItem.isPlaybackBufferFull),
             #keyPath(currentItem.loadedTimeRanges),
             #keyPath(currentItem.timedMetadata),
-            #keyPath(currentItem.duration)
+            #keyPath(currentItem.duration),
+            #keyPath(currentItem.tracks)
         ]
     }
     
@@ -181,6 +182,8 @@ extension AVPlayerEngine {
             self.handleTimedMedia()
         case #keyPath(currentItem.duration):
             self.handleDurationChanged()
+        case #keyPath(currentItem.tracks):
+            self.handleTracksCodecs()
         default: super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
@@ -226,6 +229,31 @@ extension AVPlayerEngine {
         if let isPlaybackLikelyToKeepUp = self.currentItem?.isPlaybackLikelyToKeepUp, isPlaybackLikelyToKeepUp == false {
             if self.rate == 0, self.currentState == .buffering || self.currentState == .ready {
                 self.post(event: PlayerEvent.Pause())
+            }
+        }
+    }
+    
+    /// Handle changes in Audio/Video tracks codecs.
+    private func handleTracksCodecs() {
+        if #available(iOS 13.0, tvOS 13.0, *) {
+            
+            if let playerItem = currentItem {
+                playerItem.tracks.forEach { track in
+                    
+                    if let videoFormatDescriptions = track.assetTrack?.formatDescriptions as? [CMFormatDescription] {
+                        
+                        videoFormatDescriptions.forEach { formatDescription in
+                            switch formatDescription.mediaType {
+                            case .video:
+                                self.post(event: PlayerEvent.VideoTrackChanged(codecDescription: formatDescription.mediaSubType.description))
+                            case .audio:
+                                self.post(event: PlayerEvent.AudioTrackChanged(codecDescription: formatDescription.mediaSubType.description))
+                            default:
+                                break
+                            }
+                        }
+                    }
+                }
             }
         }
     }

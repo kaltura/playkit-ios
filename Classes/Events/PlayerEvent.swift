@@ -153,11 +153,19 @@ import AVFoundation
         convenience init(track: Track) {
             self.init([EventDataKeys.selectedTrack: track])
         }
+        
+        convenience init(codecDescription: String) {
+            self.init([EventDataKeys.codec: codecDescription])
+        }
     }
 
     public class VideoTrackChanged: PlayerEvent {
         convenience init(bitrate: Double) {
             self.init([EventDataKeys.bitrate: bitrate])
+        }
+        
+        convenience init(codecDescription: String) {
+            self.init([EventDataKeys.codec: codecDescription])
         }
     }
 
