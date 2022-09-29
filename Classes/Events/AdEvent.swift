@@ -224,7 +224,7 @@ extension PKEvent {
         return self.data?[AdEventDataKeys.adDAICuePoints] as? PKAdDAICuePoints
     }
     
-    /// TotalTime, PKEvent Ad Data Accessor
+    /// AdTagUrl, PKEvent Ad Data Accessor
     @objc public var adTagUrl: String? {
         return self.data?[AdEventDataKeys.adTagUrl] as? String
     }
@@ -232,5 +232,10 @@ extension PKEvent {
     /// Ad info, PKEvent Ad Data Accessor
     @objc public var adInfo: PKAdInfo? {
         return self.data?[AdEventDataKeys.adInfo] as? PKAdInfo
+    }
+    
+    /// ClickThroughUrl, PKEvent Ad Data Accessor
+    @objc public var clickThroughUrl: String? {
+        return self.data?[AdEventDataKeys.clickThroughUrl] as? String
     }
 }
