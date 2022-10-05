@@ -32,7 +32,11 @@ extension AVPlayerEngine {
          */
         let playerItem = AVPlayerItem(asset: newAsset.avAsset)
         playerItem.preferredPeakBitRate = newAsset.playerSettings.network.preferredPeakBitRate
-
+        
+        let metadataOutput = AVPlayerItemMetadataOutput(identifiers: nil)
+        metadataOutput.setDelegate(self, queue: DispatchQueue.main)
+        playerItem.add(metadataOutput)
+        
         if #available(iOS 13.0, tvOS 13.0, *) {
             playerItem.automaticallyPreservesTimeOffsetFromLive = newAsset.playerSettings.lowLatency.automaticallyPreservesTimeOffsetFromLive
             
@@ -114,6 +118,17 @@ extension AVPlayerEngine {
                     self.initializePlayerItem(newAsset)
                 }
             }
+        }
+    }
+}
+
+extension AVPlayerEngine: AVPlayerItemMetadataOutputPushDelegate {
+    
+    public func metadataOutput(_ output: AVPlayerItemMetadataOutput,
+                               didOutputTimedMetadataGroups groups: [AVTimedMetadataGroup],
+                               from track: AVPlayerItemTrack?) {
+        groups.forEach { group in
+            self.post(event: PlayerEvent.TimedMetadata(metadata: group.items))
         }
     }
 }
