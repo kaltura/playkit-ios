@@ -155,7 +155,7 @@ import AVFoundation
         }
         
         convenience init(codecDescription: String) {
-            self.init([EventDataKeys.codec: codecDescription])
+            self.init([EventDataKeys.codec: codecDescription.replacingOccurrences(of: "\'", with: "")])
         }
     }
 
@@ -165,7 +165,7 @@ import AVFoundation
         }
         
         convenience init(codecDescription: String) {
-            self.init([EventDataKeys.codec: codecDescription])
+            self.init([EventDataKeys.codec: codecDescription.replacingOccurrences(of: "\'", with: "")])
         }
     }
 
