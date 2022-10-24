@@ -25,7 +25,6 @@ extension AVPlayerEngine {
             #keyPath(currentItem.isPlaybackBufferEmpty),
             #keyPath(currentItem.isPlaybackBufferFull),
             #keyPath(currentItem.loadedTimeRanges),
-            #keyPath(currentItem.timedMetadata),
             #keyPath(currentItem.duration),
             #keyPath(currentItem.tracks)
         ]
@@ -178,8 +177,6 @@ extension AVPlayerEngine {
                 return
             }
             self.handle(playerItemStatus: newPlayerItemStatus)
-        case #keyPath(currentItem.timedMetadata):
-            self.handleTimedMedia()
         case #keyPath(currentItem.duration):
             self.handleDurationChanged()
         case #keyPath(currentItem.tracks):
@@ -333,12 +330,6 @@ extension AVPlayerEngine {
         if currentItem != nil, seekToLiveEdgeTriggered {
             self.seekToLiveEdge()
         }
-    }
-    
-    private func handleTimedMedia() {
-        guard let currentItem = self.currentItem else { return }
-        guard let metadata = currentItem.timedMetadata else { return }
-        self.post(event: PlayerEvent.TimedMetadata(metadata: metadata))
     }
     
     private func handleTracksSelection(_ tracks: PKTracks) {
