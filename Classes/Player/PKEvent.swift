@@ -57,6 +57,7 @@ public extension PKEvent {
         static let currentTime = "currentTime"
         static let rate = "rate"
         static let entryId = "entryId"
+        static let codec = "codec"
     }
     
     // MARK: Player Data Accessors
@@ -89,6 +90,11 @@ public extension PKEvent {
     /// Indicated Bitrate, PKEvent Data Accessor
     @objc var bitrate: NSNumber? {
         return self.data?[EventDataKeys.bitrate] as? NSNumber
+    }
+    
+    /// Audio/video codec description, PKEvent Data Accessor
+    @objc var codecDescription: String? {
+        return self.data?[EventDataKeys.codec] as? String
     }
     
     /// The PlaybackInfo object, PKEvent Data Accessor
