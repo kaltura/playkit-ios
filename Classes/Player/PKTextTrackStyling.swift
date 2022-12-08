@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreMedia
+import UIKit
 
 struct RGBA: CustomStringConvertible {
     var red: CGFloat
