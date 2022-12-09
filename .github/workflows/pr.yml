@@ -44,7 +44,7 @@ jobs:
             scheme: "PlayKit-Package"
           - destination: "OS=16.1,name=Apple TV"
             name: "tvOS"
-            scheme: "PlayKit-PackageS"
+            scheme: "PlayKit-Package"
     steps:
       - uses: actions/checkout@v3
       - name: ${{ matrix.name }}
