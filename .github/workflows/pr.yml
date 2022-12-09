@@ -18,14 +18,26 @@ concurrency:
 
 jobs:
   build:
+    name: "CocoaPods linting"
     environment: PR
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Updating CocoaPods repo
-      run: pod repo update
+      - name: Updating CocoaPods repo
+        run: pod repo update
 
-    - name: Pod linting
-      run: pod lib lint --fail-fast --verbose --allow-warnings
+      - name: Pod linting
+        run: pod lib lint --fail-fast --verbose --allow-warnings
+      
+  SPM:
+    name: "Build SPM"
+    environment: PR
+    runs-on: macos-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build SPM
+        run: "swift build -c debug"
