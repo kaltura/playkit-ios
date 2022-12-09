@@ -39,10 +39,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - destination: "OS=16.1,name=iPhone 14 Pro"
+          - destination: "OS=16.0,name=iPhone 14 Pro"
             name: "iOS"
             scheme: "PlayKit-Package"
-          - destination: "OS=16.1,name=Apple TV"
+          - destination: "OS=16.0,name=Apple TV"
             name: "tvOS"
             scheme: "PlayKit-Package"
     steps:
