@@ -35,9 +35,19 @@ jobs:
     name: "Build SPM"
     environment: PR
     runs-on: macos-latest
-    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - destination: "OS=16.1,name=iPhone 14 Pro"
+            name: "iOS"
+            scheme: "PlayKit-Package"
+          - destination: "OS=16.1,name=Apple TV"
+            name: "tvOS"
+            scheme: "PlayKit-PackageS"
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Build SPM
-        run: "swift build -c debug"
+      - name: ${{ matrix.name }}
+        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}" clean test | xcpretty
+        
+        
