@@ -8,6 +8,7 @@
 // https://www.gnu.org/licenses/agpl-3.0.html
 // ===================================================================================================
 
+import XCTest
 import Foundation
 import Quick
 import SwiftyJSON
@@ -28,32 +29,30 @@ extension XCTestCase: PlayerCreator { }
 
 extension PlayerCreator {
     
-    func createPlayer(pluginConfigDict: [String : Any]? = nil, shouldStartPreparing: Bool = true) -> PlayerLoader {
-        let player: PlayerLoader
+    func createPlayer(pluginConfigDict: [String : Any]? = nil, shouldStartPreparing: Bool = true) -> PlayerLoader? {
         
-        // for hls stream use: "https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
-        let url = URL(fileURLWithPath: Bundle(for: type(of: self)).path(forResource: "big_buck_bunny_short", ofType: "mp4")!)
+        let player: PlayerLoader?
+        
+        // let url = URL(fileURLWithPath: Bundle(for: type(of: self)).path(forResource: "big_buck_bunny_short", ofType: "mp4")!)
+        let url = URL(string: "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8")
+        
         let entry = PKMediaEntry("test", sources: [PKMediaSource("test", contentUrl: url)])
         let mediaConfig = MediaConfig(mediaEntry: entry)
-        do {
-            let pluginConfig: PluginConfig?
-            if let pluginConfigDict = pluginConfigDict {
-                let pluginConfig = PluginConfig(config: pluginConfigDict)
-                player = try PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
-            } else {
-                pluginConfig = nil
-                player = try PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as! PlayerLoader
-            }
-            
-            if shouldStartPreparing {
-                player.prepare(mediaConfig)
-            }
-            return player
-        } catch {
-            print("could not create player instance")
+        
+        let pluginConfig: PluginConfig?
+        if let pluginConfigDict = pluginConfigDict {
+            let pluginConfig = PluginConfig(config: pluginConfigDict)
+            player = PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as? PlayerLoader
+        } else {
+            pluginConfig = nil
+            player = PlayKitManager.shared.loadPlayer(pluginConfig: pluginConfig) as? PlayerLoader
         }
         
-        return PlayerLoader()
+        if shouldStartPreparing {
+            player?.prepare(mediaConfig)
+        }
+        
+        return player
     }
     
     func destroyPlayer(_ player: Player!) {
@@ -67,7 +66,7 @@ extension PlayerCreator {
 /************************************************************/
 // MARK: - OTT Analytics Player
 /************************************************************/
-
+/*
 extension PlayerCreator {
     
     func createPlayerForTVPAPI(shouldStartPreparing: Bool = true) -> PlayerLoader {
@@ -92,3 +91,4 @@ extension PlayerCreator {
         return self.createPlayer(pluginConfigDict: pluginConfigDict, shouldStartPreparing: shouldStartPreparing)
     }
 }
+*/

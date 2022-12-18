@@ -19,6 +19,8 @@ let package = Package(
         .package(name: "KalturaNetKit",
                  url: "https://github.com/kaltura/netkit-ios.git",
                  .branch("FEC-12640")),
+        .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "5.0.0")),
+        .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "9.0.0")),
     ],
     targets: [.target(name: "PlayKit",
                       dependencies:
@@ -31,6 +33,10 @@ let package = Package(
                       path: "Classes/"),
               .target(name: "AnalyticsCommon",
                       dependencies: ["PlayKit"],
-                      path: "Plugins/AnalyticsCommon/")
+                      path: "Plugins/AnalyticsCommon/"),
+              .testTarget(name: "PlayKitTests",
+                          dependencies: ["PlayKit", "Quick", "Nimble"],
+                          path: "Example/Tests/Basic",
+                          exclude: [])
     ]
 )

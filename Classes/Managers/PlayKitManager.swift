@@ -18,7 +18,7 @@ import PlayKitUtils
  */
 @objc public class PlayKitManager: NSObject {
     
-    @objc public static let versionString: String = Bundle(for: PlayKitManager.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    @objc public static let versionString: String = Bundle(for: PlayKitManager.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "playkit/ios-beta"
     @objc public static let clientTag = "playkit/ios-\(versionString)"
     @objc public static let userAgent = UserAgent.build(clientTag: clientTag)
     
