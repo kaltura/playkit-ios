@@ -7,8 +7,9 @@ jobs:
 
   SPM:
     name: "Build SPM"
-    environment: PR
+    environment: Tag
     runs-on: macos-latest
+    
     strategy:
       fail-fast: false
       matrix:
