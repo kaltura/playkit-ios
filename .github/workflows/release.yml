@@ -52,7 +52,7 @@ jobs:
     environment: CocoaPods
     needs: TAGGING
     steps:
-      - name: Print >>>
+      - name: Print
         run: echo ${{needs.TAGGING.outputs.output1}}
 
   # PODS_PUSH:
