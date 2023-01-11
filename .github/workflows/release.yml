@@ -51,9 +51,14 @@ jobs:
     runs-on: macos-latest
     environment: CocoaPods
     needs: TAGGING
+    
     steps:
+      - uses: actions/checkout@v3
+      - run: git pull
+      
       - name: Print
         run: echo ${{needs.TAGGING.outputs.output1}}
+        
 
   # PODS_PUSH:
   #   runs-on: macos-latest
