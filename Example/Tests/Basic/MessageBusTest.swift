@@ -13,7 +13,7 @@ import PlayKit
 import SwiftyJSON
 import AVFoundation
 
-class MessegeBusTest: XCTestCase {
+class MessageBusTest: XCTestCase {
     var player : Player!
     
     override func setUp() {
