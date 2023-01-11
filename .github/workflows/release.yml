@@ -53,7 +53,7 @@ jobs:
     needs: TAGGING
     steps:
       - name: Print >>>
-      run: echo ${{needs.TAGGING.outputs.output1}}
+        run: echo ${{needs.TAGGING.outputs.output1}}
 
   # PODS_PUSH:
   #   runs-on: macos-latest
