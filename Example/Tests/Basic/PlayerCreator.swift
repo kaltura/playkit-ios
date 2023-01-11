@@ -18,7 +18,7 @@ enum PlayerCreationError: Error {
     case PluginNamesCountMismatch
 }
 
-protocol PlayerCreator: class { }
+protocol PlayerCreator: AnyObject { }
 
 // make sure all xctest case classes have player creator.
 extension XCTestCase: PlayerCreator { }
@@ -66,29 +66,34 @@ extension PlayerCreator {
 /************************************************************/
 // MARK: - OTT Analytics Player
 /************************************************************/
-/*
+
 extension PlayerCreator {
     
-    func createPlayerForTVPAPI(shouldStartPreparing: Bool = true) -> PlayerLoader {
-        let pluginConfigDict: [String : Any] = [
+    /*
+    func createPlayerForPhoenix(shouldStartPreparing: Bool = true) -> PlayerLoader? {
+        let pluginConfigDict: [String: Any] = [
+            PhoenixAnalyticsPlugin.pluginName: AnalyticsConfig(params: PluginTestConfiguration.Phoenix.paramsDict)
+        ]
+        return self.createPlayer(pluginConfigDict: pluginConfigDict,
+                                 shouldStartPreparing: shouldStartPreparing)
+    }
+    */
+    
+    // TVPAPI is no longet supported
+    /*
+    func createPlayerForTVPAPI(shouldStartPreparing: Bool = true) -> PlayerLoader? {
+        let pluginConfigDict: [String: Any] = [
             PluginTestConfiguration.TVPAPI.pluginName: AnalyticsConfig(params: PluginTestConfiguration.TVPAPI.paramsDict)
         ]
         return self.createPlayer(pluginConfigDict: pluginConfigDict, shouldStartPreparing: shouldStartPreparing)
     }
     
-    func createPlayerForPhoenix(shouldStartPreparing: Bool = true) -> PlayerLoader {
-        let pluginConfigDict: [String : Any] = [
-            PluginTestConfiguration.Phoenix.pluginName: AnalyticsConfig(params: PluginTestConfiguration.Phoenix.paramsDict)
-        ]
-        return self.createPlayer(pluginConfigDict: pluginConfigDict, shouldStartPreparing: shouldStartPreparing)
-    }
-    
-    func createPlayerForPhoenixAndTVPAPI(shouldStartPreparing: Bool = true) -> PlayerLoader {
-        let pluginConfigDict: [String : Any] = [
+    func createPlayerForPhoenixAndTVPAPI(shouldStartPreparing: Bool = true) -> PlayerLoader? {
+        let pluginConfigDict: [String: Any] = [
             PluginTestConfiguration.Phoenix.pluginName: AnalyticsConfig(params: PluginTestConfiguration.Phoenix.paramsDict),
             PluginTestConfiguration.TVPAPI.pluginName: AnalyticsConfig(params: PluginTestConfiguration.TVPAPI.paramsDict)
         ]
         return self.createPlayer(pluginConfigDict: pluginConfigDict, shouldStartPreparing: shouldStartPreparing)
     }
+     */
 }
-*/

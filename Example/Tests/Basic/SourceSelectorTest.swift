@@ -20,16 +20,22 @@ class SourceSelectorTest: XCTestCase {
     let wvm = PKMediaSource("wvm", contentUrl: URL(string: "https://example.com/a.wvm"), mediaFormat: .wvm )
     
     func testSelectedSource() {
-        /*guard let preferredMedia = AssetBuilder.getPreferredMediaSource(from: PKMediaEntry("e", sources: [mp4, hls, fps])) else {
+        
+        guard let preferredMedia = DefaultAssetHandler.getPreferredMediaSource(from: PKMediaEntry("e",
+                                                                                                  sources: [mp4, hls, fps])) else {
             XCTFail()
             return
         }
-        let _ = AssetBuilder.build(from: preferredMedia.0, using: preferredMedia.1) { (_, asset) in
+        
+        DefaultAssetHandler().build(from: preferredMedia.0) { (error: Error?, asset: AVURLAsset?) in
+            XCTAssertNil(error)
+            
             guard let asset = asset else {
                 XCTFail()
                 return
             }
+            
             XCTAssertEqual(asset.url.lastPathComponent, "hls.m3u8")
-        }*/
+        }
     }
 }

@@ -36,7 +36,9 @@ let package = Package(
                       path: "Plugins/AnalyticsCommon/"),
               .testTarget(name: "PlayKitTests",
                           dependencies: ["PlayKit", "Quick", "Nimble"],
-                          path: "Example/Tests/Basic",
-                          exclude: [])
+                          path: "Example/Tests/Basic/",
+                          exclude: [
+                            
+                          ])
     ]
 )

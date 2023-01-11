@@ -19,49 +19,48 @@ class TracksTest: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        let config = PlayerConfig()
+        let url = URL(string: "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8")
         
-        var source = [String : Any]()
-        source["id"] = "test"
-        source["url"] = "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8"
+        let mediaEntry = PKMediaEntry("test-id",
+                                      sources: [PKMediaSource("test", contentUrl: url)],
+                                      duration: -1)
         
-        var sources = [JSON]()
-        sources.append(JSON(source))
-        
-        var entry = [String : Any]()
-        entry["id"] = "test"
-        entry["sources"] = sources
-        
-        config.set(mediaEntry: MediaEntry(json: JSON(entry)))
-        
-        self.player = PlayKitManager.sharedInstance.loadPlayer(config:config)
+        self.player = PlayKitManager.shared.loadPlayer(pluginConfig: nil)
+        self.player.prepare(MediaConfig(mediaEntry: mediaEntry))
     }
     
     func testGetTracksByEvent() {
+        self.player.play()
+        
         let theExeption = expectation(description: "get tracks")
         
-        self.player.addObserver(self, events: [PlayerEvents.tracksAvailable.self]) { (data: Any) in
-            if let tracksAvailable = data as? PlayerEvents.tracksAvailable {
-                self.tracks = tracksAvailable.tracks
+        self.player.addObserver(self,
+                                events: [PlayerEvent.tracksAvailable]) { event in
+            
+            if event is PlayerEvent.TracksAvailable {
+                self.tracks = event.tracks
                 
                 theExeption.fulfill()
             } else {
-               XCTFail()
+                XCTFail()
             }
         }
-
+        
         waitForExpectations(timeout: 10.0) { (_) -> Void in}
     }
     
     func testSelectTrack() {
+        self.player.play()
+        
         let theExeption = expectation(description: "select track")
         
-        self.player.addObserver(self, events: [PlayerEvents.tracksAvailable.self]) { (data: Any) in
-            if let tracksAvailable = data as? PlayerEvents.tracksAvailable {
-                print(tracksAvailable)
+        self.player.addObserver(self,
+                                events: [PlayerEvent.tracksAvailable]) { event in
+            if event is PlayerEvent.TracksAvailable {
+                print(event)
                 self.player.selectTrack(trackId: "sbtl:0")
                 
-              theExeption.fulfill()
+                theExeption.fulfill()
             } else {
                 XCTFail()
             }
@@ -73,5 +72,6 @@ class TracksTest: XCTestCase {
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
+        self.destroyPlayer(player)
     }
 }
