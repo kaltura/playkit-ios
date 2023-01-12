@@ -12,8 +12,9 @@
 
 // NOTE: LocalAssetsManager and other offline features only work in iOS 
 
-#if os(iOS)
 import Foundation
+
+#if os(iOS)
 import AVFoundation
 
 /// Manage local (downloaded) assets.

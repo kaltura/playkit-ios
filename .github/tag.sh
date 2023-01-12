@@ -23,6 +23,6 @@ POST_URL=https://api.github.com/repos/$GITHUB_REPOSITORY/git/refs
 curl $POST_URL -X POST -H "Content-Type: application/json" -H "authorization: Bearer $GITHUB_TOKEN" -d@post.json
 
 #Add current tag to job output
-echo "::set-output name=tag::$TARGET_TAG"
+echo "tag=${TARGET_TAG}" >> $GITHUB_OUTPUT
 
 echo "$NAME release tag added and it is ready for CocoaPods distribution, upcoming version is going to be $TARGET_TAG"

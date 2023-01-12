@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import XCGLogger
+import Foundation
 
 /// `PKLogLevel` describes the available log levels.
 @objc public enum PKLogLevel: Int, CustomStringConvertible {

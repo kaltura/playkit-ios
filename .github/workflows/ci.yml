@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   build:
+    name: "CocoaPods linting"
     runs-on: macos-latest
 
     steps:
@@ -28,3 +29,23 @@ jobs:
 
     - name: Pod linting
       run: pod lib lint --fail-fast --verbose --allow-warnings
+
+  SPM:
+    name: "Build SPM"
+    runs-on: macos-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - destination: "OS=16.0,name=iPhone 14 Pro"
+            name: "iOS"
+            scheme: "PlayKit-Package"
+          - destination: "OS=16.0,name=Apple TV"
+            name: "tvOS"
+            scheme: "PlayKit-Package"
+    steps:
+      - uses: actions/checkout@v3
+      - name: ${{ matrix.name }}
+        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}" clean test | xcpretty
+        

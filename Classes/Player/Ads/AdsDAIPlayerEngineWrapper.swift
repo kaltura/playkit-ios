@@ -3,6 +3,7 @@
 import Foundation
 import CoreMedia
 import AVFoundation
+import UIKit
 
 /// `AdsPlayerEngineWrapperState` represents `AdsPlayerEngineWrapper` state machine states.
 enum AdsDAIPlayerEngineWrapperState: Int, StateProtocol {

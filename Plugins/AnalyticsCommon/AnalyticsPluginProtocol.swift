@@ -9,6 +9,7 @@
 // ===================================================================================================
 
 import Foundation
+import PlayKit
 
 @objc public protocol AnalyticsPluginProtocol: PKPlugin {
     

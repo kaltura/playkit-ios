@@ -1,6 +1,7 @@
 
 
 import Foundation
+import UIKit
 
 /// `AdsPlayerEngineWrapperState` represents `AdsPlayerEngineWrapper` state machine states.
 enum AdsPlayerEngineWrapperState: Int, StateProtocol {
