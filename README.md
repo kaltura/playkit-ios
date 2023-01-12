@@ -1,10 +1,10 @@
 
 ![Swift 3.0+](https://img.shields.io/badge/Swift-3.0+-orange.svg)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3c95a3b285d9447cb525be42647af4f8)](https://www.codacy.com/app/PlayKit/playkit-ios?utm_source=github.com&utm_medium=referral&utm_content=kaltura/playkit-ios&utm_campaign=badger)
-[![CI Status](https://api.travis-ci.org/kaltura/playkit-ios.svg?branch=develop)](https://travis-ci.org/kaltura/playkit-ios)
+[![CI Status](https://github.com/kaltura/playkit-ios/actions/workflows/ci.yml/badge.svg)](https://github.com/kaltura/playkit-ios/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/cocoapods/v/PlayKit.svg?style=flat)](https://cocoapods.org/pods/PlayKit)
 [![License](https://img.shields.io/cocoapods/l/PlayKit.svg?style=flat)](https://cocoapods.org/pods/PlayKit)
 [![Platform](https://img.shields.io/cocoapods/p/PlayKit.svg?style=flat)](https://cocoapods.org/pods/PlayKit)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3c95a3b285d9447cb525be42647af4f8)](https://www.codacy.com/app/PlayKit/playkit-ios?utm_source=github.com&utm_medium=referral&utm_content=kaltura/playkit-ios&utm_campaign=badger)
 
 # Kaltura Player SDK
 
