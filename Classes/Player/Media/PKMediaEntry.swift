@@ -184,6 +184,14 @@ public class FairPlayDRMParams: DRMParams {
 }
 
 @objc public protocol FairPlayLicenseProvider {
-    @objc func getLicense(spc: Data, assetId: String, requestParams: PKRequestParams,
+    
+    var assetId: String? { get }
+    
+    @objc func getLicense(spc: Data,
+                          assetId: String,
+                          requestParams: PKRequestParams,
                           callback: @escaping (_ ckc: Data?, _ offlineDuration: TimeInterval, _ error: Error?) -> Void)
+    
+    @objc func getAssetId(request: URLRequest) -> String?
+    
 }
