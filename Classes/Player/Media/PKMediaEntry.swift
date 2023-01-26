@@ -10,6 +10,7 @@
 
 import UIKit
 import SwiftyJSON
+import AVFoundation
 
 @objc public enum MediaType: Int, CustomStringConvertible {
     case dvrLive
@@ -185,13 +186,18 @@ public class FairPlayDRMParams: DRMParams {
 
 @objc public protocol FairPlayLicenseProvider {
     
-    var assetId: String? { get }
-    
     @objc func getLicense(spc: Data,
-                          assetId: String,
+                          contentId: String,
                           requestParams: PKRequestParams,
                           callback: @escaping (_ ckc: Data?, _ offlineDuration: TimeInterval, _ error: Error?) -> Void)
     
-    @objc func getAssetId(request: URLRequest) -> String?
+    /// Obtain the identifier for the content.
+    /// This value depends on the particular system used to provide the decryption key.
+    /// parse URI attributes of the EXT-X-KEY or EXT-X-SESSION-KEY
+    /// https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.2.4
+    /// https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.4.5
+    /// - Parameter request: Request for the requested resource. AVAssetResourceLoadingRequest.request
+    /// - Returns: Content Identifier
+    @objc func getContentId(request: URLRequest) -> String?
     
 }
