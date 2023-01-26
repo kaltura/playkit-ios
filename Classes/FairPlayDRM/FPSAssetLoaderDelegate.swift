@@ -148,11 +148,6 @@ class FPSResourceLoadingKeyRequest: FPSLicenseRequest {
         
         do {
             let spc = try request.streamingContentKeyRequestData(forApp: cert, contentIdentifier: id.data(using: .utf8)!, options: options)
-            
-            print("@@@")
-            print(spc.base64EncodedString())
-            print("@@@")
-            
             callback(spc, nil)
         } catch {
             callback(nil, error)

@@ -22,17 +22,14 @@ struct KalturaLicenseResponseContainer: Codable {
 
 class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
     
-    var assetId: String?
-    
     func getContentId(request: URLRequest) -> String? {
-        self.assetId = request.url?.host
-        return self.assetId
+        return request.url?.host
     }
     
     static let sharedInstance = KalturaFairPlayLicenseProvider()
     
     func getLicense(spc: Data,
-                                              contentId: String,
+                    contentId: String,
                     requestParams: PKRequestParams,
                     callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
         
@@ -140,7 +137,7 @@ class FPSLicenseHelper {
         let licenseProvider = self.params?.licenseProvider ?? KalturaFairPlayLicenseProvider.sharedInstance
         
         licenseProvider.getLicense(spc: spcData,
-                                                             contentId: assetId,
+                                   contentId: assetId,
                                    requestParams: requestParams) { (ckc, duration, error) in
             
             guard let ckc = ckc else {
