@@ -67,7 +67,8 @@ class FPSAssetLoaderDelegate: NSObject {
     
     func prepareAndSendContentKeyRequest(resourceLoadingRequest: AVAssetResourceLoadingRequest) {
         
-        guard let assetId = self.drmData?.licenseProvider?.getContentId(request: resourceLoadingRequest.request) else {
+        let licenseProvider = self.drmData?.licenseProvider ?? KalturaFairPlayLicenseProvider.sharedInstance
+        guard let assetId = licenseProvider.getContentId(request: resourceLoadingRequest.request) else {
             PKLog.error("No asset id")
             return
         }
