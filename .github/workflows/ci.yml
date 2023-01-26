@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     name: "CocoaPods linting"
-    runs-on: macos-latest
+    runs-on: macOS-12
 
     steps:
     - uses: actions/checkout@v3
@@ -32,7 +32,7 @@ jobs:
 
   SPM:
     name: "Build SPM"
-    runs-on: macos-latest
+    runs-on: macOS-12
     
     strategy:
       fail-fast: false
