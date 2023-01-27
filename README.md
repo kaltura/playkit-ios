@@ -1,5 +1,5 @@
 
-![Swift 3.0+](https://img.shields.io/badge/Swift-3.0+-orange.svg)
+![Swift 5.0+](https://img.shields.io/badge/Swift-5.0+-orange.svg)
 [![CI Status](https://github.com/kaltura/playkit-ios/actions/workflows/ci.yml/badge.svg)](https://github.com/kaltura/playkit-ios/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/cocoapods/v/PlayKit.svg?style=flat)](https://cocoapods.org/pods/PlayKit)
 [![License](https://img.shields.io/cocoapods/l/PlayKit.svg?style=flat)](https://cocoapods.org/pods/PlayKit)
