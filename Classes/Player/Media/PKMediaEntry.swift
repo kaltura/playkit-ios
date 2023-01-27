@@ -184,6 +184,19 @@ public class FairPlayDRMParams: DRMParams {
 }
 
 @objc public protocol FairPlayLicenseProvider {
-    @objc func getLicense(spc: Data, assetId: String, requestParams: PKRequestParams,
+    
+    @objc func getLicense(spc: Data,
+                          contentId: String,
+                          requestParams: PKRequestParams,
                           callback: @escaping (_ ckc: Data?, _ offlineDuration: TimeInterval, _ error: Error?) -> Void)
+    
+    /// Obtain the identifier for the content.
+    /// This value depends on the particular system used to provide the decryption key.
+    /// Parse URI attribute of the EXT-X-KEY or EXT-X-SESSION-KEY
+    /// https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.2.4
+    /// https://www.rfc-editor.org/rfc/rfc8216.html#section-4.3.4.5
+    /// - Parameter request: Request for the requested resource. AVAssetResourceLoadingRequest.request
+    /// - Returns: Content Identifier
+    @objc func getContentId(request: URLRequest) -> String?
+    
 }

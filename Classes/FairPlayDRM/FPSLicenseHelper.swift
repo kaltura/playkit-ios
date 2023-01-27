@@ -22,9 +22,17 @@ struct KalturaLicenseResponseContainer: Codable {
 
 class KalturaFairPlayLicenseProvider: FairPlayLicenseProvider {
     
+    func getContentId(request: URLRequest) -> String? {
+        return request.url?.host
+    }
+    
     static let sharedInstance = KalturaFairPlayLicenseProvider()
     
-    func getLicense(spc: Data, assetId: String, requestParams: PKRequestParams, callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
+    func getLicense(spc: Data,
+                    contentId: String,
+                    requestParams: PKRequestParams,
+                    callback: @escaping (Data?, TimeInterval, Error?) -> Void) {
+        
         var request = URLRequest(url: requestParams.url)
         
         // uDRM requires application/octet-stream as the content type.
@@ -127,16 +135,17 @@ class FPSLicenseHelper {
         }
         
         let licenseProvider = self.params?.licenseProvider ?? KalturaFairPlayLicenseProvider.sharedInstance
-
-        licenseProvider.getLicense(spc: spcData, assetId: assetId,
-                                               requestParams: requestParams) { (ckc, duration, error) in
-                                                
-                                                guard let ckc = ckc else {
-                                                    callback(nil, error)
-                                                    return
-                                                }
-                                                
-                                                callback(FPSLicense(ckc: ckc, duration: duration), nil)
+        
+        licenseProvider.getLicense(spc: spcData,
+                                   contentId: assetId,
+                                   requestParams: requestParams) { (ckc, duration, error) in
+            
+            guard let ckc = ckc else {
+                callback(nil, error)
+                return
+            }
+            
+            callback(FPSLicense(ckc: ckc, duration: duration), nil)
         }
     }
 
