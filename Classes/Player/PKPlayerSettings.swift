@@ -29,6 +29,18 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
         }
     }
     
+    /// Indicates ta preferred maximum video resolution
+    ///
+    /// Set preferredMaximumResolution to non-zero to indicates a preferred maximum video resolution. This property only applies to HTTP Live Streaming assets.
+    /// zero is the default value and it indicates there is no limit on the video resolution
+    ///
+    /// @available(iOS 11.0, *) via AVPlayerItem
+    @objc public var preferredMaximumResolution: CGSize = CGSize(width: 0, height: 0){
+        didSet {
+            self.onChange?(.preferredMaximumResolution(preferredMaximumResolution))
+        }
+    }
+    
     /// Indicates the media duration the caller prefers the player to buffer from the network ahead of the playhead to guard against playback disruption.
     ///
     /// The value is in seconds. If it is set to 0, the player will choose an appropriate level of buffering for most use cases.
@@ -65,6 +77,7 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     @objc public func createCopy() -> PKNetworkSettings {
         let copy = PKNetworkSettings()
         copy.preferredPeakBitRate = self.preferredPeakBitRate
+        copy.preferredMaximumResolution = self.preferredMaximumResolution
         copy.preferredForwardBufferDuration = self.preferredForwardBufferDuration
         copy.automaticallyWaitsToMinimizeStalling = self.automaticallyWaitsToMinimizeStalling
         
@@ -143,6 +156,7 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
 
 enum PlayerSettingsType {
     case preferredPeakBitRate(Double)
+    case preferredMaximumResolution(CGSize)
     case preferredForwardBufferDuration(Double)
     case automaticallyWaitsToMinimizeStalling(Bool)
     case configuredTimeOffsetFromLive(CMTime)
