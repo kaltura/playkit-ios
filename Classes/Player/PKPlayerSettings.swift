@@ -34,7 +34,7 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     /// Set preferredMaximumResolution to non-zero to indicates a preferred maximum video resolution. This property only applies to HTTP Live Streaming assets.
     /// zero is the default value and it indicates there is no limit on the video resolution
     ///
-    /// @available(iOS 11.0, *) via AVPlayerItem
+    /// @available(iOS 11.0, tvOS 11.0, *) via AVPlayerItem
     @objc public var preferredMaximumResolution: CGSize = CGSize(width: 0, height: 0){
         didSet {
             self.onChange?(.preferredMaximumResolution(preferredMaximumResolution))
