@@ -353,6 +353,8 @@ public class AVPlayerEngine: AVPlayer {
     
     func destroy() {
         PKLog.verbose("Destroy player")
+        self.view?.removeFromSuperview()
+        self.view = nil
         self.onEventBlock = nil
         // removes app state observer
         AppStateSubject.shared.remove(observer: self)
