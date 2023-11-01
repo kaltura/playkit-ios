@@ -48,6 +48,10 @@ extension AVPlayerEngine {
         if #available(iOS 10.0, tvOS 10.0, *) {
             playerItem.preferredForwardBufferDuration = newAsset.playerSettings.network.preferredForwardBufferDuration
         }
+        
+        if #available(iOS 11.0, tvOS 11.0, *) {
+            playerItem.preferredMaximumResolution = newAsset.playerSettings.network.preferredMaximumResolution
+        }
 
         // Add observers
         self.removeObservers()
