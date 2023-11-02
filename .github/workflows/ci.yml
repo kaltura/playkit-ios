@@ -17,22 +17,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  update:
-    name: "CocoaPods update"
-    runs-on: macOS-12
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Updating CocoaPods
-      run: gem install cocoapods
-
   build:
     name: "CocoaPods linting"
     runs-on: macOS-12
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Updating Cocoapods
+      run: gem install cocoapods
 
     - name: Updating CocoaPods repo
       run: pod repo update

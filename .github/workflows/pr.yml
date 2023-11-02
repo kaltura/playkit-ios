@@ -25,6 +25,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Updating Cocoapods
+        run: gem install cocoapods
+
       - name: Updating CocoaPods repo
         run: pod repo update
 
