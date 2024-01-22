@@ -24,6 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          xcode-version: '14.3.1'
 
       - name: Updating Cocoapods
         run: gem install cocoapods
@@ -42,10 +44,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - destination: "OS=17.0,name=iPhone 14 Pro"
+          - destination: "OS=16.2,name=iPhone 14 Pro"
             name: "iOS"
             scheme: "PlayKit-Package"
-          - destination: "OS=17.0,name=Apple TV"
+          - destination: "OS=16.2,name=Apple TV"
             name: "tvOS"
             scheme: "PlayKit-Package"
     steps:
