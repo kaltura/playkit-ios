@@ -44,7 +44,7 @@ extension AVPlayerEngine {
         NotificationCenter.default.addObserver(self, selector: #selector(self.didPlayToEndTime(_:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onPlaybackStalledNotification), name: .AVPlayerItemPlaybackStalled, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
-        if #available(iOS 17.0, *) {
+        if #available(iOS 17.0, tvOS 17.0, *) {
             // On iOS, this branch runs in versions 17.0 and greater.
             NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: AVPlayerItem.newAccessLogEntryNotification, object: self.currentItem)
             NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: AVPlayerItem.newErrorLogEntryNotification, object: self.currentItem)
