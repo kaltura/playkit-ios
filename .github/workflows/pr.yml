@@ -20,10 +20,10 @@ jobs:
   build:
     name: "CocoaPods linting"
     environment: PR
-    runs-on: macOS-12
+    runs-on: macos-13
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Updating Cocoapods
         run: gem install cocoapods
@@ -37,7 +37,7 @@ jobs:
   SPM:
     name: "Build SPM"
     environment: PR
-    runs-on: macOS-12
+    runs-on: macos-13
     strategy:
       fail-fast: false
       matrix:
@@ -49,7 +49,7 @@ jobs:
             name: "tvOS"
             scheme: "PlayKit-Package"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: ${{ matrix.name }}
         run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}" clean test | xcpretty
         
