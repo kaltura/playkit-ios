@@ -11,7 +11,7 @@
 import Foundation
 import Quick
 import Nimble
-import SwiftyJSON
+import kSwiftyJSON
 import CoreMedia
 @testable import PlayKit
 

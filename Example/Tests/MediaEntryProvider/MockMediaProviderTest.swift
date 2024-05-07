@@ -10,7 +10,7 @@
 import UIKit
 import XCTest
 import PlayKit
-import SwiftyJSON
+import kSwiftyJSON
 
 class MockMediaProviderTest: XCTestCase {
     
