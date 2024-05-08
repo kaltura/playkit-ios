@@ -10,7 +10,7 @@
 
 import XCTest
 import PlayKit
-import SwiftyJSON
+import kSwiftyJSON
 import AVFoundation
 
 class MessageBusTest: XCTestCase {

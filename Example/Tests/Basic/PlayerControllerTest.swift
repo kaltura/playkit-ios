@@ -10,7 +10,7 @@
 
 import XCTest
 import PlayKit
-import SwiftyJSON
+import kSwiftyJSON
 import CoreMedia
 
 //Unit test to check the player controller

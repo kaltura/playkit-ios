@@ -11,7 +11,7 @@
 import XCTest
 import Foundation
 import Quick
-import SwiftyJSON
+import kSwiftyJSON
 @testable import PlayKit
 
 enum PlayerCreationError: Error {

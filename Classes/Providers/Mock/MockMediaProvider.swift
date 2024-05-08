@@ -9,7 +9,7 @@
 // ===================================================================================================
 
 import UIKit
-import SwiftyJSON
+import kSwiftyJSON
 
 @objc public class MockMediaEntryProvider: NSObject, MediaEntryProvider {
 

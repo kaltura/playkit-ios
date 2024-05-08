@@ -11,7 +11,7 @@
 
 import Foundation
 import AVFoundation
-import SwiftyJSON
+import kSwiftyJSON
 
 import PlayKitUtils
 

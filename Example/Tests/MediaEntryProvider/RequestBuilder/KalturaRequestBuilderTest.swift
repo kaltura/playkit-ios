@@ -13,7 +13,7 @@ import Quick
 import Nimble
 @testable import PlayKit
 @testable import KalturaNetKit
-import SwiftyJSON
+import kSwiftyJSON
 
 class KalturaRequestBuilderTest: QuickSpec {
         

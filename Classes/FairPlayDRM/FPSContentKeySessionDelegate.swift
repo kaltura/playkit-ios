@@ -9,7 +9,7 @@
 // ===================================================================================================
 
 import AVFoundation
-import SwiftyJSON
+import kSwiftyJSON
 
 #if os(iOS)
 @available(iOS 10.3, *)
