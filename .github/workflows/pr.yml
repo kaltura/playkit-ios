@@ -23,7 +23,7 @@ jobs:
     runs-on: macos-13
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Updating Cocoapods
         run: gem install cocoapods
@@ -42,15 +42,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - destination: "OS=17.2,name=iPhone 15"
+          - destination: "OS=17.0,name=iPhone 14 Pro"
             name: "iOS"
             scheme: "PlayKit-Package"
           - destination: "OS=17.0,name=Apple TV"
             name: "tvOS"
             scheme: "PlayKit-Package"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: ${{ matrix.name }}
-        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild docbuild -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}" clean test | xcpretty
+        run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}" clean test | xcpretty
         
         
