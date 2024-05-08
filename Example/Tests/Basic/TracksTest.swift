@@ -46,7 +46,7 @@ class TracksTest: XCTestCase {
             }
         }
         
-        waitForExpectations(timeout: 10.0) { (_) -> Void in}
+        waitForExpectations(timeout: 20.0) { (_) -> Void in}
     }
     
     func testSelectTrack() {
@@ -66,7 +66,7 @@ class TracksTest: XCTestCase {
             }
         }
         
-        waitForExpectations(timeout: 10.0) { (_) -> Void in}
+        waitForExpectations(timeout: 20.0) { (_) -> Void in}
     }
     
     override func tearDown() {

@@ -62,7 +62,7 @@ extension AVPlayerEngine {
         
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: AVPlayerItem.newAccessLogEntryNotification, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemPlaybackStalled, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)

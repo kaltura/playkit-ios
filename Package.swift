@@ -4,8 +4,8 @@ import PackageDescription
 
 let package = Package( 
     name: "PlayKit",
-    platforms: [.iOS(.v11),
-                .tvOS(.v11)],
+    platforms: [.iOS(.v14),
+                .tvOS(.v14)],
     products: [.library(name: "PlayKit",
                         targets: ["PlayKit"]),
                .library(name: "AnalyticsCommon",
@@ -19,8 +19,8 @@ let package = Package(
         .package(name: "KalturaNetKit",
                  url: "https://github.com/kaltura/netkit-ios.git",
                  .upToNextMinor(from: "1.7.0")),
-        .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "5.0.0")),
-        .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "9.0.0")),
+        .package(url: "https://github.com/Quick/Quick.git", .upToNextMajor(from: "7.5.0")),
+        .package(url: "https://github.com/Quick/Nimble.git", .upToNextMajor(from: "13.3.0")),
     ],
     targets: [.target(name: "PlayKit",
                       dependencies:
