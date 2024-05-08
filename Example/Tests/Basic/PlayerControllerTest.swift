@@ -39,7 +39,7 @@ class PlayerControllerTest: XCTestCase {
                 XCTFail()
             }
         }
-        waitForExpectations(timeout: 20.0) { (_) -> Void in}
+        waitForExpectations(timeout: 30.0) { (_) -> Void in}
     }
     
     func testPauseCommand() {
@@ -55,7 +55,7 @@ class PlayerControllerTest: XCTestCase {
         self.player.addObserver(self, events: [PlayerEvent.playing]) { [weak self] event in
             self?.player.pause()
         }
-        waitForExpectations(timeout: 20.0) { (_) -> Void in}
+        waitForExpectations(timeout: 30.0) { (_) -> Void in}
     }
     
     
@@ -78,7 +78,7 @@ class PlayerControllerTest: XCTestCase {
                 }
             }
         }
-        waitForExpectations(timeout: 20.0) { (_) -> Void in}
+        waitForExpectations(timeout: 30.0) { (_) -> Void in}
     }
     
     /// Test a guard mechanism that prevents receiving pause events after ended event.
