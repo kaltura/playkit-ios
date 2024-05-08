@@ -50,6 +50,7 @@ class TracksTest: XCTestCase {
     }
     
     func testSelectTrack() {
+        
         self.player.play()
         
         let theExeption = expectation(description: "select track")
