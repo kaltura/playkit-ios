@@ -48,6 +48,8 @@ jobs:
             name: "tvOS"
             scheme: "PlayKit-Package"
     steps:
+       - name: Force Xcode 15
+        run: sudo xcode-select -switch /Applications/Xcode_15.2.app
       - uses: actions/checkout@v4
       - name: ${{ matrix.name }}
         run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}" clean test | xcpretty
