@@ -43,7 +43,7 @@ extension AVPlayerEngine {
         NotificationCenter.default.addObserver(self, selector: #selector(self.didFailToPlayToEndTime(_:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.didPlayToEndTime(_:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: AVPlayerItem.newAccessLogEntryNotification, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onPlaybackStalledNotification), name: .AVPlayerItemPlaybackStalled, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
