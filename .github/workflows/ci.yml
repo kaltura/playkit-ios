@@ -48,7 +48,7 @@ jobs:
             name: "tvOS"
             scheme: "PlayKit-Package"
     steps:
-       - name: Force Xcode 15
+      - name: Force Xcode 15
         run: sudo xcode-select -switch /Applications/Xcode_15.2.app
       - uses: actions/checkout@v4
       - name: ${{ matrix.name }}
