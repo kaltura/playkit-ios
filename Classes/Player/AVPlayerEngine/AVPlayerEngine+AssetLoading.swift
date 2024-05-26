@@ -37,6 +37,10 @@ extension AVPlayerEngine {
         metadataOutput.setDelegate(self, queue: DispatchQueue.main)
         playerItem.add(metadataOutput)
         
+        let metadataCollector = AVPlayerItemMetadataCollector()
+        metadataCollector.setDelegate(self, queue: DispatchQueue.main)
+        playerItem.add(metadataCollector)
+        
         if #available(iOS 13.0, tvOS 13.0, *) {
             playerItem.automaticallyPreservesTimeOffsetFromLive = newAsset.playerSettings.lowLatency.automaticallyPreservesTimeOffsetFromLive
             
@@ -134,5 +138,15 @@ extension AVPlayerEngine: AVPlayerItemMetadataOutputPushDelegate {
         groups.forEach { group in
             self.post(event: PlayerEvent.TimedMetadata(metadata: group.items))
         }
+    }
+}
+
+extension AVPlayerEngine: AVPlayerItemMetadataCollectorPushDelegate {
+    
+    public func metadataCollector(_ metadataCollector: AVPlayerItemMetadataCollector, 
+                                  didCollect metadataGroups: [AVDateRangeMetadataGroup],
+                                  indexesOfNewGroups: IndexSet,
+                                  indexesOfModifiedGroups: IndexSet) {
+        self.post(event: PlayerEvent.MetadataGroups(metadata: metadataGroups))
     }
 }

@@ -17,9 +17,9 @@ import AVFoundation
     @objc public static let allEventTypes: [PlayerEvent.Type] = [
         canPlay, durationChanged, stopped, ended, loadedMetadata, play, pause, playing, seeking, seeked, replay,
         tracksAvailable, textTrackChanged, audioTrackChanged, videoTrackChanged, playbackInfo, stateChanged,
-        timedMetadata, sourceSelected, loadedTimeRanges, playheadUpdate, error, errorLog, playbackStalled, playbackRate
+        timedMetadata, sourceSelected, loadedTimeRanges, playheadUpdate, error, errorLog, playbackStalled, playbackRate,metadataGroups
     ]
-    
+
     // MARK: - Player Events Static Reference
     
     /// Sent when enough data is available that the media can be played, at least for a couple of frames.
@@ -58,6 +58,8 @@ import AVFoundation
     @objc public static let stateChanged: PlayerEvent.Type = StateChanged.self
     /// Sent when timed metadata is available.
     @objc public static let timedMetadata: PlayerEvent.Type = TimedMetadata.self
+    /// Sent when timed metadata Groups is available.
+    @objc public static let metadataGroups: PlayerEvent.Type = MetadataGroups.self
     /// Sent when source was selected.
     @objc public static let sourceSelected: PlayerEvent.Type = SourceSelected.self
     /// Sent when loaded time ranges was changed, loaded time ranges represent the buffered content.
@@ -137,6 +139,12 @@ import AVFoundation
         }
     }
     
+    public class MetadataGroups: PlayerEvent {
+        convenience init(metadata: [AVDateRangeMetadataGroup]) {
+            self.init([EventDataKeys.metadataGroup: metadata])
+        }
+    }
+
     public class TracksAvailable: PlayerEvent {
         convenience init(tracks: PKTracks) {
             self.init([EventDataKeys.tracks: tracks])
