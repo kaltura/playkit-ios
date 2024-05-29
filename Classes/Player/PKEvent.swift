@@ -51,6 +51,7 @@ public extension PKEvent {
         static let newState = "newState"
         static let error = "error"
         static let metadata = "metadata"
+        static let metadataGroup = "metadataGroup"
         static let mediaSource = "mediaSource"
         static let timeRanges = "timeRanges"
         static let bitrate = "bitrate"
@@ -133,6 +134,12 @@ public extension PKEvent {
     /// Associated metadata from the event, PKEvent Data Accessor
     @objc var timedMetadata: [AVMetadataItem]? {
         return self.data?[EventDataKeys.metadata] as? [AVMetadataItem]
+    }
+    
+    /// Associated metadata group from the event, PKEvent Metadata Group Accessor
+
+    @objc var metadataGroups: [AVDateRangeMetadataGroup]? {
+        return self.data?[EventDataKeys.metadataGroup] as? [AVDateRangeMetadataGroup]
     }
     
     /// The MediaSource object, PKEvent Data Accessor
