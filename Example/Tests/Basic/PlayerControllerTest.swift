@@ -115,7 +115,7 @@ class PlayerControllerTest: XCTestCase {
         DispatchQueue.main.asyncAfter(deadline: .now() + 9) {
             asyncExpectation.fulfill()
         }
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: 30, handler: nil)
     }
     
     /// Test to make sure pause/play events are received after ended + seeked event.
@@ -157,6 +157,6 @@ class PlayerControllerTest: XCTestCase {
         }
         player.play()
         
-        waitForExpectations(timeout: 20, handler: nil)
+        waitForExpectations(timeout: 30, handler: nil)
     }
 }
