@@ -1,7 +1,7 @@
 // ===================================================================================================
 // Copyright (C) 2017 Kaltura Inc.
 //
-// Licensed under the AGPLv3 license, unless a different license for a 
+// Licensed under the AGPLv3 license, unless a different license for a
 // particular library is specified in the applicable library path.
 //
 // You may obtain a copy of the License at
@@ -40,11 +40,11 @@ extension AVPlayerEngine {
             addObserver(self, forKeyPath: keyPath, options: [.new, .initial], context: &AVPlayerEngine.observerContext)
         }
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.didFailToPlayToEndTime(_:)), name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.didPlayToEndTime(_:)), name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: .AVPlayerItemNewAccessLogEntry, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: AVPlayerItem.newAccessLogEntryNotification, object: self.currentItem)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onPlaybackStalledNotification), name: .AVPlayerItemPlaybackStalled, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.didFailToPlayToEndTime(_:)), name: AVPlayerItem.failedToPlayToEndTimeNotification, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.didPlayToEndTime(_:)), name: AVPlayerItem.didPlayToEndTimeNotification, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onAccessLogEntryNotification), name: AVPlayerItem.newAccessLogEntryNotification, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onErrorLogEntryNotification), name: AVPlayerItem.newErrorLogEntryNotification, object: self.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onPlaybackStalledNotification), name: AVPlayerItem.playbackStalledNotification, object: self.currentItem)
         NotificationCenter.default.addObserver(self, selector: #selector(self.timebaseChanged), name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
@@ -60,11 +60,11 @@ extension AVPlayerEngine {
             removeObserver(self, forKeyPath: keyPath, context: &AVPlayerEngine.observerContext)
         }
         
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemFailedToPlayToEndTime, object: self.currentItem)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: AVPlayerItem.failedToPlayToEndTimeNotification, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: AVPlayerItem.didPlayToEndTimeNotification, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: AVPlayerItem.newAccessLogEntryNotification, object: self.currentItem)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemNewErrorLogEntry, object: self.currentItem)
-        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemPlaybackStalled, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: AVPlayerItem.newErrorLogEntryNotification, object: self.currentItem)
+        NotificationCenter.default.removeObserver(self, name: AVPlayerItem.playbackStalledNotification, object: self.currentItem)
         NotificationCenter.default.removeObserver(self, name: Notification.Name(kCMTimebaseNotification_EffectiveRateChanged as String), object: nil)
     }
     
