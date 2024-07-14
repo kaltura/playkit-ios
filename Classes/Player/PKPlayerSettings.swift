@@ -67,7 +67,7 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
     
     /// A Boolean value that indicates whether playback starts with the first eligible variant that appears in the stream’s main playlist.
     /// For further details please see Apple's documentation: https://developer.apple.com/documentation/avfoundation/avplayeritem/3579514-startsonfirsteligiblevariant?language=objc
-    @objc public var startsOnFirstEligibleVariant: Bool = true {
+    @objc public var startsOnFirstEligibleVariant: Bool = false {
         didSet {
             self.onChange?(.startsOnFirstEligibleVariant(startsOnFirstEligibleVariant))
         }
