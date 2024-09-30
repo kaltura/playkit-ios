@@ -55,6 +55,7 @@ public class AVPlayerEngine: AVPlayer {
     
     var onEventBlock: ((PKEvent) -> Void)?
     
+    var isAppInBackground: Bool = false
     public weak var view: PlayerView? {
         didSet {
             view?.player = self
@@ -458,8 +459,10 @@ extension AVPlayerEngine: AppStateObservable {
             }),
             NotificationObservation(name: UIApplication.didEnterBackgroundNotification, onObserve: { [weak self] in
                 guard let self = self else { return }
-                
+                                
                 PKLog.debug("player: \(self)\n Did enter background, finishing up...")
+                self.isAppInBackground = true
+
                 self.startBackgroundTask()
                 
                 if self.allowAudioFromVideoAssetInBackground {
@@ -470,6 +473,8 @@ extension AVPlayerEngine: AppStateObservable {
                 guard let self = self else { return }
                 
                 PKLog.debug("player: \(self)\n Will enter foreground...")
+                self.isAppInBackground = false
+
                 self.endBackgroundTask()
                 
                 if self.playerLayer?.player == nil {

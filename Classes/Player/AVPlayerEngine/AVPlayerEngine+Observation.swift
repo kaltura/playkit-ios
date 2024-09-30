@@ -220,47 +220,28 @@ extension AVPlayerEngine {
     }
     
     /* When setting automaticallyWaitsToMinimizeStalling and shouldPlayImmediately, the player may be stalled and the rate will be changed to 0, player paused, by the AVPlayer. Therefor we are sending a paused event.
-            if let isPlaybackLikelyToKeepUp = self.currentItem?.isPlaybackLikelyToKeepUp, isPlaybackLikelyToKeepUp == false {
-                if self.rate == 0, self.currentState == .buffering || self.currentState == .ready {
-                    self.post(event: PlayerEvent.Pause())
-                }
-            }
      */
     /// Handles changes in player rate
     private func handleRate() {
         PKLog.debug("player rate was changed, now: \(self.rate)")
         
-        guard let currentItem = self.currentItem else {
-            return
-        }
-        
-        let isPlaybackStalled = !currentItem.isPlaybackLikelyToKeepUp && currentItem.isPlaybackBufferEmpty
-        let isPaused = self.rate == 0
-        
-        if isPaused {
-            if self.currentState != .idle && self.currentState != .ended && self.currentState != .error {
-                self.lastTimebaseRate = 0
+        if let isPlaybackLikelyToKeepUp = self.currentItem?.isPlaybackLikelyToKeepUp, isPlaybackLikelyToKeepUp == false {
+            if self.rate == 0, self.currentState == .buffering || self.currentState == .ready {
                 self.post(event: PlayerEvent.Pause())
-                let newState = PlayerState.ready // Assuming ready is the appropriate state when paused
-                self.postStateChange(newState: newState, oldState: self.currentState)
-                self.currentState = newState
+            }
+        }
+        
+        // In all other cases, the player manages pause in the timebaseChanged event!
+        //This is only when the user clicks the pause button on the TV and the app needs refreshing UI in BG.
+        if isAppInBackground{
+            let isPaused = self.rate == 0
+            if isPaused && self.lastTimebaseRate > 0{
+                if self.currentState != .idle && self.currentState != .ended && self.currentState != .error {
+                    self.lastTimebaseRate = 0
+                    self.post(event: PlayerEvent.Pause())
+                }
+            }
 
-            }
-        }
-        else if isPlaybackStalled {
-            if self.currentState != .buffering {
-                let newState = PlayerState.buffering
-                self.postStateChange(newState: newState, oldState: self.currentState)
-                self.currentState = newState
-            }
-        }
-    
-        // Handle potential end of playback
-        if currentItem.currentTime() >= currentItem.duration {
-            self.post(event: PlayerEvent.Ended())
-            let newState = PlayerState.ended
-            self.postStateChange(newState: newState, oldState: self.currentState)
-            self.currentState = newState
         }
     }
     
