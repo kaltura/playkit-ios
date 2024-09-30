@@ -72,6 +72,11 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
                     }
                 case .allowAudioFromVideoAssetInBackground(let allowAudioFromVideoAssetInBackground):
                     self.currentPlayer.allowAudioFromVideoAssetInBackground = allowAudioFromVideoAssetInBackground
+                case .startsOnFirstEligibleVariant(let startsOnFirstEligibleVariant):
+                    if #available(iOS 14.0, tvOS 14.0, *) {
+                        self.currentPlayer.currentItem?.startsOnFirstEligibleVariant = startsOnFirstEligibleVariant
+                    }
+
                 }
             }
         }

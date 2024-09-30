@@ -56,7 +56,11 @@ extension AVPlayerEngine {
         if #available(iOS 11.0, tvOS 11.0, *) {
             playerItem.preferredMaximumResolution = newAsset.playerSettings.network.preferredMaximumResolution
         }
-
+        
+        if #available(iOS 14.0, tvOS 14.0, *) {
+            playerItem.startsOnFirstEligibleVariant = newAsset.playerSettings.network.startsOnFirstEligibleVariant
+        }
+    
         // Add observers
         self.removeObservers()
         self.addObservers()

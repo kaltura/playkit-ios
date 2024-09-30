@@ -65,6 +65,13 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
         }
     }
     
+    /// A Boolean value that indicates whether playback starts with the first eligible variant that appears in the stream’s main playlist.
+    /// For further details please see Apple's documentation: https://developer.apple.com/documentation/avfoundation/avplayeritem/3579514-startsonfirsteligiblevariant?language=objc
+    @objc public var startsOnFirstEligibleVariant: Bool = false {
+        didSet {
+            self.onChange?(.startsOnFirstEligibleVariant(startsOnFirstEligibleVariant))
+        }
+    }
     /// Tells the player whether or not to buffer the media, or stop after initializing the asset and fetching the keys.
     ///
     /// Default value is true, initialize the asset, fetch the keys and buffer the media.
@@ -79,6 +86,7 @@ typealias SettingsChange = ((PlayerSettingsType) -> Void)
         copy.preferredPeakBitRate = self.preferredPeakBitRate
         copy.preferredMaximumResolution = self.preferredMaximumResolution
         copy.preferredForwardBufferDuration = self.preferredForwardBufferDuration
+        copy.startsOnFirstEligibleVariant = self.startsOnFirstEligibleVariant
         copy.automaticallyWaitsToMinimizeStalling = self.automaticallyWaitsToMinimizeStalling
         
         return copy
@@ -162,6 +170,7 @@ enum PlayerSettingsType {
     case configuredTimeOffsetFromLive(CMTime)
     case preventsDisplaySleepDuringVideoPlayback(Bool)
     case allowAudioFromVideoAssetInBackground(Bool)
+    case startsOnFirstEligibleVariant (Bool)
 }
 
 /************************************************************/
