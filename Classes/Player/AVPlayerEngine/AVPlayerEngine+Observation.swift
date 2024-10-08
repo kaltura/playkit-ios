@@ -205,13 +205,18 @@ extension AVPlayerEngine {
     @objc func timebaseChanged(notification: Notification) {
         // For some reason timebase rate changed is received on a background thread.
         // in order to check self.rate we must make sure we are on the main thread.
+    
         DispatchQueue.main.async {
             guard let timebase = self.currentItem?.timebase else { return }
             PKLog.verbose("timebase changed, current timebase: \(String(describing: timebase))")
             let timebaseRate = CMTimebaseGetRate(timebase)
             if timebaseRate > 0 && self.lastTimebaseRate != timebaseRate {
+                PKLog.verbose("timebaseChanged->PlayerEvent.Playing")
+
                 self.post(event: PlayerEvent.Playing())
             } else if timebaseRate == 0 && self.rate == 0 && self.lastTimebaseRate != timebaseRate {
+                PKLog.verbose("timebaseChanged->PlayerEvent.Pause")
+
                 self.post(event: PlayerEvent.Pause())
             }
             // Make sure to save the last value so we could only post events only when currentTimebase != lastTimebase
@@ -219,13 +224,32 @@ extension AVPlayerEngine {
         }
     }
     
+    /* When setting automaticallyWaitsToMinimizeStalling and shouldPlayImmediately, the player may be stalled and the rate will be changed to 0, player paused, by the AVPlayer. Therefor we are sending a paused event.
+     */
     /// Handles changes in player rate
     private func handleRate() {
-        PKLog.debug("player rate was changed, now: \(self.rate)")
-        // When setting automaticallyWaitsToMinimizeStalling and shouldPlayImmediately, the player may be stalled and the rate will be changed to 0, player paused, by the AVPlayer. Therefor we are sending a paused event.
+        PKLog.verbose("player rate was changed, now: \(self.rate)")
+        
         if let isPlaybackLikelyToKeepUp = self.currentItem?.isPlaybackLikelyToKeepUp, isPlaybackLikelyToKeepUp == false {
             if self.rate == 0, self.currentState == .buffering || self.currentState == .ready {
                 self.post(event: PlayerEvent.Pause())
+            }
+        }
+        
+        // In all other cases, the player manages pause in the timebaseChanged event!
+        //This is only when the user clicks the pause button on the exteranl TV remote control, and the app needs refreshing UI in sender device.
+        PKLog.debug("isAppInBackground = \(isAppInBackground)")
+        if isAppInBackground{
+
+            let isPaused = self.rate == 0
+            PKLog.debug("isPaused = \(isPaused)")
+
+            if isPaused{
+                if self.currentState != .idle && self.currentState != .ended && self.currentState != .error {
+                    PKLog.debug("player send pause event!!!")
+                    self.lastTimebaseRate = 0
+                    self.post(event: PlayerEvent.Pause())
+                }
             }
         }
     }
