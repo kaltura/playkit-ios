@@ -237,21 +237,20 @@ extension AVPlayerEngine {
         }
         
         // In all other cases, the player manages pause in the timebaseChanged event!
-        //This is only when the user clicks the pause button on the TV and the app needs refreshing UI in BG.
-        PKLog.verbose("isAppInBackground = \(isAppInBackground)")
+        //This is only when the user clicks the pause button on the exteranl TV remote control, and the app needs refreshing UI in sender device.
+        PKLog.debug("isAppInBackground = \(isAppInBackground)")
         if isAppInBackground{
 
             let isPaused = self.rate == 0
-            PKLog.verbose("isPaused = \(isPaused)")
+            PKLog.debug("isPaused = \(isPaused)")
 
             if isPaused{
                 if self.currentState != .idle && self.currentState != .ended && self.currentState != .error {
-                    PKLog.verbose("player send pause event!!!")
+                    PKLog.debug("player send pause event!!!")
                     self.lastTimebaseRate = 0
                     self.post(event: PlayerEvent.Pause())
                 }
             }
-
         }
     }
     

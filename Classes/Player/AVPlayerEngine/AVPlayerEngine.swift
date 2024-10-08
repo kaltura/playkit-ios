@@ -55,7 +55,20 @@ public class AVPlayerEngine: AVPlayer {
     
     var onEventBlock: ((PKEvent) -> Void)?
     
-    var isAppInBackground: Bool = false
+    var isAppInBackground: Bool{
+        switch UIApplication.shared.applicationState {
+        case .active:
+            return false
+        case .inactive:
+            return true
+        case .background:
+            return true
+        @unknown default:
+            return false
+        }
+    }
+    
+    
     public weak var view: PlayerView? {
         didSet {
             view?.player = self
@@ -461,8 +474,7 @@ extension AVPlayerEngine: AppStateObservable {
                 guard let self = self else { return }
                                 
                 PKLog.debug("player: \(self)\n Did enter background, finishing up...")
-                self.isAppInBackground = true
-
+                
                 self.startBackgroundTask()
                 
                 if self.allowAudioFromVideoAssetInBackground {
@@ -473,14 +485,28 @@ extension AVPlayerEngine: AppStateObservable {
                 guard let self = self else { return }
                 
                 PKLog.debug("player: \(self)\n Will enter foreground...")
-                self.isAppInBackground = false
-
+                
                 self.endBackgroundTask()
                 
                 if self.playerLayer?.player == nil {
                     self.playerLayer?.player = self
                 }
+            }),
+            
+            NotificationObservation(name: UIApplication.willResignActiveNotification, onObserve: {
+                [weak self] in
+                guard let self = self else { return }
+                PKLog.debug("player: \(self)\n  app is no longer active and loses focus...")
+
+            }),
+            
+            NotificationObservation(name: UIApplication.didBecomeActiveNotification, onObserve: {
+                [weak self] in
+                guard let self = self else { return }
+                PKLog.debug("player: \(self)\n  app becomes active (fcused)...")
+
             })
+            
         ]
     }
     
