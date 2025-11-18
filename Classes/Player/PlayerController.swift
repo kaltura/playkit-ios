@@ -122,6 +122,13 @@ class PlayerController: NSObject, Player {
         //Assert.shouldNeverHappen();
     }
     
+    //AG!
+    //////////////////////////////////
+    @objc public func getThumbnailInfo(for position: Float64, params: ThumbnailRequestParams?, completion: @escaping (ThumbnailInfo?) -> Void) {
+        currentPlayer.getThumbnailInfo(for: position, params: params, completion: completion)
+    }
+    /////////////////////////////////
+    
     func isLive() -> Bool {
         let avPlayerItemAccessLogEventPlaybackTypeLive = "LIVE"
         if let playbackType = currentPlayer.playbackType, playbackType == avPlayerItemAccessLogEventPlaybackTypeLive {

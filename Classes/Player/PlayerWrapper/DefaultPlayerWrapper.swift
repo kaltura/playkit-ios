@@ -178,6 +178,13 @@ class DefaultPlayerWrapper: NSObject, PlayerEngine {
         printInvocationWarning("\(#function)")
     }
     
+    //AG!
+    //////////////////////////////////
+    @objc public func getThumbnailInfo(for position: Float64, params: ThumbnailRequestParams?, completion: @escaping (ThumbnailInfo?) -> Void) {
+        printInvocationWarning("\(#function)")
+    }
+    /////////////////////////////////
+    
     // ***************************** //
     // MARK: - Time Observation
     // ***************************** //

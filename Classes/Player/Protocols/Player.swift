@@ -42,6 +42,12 @@ import UIKit
     /// Updates the styling from the settings textTrackStyling object
     @objc func updateTextTrackStyling()
     
+    //AG!
+    //////////////////////////////////
+    /// Extract thumbnail for a given time position
+    @objc func getThumbnailInfo(for position: Float64, params: ThumbnailRequestParams?, completion: @escaping (ThumbnailInfo?) -> Void)
+    //////////////////////////////////
+    
     
     /// Indicates if current media is Live.
     ///

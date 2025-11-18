@@ -169,4 +169,11 @@ public class PlayerEngineWrapper: NSObject, PlayerEngine {
     public func startBuffering() {
         playerEngine?.startBuffering()
     }
+    
+    //AG!
+    //////////////////////////////////
+    @objc public func getThumbnailInfo(for position: Float64, params: ThumbnailRequestParams?, completion: @escaping (ThumbnailInfo?) -> Void) {
+        playerEngine?.getThumbnailInfo(for: position, params: params, completion: completion)
+    }
+    /////////////////////////////////
 }

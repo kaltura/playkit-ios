@@ -60,6 +60,13 @@ import AVKit
         //Assert.shouldNeverHappen();
     }
     
+    //AG!
+    ///////////////////////////////////////
+    @objc public func getThumbnailInfo(for position: Float64, params: ThumbnailRequestParams?, completion: @escaping (ThumbnailInfo?) -> Void) {
+        self.player.getThumbnailInfo(for: position, params: params, completion: completion)
+    }
+    //////////////////////////////////////
+    
     public func updatePluginConfig(pluginName: String, config: Any) {
         self.player.updatePluginConfig(pluginName: pluginName, config: config)
     }

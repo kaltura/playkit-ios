@@ -36,6 +36,11 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     /// a semaphore to make sure prepare calling will wait till assetToPrepare it set.
     private let prepareSemaphore = DispatchSemaphore(value: 0)
     
+    //AG!
+    ///////////////////////////////////////////
+    private var assetImageGenerator: AVAssetImageGenerator!
+    ///////////////////////////////////////////
+    
     var settings: PKPlayerSettings? {
         didSet {
             guard let settings = self.settings else {
@@ -276,6 +281,12 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
             
             guard let assetToPrepare = self.assetToPrepare else { return }
             
+            //AG!
+            ///////////////////////////////////
+            self.assetImageGenerator = AVAssetImageGenerator(asset: assetToPrepare)
+            ///////////////////////////////////
+            
+            
             if let startTime = self.mediaConfig?.startTime {
                 self.currentPlayer.startPosition = startTime
             }
@@ -312,6 +323,36 @@ open class AVPlayerWrapper: NSObject, PlayerEngine {
     public func startBuffering() {
         currentPlayer.shouldStartBuffering = true
     }
+    
+    //AG!
+    //////////////////////////////////
+    public func getThumbnailInfo(for position: Float64, params: ThumbnailRequestParams?, completion: @escaping (ThumbnailInfo?) -> Void) {
+        
+        if let maximumSize = params?.maximumSize {
+            assetImageGenerator.maximumSize = maximumSize
+        }
+        if let requestedTimeToleranceBefore = params?.requestedTimeToleranceBefore {
+            assetImageGenerator.requestedTimeToleranceBefore = requestedTimeToleranceBefore
+        }
+        if let requestedTimeToleranceAfter = params?.requestedTimeToleranceAfter {
+            assetImageGenerator.requestedTimeToleranceAfter = requestedTimeToleranceAfter
+        }
+        if let dynamicRangePolicy = params?.dynamicRangePolicy {
+            assetImageGenerator.dynamicRangePolicy = dynamicRangePolicy
+        }
+        if let apertureMode = params?.apertureMode {
+            assetImageGenerator.apertureMode = apertureMode
+        }
+        assetImageGenerator.appliesPreferredTrackTransform = params?.appliesPreferredTrackTransform ?? true
+
+        assetImageGenerator.generateCGImageAsynchronously(for: CMTime(seconds: position, preferredTimescale: 1)) { image, time, error in
+            guard let image else { return }
+            let uiImage = UIImage(cgImage: image)
+            completion(ThumbnailInfo(image: uiImage, requestedPosition: position, actualPosition: CMTimeGetSeconds(time)))
+            
+        }
+    }
+    /////////////////////////////////
 }
 
 // ********************************************************** //

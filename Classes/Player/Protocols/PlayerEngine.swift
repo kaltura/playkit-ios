@@ -34,4 +34,10 @@ import Foundation
     
     /// Update the text tracks styling.
     func updateTextTrackStyling(_ textTrackStyling: PKTextTrackStyling)
+    
+    //AG!
+    /////////////////////////////////////
+    /// Extract thumbnail for a given time position
+    func getThumbnailInfo(for position: Float64, params: ThumbnailRequestParams?, completion: @escaping (ThumbnailInfo?) -> Void)
+    /////////////////////////////////////
 }
