@@ -8,7 +8,7 @@ jobs:
   SPM:
     name: "Build SPM"
     environment: Tag
-    runs-on: macos-13
+    runs-on: macos-15
     
     strategy:
       fail-fast: false
@@ -29,7 +29,7 @@ jobs:
   
   TAGGING:
     name: "Add Git Tag"
-    runs-on: macos-13
+    runs-on: macos-15
     environment: Tag
     needs: SPM
     
@@ -50,7 +50,7 @@ jobs:
 
   PODS_PUSH:
     name: "CocoaPods push"
-    runs-on: macos-13
+    runs-on: macos-15
     environment: CocoaPods
     needs: TAGGING
 

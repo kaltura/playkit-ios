@@ -20,7 +20,7 @@ jobs:
   build:
     name: "CocoaPods linting"
     environment: PR
-    runs-on: macos-13
+    runs-on: macos-15
 
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
   SPM:
     name: "Build SPM"
     environment: PR
-    runs-on: macos-13
+    runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
