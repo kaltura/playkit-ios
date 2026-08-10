@@ -24,9 +24,17 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         guard let ext = src.contentUrl?.pathExtension else {
             return false
         }
+
+        var isSimulator: Bool {
+            #if targetEnvironment(simulator)
+            return true
+            #else
+            return false
+            #endif
+        }
         
         // DRM is not supported on simulators
-        if src.drmData != nil && TARGET_OS_SIMULATOR != 0 {
+        if src.drmData != nil && !isSimulator {
             PKLog.warning("DRM is not supported on simulators")
             return false
         }
@@ -38,7 +46,7 @@ class WidevineClassicAssetHandler: RefreshableAssetHandler {
         
         return false
     }
-    
+
     func shouldRefreshAsset(mediaSource: PKMediaSource, refreshCallback: @escaping RefreshCallback) {
         self.refreshCallback = refreshCallback
 
