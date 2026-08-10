@@ -315,8 +315,8 @@ extension AVPlayerEngine {
                 self.tracksManager.handleTracks(item: self.currentItem,
                                                 cea608CaptionsEnabled: self.asset?.playerSettings.cea608CaptionsEnabled ?? false,
                                                 block: { (tracks: PKTracks) in
-                    self.handleTracksSelection(tracks)
                     self.post(event: PlayerEvent.TracksAvailable(tracks: tracks))
+                    self.handleTracksSelection(tracks)
                 })
                 // When player item is readyToPlay for the first time it is safe to assume we have a valid duration for VOD.
                 if self.duration != 0 {
