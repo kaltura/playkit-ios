@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Force Xcode 15
         run: sudo xcode-select -switch /Applications/Xcode_15.2.app
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: ${{ matrix.name }}
         run: set -o pipefail && env NSUnbufferedIO=YES xcodebuild docbuild -scheme "${{ matrix.scheme }}" -destination "${{ matrix.destination }}" clean test | xcpretty
   
@@ -37,7 +37,7 @@ jobs:
       output1: ${{ steps.tagging.outputs.tag }}
         
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         
       - name: Switching Podspec to release mode
         run: |
@@ -55,7 +55,7 @@ jobs:
     needs: TAGGING
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
     - run: git pull
 
     - name: Updating Cocoapods
@@ -72,7 +72,7 @@ jobs:
       run: |
         sh .github/release_notes.sh
     
-    - uses: ncipollo/release-action@v1
+    - uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
       with:
         tag: ${{needs.TAGGING.outputs.output1}}
         bodyFile: ".github/release_notes_template.md"
